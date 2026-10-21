@@ -43,6 +43,10 @@ final class DockStore {
     @ObservationIgnored var openNotificationFeed: (() -> Void)?
     /// Opens or closes Harbor.
     @ObservationIgnored var openHarbor: (() -> Void)?
+    /// Runs a plugin tile's click action, by the plugin's bundle identifier.
+    @ObservationIgnored var openPlugin: ((String) -> Void)?
+    /// The shared plugins whose pinned tiles this dock shows. Nil shows none.
+    @ObservationIgnored var plugins: DockPluginController?
     @ObservationIgnored var openUpdate: ((UpdateDockItem) -> Void)?
     /// Opens a volume's contents as a stack. The flag is true for keyboard activation.
     @ObservationIgnored var openVolume: ((VolumeDockItem, Bool) -> Void)?
@@ -242,6 +246,10 @@ final class DockStore {
                                                   volumes: volumes?.dockItems.filter { volumeVisibility.includes($0.kind) } ?? [],
                                                   update: updateTile,
                                                   trash: showsTrash ? trash?.item : nil)
+        // Plugins get their own section right after the applications, ahead of every DOKK tile.
+        // Melted pairs below then land after them, among the utilities they already belong to.
+        content.insert(contentsOf: (plugins?.dockItems ?? []).map(DockRenderSlot.plugin),
+                       at: content.firstIndex(where: \.isUtility) ?? content.count)
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
         let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
@@ -756,6 +764,7 @@ final class DockStore {
         case .shelf: openShelf?()
         case .notificationFeed: openNotificationFeed?()
         case .harbor: openHarbor?()
+        case .plugin(let item): openPlugin?(item.pluginID)
         case .update(let item): openUpdate?(item)
         case .volume(let item): openVolume?(item, keyboardFocus)
         case .trash: openTrash()
@@ -767,5 +776,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

@@ -17,11 +17,15 @@ struct DockIslandColor: Equatable, Hashable, Sendable {
 /// Resolves an island's colour from its own tint, the dock-wide mode, and its contents.
 enum DockIslandPalette {
     /// The concept's palette: blue system, purple tile, gold apps, teal running, graphite extras.
+    ///
+    /// Plugins (DEE-140) take orchid. Their island sits between teal running apps and graphite
+    /// extras, so it needs a hue far from both, and from the purple tile and the gold apps.
     static func color(for kind: DockIslandKind, customIndex: Int = 0) -> DockIslandColor {
         switch kind {
         case .tile: DockIslandColor(hue: 268, saturation: 0.70)
         case .pinned: DockIslandColor(hue: 40, saturation: 0.60)
         case .running: DockIslandColor(hue: 172, saturation: 0.70)
+        case .plugins: DockIslandColor(hue: 312, saturation: 0.55)
         case .utilities: DockIslandColor(hue: 220, saturation: 0.14)
         case .custom: customPalette[customIndex % customPalette.count]
         }

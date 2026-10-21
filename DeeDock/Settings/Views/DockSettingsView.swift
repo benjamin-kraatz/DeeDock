@@ -32,7 +32,8 @@ struct DockSettingsView: View {
                 path = []
                 selection = $0
                 report($0, page: nil, via: .sidebar)
-            }), searchText: $searchText, profiles: profiles)
+            }), searchText: $searchText, profiles: profiles,
+                            pluginsWaiting: coordinator?.plugins.waitingCount ?? 0)
                 .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 300)
         } detail: {
             detail
@@ -93,6 +94,11 @@ struct DockSettingsView: View {
             coordinator?.settingsLookoutRequest = false
             select(.lookout)
         }
+        .onChange(of: coordinator?.settingsPluginsRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsPluginsRequest = false
+            select(.plugins)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
@@ -139,6 +145,10 @@ struct DockSettingsView: View {
         case .lookout:
             if let hub = coordinator?.hub {
                 LookoutSettingsPane(model: hub.lookoutSettings)
+            }
+        case .plugins:
+            if let plugins = coordinator?.plugins {
+                PluginsSettingsPane(controller: plugins)
             }
         case .modes:
             DockModesSettingsPane(store: profiles.modes,

@@ -170,6 +170,7 @@ final class DockPanelController {
                                           settings: settings.islands)
             : nil
         baseLayout = DockGeometry.layout(count: store.entries.count, favoriteCount: restingSections.favorites,
+                                         pluginCount: restingSections.plugins,
                                          utilityCount: restingSections.utilities,
                                          leadingUtilityCount: restingSections.leading,
                                          availableLength: settings.edge.length(of: reference.size),
@@ -181,6 +182,7 @@ final class DockPanelController {
         let islands = settings.islands.isEnabled ? islandPresentation(slots: slots, settings: settings.islands) : nil
         interaction.islands = islands
         interaction.layout = DockGeometry.layout(count: slots.count, favoriteCount: sections.favorites,
+                                                 pluginCount: sections.plugins,
                                                  utilityCount: sections.utilities,
                                                  leadingUtilityCount: sections.leading,
                                                  availableLength: settings.edge.length(of: reference.size),
@@ -897,6 +899,8 @@ final class DockPanelController {
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.openNotificationFeed = nil; interaction.notificationFeed = nil; interaction.openHarbor = nil
         interaction.clearNotificationFeed = nil; interaction.prepareNotificationFeedSettings = nil
+        interaction.plugins = nil; interaction.openPlugin = nil; interaction.togglePluginPanel = nil
+        interaction.isPluginPanelOpen = nil; interaction.preparePluginSettings = nil
         interaction.resumeSessionCapsule = nil; interaction.deleteSessionCapsule = nil
         interaction.windowPeekHoverChanged = nil; interaction.openWindowPeek = nil
         interaction.removePin = nil; interaction.setFolderPresentation = nil

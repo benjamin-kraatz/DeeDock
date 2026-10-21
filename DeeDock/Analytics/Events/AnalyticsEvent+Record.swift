@@ -90,6 +90,13 @@ extension AnalyticsEvent {
         case .notificationFeedClosed: "notification_feed_closed"
         case .harborOpened: "harbor_opened"
         case .harborClosed: "harbor_closed"
+        case .pluginPanelOpened: "plugin_panel_opened"
+        case .pluginPanelClosed: "plugin_panel_closed"
+        case .pluginStopped: "plugin_stopped"
+        case .pluginRestarted: "plugin_restarted"
+        case .pluginPinChanged: "plugin_pin_changed"
+        case .pluginsManageOpened: "plugins_manage_opened"
+        case .pluginsCounted: "plugins_counted"
         case .discoveryCallout: "discovery_callout"
         case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
@@ -292,6 +299,21 @@ extension AnalyticsEvent {
         case let .harborClosed(outcome, duration, searched, filtered, closedWindows):
             ["outcome": .init(outcome), "duration": .init(duration), "searched": .init(searched),
              "filtered": .init(filtered), "closed_windows": .init(closedWindows)]
+        case let .pluginPanelOpened(trigger, pinnedCount):
+            ["trigger": .init(trigger), "pinned_count": .init(pinnedCount)]
+        case let .pluginPanelClosed(duration, stopped):
+            ["duration": .init(duration), "stopped": .init(stopped)]
+        case let .pluginStopped(panelOpen):
+            ["panel_open": .init(panelOpen)]
+        case let .pluginRestarted(surface):
+            ["surface": .init(surface)]
+        case let .pluginPinChanged(pinned, surface):
+            ["pinned": .init(pinned), "surface": .init(surface)]
+        case let .pluginsManageOpened(waitingCount):
+            ["waiting_count": .init(waitingCount)]
+        case let .pluginsCounted(enabledCount, waitingCount, disabledCount, pinnedCount):
+            ["enabled_count": .init(enabledCount), "waiting_count": .init(waitingCount),
+             "disabled_count": .init(disabledCount), "pinned_count": .init(pinnedCount)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
         case let .lineIconCoverage(coverage):

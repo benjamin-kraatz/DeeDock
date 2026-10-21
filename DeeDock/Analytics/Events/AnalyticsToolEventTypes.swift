@@ -274,3 +274,15 @@ nonisolated enum AnalyticsLookoutAccessOutcome: String, AnalyticsToken {
 nonisolated enum AnalyticsLookoutAccessContext: String, AnalyticsToken {
     case onboarding, settings
 }
+
+/// Where a plugin action came from.
+nonisolated enum AnalyticsPluginSurface: String, AnalyticsToken {
+    /// The plugin tile's menu or its VoiceOver actions.
+    case tile
+    /// The plugin's panel: its stopped state or its More menu.
+    case panel
+    /// The Plugins page in Settings.
+    case settings
+    /// DOKK did it on its own, such as pinning a newly approved plugin.
+    case automatic
+}

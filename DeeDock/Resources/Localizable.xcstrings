@@ -2919,6 +2919,24 @@
         }
       }
     },
+    "islandsNamePlugins" : {
+      "comment" : "Default name of the DOKK Islands island that holds plugin tiles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-ins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugins"
+          }
+        }
+      }
+    },
     "islandsNameRunning" : {
       "comment" : "Default name of the island holding running apps that are not pinned.",
       "extractionState" : "manual",
@@ -3545,6 +3563,738 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DOKK Islands"
+          }
+        }
+      }
+    },
+    "pluginBadgeCount" : {
+      "comment" : "VoiceOver value for a plugin tile showing a numeric badge. The number is the badge's value, whatever the plugin counts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kennzeichen %lld"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kennzeichen %lld"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Badge %lld"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Badge %lld"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pluginMenuClosePanel" : {
+      "comment" : "Plugin tile menu: closes the plugin's open panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Panel"
+          }
+        }
+      }
+    },
+    "pluginMenuOpenApp" : {
+      "comment" : "Plugin tile menu and VoiceOver action: opens the app the plugin ships in. The argument is that app's name, supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %@"
+          }
+        }
+      }
+    },
+    "pluginMenuOpenPanel" : {
+      "comment" : "Plugin tile menu: opens the plugin's panel above its dock tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Panel"
+          }
+        }
+      }
+    },
+    "pluginMenuRestart" : {
+      "comment" : "Plugin tile menu and VoiceOver action: starts a plugin again after it stopped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-in neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Plugin"
+          }
+        }
+      }
+    },
+    "pluginMenuSettings" : {
+      "comment" : "Plugin tile menu: opens DOKK Settings on the Plugins page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-in-Einstellungen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugin Settings…"
+          }
+        }
+      }
+    },
+    "pluginMenuUnpin" : {
+      "comment" : "Plugin tile menu and VoiceOver action: removes the plugin's tile. The plugin stays installed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus dem Dock lösen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unpin from Dock"
+          }
+        }
+      }
+    },
+    "pluginPanelLoading" : {
+      "comment" : "VoiceOver label of the spinner shown until a plugin's panel content appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-in wird geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading plugin"
+          }
+        }
+      }
+    },
+    "pluginPanelMore" : {
+      "comment" : "Help tag and VoiceOver label of the ellipsis button in a plugin panel's header, which opens the tile's menu.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "pluginPanelRestart" : {
+      "comment" : "Button in a stopped plugin's panel and on the Plugins settings page that starts the plugin again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart"
+          }
+        }
+      }
+    },
+    "pluginPanelStoppedDetail" : {
+      "comment" : "Reassurance under the stopped heading in a plugin's panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Plug-in läuft eigenständig, deshalb lief der Rest von DOKK weiter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The plugin runs on its own, so the rest of DOKK kept going."
+          }
+        }
+      }
+    },
+    "pluginPanelStoppedTitle" : {
+      "comment" : "Heading in a plugin's panel after the plugin's process stopped. The argument is the plugin's name, supplied by the plugin.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wurde beendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ stopped"
+          }
+        }
+      }
+    },
+    "pluginsAllApprovedDetail" : {
+      "comment" : "Plugins settings: under the all-approved note, explaining where approval lives.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS verwaltet, welche Plug-ins DOKK verwenden darf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS keeps the list of which plugins DOKK may use."
+          }
+        }
+      }
+    },
+    "pluginsAllApprovedTitle" : {
+      "comment" : "Plugins settings: shown instead of the waiting count when none wait.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle installierten Plug-ins sind aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All installed plugins are turned on"
+          }
+        }
+      }
+    },
+    "pluginsEmptyDetail" : {
+      "comment" : "Plugins settings: explanation when no plugin is installed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installierst du eine App mit einem DOKK-Plug-in, erscheint es hier, damit du es aktivieren kannst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you install an app that comes with a DOKK plugin, it shows up here so you can turn it on."
+          }
+        }
+      }
+    },
+    "pluginsEmptyTitle" : {
+      "comment" : "Plugins settings: heading when no plugin is installed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Plug-ins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No plugins yet"
+          }
+        }
+      }
+    },
+    "pluginsFromApp" : {
+      "comment" : "Plugins settings: which app a plugin ships in. The argument is that app's name, supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From %@"
+          }
+        }
+      }
+    },
+    "pluginsInstalledFootnote" : {
+      "comment" : "Plugins settings: footnote under the installed list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angepinnte Plug-ins zeigen eine Kachel im Dock. Gelöste Plug-ins bleiben installiert, laufen aber erst wieder, wenn du sie anpinnst. Um ein Plug-in ganz auszuschalten, wähle „Plug-ins verwalten“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned plugins show a tile in the dock. Unpinning keeps a plugin installed and stops it until you pin it again. To turn a plugin off completely, use Manage Plugins."
+          }
+        }
+      }
+    },
+    "pluginsInstalledTitle" : {
+      "comment" : "Plugins settings: heading of the card listing turned-on plugins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed"
+          }
+        }
+      }
+    },
+    "pluginsManage" : {
+      "comment" : "Plugins settings button that opens the system window where plugins are turned on or off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-ins verwalten …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Plugins…"
+          }
+        }
+      }
+    },
+    "pluginsManageWindowTitle" : {
+      "comment" : "Title of the window that shows the system's list of plugins for DOKK.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-ins verwalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Plugins"
+          }
+        }
+      }
+    },
+    "pluginsNoneEnabled" : {
+      "comment" : "Plugins settings: the installed list when plugins wait but none is turned on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Plug-ins aktiv."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No plugins are turned on yet."
+          }
+        }
+      }
+    },
+    "pluginsPinned" : {
+      "comment" : "Plugins settings: label of the switch that shows or hides a plugin's dock tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angepinnt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinned"
+          }
+        }
+      }
+    },
+    "pluginsPinnedAccessibility" : {
+      "comment" : "VoiceOver label of a plugin's Pinned switch. The argument is the plugin's name, supplied by the plugin.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ im Dock anpinnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin %@ in the dock"
+          }
+        }
+      }
+    },
+    "pluginsSettingsIntro" : {
+      "comment" : "Introduction at the top of the Plugins settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Plug-ins können andere Apps deinem Dock eine Kachel und ein Panel hinzufügen. Jedes Plug-in läuft eigenständig – hält eines an, läuft DOKK weiter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugins let other apps add a tile and a panel to your dock. Each plugin runs on its own, so if one stops, DOKK keeps running."
+          }
+        }
+      }
+    },
+    "pluginsSettingsKeywords" : {
+      "comment" : "Space-separated search synonyms for the Plugins settings section; translate to words a user would type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-in Plugin Erweiterung Add-on genehmigen Freigabe erlauben aktivieren Kachel Panel neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "plugin plug-in extension add-on approve approval allow enable tile panel restart"
+          }
+        }
+      }
+    },
+    "pluginsSettingsLooking" : {
+      "comment" : "VoiceOver label of the spinner shown on the Plugins page until DOKK has checked for plugins.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche nach Plug-ins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking for plugins"
+          }
+        }
+      }
+    },
+    "pluginsSettingsSummary" : {
+      "comment" : "One-line description of the Plugins settings section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kacheln und Panels, die andere Apps deinem Dock hinzufügen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiles and panels that other apps add to your dock."
+          }
+        }
+      }
+    },
+    "pluginsSettingsTitle" : {
+      "comment" : "Settings sidebar title and page heading for DOKK plugins: extensions from other apps that add a dock tile and a panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plug-ins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugins"
+          }
+        }
+      }
+    },
+    "pluginStatusNotRunning" : {
+      "comment" : "Status of an unpinned plugin on the Plugins settings page. Unpinned plugins do not run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not running"
+          }
+        }
+      }
+    },
+    "pluginStatusRunning" : {
+      "comment" : "Status of a connected plugin on the Plugins settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "pluginStatusStarting" : {
+      "comment" : "Status of a plugin DOKK is launching, on the Plugins settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gestartet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting…"
+          }
+        }
+      }
+    },
+    "pluginStatusStopped" : {
+      "comment" : "Status of a plugin whose process exited or crashed; also the VoiceOver value of its tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestoppt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        }
+      }
+    },
+    "pluginsWaitingDetail" : {
+      "comment" : "Plugins settings: explains the waiting count.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS fragt dich einmal pro neuem Plug-in, ob es aktiv sein darf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS asks you to turn on each new plugin once."
+          }
+        }
+      }
+    },
+    "pluginsWaitingTitle" : {
+      "comment" : "Plugins settings: how many installed plugins have not been turned on in the system window yet. macOS counts them but does not name them.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Plug-in wartet auf Freigabe"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Plug-ins warten auf Freigabe"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld plugin is waiting for approval"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld plugins are waiting for approval"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pluginTileOpenAppHint" : {
+      "comment" : "VoiceOver hint for a plugin tile whose click opens the app it ships in. The argument is that app's name, supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens %@"
+          }
+        }
+      }
+    },
+    "pluginTileOpenPanelHint" : {
+      "comment" : "VoiceOver hint for a plugin tile whose click opens its panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet das Panel des Plug-ins"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the plugin's panel"
+          }
+        }
+      }
+    },
+    "pluginTooltipStopped" : {
+      "comment" : "Dock tooltip for a plugin whose process stopped. The argument is the plugin's name, supplied by the plugin.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · Gestoppt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · Stopped"
           }
         }
       }

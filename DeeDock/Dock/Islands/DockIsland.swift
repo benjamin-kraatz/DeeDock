@@ -11,6 +11,8 @@ enum DockIslandKind: String, Codable, CaseIterable, Sendable {
     case custom
     /// Running apps that are not pinned, including the collapsed Running control.
     case running
+    /// Pinned plugin tiles, between the apps and DOKK's own tiles.
+    case plugins
     /// Downloads, the Shelf, capsules, feeds, drives, Trash, and every other trailing tile.
     case utilities
 
@@ -24,6 +26,7 @@ enum DockIslandKind: String, Codable, CaseIterable, Sendable {
         case .pinned: .islandsNamePinned
         case .custom: .islandsNameCustom
         case .running: .islandsNameRunning
+        case .plugins: .islandsNamePlugins
         case .utilities: .islandsNameUtilities
         }
     }
@@ -73,6 +76,7 @@ struct DockIsland: Identifiable, Codable, Equatable, Hashable, Sendable {
         case .pinned: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000002")!
         case .running: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000003")!
         case .utilities: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000004")!
+        case .plugins: UUID(uuidString: "6D0A1F6E-0000-4000-8000-000000000005")!
         case .custom: UUID()
         }
     }

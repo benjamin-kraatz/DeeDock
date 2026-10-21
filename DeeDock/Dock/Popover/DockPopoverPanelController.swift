@@ -29,7 +29,7 @@ final class DockPopoverPanelController<Content: View> {
     private let clickFocus: Bool
     private let activates: Bool
     private let reduceMotion: Bool
-    private let ideal: CGSize
+    private var ideal: CGSize
     private let outline: ((DockPopoverChrome) -> DockPopoverShape)?
     private let chromeChanged: (DockPopoverChrome) -> Void
     private var placement: DockPopoverPlacement
@@ -136,6 +136,25 @@ final class DockPopoverPanelController<Content: View> {
         placement = DockPopoverGeometry.placement(anchor: anchor, ideal: ideal)
         chromeChanged(placement.chrome)
         panel.setFrame(placement.frame, display: true)
+    }
+
+    /// Changes the size the panel asks for, keeping it attached to `anchor`. Animates the frame
+    /// unless Reduce Motion is on. Used by plugin panels, whose plugin can ask for a new size.
+    func resize(to ideal: CGSize, anchor: DockPopoverAnchor) {
+        guard !stopped, ideal != self.ideal else { return }
+        self.ideal = ideal
+        placement = DockPopoverGeometry.placement(anchor: anchor, ideal: ideal)
+        chromeChanged(placement.chrome)
+        guard !reduceMotion, panel.isVisible else {
+            panel.setFrame(placement.frame, display: true)
+            return
+        }
+        let frame = placement.frame
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.3
+            context.timingFunction = CAMediaTimingFunction(controlPoints: 0.25, 0.9, 0.3, 1)
+            panel.animator().setFrame(frame, display: true)
+        }
     }
 
     func close(returnFocus: Bool) {
