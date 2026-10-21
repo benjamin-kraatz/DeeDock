@@ -139,6 +139,22 @@ struct DockPluginTests {
         #expect(plugin(badge: .dot).badge?.style == .dot)
     }
 
+    @Test("A session's first state is reported once, from starting or stopped")
+    func firstStateOfSession() {
+        let starting = plugin(badge: nil, status: .starting)
+        #expect(starting.receive(DOKKPluginTileState(badge: .count(1))))
+        #expect(starting.status == .running && starting.tileState?.badge == .count(1))
+        #expect(!starting.receive(DOKKPluginTileState(badge: .count(2))))
+        #expect(plugin(badge: nil, status: .stopped).receive(DOKKPluginTileState()))
+    }
+
+    @Test("Only a tile state ends the reply deadline, not a request")
+    func replyDeadlineNeedsState() {
+        #expect(DockPluginConnection.endsReplyDeadline(.state(DOKKPluginTileState())))
+        #expect(!DockPluginConnection.endsReplyDeadline(.request(.closePanel)))
+        #expect(!DockPluginConnection.endsReplyDeadline(.request(.openApp)))
+    }
+
     @Test("A blank title falls back to the extension's name")
     func blankTitleFallsBack() {
         let plugin = plugin(badge: nil)

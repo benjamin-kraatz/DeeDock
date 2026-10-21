@@ -143,10 +143,19 @@ final class DockPluginConnection {
         }
     }
 
+    /// Only a tile state proves the plugin answers; a request alone leaves the tile with nothing
+    /// to show, so the deadline keeps running.
+    static func endsReplyDeadline(_ event: Event) -> Bool {
+        if case .state = event { return true }
+        return false
+    }
+
     private func deliver(_ event: Event) {
         guard !finished else { return }
-        replyTimeout?.cancel()
-        replyTimeout = nil
+        if Self.endsReplyDeadline(event) {
+            replyTimeout?.cancel()
+            replyTimeout = nil
+        }
         onEvent(event)
     }
 

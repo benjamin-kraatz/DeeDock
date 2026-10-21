@@ -39,6 +39,9 @@ final class DockPluginController {
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reportedCounts: [Int]?
+    /// Plugins whose panel is open. A session that connects later, after a restart or a slow
+    /// launch, is told so once its first state arrives, since `panelOpened` sent earlier was lost.
+    @ObservationIgnored private var openPanels: Set<String> = []
 
     /// - Parameter pins: Where pins are saved. Nil uses the app's defaults.
     init(pins: DockPluginPinStore? = nil) {
@@ -71,6 +74,7 @@ final class DockPluginController {
         approval.close()
         for session in sessions.values { session.stop() }
         sessions.removeAll()
+        openPanels.removeAll()
         for plugin in plugins { plugin.status = .idle }
         dockItemsChanged = nil
         closePanel = nil
@@ -135,6 +139,7 @@ final class DockPluginController {
 
     /// Tells the plugin its panel opened or closed.
     func notePanel(_ id: String, open: Bool) {
+        if open { openPanels.insert(id) } else { openPanels.remove(id) }
         sessions[id]?.send(open ? .panelOpened : .panelClosed)
     }
 
@@ -243,9 +248,8 @@ final class DockPluginController {
             switch event {
             case .state(let state):
                 let titleChanged = plugin.tileState?.title != state.title
-                plugin.tileState = state
                 let wasStopped = plugin.isStopped
-                plugin.status = .running
+                if plugin.receive(state), openPanels.contains(id) { sessions[id]?.send(.panelOpened) }
                 if titleChanged || wasStopped { publishDockItems() }
             case .request(let request):
                 handle(request, from: id)

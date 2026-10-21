@@ -82,6 +82,17 @@ final class DockPlugin: Identifiable {
 
     func noteRestart() { sceneGeneration += 1 }
 
+    /// Takes a tile state from the plugin's session and marks the plugin running.
+    /// - Returns: True for the first state of a session, when the plugin was starting or stopped.
+    ///   The owner then repeats anything the new process missed, such as an open panel.
+    @discardableResult
+    func receive(_ state: DOKKPluginTileState) -> Bool {
+        let first = status != .running
+        tileState = state
+        status = .running
+        return first
+    }
+
     func update(identity: AppExtensionIdentity) {
         self.identity = identity
         extensionName = identity.localizedName
