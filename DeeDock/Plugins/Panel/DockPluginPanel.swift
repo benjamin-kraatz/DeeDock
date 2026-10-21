@@ -14,8 +14,9 @@ struct DockPluginPanel: View {
             // A stopped plugin has no scene: hosting one would launch its process behind DOKK's
             // back. Restart brings the scene back with the session.
             if let identity = plugin.identity, plugin.status != .stopped {
-                DockPluginSceneHost(identity: identity, generation: plugin.sceneGeneration,
-                                    failed: { state.sceneFailed?() })
+                DockPluginSceneHost(identity: identity, failed: { state.sceneFailed?() })
+                    // A restart or an updated plugin raises the generation: a fresh host, a fresh scene.
+                    .id(plugin.sceneGeneration)
             }
         }
     }

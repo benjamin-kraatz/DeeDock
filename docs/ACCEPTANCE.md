@@ -3558,6 +3558,12 @@ Checked on build products without launching anything:
 - badge display rules;
 - the plugin section's dividers and island.
 
+`DeeDockTests/DockPluginControllerTests.swift` drives the controller through fake sessions:
+- auto-pin and start;
+- `panelOpened` delivered once the plugin first answers, and after a restart with the panel open;
+- a scene failure while starting stops the plugin;
+- unpinning and removal end the session.
+
 The tests were compiled but not run, following `AGENTS.md`. Release was not built, so a Release build product with DOKK's bundle ID never entered LaunchServices.
 
 The app was not launched. Not exercised:

@@ -7,13 +7,15 @@ import SwiftUI
 ///
 /// `EXHostViewController` renders the remote SwiftUI as a remote view. The scene fills whatever
 /// SwiftUI proposes; the panel's size comes from ``DockPluginPanelGeometry``, never from the remote
-/// content. Raising `generation` reloads the scene, which is how a restart brings it back.
-/// Removing the view clears the configuration, which ends the scene.
+/// content. Each host shows one scene for its whole life: the panel gives it a new identity per
+/// session, so a restart builds a fresh host rather than reloading this one. Removing the view
+/// detaches the delegate before clearing the configuration, so an old scene can never report into
+/// a new attempt.
 struct DockPluginSceneHost: NSViewControllerRepresentable {
     let identity: AppExtensionIdentity
-    let generation: Int
-    /// Called when the scene ends with an error, such as the plugin process exiting. ExtensionKit
-    /// can report one exit twice, so the receiver must tolerate repeats.
+    /// Called when the scene ends with an error, such as the plugin process exiting or the scene
+    /// failing to activate. ExtensionKit can report one exit twice, so the receiver must tolerate
+    /// repeats.
     let failed: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(failed: failed) }
@@ -23,18 +25,11 @@ struct DockPluginSceneHost: NSViewControllerRepresentable {
         controller.placeholderView = DockPluginScenePlaceholder()
         controller.delegate = context.coordinator
         controller.configuration = configuration
-        context.coordinator.generation = generation
         return controller
     }
 
     func updateNSViewController(_ controller: EXHostViewController, context: Context) {
         context.coordinator.failed = failed
-        guard context.coordinator.generation != generation else { return }
-        context.coordinator.generation = generation
-        // Tearing down the old scene can report its earlier failure again; only the new one counts.
-        context.coordinator.awaitingActivation = true
-        controller.configuration = nil
-        controller.configuration = configuration
     }
 
     static func dismantleNSViewController(_ controller: EXHostViewController, coordinator: Coordinator) {
@@ -55,18 +50,13 @@ struct DockPluginSceneHost: NSViewControllerRepresentable {
 
     final class Coordinator: NSObject, EXHostViewControllerDelegate {
         var failed: () -> Void
-        var generation = 0
-        /// True from a reload until the new scene activates.
-        var awaitingActivation = false
 
         init(failed: @escaping () -> Void) { self.failed = failed }
 
-        func hostViewControllerDidActivate(_ viewController: EXHostViewController) {
-            awaitingActivation = false
-        }
+        func hostViewControllerDidActivate(_ viewController: EXHostViewController) {}
 
         func hostViewControllerWillDeactivate(_ viewController: EXHostViewController, error: (any Error)?) {
-            guard error != nil, !awaitingActivation else { return }
+            guard error != nil else { return }
             failed()
         }
     }

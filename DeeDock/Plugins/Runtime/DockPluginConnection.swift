@@ -11,14 +11,8 @@ import os
 /// Every callback is delivered once on the main actor. After ``stop()`` or the first ``Event/ended(unexpected:)``
 /// the session is finished and reports nothing more; a restart makes a new session.
 @MainActor
-final class DockPluginConnection {
-    enum Event {
-        case state(DOKKPluginTileState)
-        case request(DOKKPluginRequest)
-        /// The session is over. `unexpected` is true when the plugin exited, crashed, or never
-        /// answered, rather than DOKK letting go.
-        case ended(unexpected: Bool)
-    }
+final class DockPluginConnection: DockPluginSession {
+    typealias Event = DockPluginSessionEvent
 
     private let identity: AppExtensionIdentity
     private let onEvent: (Event) -> Void

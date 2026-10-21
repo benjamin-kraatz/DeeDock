@@ -35,7 +35,8 @@ final class DockPluginController {
     @ObservationIgnored private let discovery = DockPluginDiscovery()
     @ObservationIgnored private let pins: DockPluginPinStore
     @ObservationIgnored private let approval = DockPluginApprovalWindow()
-    @ObservationIgnored private var sessions: [String: DockPluginConnection] = [:]
+    @ObservationIgnored private var sessions: [String: DockPluginSession] = [:]
+    @ObservationIgnored private let makeSession: DockPluginSessionFactory
     @ObservationIgnored private var activationObserver: NSObjectProtocol?
     @ObservationIgnored private var started = false
     @ObservationIgnored private var reportedCounts: [Int]?
@@ -43,9 +44,14 @@ final class DockPluginController {
     /// launch, is told so once its first state arrives, since `panelOpened` sent earlier was lost.
     @ObservationIgnored private var openPanels: Set<String> = []
 
-    /// - Parameter pins: Where pins are saved. Nil uses the app's defaults.
-    init(pins: DockPluginPinStore? = nil) {
+    /// - Parameters:
+    ///   - pins: Where pins are saved. Nil uses the app's defaults.
+    ///   - makeSession: Makes each plugin's session. Nil connects through ExtensionKit; tests pass fakes.
+    init(pins: DockPluginPinStore? = nil, makeSession: DockPluginSessionFactory? = nil) {
         self.pins = pins ?? DockPluginPinStore()
+        self.makeSession = makeSession ?? { plugin, onEvent in
+            plugin.identity.map { DockPluginConnection(identity: $0, onEvent: onEvent) }
+        }
     }
 
     /// Starts discovery and re-checks for plugins whenever DOKK comes to the front, because
@@ -144,11 +150,11 @@ final class DockPluginController {
     }
 
     /// The panel's scene ended with an error: the plugin process is gone or could not show it.
-    /// The background session usually reports the same exit; whichever comes first wins. While a
-    /// plugin is starting, only its session decides, so a late error from the scene it replaced
-    /// cannot stop the restart.
+    /// The background session usually reports the same exit; whichever comes first wins. Counts
+    /// while the plugin is still starting too: the panel hosts a fresh scene for every session, so
+    /// an error always belongs to the current attempt.
     func sceneFailed(_ id: String) {
-        guard let plugin = plugin(id), plugin.status == .running else { return }
+        guard let plugin = plugin(id), plugin.status == .running || plugin.status == .starting else { return }
         markStopped(plugin)
     }
 
@@ -161,23 +167,28 @@ final class DockPluginController {
     // MARK: - Inventory
 
     private func apply(_ inventory: DockPluginInventory) {
+        apply(inventory.enabled.map { DockPluginRecord(id: $0.bundleIdentifier, name: $0.localizedName, identity: $0) },
+              waiting: inventory.waiting, disabled: inventory.disabled)
+    }
+
+    /// Applies what discovery reports. Internal so tests can feed plugins without ExtensionKit.
+    func apply(_ records: [DockPluginRecord], waiting: Int, disabled: Int) {
         hasInventory = true
-        waitingCount = inventory.waiting
-        disabledCount = inventory.disabled
-        let identities = inventory.enabled
+        waitingCount = waiting
+        disabledCount = disabled
         // A plugin seen enabled for the first time gets a tile at the end of the plugin section.
         var newlyPinned: [String] = []
-        pins.update { newlyPinned = $0.adopt(identities.map(\.bundleIdentifier)) }
+        pins.update { newlyPinned = $0.adopt(records.map(\.id)) }
         for _ in newlyPinned { Analytics.track(.pluginPinChanged(pinned: true, surface: .automatic)) }
 
         let existing = Dictionary(uniqueKeysWithValues: plugins.map { ($0.id, $0) })
         var next: [DockPlugin] = []
-        for identity in identities {
-            let id = identity.bundleIdentifier
+        for record in records {
+            let id = record.id
             guard !next.contains(where: { $0.id == id }) else { continue }
             if let plugin = existing[id] {
                 // A reinstalled or updated plugin gets a new identity; its old session serves the old binary.
-                if plugin.identity?.id != identity.id {
+                if let identity = record.identity, plugin.identity?.id != identity.id {
                     plugin.update(identity: identity)
                     if sessions[id] != nil {
                         disconnect(id)
@@ -186,9 +197,9 @@ final class DockPluginController {
                 }
                 next.append(plugin)
             } else {
-                next.append(DockPlugin(id: id, extensionName: identity.localizedName,
-                                       app: DockPluginApp.resolve(extension: id, fallbackName: identity.localizedName),
-                                       identity: identity))
+                next.append(DockPlugin(id: id, extensionName: record.name,
+                                       app: DockPluginApp.resolve(extension: id, fallbackName: record.name),
+                                       identity: record.identity))
             }
         }
         let remaining = Set(next.map(\.id))
@@ -240,10 +251,9 @@ final class DockPluginController {
     // MARK: - Sessions
 
     private func connect(_ plugin: DockPlugin) {
-        guard let identity = plugin.identity, sessions[plugin.id] == nil else { return }
+        guard sessions[plugin.id] == nil else { return }
         let id = plugin.id
-        plugin.status = .starting
-        let session = DockPluginConnection(identity: identity) { [weak self, weak plugin] event in
+        let made = makeSession(plugin) { [weak self, weak plugin] event in
             guard let self, let plugin else { return }
             switch event {
             case .state(let state):
@@ -258,6 +268,8 @@ final class DockPluginController {
                 if unexpected { markStopped(plugin) } else { plugin.status = .idle }
             }
         }
+        guard let session = made else { return }
+        plugin.status = .starting
         sessions[id] = session
         session.start()
         publishDockItems()
@@ -282,4 +294,14 @@ final class DockPluginController {
         case .openApp: openApp(id)
         }
     }
+}
+
+/// One enabled plugin as discovery reports it.
+struct DockPluginRecord {
+    /// The extension's bundle identifier.
+    let id: String
+    /// The extension's display name.
+    let name: String
+    /// The system's handle for the plugin. Nil in tests.
+    let identity: AppExtensionIdentity?
 }
