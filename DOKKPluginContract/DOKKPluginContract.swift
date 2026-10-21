@@ -17,11 +17,13 @@ nonisolated enum DOKKPluginContract {
     /// identifier starts with that app's bundle identifier, and this one has to start with DOKK Dev's
     /// (`de.benjaminkraatz.DeeDock.dev`) as well as DOKK's (`de.benjaminkraatz.DeeDock`).
     ///
-    /// A plugin must repeat the string as a literal in its `@AppExtensionPoint.Bind`:
+    /// A plugin repeats it in its `@AppExtensionPoint.Bind`, as literals split into host and name.
+    /// The build turns that into the extension's Info.plist; it writes nothing for the
+    /// single-string `Identifier(_:)` form.
     /// ```swift
     /// @AppExtensionPoint.Bind
     /// var boundExtensionPoint: AppExtensionPoint {
-    ///     AppExtensionPoint.Identifier("de.benjaminkraatz.DeeDock.dev.plugin")
+    ///     AppExtensionPoint.Identifier(host: "de.benjaminkraatz.DeeDock.dev", name: "plugin")
     /// }
     /// ```
     static let extensionPointIdentifier = "de.benjaminkraatz.DeeDock.dev.plugin"

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The sample plugin's binding to DOKK's extension point, stated explicitly.
+
+  Xcode also derives this key from @AppExtensionPoint.Bind with `exutil generate-appextension-plist`,
+  but with Xcode 27.0 (27A266a) that step is nondeterministic once a target has more than one Swift
+  file: its output sometimes comes out empty, and the extension then binds to nothing. Declaring
+  the key here makes every build bind. Keep it in step with the Bind in SamplePluginExtension.swift.
+-->
+<plist version="1.0">
+<dict>
+	<key>EXAppExtensionAttributes</key>
+	<dict>
+		<key>EXExtensionPointIdentifier</key>
+		<string>de.benjaminkraatz.DeeDock.dev.plugin</string>
+	</dict>
+</dict>
+</plist>

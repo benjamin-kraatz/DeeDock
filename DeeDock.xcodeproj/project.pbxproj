@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DEC140000000000000000201 /* DOKK Sample Plugin Extension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = DEC140000000000000000212 /* DOKK Sample Plugin Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DEC140000000000000000101 /* DOKKPluginExtensionPoint.appexpt in Embed Extension Point */ = {isa = PBXBuildFile; fileRef = DEC140000000000000000102 /* DOKKPluginExtensionPoint.appexpt */; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		DEE125000000000000000301 /* LookoutQueryService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = DEE125000000000000000002 /* LookoutQueryService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -16,6 +17,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		DEC140000000000000000202 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DEC140000000000000000400;
+			remoteInfo = "DOKK Sample Plugin Extension";
+		};
 		D7E57C0000000000000000A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 000000000000000000000000 /* Project object */;
@@ -40,6 +48,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		DEC140000000000000000204 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolder = Product;
+			files = (
+				DEC140000000000000000201 /* DOKK Sample Plugin Extension.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+		};
 		DEC140000000000000000103 /* Embed Extension Point */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
@@ -62,6 +79,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DEC140000000000000000211 /* DOKK Sample Plugin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DOKK Sample Plugin.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEC140000000000000000212 /* DOKK Sample Plugin Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = "DOKK Sample Plugin Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEC140000000000000000102 /* DOKKPluginExtensionPoint.appexpt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = DOKKPluginExtensionPoint.appexpt; path = Configuration/DOKKPluginExtensionPoint.appexpt; sourceTree = "<group>"; };
 		000000000000000000000120 /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
@@ -75,6 +94,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DEC140000000000000000221 /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = App;
+			sourceTree = "<group>";
+		};
+		DEC140000000000000000222 /* Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		DEC140000000000000000010 /* DOKKPluginContract */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DOKKPluginContract;
@@ -133,6 +162,16 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DEC140000000000000000322 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		DEC140000000000000000422 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -163,6 +202,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DEC140000000000000000220 /* DOKKPluginSample */ = {
+			isa = PBXGroup;
+			children = (
+				DEC140000000000000000221 /* App */,
+				DEC140000000000000000222 /* Extension */,
+			);
+			path = DOKKPluginSample;
+			sourceTree = "<group>";
+		};
 		000000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
@@ -170,6 +218,7 @@
 				DD0000000000000000000004 /* DeeDockTests */,
 				DEE125000000000000000010 /* Lookout */,
 				DEC140000000000000000010 /* DOKKPluginContract */,
+				DEC140000000000000000220 /* DOKKPluginSample */,
 				000000000000000000000020 /* Products */,
 				33DE04A8304AA89B007D87CE /* Frameworks */,
 				0EE3B5E31B6358B0F2F32162 /* App.xcconfig */,
@@ -187,6 +236,8 @@
 				DEE125000000000000000001 /* LookoutBench */,
 				DEE125000000000000000002 /* LookoutQueryService.xpc */,
 				DEE125000000000000000004 /* LookoutIndexService.xpc */,
+				DEC140000000000000000211 /* DOKK Sample Plugin.app */,
+				DEC140000000000000000212 /* DOKK Sample Plugin Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -217,6 +268,49 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DEC140000000000000000300 /* DOKK Sample Plugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DEC140000000000000000310 /* Build configuration list for PBXNativeTarget "DOKK Sample Plugin" */;
+			buildPhases = (
+				DEC140000000000000000321 /* Sources */,
+				DEC140000000000000000322 /* Frameworks */,
+				DEC140000000000000000323 /* Resources */,
+				DEC140000000000000000204 /* Embed ExtensionKit Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DEC140000000000000000203 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DEC140000000000000000221 /* App */,
+			);
+			name = "DOKK Sample Plugin";
+			productName = "DOKK Sample Plugin";
+			productReference = DEC140000000000000000211 /* DOKK Sample Plugin.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DEC140000000000000000400 /* DOKK Sample Plugin Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DEC140000000000000000410 /* Build configuration list for PBXNativeTarget "DOKK Sample Plugin Extension" */;
+			buildPhases = (
+				DEC140000000000000000421 /* Sources */,
+				DEC140000000000000000422 /* Frameworks */,
+				DEC140000000000000000423 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DEC140000000000000000010 /* DOKKPluginContract */,
+				DEC140000000000000000222 /* Extension */,
+			);
+			name = "DOKK Sample Plugin Extension";
+			productName = "DOKK Sample Plugin Extension";
+			productReference = DEC140000000000000000212 /* DOKK Sample Plugin Extension.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
 		000000000000000100000000 /* DeeDock */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "DeeDock" */;
@@ -375,11 +469,23 @@
 				DEE125000000000000000200 /* LookoutQueryService */,
 				DEE125000000000000000400 /* LookoutIndexService */,
 				DEE125000000000000000100 /* LookoutBench */,
+				DEC140000000000000000300 /* DOKK Sample Plugin */,
+				DEC140000000000000000400 /* DOKK Sample Plugin Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		DEC140000000000000000323 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		DEC140000000000000000423 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -481,6 +587,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DEC140000000000000000321 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		DEC140000000000000000421 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		000000000000000120000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -509,6 +625,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DEC140000000000000000203 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DEC140000000000000000400 /* DOKK Sample Plugin Extension */;
+			targetProxy = DEC140000000000000000202 /* PBXContainerItemProxy */;
+		};
 		D7E57C0000000000000000A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 000000000000000100000000 /* DeeDock */;
@@ -527,6 +648,171 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		DEC140000000000000000311 /* Debug configuration for PBXNativeTarget "DOKK Sample Plugin" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DEC140000000000000000312 /* Release configuration for PBXNativeTarget "DOKK Sample Plugin" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DEC140000000000000000313 /* Preview configuration for PBXNativeTarget "DOKK Sample Plugin" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Preview;
+		};
+		DEC140000000000000000411 /* Debug configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DOKKPluginSample/SamplePluginExtension-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DEC140000000000000000412 /* Release configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DOKKPluginSample/SamplePluginExtension-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DEC140000000000000000413 /* Preview configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DOKKPluginSample/SamplePluginExtension-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Sample Plugin";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.benjaminkraatz.DOKKSamplePlugin.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Preview;
+		};
 		000000000000000011000000 /* Debug configuration for PBXProject "DeeDock" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1177,6 +1463,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DEC140000000000000000310 /* Build configuration list for PBXNativeTarget "DOKK Sample Plugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DEC140000000000000000311 /* Debug configuration for PBXNativeTarget "DOKK Sample Plugin" */,
+				DEC140000000000000000313 /* Preview configuration for PBXNativeTarget "DOKK Sample Plugin" */,
+				DEC140000000000000000312 /* Release configuration for PBXNativeTarget "DOKK Sample Plugin" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DEC140000000000000000410 /* Build configuration list for PBXNativeTarget "DOKK Sample Plugin Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DEC140000000000000000411 /* Debug configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */,
+				DEC140000000000000000413 /* Preview configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */,
+				DEC140000000000000000412 /* Release configuration for PBXNativeTarget "DOKK Sample Plugin Extension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		000000000000000010000000 /* Build configuration list for PBXProject "DeeDock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
