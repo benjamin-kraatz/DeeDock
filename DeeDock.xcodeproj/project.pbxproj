@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DEC140000000000000000101 /* DOKKPluginExtensionPoint.appexpt in Embed Extension Point */ = {isa = PBXBuildFile; fileRef = DEC140000000000000000102 /* DOKKPluginExtensionPoint.appexpt */; };
 		2AD77656445F63DC6A1001D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C7F376D8610F320F205B46E7 /* Sparkle */; };
 		DEE125000000000000000301 /* LookoutQueryService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = DEE125000000000000000002 /* LookoutQueryService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DEE125000000000000000304 /* LookoutIndexService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = DEE125000000000000000004 /* LookoutIndexService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -39,6 +40,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		DEC140000000000000000103 /* Embed Extension Point */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolder = Product;
+			files = (
+				DEC140000000000000000101 /* DOKKPluginExtensionPoint.appexpt in Embed Extension Point */,
+			);
+			name = "Embed Extension Point";
+		};
 		DEE125000000000000000300 /* Embed XPC Services */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
@@ -52,6 +62,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DEC140000000000000000102 /* DOKKPluginExtensionPoint.appexpt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = DOKKPluginExtensionPoint.appexpt; path = Configuration/DOKKPluginExtensionPoint.appexpt; sourceTree = "<group>"; };
 		000000000000000000000120 /* DOKK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DOKK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE3B5E31B6358B0F2F32162 /* App.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = App.xcconfig; path = Configuration/App.xcconfig; sourceTree = "<group>"; };
 		33DE04A9304AA89B007D87CE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
@@ -64,6 +75,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DEC140000000000000000010 /* DOKKPluginContract */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DOKKPluginContract;
+			sourceTree = "<group>";
+		};
 		000000000000000000000010 /* DeeDock */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DeeDock;
@@ -153,9 +169,11 @@
 				000000000000000000000010 /* DeeDock */,
 				DD0000000000000000000004 /* DeeDockTests */,
 				DEE125000000000000000010 /* Lookout */,
+				DEC140000000000000000010 /* DOKKPluginContract */,
 				000000000000000000000020 /* Products */,
 				33DE04A8304AA89B007D87CE /* Frameworks */,
 				0EE3B5E31B6358B0F2F32162 /* App.xcconfig */,
+				DEC140000000000000000102 /* DOKKPluginExtensionPoint.appexpt */,
 				DEE125000000000000000003 /* LookoutService.xcconfig */,
 				DEE400000000000000000002 /* Sparkle-LICENSE.txt */,
 			);
@@ -207,6 +225,7 @@
 				000000000000000130000000 /* Frameworks */,
 				000000000000000140000000 /* Resources */,
 				DEE125000000000000000300 /* Embed XPC Services */,
+				DEC140000000000000000103 /* Embed Extension Point */,
 				B7A1C0FFEE0000000000C001 /* Stamp git commit */,
 				A5A968D9636D387DCD7B9F33 /* Validate direct updater configuration */,
 			);
@@ -219,6 +238,7 @@
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* DeeDock */,
 				DEE125000000000000000011 /* Core */,
+				DEC140000000000000000010 /* DOKKPluginContract */,
 			);
 			name = DeeDock;
 			packageProductDependencies = (

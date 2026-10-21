@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DOKK's plugin extension point (DEE-140), copied to DOKK.app/Contents/Extensions by the
+  "Embed Extension Point" build phase. LaunchServices reads app extension points only from there.
+
+  One identifier for every configuration, so a plugin built against DOKK also loads in DOKK Dev.
+  LaunchServices registers a third-party point only when its identifier starts with the declaring
+  app's bundle identifier, so the shared one has to start with the Debug identifier
+  (de.benjaminkraatz.DeeDock.dev), which also starts with the Release one (de.benjaminkraatz.DeeDock).
+  Keep the key in step with DOKKPluginContract.extensionPointIdentifier and AppExtensionPoint.dokkPlugin().
+-->
+<plist version="1.0">
+<dict>
+	<key>de.benjaminkraatz.DeeDock.dev.plugin</key>
+	<dict>
+		<key>EXExtensionPointName</key>
+		<string>plugin</string>
+		<key>EXPresentsUserInterface</key>
+		<true/>
+		<key>EXRequiresEnhancedSecurity</key>
+		<false/>
+		<key>_EXScopeRestriction</key>
+		<string>none</string>
+	</dict>
+	<key>EXVersion</key>
+	<integer>2</integer>
+</dict>
+</plist>
