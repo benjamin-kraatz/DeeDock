@@ -1,0 +1,786 @@
+<!doctype html><html><head><meta charset="utf-8"><title>DOKK Plugins — mockup (DEE-140)</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 20px 28px;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de);background:var(--background,#131316)}
+h1{font-size:17px;margin:0 0 6px;font-weight:650}
+h1 span{font-weight:400;color:var(--muted-foreground,#9a9ca6);font-size:13px;margin-left:6px}
+p.lede{margin:0 0 10px;color:var(--muted-foreground,#9a9ca6);line-height:1.5;max-width:980px}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.btn.tog.on{background:#0a84ff;color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.viewport{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14}
+.tune{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-top:10px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.tune code{font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--foreground,#d8d9de);background:var(--code-background,#ffffff0d);padding:6px 9px;border-radius:7px;display:block;white-space:pre}
+details.notes{margin-top:12px;color:var(--muted-foreground,#9a9ca6);max-width:980px;line-height:1.5}
+details.notes summary{cursor:pointer;color:var(--foreground,#d8d9de)}
+details.notes li{margin:3px 0}
+details.notes b{color:var(--foreground,#e6e7ea)}
+
+/* ───────── stage ───────── */
+@property --s{syntax:'<length>';inherits:true;initial-value:48px}
+.stage{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0;overflow:hidden;outline:none;cursor:default;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+.stage.dark{--fg:#f5f5f7;--fg2:rgba(235,235,245,.62);--fg3:rgba(235,235,245,.36);--panel:rgba(30,31,38,.62);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);
+ --chip:rgba(255,255,255,.07);--chipHi:rgba(255,255,255,.13);--accent:#0a84ff;--dock:rgba(40,41,50,.40);--menu:rgba(40,41,50,.84);--shadow:rgba(0,0,0,.5);
+ --win:rgba(32,32,37,.86);--side:rgba(255,255,255,.04);--card:rgba(255,255,255,.05);--field:rgba(255,255,255,.07);--red:#ff453a;--green:#30d158;--amber:#ffd60a;--knob:#f2f2f2;--swOff:rgba(255,255,255,.16);--arrow:#18202a}
+.stage.light{--fg:#1d1d1f;--fg2:rgba(60,60,67,.72);--fg3:rgba(60,60,67,.44);--panel:rgba(248,248,251,.70);--line:rgba(0,0,0,.075);--line2:rgba(0,0,0,.13);
+ --chip:rgba(0,0,0,.05);--chipHi:rgba(0,0,0,.09);--accent:#007aff;--dock:rgba(255,255,255,.40);--menu:rgba(250,250,252,.9);--shadow:rgba(30,30,60,.24);
+ --win:rgba(246,246,248,.9);--side:rgba(0,0,0,.035);--card:rgba(0,0,0,.035);--field:rgba(0,0,0,.05);--red:#ff3b30;--green:#28cd41;--amber:#ffcc00;--knob:#fff;--swOff:rgba(0,0,0,.12);--arrow:#e4edf3}
+/* Reduce Transparency: solid surfaces instead of glass. */
+.stage.rt.dark{--panel:#1f2026;--arrow:#1f2026;--dock:#2a2b33;--menu:#2a2b33;--win:#202025}
+.stage.rt.light{--panel:#f4f4f7;--arrow:#f4f4f7;--dock:#e9e9ee;--menu:#fafafc;--win:#f3f3f5}
+.stage.rt .glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+#wall{position:absolute;inset:0}
+#wall svg{width:100%;height:100%;display:block}
+.light #wall .wd,.dark #wall .wl{display:none}
+#menubar{position:absolute;left:0;right:0;top:0;height:28px;display:flex;align-items:center;gap:20px;padding:0 18px;font-size:13px;color:var(--fg);z-index:5;
+ backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.dark #menubar{background:rgba(10,10,16,.3)}.light #menubar{background:rgba(255,255,255,.34)}
+#menubar b{font-weight:700}
+#menubar .r{margin-left:auto;display:flex;gap:16px;align-items:center}
+#menubar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+
+/* ───────── dock (DockGeometry: padding 6, crossPadding 6, indicator 4, outerMargin 8; DockBackgroundView radius 22) ───────── */
+#dock{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:4px;padding:6px 6px 10px;border-radius:22px;z-index:40;
+ background:var(--dock);backdrop-filter:blur(26px) saturate(1.7);-webkit-backdrop-filter:blur(26px) saturate(1.7);box-shadow:inset 0 0 0 .5px var(--line2),0 10px 30px rgba(0,0,0,.25)}
+.dt{position:relative;flex:none;width:var(--s);height:48px;cursor:pointer}
+.dt .ic{position:absolute;left:0;bottom:0;width:var(--s);height:var(--s)}
+.dt .ic>svg.app{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.28));transition:filter .3s,opacity .3s}
+#dock.settle .dt,.dt.anim{transition:--s .26s cubic-bezier(.25,.9,.3,1),opacity .26s}
+.dt.leaving{opacity:0;pointer-events:none}
+.dt .run{position:absolute;bottom:-4px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:2px;background:var(--fg2)}
+.sep{position:relative;flex:none;width:16px;height:48px;transition:width .26s cubic-bezier(.25,.9,.3,1),opacity .26s}
+.sep::after{content:'';position:absolute;left:7.5px;top:5px;bottom:-2px;width:1px;background:var(--line2)}
+.sep.leaving,.sep.entering{width:0;opacity:0}
+.dt .tip{position:absolute;left:50%;bottom:calc(var(--s) + 12px);transform:translateX(-50%) translateY(3px);padding:4px 10px;border-radius:8px;background:var(--menu);color:var(--fg);font-size:12.5px;white-space:nowrap;
+ box-shadow:inset 0 0 0 .5px var(--line2),0 4px 14px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.dt .tip small{color:var(--fg2);font-size:12px}
+.dt:hover .tip{opacity:1;transform:translateX(-50%)}
+.dt.open .tip,.menu-open .dt .tip,.dt.leaving .tip{opacity:0!important}
+/* DockAppBadge .count: font max(9, s*0.23) semibold, min side s*0.32, systemRed, white 0.85 hairline */
+.bdg{position:absolute;top:calc(var(--s) * -0.06);right:calc(var(--s) * -0.1);min-width:calc(var(--s) * 0.32);height:calc(var(--s) * 0.32);padding:0 4px;border-radius:999px;
+ background:var(--red);color:#fff;font-weight:600;font-size:max(9px,calc(var(--s) * 0.23));line-height:1;display:none;align-items:center;justify-content:center;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.85);font-variant-numeric:tabular-nums;transform-origin:70% 30%}
+.dt.has-badge .bdg{display:flex}
+.bdg.pop{animation:bpop .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bpop{0%{transform:scale(.45)}60%{transform:scale(1.16)}100%{transform:scale(1)}}
+.rm .bdg.pop{animation:bfade .2s linear}
+@keyframes bfade{from{opacity:.15}}
+/* Optional plugin mark (variant) */
+.mk{display:none;position:absolute;left:calc(var(--s) * -0.05);bottom:calc(var(--s) * -0.03);width:calc(var(--s) * 0.36);height:calc(var(--s) * 0.36);border-radius:50%;
+ background:rgba(26,26,30,.92);box-shadow:0 0 0 1.2px rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.4);place-items:center}
+.mk svg{width:80%;height:80%}
+.mark-corner .plug .mk{display:grid}
+/* Stopped plugin tile */
+.stp{display:none;position:absolute;right:calc(var(--s) * -0.06);bottom:calc(var(--s) * -0.04);width:calc(var(--s) * 0.4);height:calc(var(--s) * 0.4);border-radius:50%;
+ background:var(--menu);box-shadow:0 0 0 .5px var(--line2),0 1px 4px rgba(0,0,0,.35);place-items:center;color:var(--fg)}
+.stp svg{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.dt.stopped .stp{display:grid}
+.dt.stopped .ic>svg.app{filter:grayscale(1);opacity:.42}
+.dt.stopped .mk{opacity:.5}
+
+/* ───────── plugin panel (DockPopoverGeometry + DockPopoverShape) ───────── */
+#pp{position:absolute;z-index:45;display:none;--ax:100px;color:var(--fg);
+ transition:opacity .18s cubic-bezier(0,0,.58,1),transform .18s cubic-bezier(0,0,.58,1)}
+#pp.show{display:block}
+#pp.pre{opacity:0;transform:translateY(10px)}
+#pp.closing{opacity:0;transform:translateY(10px);transition-duration:.14s;transition-timing-function:cubic-bezier(.42,0,1,1)}
+#pp.live{transition:left .3s cubic-bezier(.25,.9,.3,1),top .3s cubic-bezier(.25,.9,.3,1),width .3s cubic-bezier(.25,.9,.3,1),height .3s cubic-bezier(.25,.9,.3,1)}
+.rm #pp,.rm #pp.live{transition:none}
+#pp .body{position:absolute;left:0;top:0;right:0;bottom:10px;border-radius:18px;overflow:hidden;background:var(--panel);
+ backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.3),0 24px 70px var(--shadow)}
+/* clip-path does not clip backdrop-filter everywhere, so the pointer is a plain fill tuned to the glass's bottom edge (as in dokk-hub.html). */
+#pp .arrow{position:absolute;bottom:0;left:var(--ax);width:20px;height:10px;margin-left:-10px;background:var(--arrow);clip-path:path('M0 0 H20 L11.2 9 Q10 10.2 8.8 9 Z')}
+.ph{position:absolute;left:0;right:0;top:0;height:40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 12px;border-bottom:.5px solid var(--line)}
+.ph .pi{width:20px;height:20px;flex:none}.ph .pi svg{width:100%;height:100%}
+.ph .nm{font-weight:600;font-size:13px;white-space:nowrap}
+.ph .from{color:var(--fg3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph .sp{flex:1}
+.ib{width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--fg2);display:grid;place-items:center;cursor:pointer;flex:none}
+.ib:hover{background:var(--chip);color:var(--fg)}
+.ib svg{width:16px;height:16px;fill:currentColor}
+.pc{position:absolute;left:0;right:0;top:40px;bottom:0;overflow:hidden}
+.outline .pc::after{content:'';position:absolute;inset:5px;border:1px dashed var(--accent);border-radius:13px;pointer-events:none;opacity:.8}
+.otag{display:none;position:absolute;right:12px;bottom:9px;font-size:10.5px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);padding:2px 7px;border-radius:6px;z-index:2}
+.outline .otag{display:block}
+.pv{position:absolute;inset:0;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:opacity .3s,filter .3s}
+.stopped .pv{opacity:.16;filter:grayscale(1) blur(1.5px);pointer-events:none}
+.crash{position:absolute;left:0;right:0;top:40px;bottom:0;display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.stopped .crash{opacity:1;pointer-events:auto}
+.cbox{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;max-width:250px}
+.cic{width:34px;height:34px;border-radius:50%;background:var(--chip);box-shadow:inset 0 0 0 .5px var(--line2);display:grid;place-items:center;color:var(--fg2);margin-bottom:2px}
+.cic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ct{font-weight:600;font-size:13.5px}
+.cs{font-size:12px;color:var(--fg2);line-height:1.4;margin-bottom:6px}
+.pbtn{font:inherit;font-size:12.5px;border:0;border-radius:7px;padding:5px 11px;background:var(--chip);color:var(--fg);box-shadow:inset 0 0 0 .5px var(--line2);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pbtn:hover{background:var(--chipHi)}
+.pbtn.pri{background:var(--accent);color:#fff;box-shadow:none}
+.pbtn.pri:hover{filter:brightness(1.08)}
+.pbtn.danger{color:var(--red)}
+.pbtn.busy{pointer-events:none;opacity:.8}
+.pbtn.busy::before{content:'';width:11px;height:11px;border-radius:50%;border:1.6px solid rgba(255,255,255,.45);border-top-color:#fff;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.eyebrow{font-size:11px;font-weight:600;color:var(--fg3);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+.eyebrow .cnt{color:#fff;background:#3fb68b;border-radius:8px;padding:0 6px;font-size:10.5px;line-height:16px;letter-spacing:0}
+.book{display:flex;gap:12px;align-items:center}
+.cover{width:38px;height:54px;flex:none;border-radius:3px 5px 5px 3px;background:linear-gradient(160deg,#9a3a34,#3c1414);box-shadow:0 2px 6px rgba(0,0,0,.35),inset 3px 0 0 rgba(255,255,255,.14);position:relative}
+.cover::after{content:'';position:absolute;left:9px;right:7px;top:12px;height:1.5px;background:rgba(255,230,190,.6);box-shadow:0 5px 0 rgba(255,230,190,.35)}
+.bt{font-weight:600;font-size:13.5px}.ba{font-size:12px;color:var(--fg2);margin-top:2px}
+.bar{height:4px;border-radius:2px;background:var(--chip);margin-top:7px;width:170px;overflow:hidden}.bar i{display:block;height:100%;background:#3fb68b;border-radius:2px}
+.hl{font:13px/1.42 "New York",ui-serif,Georgia,serif;padding:1px 0 1px 10px;border-left:2.5px solid #3fb68b;transition:opacity .3s}
+.done{font-size:12.5px;color:var(--fg2);display:flex;align-items:center;gap:7px}
+.done svg{width:15px;height:15px;fill:none;stroke:#3fb68b;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.acts{margin-top:auto;display:flex;gap:8px;justify-content:flex-end}
+.bl{display:flex;flex-direction:column;gap:1px;margin:-4px -6px 0}
+.br{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;transition:background .15s}
+.br:hover{background:var(--chip)}
+.bs{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center}
+.bs svg{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.bs.pass{background:var(--green)}.bs.fail{background:var(--red)}
+.bs.run{border:2px solid var(--chipHi);border-top-color:var(--accent);animation:sp .9s linear infinite}
+.br .tx{min-width:0}
+.bn{font-weight:600;font-size:13px}.bb{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg2);margin-top:1px}
+.bt2{margin-left:auto;font-size:11.5px;color:var(--fg3);white-space:nowrap}
+.br.flash{animation:flash 1s}
+@keyframes flash{0%{background:color-mix(in srgb,var(--red) 22%,transparent)}100%{background:transparent}}
+.smp{align-items:center;justify-content:center;text-align:center;gap:7px}
+.smp .lbl{font-weight:600;font-size:13px}
+.smp .big{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.05;display:inline-block}
+.smp .big.pop{animation:bpop .4s cubic-bezier(.3,1.6,.5,1)}
+.rm .smp .big.pop{animation:none}
+.smp .cap{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg3)}
+.smp .row2{display:flex;gap:8px;margin-top:4px}
+.fld{width:210px;height:26px;border-radius:7px;border:0;background:var(--field);box-shadow:inset 0 0 0 .5px var(--line2);color:var(--fg);padding:0 9px;font:inherit;font-size:12.5px;outline:none;user-select:text;-webkit-user-select:text}
+.fld:focus{box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}
+.gl{justify-content:center;gap:4px}
+.gl .tmp{font-size:46px;font-weight:300;line-height:1}
+.gl .cond{font-size:13px;color:var(--fg2)}
+.gl .hrs{display:flex;gap:14px;margin-top:10px;font-size:11.5px;color:var(--fg2)}
+.gl .hrs b{display:block;color:var(--fg);font-weight:600;font-size:12.5px;margin-top:2px}
+.ta{align-items:center;justify-content:center;gap:10px}
+.ta .big{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ───────── context menu ───────── */
+#cm{position:absolute;z-index:60;min-width:200px;padding:5px;border-radius:11px;background:var(--menu);color:var(--fg);font-size:13px;display:none;
+ backdrop-filter:blur(30px) saturate(1.8);-webkit-backdrop-filter:blur(30px) saturate(1.8);box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.25),0 12px 36px rgba(0,0,0,.3)}
+#cm.show{display:block;animation:cmIn .12s ease-out}
+@keyframes cmIn{from{opacity:0;transform:scale(.97)}}
+.rm #cm.show{animation:none}
+.mi{display:flex;align-items:center;gap:9px;padding:4px 10px;border-radius:6px;cursor:default;white-space:nowrap}
+.mi svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.mi:hover{background:var(--accent);color:#fff}
+.mi.dis{opacity:.35;pointer-events:none}
+.ms{height:1px;background:var(--line2);margin:5px 10px}
+.mh{padding:3px 10px 4px;font-size:11.5px;color:var(--fg3);font-weight:600}
+
+/* ───────── settings window (SettingsMetrics: cardRadius 12, cardSpacing 22, column 640, rowInset 14, row min 42) ───────── */
+#sw{position:absolute;left:220px;top:52px;width:840px;height:610px;border-radius:16px;overflow:hidden;z-index:20;display:none;color:var(--fg);
+ background:var(--win);backdrop-filter:blur(50px) saturate(1.6);-webkit-backdrop-filter:blur(50px) saturate(1.6);
+ box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.35),0 34px 100px var(--shadow);transition:opacity .2s,transform .2s cubic-bezier(.2,.9,.3,1)}
+#sw.show{display:block}
+#sw.pre{opacity:0;transform:scale(.97)}
+.rm #sw{transition:opacity .15s}
+.side{position:absolute;left:8px;top:8px;bottom:8px;width:214px;border-radius:12px;background:var(--side);box-shadow:inset 0 0 0 .5px var(--line);padding:44px 8px 8px}
+.lights{position:absolute;left:14px;top:14px;display:flex;gap:8px}
+.lights i{width:12px;height:12px;border-radius:6px;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2)}
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+.sfind{height:28px;border-radius:8px;background:var(--field);display:flex;align-items:center;gap:6px;padding:0 9px;color:var(--fg3);font-size:12.5px;margin-bottom:8px}
+.sfind svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8}
+.si{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:7px;font-size:13px;cursor:default}
+.si.on{background:var(--accent);color:#fff}
+.si .cnt{margin-left:auto;font-size:11px;font-weight:600;padding:0 6px;line-height:16px;border-radius:8px;background:var(--chipHi);color:var(--fg2)}
+.si.on .cnt{background:rgba(255,255,255,.25);color:#fff}
+.tile18{width:18px;height:18px;border-radius:5.2px;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.15)}
+.tile18 svg{width:11px;height:11px}
+.detail{position:absolute;left:230px;top:0;right:0;bottom:0;display:flex;flex-direction:column}
+.dbar{height:52px;flex:none;display:flex;align-items:center;gap:8px;padding:0 18px;font-weight:700;font-size:15px}
+.dbar svg{width:15px;height:15px;fill:none;stroke:var(--fg2);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dscroll{flex:1;overflow:auto;padding:4px 28px 28px}
+.col{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.hero{display:flex;gap:14px;align-items:flex-start;padding:6px 4px 0}
+.hero .tile40{width:44px;height:44px;border-radius:12.5px;flex:none;display:grid;place-items:center;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18),0 2px 8px rgba(0,0,0,.18)}
+.hero .tile40 svg{width:26px;height:26px}
+.hero .ht{font-size:20px;font-weight:700;margin:2px 0 3px}
+.hero .hs{font-size:12.5px;color:var(--fg2);line-height:1.45}
+.grp2{display:flex;flex-direction:column;gap:7px}
+.chead{font-weight:600;font-size:13px;padding-left:4px}
+.card{border-radius:12px;background:var(--card);box-shadow:inset 0 0 0 .5px var(--line)}
+.foot{font-size:11.5px;color:var(--fg3);padding:0 4px;line-height:1.45}
+.row{display:flex;align-items:center;gap:11px;min-height:42px;padding:8px 14px;position:relative}
+.row+.row::before{content:'';position:absolute;left:14px;right:0;top:0;height:.5px;background:var(--line2);opacity:.7}
+.prow+.prow::before{left:57px}
+.row .tx{min-width:0;flex:1}
+.row .t{font-size:13px}
+.row .s{font-size:11.5px;color:var(--fg2);margin-top:1px;display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:3px;background:var(--fg3);display:inline-block}
+.dot.run{background:var(--green)}.dot.stop{background:var(--red)}
+.pico{width:32px;height:32px;flex:none}.pico svg{width:100%;height:100%;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
+.wait .wic{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.wait .wic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wait.hot{box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 7%,var(--card))}
+.sbtn{font:inherit;font-size:12.5px;border:0;border-radius:6px;padding:4px 11px;background:var(--chipHi);color:var(--fg);box-shadow:0 .5px 1px rgba(0,0,0,.15),inset 0 0 0 .5px var(--line2);cursor:pointer;white-space:nowrap}
+.light .sbtn{background:#fff}
+.sbtn:hover{filter:brightness(1.06)}
+.sbtn.pri{background:var(--accent);color:#fff}
+.pinl{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--fg2)}
+.sw{position:relative;width:32px;height:19px;border-radius:10px;background:var(--swOff);cursor:pointer;transition:background .2s;flex:none}
+.sw::after{content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:var(--knob);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .22s cubic-bezier(.3,1.3,.5,1)}
+.sw.on{background:var(--accent)}
+.sw.on::after{transform:translateX(13px)}
+.rm .sw::after{transition:none}
+.enter{animation:rowIn .45s cubic-bezier(.2,1,.3,1)}
+@keyframes rowIn{from{opacity:0;transform:translateY(-6px);background:color-mix(in srgb,var(--accent) 18%,transparent)}}
+.rm .enter{animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0}}
+.empty{padding:26px 20px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.empty .eic{width:46px;height:46px;border-radius:13px;background:var(--chip);display:grid;place-items:center;color:var(--fg3);margin-bottom:4px}
+.empty .eic svg{width:26px;height:26px}
+.empty .et{font-weight:600;font-size:14px}
+.empty .es{font-size:12.5px;color:var(--fg2);max-width:380px;line-height:1.45}
+
+/* ───────── system approval window (stand-in) ───────── */
+#apw{position:absolute;left:430px;top:150px;width:440px;border-radius:14px;z-index:26;display:none;color:var(--fg);
+ background:var(--win);backdrop-filter:blur(50px) saturate(1.6);-webkit-backdrop-filter:blur(50px) saturate(1.6);
+ box-shadow:inset 0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.4),0 30px 90px var(--shadow);transition:opacity .2s,transform .2s cubic-bezier(.2,.9,.3,1)}
+#apw.show{display:block}
+#apw.pre{opacity:0;transform:scale(.96)}
+.rm #apw{transition:opacity .15s}
+.apt{height:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;position:relative}
+.apt .lights{top:14px}
+.aptag{position:absolute;right:-6px;top:-26px;font-size:10.5px;font-weight:600;color:#ffd60a;background:rgba(40,36,6,.85);border:1px dashed rgba(255,214,10,.6);padding:2px 8px;border-radius:6px}
+.apb{padding:2px 16px 14px}
+.aph{font-size:12.5px;color:var(--fg2);margin:0 2px 10px;line-height:1.4}
+.apl{border-radius:10px;background:var(--card);box-shadow:inset 0 0 0 .5px var(--line)}
+.apf{display:flex;justify-content:flex-end;margin-top:12px}
+</style></head><body>
+<h1>DOKK Plugins <span>interactive mockup · DEE-140</span></h1>
+<p class="lede">
+<b>What this is.</b> Plugins are small extensions that ship inside other apps. DOKK lists them, the user turns each one on once in a system window, and each pinned plugin gets a tile. Clicking the tile opens the plugin's panel, anchored like the Notification Feed. <b>Everything under the panel's header is drawn by the plugin</b> in its own process. DOKK draws the glass, the header, the pointer, and the stopped state. Try it: click a plugin tile, right-click a tile, press <b>Re-run</b> in Build Status, press <b>Bump badge</b> in the Sample plugin, then <b>Simulate plugin crash</b>. Switch to <b>Settings</b> and press <b>Manage Plugins…</b> to approve the waiting plugin.
+</p>
+<div class="ctl">
+ <div class="grp">View <span class="sg" data-k="view"><button data-v="dock" class="on">Dock</button><button data-v="settings">Settings</button></span></div>
+ <div class="grp">Appearance <span class="sg" data-k="theme"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></span></div>
+ <div class="grp">Placement <span class="sg" data-k="placement"><button data-v="section" class="on">A · Own section</button><button data-v="utility">B · With Shelf &amp; Trash</button></span></div>
+ <div class="grp">Plugin mark <span class="sg" data-k="mark"><button data-v="none" class="on">None</button><button data-v="corner">Corner badge</button></span></div>
+ <div class="grp">Panel size <span class="sg" data-k="size"><button data-v="req" class="on">As the plugin asks</button><button data-v="min">Minimum</button><button data-v="ideal">Popover default</button></span></div>
+</div>
+<div class="ctl">
+ <button class="btn" id="bCrash">Simulate plugin crash</button>
+ <button class="btn" id="bInstall">Install another plugin app</button>
+ <div class="grp">Installed <span class="sg" data-k="installed"><button data-v="set" class="on">Example set</button><button data-v="none">None</button></span></div>
+ <button class="btn tog" data-t="rm">Reduce Motion</button>
+ <button class="btn tog" data-t="rt">Reduce Transparency</button>
+ <button class="btn tog" data-t="outline">Outline plugin area</button>
+ <button class="btn" id="bReset">Reset</button>
+</div>
+
+<div class="viewport" id="vp">
+<div class="stage dark" id="stage" tabindex="0">
+ <div id="wall"><svg viewBox="0 0 1280 800" preserveAspectRatio="xMidYMid slice"><defs>
+  <radialGradient id="w1" cx="18%" cy="22%" r="62%"><stop offset="0" stop-color="#3d2b78"/><stop offset="1" stop-color="#3d2b78" stop-opacity="0"/></radialGradient>
+  <radialGradient id="w2" cx="86%" cy="72%" r="58%"><stop offset="0" stop-color="#0e5f66"/><stop offset="1" stop-color="#0e5f66" stop-opacity="0"/></radialGradient>
+  <radialGradient id="w3" cx="62%" cy="6%" r="44%"><stop offset="0" stop-color="#7c2f55" stop-opacity=".85"/><stop offset="1" stop-color="#7c2f55" stop-opacity="0"/></radialGradient>
+  <radialGradient id="l1" cx="18%" cy="22%" r="62%"><stop offset="0" stop-color="#c9c0ff"/><stop offset="1" stop-color="#c9c0ff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="l2" cx="86%" cy="72%" r="58%"><stop offset="0" stop-color="#9fe3e0"/><stop offset="1" stop-color="#9fe3e0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="l3" cx="62%" cy="6%" r="44%"><stop offset="0" stop-color="#ffc6dc"/><stop offset="1" stop-color="#ffc6dc" stop-opacity="0"/></radialGradient>
+ </defs>
+ <g class="wd"><rect width="1280" height="800" fill="#0c0e19"/><rect width="1280" height="800" fill="url(#w1)"/><rect width="1280" height="800" fill="url(#w2)"/><rect width="1280" height="800" fill="url(#w3)"/>
+  <path d="M0 590 C 280 470 520 720 860 560 S 1280 500 1280 500 V800 H0Z" fill="#141a36" opacity=".55"/><path d="M0 660 C 360 560 640 780 1280 620 V800 H0Z" fill="#0a2a33" opacity=".5"/></g>
+ <g class="wl"><rect width="1280" height="800" fill="#eef0f7"/><rect width="1280" height="800" fill="url(#l1)"/><rect width="1280" height="800" fill="url(#l2)"/><rect width="1280" height="800" fill="url(#l3)"/>
+  <path d="M0 590 C 280 470 520 720 860 560 S 1280 500 1280 500 V800 H0Z" fill="#dfe3f6" opacity=".7"/><path d="M0 660 C 360 560 640 780 1280 620 V800 H0Z" fill="#d3eeee" opacity=".6"/></g>
+ </svg></div>
+ <div id="menubar"><b style="font-size:15px"></b><b>Finder</b><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span>
+  <div class="r"><svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="8" rx="2.5"/><path d="M5 8h6"/></svg><svg viewBox="0 0 16 16"><path d="M2 6.5a9 9 0 0 1 12 0M4.3 9a5.5 5.5 0 0 1 7.4 0M6.6 11.4a2 2 0 0 1 2.8 0"/></svg><span>Wed 21 Oct&nbsp;&nbsp;22:14</span></div></div>
+
+ <div id="sw"></div>
+ <div id="apw"></div>
+ <div id="pp"><div class="body"><div class="ph" id="ph"></div><div class="pc" id="pc"></div><div class="crash" id="crash"></div><span class="otag" id="otag"></span></div><div class="arrow"></div></div>
+ <div id="dock" class="glass"></div>
+ <div id="cm"></div>
+</div>
+</div>
+<div class="tune"><code id="tune"></code></div>
+<details class="notes" open><summary>Locked by Benn on 2026-10-21</summary>
+<ol>
+ <li><b>Placement A.</b> Plugins get their own dock section between apps and DOKK's own tiles. With DOKK Islands on, that section is its own island.</li>
+ <li><b>No plugin mark.</b> Plugin tiles look like any other tile. The "Corner badge" control is kept only for comparison.</li>
+ <li><b>Panel size.</b> The plugin asks for a content size. DOKK adds its 40&nbsp;pt header and the 10&nbsp;pt pointer, and keeps the panel between the popover minimum of 280×220 and the popover default of 560×420, on screen with a 16&nbsp;pt margin.</li>
+ <li><b>Settings.</b> Plugins get their own sidebar section with the puzzle-piece symbol. Dock Extras moves to a different symbol.</li>
+ <li><b>Newly approved plugins are pinned automatically</b> at the end of the plugin section. They can be unpinned from the tile menu or in Settings.</li>
+ <li><b>Stopped state.</b> A grey tile with a small restart chip, and the stale badge hidden. The panel shows a calm "stopped · Restart" in place, never an alert.</li>
+ <li><b>Waiting plugins appear only in Settings</b>, never in the dock.</li>
+</ol>
+</details>
+
+<script>
+/* Real constants, with where they come from:
+ *  DockSettings.swift            iconSize 48, magnification 1.4, itemSpacing 4
+ *  DockGeometry.swift            padding 6, crossPadding 6, indicatorSize 4 (spacing 0), outerMargin 8, separatorLength 16
+ *  DockBackgroundView.swift      cornerRadius 22
+ *  DockPopoverGeometry.swift     margin 16, idealSize 560×420, minimumSize 280×220, attachmentGap 2, pointerDepth 10,
+ *                                attachment clamped 28 from either end, dismissed frame offset 10
+ *  DockPopoverShape.swift        cornerRadius 18, pointer half-width 10
+ *  DockPopoverPanelController    open 0.18 s easeOut from the dismissed frame, close 0.14 s easeIn; Reduce Motion: no animation
+ *  DockAppBadge.swift            .count: font max(9, s×0.23) semibold, min side s×0.32, systemRed, white 0.85 hairline
+ *  SettingsRow.swift (Metrics)   cardRadius 12, cardSpacing 22, columnWidth 640, pageInset 28, rowInset 14, row min 42
+ *  SettingsIconTile.swift        corner size×0.29, top-to-bottom gradient, white glyph
+ */
+const K={icon:48,mag:1.4,spacing:4,padding:6,cross:6,indicator:4,outerMargin:8,sepLen:16,
+ pop:{margin:16,idealW:560,idealH:420,minW:280,minH:220,gap:2,pointer:10,header:40}};
+const ICON_TOP=800-K.outerMargin-K.cross-K.indicator-K.icon; // 734: top of an unmagnified tile
+const $=s=>document.querySelector(s);
+const stage=$('#stage'),vp=$('#vp'),dock=$('#dock'),pp=$('#pp');
+let scale=1;
+function fit(){scale=Math.min(1,vp.clientWidth/1280);stage.style.transform=`scale(${scale})`;vp.style.height=(800*scale)+'px'}
+addEventListener('resize',fit);
+
+/* ───────── artwork ───────── */
+const SQ='<rect x="7" y="7" width="86" height="86" rx="20"/>';
+const g=(id,a,b,dir)=>`<linearGradient id="${id}" x1="0" y1="0" x2="${dir?1:0}" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+const PUZ_PATH='M28 40H42A8 8 0 1 1 58 40H72V54A8 8 0 1 1 72 70V78H28Z';
+const PUZ_FILL=`<svg viewBox="22 26 62 58"><path d="${PUZ_PATH}" fill="#fff"/></svg>`;
+const RESTART='<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>';
+const ICON={
+ finder:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gfa','#8fdcff','#1f8cff')}${g('gfb','#f4f8ff','#cfe0f6')}<clipPath id="cfi">${SQ}</clipPath></defs>
+  <g clip-path="url(#cfi)"><rect x="7" y="7" width="86" height="86" fill="url(#gfb)"/><path d="M7 7H55Q45 30 50 52Q44 74 52 93H7Z" fill="url(#gfa)"/></g>
+  <path d="M33 36v8M67 36v8" stroke="#1d2b44" stroke-width="4.5" stroke-linecap="round"/><path d="M29 64q21 13 42 0" stroke="#1d2b44" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+ safari:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gsa','#fdfdfd','#d9dde4')}${g('gsb','#5fd0ff','#0a62e0')}</defs><g fill="url(#gsa)">${SQ}</g>
+  <circle cx="50" cy="50" r="33" fill="url(#gsb)"/><circle cx="50" cy="50" r="28" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-dasharray="1.2 4.6"/>
+  <path d="M66 34L54 54L46 46Z" fill="#ff3b30"/><path d="M34 66L46 46L54 54Z" fill="#fff"/></svg>`,
+ mail:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gma','#6ad2ff','#0a6cff')}</defs><g fill="url(#gma)">${SQ}</g>
+  <rect x="25" y="33" width="50" height="35" rx="5" fill="#fff"/><path d="M27 36l23 17 23-17" fill="none" stroke="#0a6cff" stroke-opacity=".55" stroke-width="3" stroke-linejoin="round"/></svg>`,
+ notes:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gna','#ffe066','#ffc61a')}<clipPath id="cno">${SQ}</clipPath></defs><g clip-path="url(#cno)"><rect x="7" y="7" width="86" height="86" fill="#fbfbf8"/><rect x="7" y="7" width="86" height="24" fill="url(#gna)"/></g>
+  <path d="M22 46H78M22 58H78M22 70H64" stroke="#d2d2cc" stroke-width="2.4"/></svg>`,
+ music:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gmu','#ff7088','#f8233c')}</defs><g fill="url(#gmu)">${SQ}</g>
+  <path d="M41 66V36l26-6v30" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><ellipse cx="35" cy="66" rx="8" ry="6.5" fill="#fff"/><ellipse cx="61" cy="60" rx="8" ry="6.5" fill="#fff"/></svg>`,
+ terminal:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gte','#3a3d45','#121317')}</defs><g fill="url(#gte)">${SQ}</g>
+  <path d="M28 38l12 11-12 11" fill="none" stroke="#f2f2f2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M47 62H70" stroke="#f2f2f2" stroke-width="5" stroke-linecap="round"/></svg>`,
+ feed:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gfe','#5b5e68','#2b2d34')}</defs><g fill="url(#gfe)">${SQ}</g>
+  <path d="M50 26c-11 0-18 8-18 19v10l-6 8h48l-6-8V45c0-11-7-19-18-19z" fill="#fff"/><path d="M43 68a7 7 0 0 0 14 0" fill="#fff"/></svg>`,
+ shelf:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gsh','#b8c3d4','#7c889c')}</defs><g fill="url(#gsh)">${SQ}</g>
+  <path d="M24 52h14l4 8h16l4-8h14v18a5 5 0 0 1-5 5H29a5 5 0 0 1-5-5z" fill="#fff"/><path d="M30 44l6-16h28l6 16" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>`,
+ trash:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gtr','#f3f5f8','#b7bdc7')}</defs>
+  <path d="M24 22h52l-6 66H30z" fill="url(#gtr)" stroke="#9aa1ab" stroke-width="1.5"/><ellipse cx="50" cy="22" rx="26" ry="5" fill="#e6e9ee" stroke="#9aa1ab" stroke-width="1.5"/>
+  <path d="M36 30l3 52M50 30v52M64 30l-3 52" stroke="#a9afb9" stroke-width="2"/></svg>`,
+ philos:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gph','#35a383','#0f4438')}</defs><g fill="url(#gph)">${SQ}</g>
+  <text x="50" y="71" text-anchor="middle" font-family="'New York',ui-serif,Georgia,serif" font-size="54" fill="#f6edd4">φ</text></svg>`,
+ build:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gbu','#3d414b','#17191e')}</defs><g fill="url(#gbu)">${SQ}</g>
+  <circle cx="29" cy="33" r="5" fill="#30d158"/><rect x="39" y="29" width="34" height="8" rx="4" fill="#fff" opacity=".88"/>
+  <circle cx="29" cy="50" r="5" fill="#ffd60a"/><rect x="39" y="46" width="24" height="8" rx="4" fill="#fff" opacity=".88"/>
+  <circle cx="29" cy="67" r="5" fill="#ff453a"/><rect x="39" y="63" width="30" height="8" rx="4" fill="#fff" opacity=".88"/></svg>`,
+ sample:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gsm','#5a98ff','#1c56d8')}</defs><g fill="url(#gsm)">${SQ}</g>
+  <path d="${PUZ_PATH}" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" transform="translate(-2 -6)"/></svg>`,
+ glance:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('ggl','#72d3ff','#1b86ff')}</defs><g fill="url(#ggl)">${SQ}</g>
+  <circle cx="40" cy="42" r="13" fill="#ffd60a"/><path d="M38 72a12 12 0 0 1 2-24 15 15 0 0 1 28 4 10 10 0 0 1 2 20z" fill="#fff"/></svg>`,
+ tally:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gta','#ffb347','#ff6a00')}</defs><g fill="url(#gta)">${SQ}</g>
+  <path d="M32 30v40M44 30v40M56 30v40M68 30v40" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M26 62L74 38" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`,
+};
+/* Every copy gets its own gradient ids: a definition inside a hidden window (Settings) would otherwise blank the visible copies. */
+let icn=0;
+const icon=id=>{const n=++icn;return ICON[id]().replace(/id="([a-z]+)"/g,`id="$1${n}"`).replace(/url\(#([a-z]+)\)/g,`url(#$1${n})`)};
+const NAMES={finder:'Finder',safari:'Safari',mail:'Mail',notes:'Notes',music:'Music',terminal:'Terminal',feed:'Notifications',shelf:'Shelf',trash:'Trash'};
+const APPS=['finder','safari','mail','notes','music','terminal'];
+const RUNNING=new Set(['finder','safari','mail','music']);
+const META={
+ philos:{name:'philos',app:'philos',req:[360,280]},
+ build:{name:'Build Status',app:'Pipeline',req:[360,236]},
+ sample:{name:'DOKK Sample Plugin',app:'DOKK Sample Plugin',req:[320,226]},
+ glance:{name:'Weather Glance',app:'Glance',req:[300,190]},
+ tally:{name:'Tally',app:'Tally Counter',req:[280,180]},
+};
+const ORDER=['philos','build','sample','glance','tally'];
+const isPlugin=id=>id in META;
+
+/* ───────── state ───────── */
+let S,T=[];
+function freshPlugins(){return{
+ philos:{installed:true,enabled:true,pinned:true,status:'running',badge:2,read:false},
+ build:{installed:true,enabled:true,pinned:true,status:'running',badge:1},
+ sample:{installed:true,enabled:true,pinned:true,status:'running',badge:0,pid:4821},
+ glance:{installed:true,enabled:false,pinned:true,status:'off',badge:0},
+ tally:{installed:false,enabled:false,pinned:true,status:'off',badge:0,count:3},
+}}
+function freshBuilds(){return[
+ {id:'b1',name:'dokk',br:'main',st:'pass',t:'4 min ago'},
+ {id:'b2',name:'dokk',br:'codex/dee-140-dokk-plugins',st:'run',t:'running'},
+ {id:'b3',name:'philos',br:'release/2.0',st:'fail',t:'12 min ago'},
+ {id:'b4',name:'site',br:'main',st:'pass',t:'1 h ago'},
+]}
+function reset(keepUI){
+ T.forEach(clearTimeout);T=[];
+ const ui=keepUI&&S?{view:S.view,theme:S.theme,placement:S.placement,mark:S.mark,size:S.size,rm:S.rm,rt:S.rt,outline:S.outline}:
+  {view:'dock',theme:'dark',placement:'section',mark:'none',size:'req',rm:false,rt:false,outline:false};
+ S={...ui,open:null,menu:null,pl:freshPlugins(),builds:freshBuilds(),fresh:new Set(),pendingFail:false};
+ // The running pipeline fails on its own after a while: a push from the plugin, with no click.
+ later(9000,()=>{const b=S.builds.find(b=>b.id==='b2');if(b&&b.st==='run'){if(S.pl.build.status==='stopped'){S.pendingFail=true;return}failB2()}});
+}
+function failB2(){const b=S.builds.find(b=>b.id==='b2');b.st='fail';b.t='just now';setBadge('build',buildFails());refresh('build',['b2'])}
+const later=(ms,f)=>T.push(setTimeout(f,ms));
+const enabledIds=()=>ORDER.filter(id=>S.pl[id].installed&&S.pl[id].enabled);
+const pinnedIds=()=>enabledIds().filter(id=>S.pl[id].pinned);
+const waitingIds=()=>ORDER.filter(id=>S.pl[id].installed&&!S.pl[id].enabled);
+const buildFails=()=>S.builds.filter(b=>b.st==='fail').length;
+
+/* ───────── dock ───────── */
+const els=new Map();
+function dockOrder(){
+ const pins=pinnedIds();
+ if(S.placement==='section') return [...APPS,'sep1',...pins,...(pins.length?['sep2']:[]),'feed','shelf','trash'];
+ return [...APPS,'sep1','feed','shelf',...pins,'trash'];
+}
+function makeEl(id){
+ const el=document.createElement('div');el.dataset.id=id;
+ if(id.startsWith('sep')){el.className='sep';return el}
+ el.className='dt'+(isPlugin(id)?' plug':'');
+ el.innerHTML=`<div class="ic">${icon(id)}${isPlugin(id)?`<span class="mk">${PUZ_FILL}</span><span class="stp">${RESTART}</span><span class="bdg"></span>`:''}</div>${RUNNING.has(id)?'<i class="run"></i>':''}<div class="tip"></div>`;
+ return el;
+}
+function leave(el,id){
+ el.classList.add('anim','leaving');
+ if(el.classList.contains('dt'))el.style.setProperty('--s','0px');
+ if(S.rm){el.remove();if(els.get(id)===el)els.delete(id);return}
+ setTimeout(()=>{el.remove();if(els.get(id)===el)els.delete(id)},300);
+}
+function renderDock(){
+ const ord=dockOrder(),keep=new Set(ord),initial=els.size===0;
+ const first=new Map();
+ for(const [id,el] of els) if(el.isConnected&&!el.classList.contains('leaving')) first.set(id,el.getBoundingClientRect().left);
+ for(const [id,el] of [...els]) if(!keep.has(id)&&!el.classList.contains('leaving')) leave(el,id);
+ let next=null;const entered=[];
+ for(let i=ord.length-1;i>=0;i--){
+  const id=ord[i];let el=els.get(id);
+  if(el&&el.classList.contains('leaving')){el.remove();els.delete(id);el=null}
+  const isNew=!el;
+  if(isNew){el=makeEl(id);els.set(id,el)}
+  let n=el.isConnected?el.nextElementSibling:undefined;
+  while(n&&n.classList.contains('leaving'))n=n.nextElementSibling;
+  if(isNew||n!==next) dock.insertBefore(el,next);
+  if(isNew&&!initial&&!S.rm)entered.push(el);
+  next=el;
+ }
+ for(const el of entered){
+  if(el.classList.contains('sep')){el.classList.add('entering')}
+  else{el.classList.add('anim');el.style.setProperty('--s','0px')}
+ }
+ if(entered.length){void dock.offsetWidth;requestAnimationFrame(()=>{for(const el of entered){el.classList.remove('entering');if(el.classList.contains('dt'))el.style.setProperty('--s',K.icon+'px');setTimeout(()=>el.classList.remove('anim'),300)}})}
+ if(!S.rm&&!initial){
+  for(const [id,x0] of first){const el=els.get(id);if(!el||!keep.has(id))continue;const dx=(x0-el.getBoundingClientRect().left)/scale;
+   if(Math.abs(dx)>.5)el.animate([{transform:`translateX(${dx}px)`},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1,.3,1)'})}
+ }
+ ord.filter(isPlugin).forEach(id=>updateTile(id));
+ for(const id of [...APPS,'feed','shelf','trash']){const el=els.get(id);if(el)el.querySelector('.tip').textContent=NAMES[id]}
+}
+function updateTile(id,pop){
+ const el=els.get(id);if(!el||el.classList.contains('leaving'))return;
+ const st=S.pl[id],stopped=st.status==='stopped',n=st.badge;
+ el.classList.toggle('stopped',stopped);
+ el.classList.toggle('open',S.open===id);
+ el.classList.toggle('has-badge',n>0&&!stopped);
+ const b=el.querySelector('.bdg');b.textContent=n>99?'99+':String(n);
+ if(pop&&n>0&&!stopped){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
+ el.querySelector('.tip').innerHTML=META[id].name+(stopped?' <small>· Stopped</small>':'');
+}
+/* Magnification: sizes follow the pointer along the unmagnified layout, so the curve stays steady while the dock grows. */
+function baseCenters(){
+ const ord=dockOrder();let x=K.padding;const out=[];
+ ord.forEach((id,i)=>{const w=id.startsWith('sep')?K.sepLen:K.icon;out.push({id,c:x+w/2});x+=w+(i<ord.length-1?K.spacing:0)});
+ x+=K.padding;out.forEach(o=>o.c+=640-x/2);return out;
+}
+const RANGE=K.icon*2.6;
+function magnify(px){
+ for(const {id,c} of baseCenters()){
+  if(id.startsWith('sep'))continue;const el=els.get(id);if(!el||el.classList.contains('anim'))continue;
+  const d=Math.abs(px-c),f=d<RANGE?(1+Math.cos(Math.PI*d/RANGE))/2:0;
+  el.style.setProperty('--s',(K.icon*(1+(K.mag-1)*f)).toFixed(2)+'px');
+ }
+}
+const stageX=e=>(e.clientX-stage.getBoundingClientRect().left)/scale;
+dock.addEventListener('mouseenter',()=>dock.classList.remove('settle'));
+dock.addEventListener('mousemove',e=>magnify(stageX(e)));
+dock.addEventListener('mouseleave',()=>{dock.classList.add('settle');for(const [id,el] of els)if(el.classList.contains('dt')&&!el.classList.contains('leaving'))el.style.setProperty('--s',K.icon+'px');setTimeout(()=>dock.classList.remove('settle'),280)});
+const tileCenter=id=>(baseCenters().find(o=>o.id===id)||{c:640}).c;
+
+/* ───────── panel ───────── */
+function frameFor(id){
+ let cw,ch;
+ if(S.size==='req')[cw,ch]=META[id].req;
+ else if(S.size==='min'){cw=K.pop.minW;ch=K.pop.minH-K.pop.header-K.pop.pointer}
+ else{cw=K.pop.idealW;ch=K.pop.idealH-K.pop.header-K.pop.pointer}
+ const m=K.pop.margin,availTop=28+m;
+ // Locked: never smaller than the popover minimum, never larger than the popover default (560×420).
+ let w=Math.min(K.pop.idealW,Math.max(K.pop.minW,cw)),h=Math.min(K.pop.idealH,Math.max(K.pop.minH,ch+K.pop.header+K.pop.pointer));
+ w=Math.min(w,1280-2*m);h=Math.min(h,ICON_TOP-K.pop.gap-availTop);
+ const c=tileCenter(id);
+ const x=Math.min(Math.max(c-w/2,m),1280-m-w),y=ICON_TOP-K.pop.gap-h;
+ const ax=Math.min(Math.max(28,c-x),w-28);
+ return {x,y,w,h,ax,cw,ch};
+}
+function place(){
+ if(!S.open)return;const f=frameFor(S.open);
+ Object.assign(pp.style,{left:f.x+'px',top:f.y+'px',width:f.w+'px',height:f.h+'px'});pp.style.setProperty('--ax',f.ax+'px');
+ $('#tune').textContent=`${META[S.open].name}: asks for ${f.cw}×${f.ch} content → panel ${Math.round(f.w)}×${Math.round(f.h)} at (${Math.round(f.x)}, ${Math.round(f.y)}), pointer ${Math.round(f.ax)} pt from the left\n`+
+  `= content + 40 header + 10 pointer · min 280×220 · max 560×420 · 16 margin · 2 gap above the tile · radius 18 · open .18s easeOut / close .14s easeIn, 10 pt slide`;
+}
+function idleTune(){$('#tune').textContent=`Dock: icon 48 · magnification 1.4 · spacing 4 · padding 6 · separator 16 · radius 22 · outer margin 8\nClick a plugin tile to see the panel's frame maths.`}
+function header(id){
+ return `<span class="pi">${icon(id)}</span><span class="nm">${META[id].name}</span>${META[id].app!==META[id].name?`<span class="from">${META[id].app}</span>`:''}<span class="sp"></span>
+  <button class="ib" data-act="more" title="More"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="12.5" cy="8" r="1.4"/></svg></button>`;
+}
+const CHECK='<svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>',CROSS='<svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg>';
+function view(id){
+ const st=S.pl[id];
+ if(id==='philos')return `<div class="pv">
+  <div class="eyebrow">Continue reading</div>
+  <div class="book"><div class="cover"></div><div><div class="bt">The Name of the Rose</div><div class="ba">Umberto Eco · 62% read</div><div class="bar"><i style="width:62%"></i></div></div></div>
+  ${st.read?`<div class="eyebrow">Highlights</div><div class="done">${'<svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg>'}You're all caught up.</div>`:
+   `<div class="eyebrow">New highlights <span class="cnt">2</span></div>
+  <div class="hl">“Books are not made to be believed, but to be subjected to inquiry.”</div>
+  <div class="hl">“The good of a book lies in its being read.”</div>`}
+  <div class="acts">${st.read?'':'<button class="pbtn" data-act="philos-read">Mark as read</button>'}<button class="pbtn pri" data-act="noop">Open in philos</button></div></div>`;
+ if(id==='build')return `<div class="pv"><div class="bl">${S.builds.map(b=>`<div class="br" data-b="${b.id}"><span class="bs ${b.st}">${b.st==='pass'?CHECK:b.st==='fail'?CROSS:''}</span>
+   <div class="tx"><div class="bn">${b.name}</div><div class="bb">${b.br}</div></div><span class="bt2">${b.st==='fail'?`<button class="pbtn" data-act="rerun" data-b="${b.id}">Re-run</button>`:b.t}</span></div>`).join('')}</div></div>`;
+ if(id==='sample')return `<div class="pv smp"><div class="lbl">Hello from DOKK Sample Plugin</div><div><span class="big" id="smpN">${st.badge}</span></div>
+  <div class="cap">pid ${st.pid} · 2 connections</div><input class="fld" placeholder="Type here to test the keyboard">
+  <div class="row2"><button class="pbtn pri" data-act="bump">Bump badge</button><button class="pbtn danger" data-act="crash-self">Crash plugin</button></div></div>`;
+ if(id==='glance')return `<div class="pv gl"><div class="tmp">18°</div><div class="cond">Partly cloudy · Berlin</div>
+  <div class="hrs"><span>23:00<b>17°</b></span><span>00:00<b>16°</b></span><span>01:00<b>15°</b></span><span>02:00<b>15°</b></span></div></div>`;
+ if(id==='tally')return `<div class="pv ta"><div class="big">${st.count}</div><button class="pbtn pri" data-act="noop">Count</button></div>`;
+}
+function fillPanel(id){
+ $('#ph').innerHTML=header(id);$('#pc').innerHTML=view(id);
+ $('#otag').textContent=`Drawn by ${META[id].app}, in its own process`;
+ $('#crash').innerHTML=`<div class="cbox"><div class="cic">${RESTART.replace('viewBox="0 0 24 24"','viewBox="0 0 24 24"')}</div><div class="ct">${META[id].name} stopped</div>
+  <div class="cs">The plugin runs on its own, so the rest of DOKK kept going.</div><button class="pbtn pri" data-act="restart" data-id="${id}">Restart</button></div>`;
+ pp.classList.toggle('stopped',S.pl[id].status==='stopped');
+}
+function refresh(id,flash){
+ if(S.open!==id||id==='sample')return;
+ $('#pc').innerHTML=view(id);
+ (flash||[]).forEach(b=>{const r=$(`#pc .br[data-b="${b}"]`);if(r&&!S.rm)r.classList.add('flash')});
+}
+let closeTimer;
+function openPanel(id){
+ hideMenu();
+ if(S.open===id){closePanel();return}
+ if(S.open)closePanel(true);
+ clearTimeout(closeTimer);
+ S.open=id;fillPanel(id);
+ pp.classList.remove('closing','live');pp.classList.add('show');
+ if(!S.rm){pp.classList.add('pre');place();void pp.offsetWidth;pp.classList.remove('pre')}else place();
+ later(200,()=>{if(S.open===id)pp.classList.add('live')});
+ for(const p of ORDER)updateTile(p);
+}
+function closePanel(instant){
+ if(!S.open)return;S.open=null;for(const p of ORDER)updateTile(p);idleTune();
+ pp.classList.remove('live');
+ if(instant||S.rm){pp.classList.remove('show','closing');return}
+ pp.classList.add('closing');clearTimeout(closeTimer);closeTimer=setTimeout(()=>pp.classList.remove('show','closing'),150);
+}
+function setBadge(id,n){
+ const st=S.pl[id];const up=n>st.badge;st.badge=n;updateTile(id,up);
+ if(id==='sample'&&S.open==='sample'){const e=$('#smpN');if(e){e.textContent=n;if(!S.rm){e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}}}
+ renderSidebarCount();
+}
+function crash(id){
+ const st=S.pl[id];if(!st||st.status!=='running')return;
+ st.status='stopped';updateTile(id);if(S.open===id)pp.classList.add('stopped');renderSettings();
+}
+function restart(id,btn){
+ if(btn)btn.classList.add('busy');
+ later(S.rm?200:750,()=>{
+  const st=S.pl[id];if(st.status!=='stopped')return;st.status='running';
+  // A restarted plugin starts fresh. Sample keeps its badge in memory, so it loses it; the others report theirs again.
+  if(id==='sample'){st.badge=0;st.pid=4000+Math.floor(Math.random()*5000)}
+  if(id==='build'&&S.pendingFail){S.pendingFail=false;later(1200,failB2)}
+  if(S.open===id){fillPanel(id)}
+  updateTile(id);renderSettings();
+ });
+}
+
+/* ───────── context menu ───────── */
+const MI={
+ open:'<svg viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="9" rx="2"/><path d="M8 11.5v2"/></svg>',
+ app:'<svg viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7 9M11 9.5V13H3V5h3.5"/></svg>',
+ restart:'<svg viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 3v3h-3"/></svg>',
+ unpin:'<svg viewBox="0 0 16 16"><path d="M6 2.5h4l-.6 4 2.1 2.1H4.5l2.1-2.1zM8 8.6v4.9"/></svg>',
+ gear:'<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v2M8 12.2v2M1.8 8h2M12.2 8h2M3.6 3.6l1.4 1.4M11 11l1.4 1.4M3.6 12.4L5 11M11 5l1.4-1.4"/></svg>',
+};
+function showMenu(id,anchor){
+ const st=S.pl[id],m=$('#cm');
+ m.innerHTML=`<div class="mh">${META[id].name}</div>
+  <div class="mi" data-act="m-open" data-id="${id}">${MI.open}${S.open===id?'Close Panel':'Open Panel'}</div>
+  <div class="mi" data-act="noop">${MI.app}Open ${META[id].app}</div>
+  <div class="mi ${st.status==='stopped'?'':'dis'}" data-act="m-restart" data-id="${id}">${MI.restart}Restart Plugin</div>
+  <div class="ms"></div>
+  <div class="mi" data-act="m-unpin" data-id="${id}">${MI.unpin}Unpin from Dock</div>
+  <div class="mi" data-act="m-settings">${MI.gear}Plugin Settings…</div>`;
+ m.classList.add('show');S.menu=id;stage.classList.add('menu-open');
+ const r=anchor.getBoundingClientRect(),sr=stage.getBoundingClientRect();
+ const ax=(r.left+r.width/2-sr.left)/scale,ay=(r.top-sr.top)/scale;
+ const w=m.offsetWidth,h=m.offsetHeight;
+ const below=anchor.closest('#pp');
+ m.style.left=Math.min(Math.max(ax-(below?w-14:w/2),8),1280-w-8)+'px';
+ m.style.top=(below?ay+(r.height/scale)+4:ay-h-10)+'px';
+}
+function hideMenu(){$('#cm').classList.remove('show');S.menu=null;stage.classList.remove('menu-open')}
+
+/* ───────── settings ───────── */
+const SG={ // sidebar glyphs (11×11 viewBox 0 0 24 24, white)
+ general:'<circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
+ dock:'<rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="#fff" stroke-width="2.4"/><rect x="6" y="19" width="12" height="2.6" rx="1.3" fill="#fff"/>',
+ atmosphere:'<path d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7z" fill="#fff"/>',
+ modes:'<path d="M12 3l9 5-9 5-9-5z" fill="#fff"/><path d="M3 12.5l9 5 9-5M3 16.5l9 5 9-5" fill="none" stroke="#fff" stroke-width="2"/>',
+ extras:`<path d="${'M4 9H9A3 3 0 1 1 15 9H20V14A3 3 0 1 1 20 20V21H4Z'}" fill="#fff"/>`,
+ windows:'<rect x="2" y="6" width="14" height="12" rx="2" fill="none" stroke="#fff" stroke-width="2.4"/><rect x="8" y="3" width="14" height="12" rx="2" fill="#fff"/>',
+ history:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="#fff" stroke-width="2.6"/><path d="M12 7v5l3 2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>',
+ lookout:'<circle cx="10" cy="10" r="6.5" fill="none" stroke="#fff" stroke-width="2.8"/><path d="M15 15l6 6" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
+ plugins:`<path d="M5 8H9A3 3 0 1 1 15 8H19V12A3 3 0 1 1 19 18V21H5Z" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>`,
+};
+const SECTIONS=[
+ ['general','General',['#9ea6b3','#5c636f']],['dock','Dock',['#52c7ff','#0f6bf0']],['atmosphere','Atmosphere',['#ff6fa8','#ff9f0a']],
+ ['modes','Modes',['#5e5ce6','#bf5af2']],['extras','Dock Extras',['#ff78b8','#d42685']],['windows','Windows & Focus',['#ff9457','#d63d29']],
+ ['history','Suggestions & History',['#75b8eb','#1f5c9e']],['lookout','Lookout',['#64d2ff','#5e5ce6']],['plugins','Plugins',['#4cd9a3','#16946b']],
+];
+const PLUGIN_TILE=SECTIONS[8][2];
+const tile18=(k,c)=>`<span class="tile18" style="background:linear-gradient(${c[0]},${c[1]})"><svg viewBox="0 0 24 24">${SG[k]}</svg></span>`;
+function renderSettingsShell(){
+ $('#sw').innerHTML=`<div class="side"><div class="lights"><i></i><i></i><i></i></div>
+  <div class="sfind"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>Search</div>
+  ${SECTIONS.map(([k,n,c])=>`<div class="si ${k==='plugins'?'on':''}">${tile18(k,c)}<span>${n}</span>${k==='plugins'?'<span class="cnt" id="sideCnt"></span>':''}</div>`).join('')}</div>
+  <div class="detail"><div class="dbar">Plugins</div><div class="dscroll"><div class="col" id="spage"></div></div></div>`;
+}
+function renderSidebarCount(){const c=$('#sideCnt');if(!c)return;const n=waitingIds().length;c.textContent=n;c.style.display=n?'':'none'}
+const status=st=>st.status==='running'?'<span class="dot run"></span>Running':st.status==='stopped'?'<span class="dot stop"></span>Stopped':'<span class="dot"></span>Not running';
+function renderSettings(){
+ renderSidebarCount();
+ const en=enabledIds(),wait=waitingIds(),page=$('#spage');if(!page)return;
+ const hero=`<div class="hero"><span class="tile40" style="background:linear-gradient(${PLUGIN_TILE[0]},${PLUGIN_TILE[1]})"><svg viewBox="0 0 24 24">${SG.plugins}</svg></span>
+  <div><div class="ht">Plugins</div><div class="hs">Plugins let other apps add a tile and a panel to your dock. Each plugin runs on its own, so if one stops, DOKK keeps running.</div></div></div>`;
+ if(!en.length&&!wait.length){
+  page.innerHTML=hero+`<div class="card empty"><div class="eic"><svg viewBox="22 26 62 58"><path d="${PUZ_PATH}" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linejoin="round"/></svg></div>
+   <div class="et">No plugins yet</div><div class="es">When you install an app that comes with a DOKK plugin, it shows up here so you can turn it on.</div>
+   <div style="margin-top:8px"><button class="sbtn" data-act="manage">Manage Plugins…</button></div></div>`;
+  return;
+ }
+ const waitCard=wait.length?`<div class="card wait hot"><div class="row"><span class="wic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
+   <div class="tx"><div class="t">${wait.length===1?'1 plugin is waiting for approval':wait.length+' plugins are waiting for approval'}</div><div class="s">macOS asks you to turn on each new plugin once.</div></div>
+   <button class="sbtn pri" data-act="manage">Manage Plugins…</button></div></div>`
+  :`<div class="card wait"><div class="row"><span class="wic"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+   <div class="tx"><div class="t">All installed plugins are turned on</div><div class="s">macOS keeps the list of which plugins DOKK may use.</div></div>
+   <button class="sbtn" data-act="manage">Manage Plugins…</button></div></div>`;
+ const rows=en.length?en.map(id=>{const st=S.pl[id];return `<div class="row prow ${S.fresh.has(id)?'enter':''}"><span class="pico">${icon(id)}</span>
+   <div class="tx"><div class="t">${META[id].name}</div><div class="s">${META[id].app!==META[id].name?'From '+META[id].app+' · ':''}${status(st)}</div></div>
+   ${st.status==='stopped'?`<button class="sbtn" data-act="restart" data-id="${id}">Restart</button>`:''}
+   <span class="pinl">Pinned<span class="sw ${st.pinned?'on':''}" data-act="pin" data-id="${id}"></span></span></div>`}).join('')
+  :`<div class="row"><div class="tx"><div class="s">No plugins are turned on yet.</div></div></div>`;
+ page.innerHTML=hero+waitCard+`<div class="grp2"><div class="chead">Installed</div><div class="card">${rows}</div>
+  <div class="foot">Pinned plugins show a tile in the dock. Unpinning keeps a plugin installed and stops it until you pin it again. To turn a plugin off completely, use Manage Plugins.</div></div>`;
+ S.fresh.clear();
+}
+function showSettings(on){
+ const sw=$('#sw');
+ if(on){closePanel(true);hideMenu();sw.classList.add('show');if(!S.rm){sw.classList.add('pre');void sw.offsetWidth;sw.classList.remove('pre')}}
+ else{sw.classList.remove('show');showApproval(false)}
+}
+function renderApproval(){
+ const ids=ORDER.filter(id=>S.pl[id].installed);
+ $('#apw').innerHTML=`<span class="aptag">System window · stand-in</span><div class="apt"><div class="lights"><i></i><i></i><i></i></div>Extensions</div>
+  <div class="apb"><div class="aph">Turn on the extensions you want DOKK to use.</div>
+  <div class="apl">${ids.length?ids.map(id=>`<div class="row prow"><span class="pico">${icon(id)}</span><div class="tx"><div class="t">${META[id].name}</div><div class="s">${META[id].app}</div></div>
+   <span class="sw ${S.pl[id].enabled?'on':''}" data-act="ap-toggle" data-id="${id}"></span></div>`).join(''):'<div class="row"><div class="tx"><div class="s">No extensions installed.</div></div></div>'}</div>
+  <div class="apf"><button class="sbtn pri" data-act="ap-done">Done</button></div></div>`;
+}
+function showApproval(on){
+ const a=$('#apw');
+ if(on){renderApproval();a.classList.add('show');if(!S.rm){a.classList.add('pre');void a.offsetWidth;a.classList.remove('pre')}}
+ else a.classList.remove('show');
+}
+function setEnabled(id,on){
+ const st=S.pl[id];st.enabled=on;
+ if(on){st.pinned=true;st.status='running';S.fresh.add(id)}
+ else{if(S.open===id)closePanel(true);st.status='off'}
+ renderDock();renderSettings();
+}
+function setPinned(id,on){
+ const st=S.pl[id];st.pinned=on;
+ if(on){st.status='running'}else{if(S.open===id)closePanel(true);st.status='idle'}
+ renderDock();renderSettings();
+}
+
+/* ───────── events ───────── */
+function act(a,el,e){
+ const id=el.dataset.id;
+ switch(a){
+  case 'philos-read':S.pl.philos.read=true;setBadge('philos',0);refresh('philos');break;
+  case 'rerun':{const b=S.builds.find(b=>b.id===el.dataset.b);b.st='run';b.t='running';refresh('build');
+   later(2600,()=>{b.st='pass';b.t='just now';if(S.pl.build.status!=='stopped'){setBadge('build',buildFails());refresh('build')}});break}
+  case 'bump':setBadge('sample',S.pl.sample.badge+1);break;
+  case 'crash-self':crash('sample');break;
+  case 'restart':restart(id||S.open,el);break;
+  case 'more':if(S.menu)hideMenu();else showMenu(S.open,el);return;
+  case 'm-open':openPanel(id);break;
+  case 'm-restart':restart(id);if(S.open!==id)openPanel(id);break;
+  case 'm-unpin':setPinned(id,false);break;
+  case 'm-settings':setView('settings');break;
+  case 'pin':setPinned(id,!S.pl[id].pinned);break;
+  case 'manage':showApproval(true);break;
+  case 'ap-toggle':setEnabled(id,!S.pl[id].enabled);renderApproval();break;
+  case 'ap-done':showApproval(false);break;
+ }
+ hideMenu();
+}
+stage.addEventListener('click',e=>{
+ const a=e.target.closest('[data-act]');
+ if(a){act(a.dataset.act,a,e);return}
+ const t=e.target.closest('.dt');
+ if(t&&!t.classList.contains('leaving')){
+  hideMenu();const id=t.dataset.id;
+  if(isPlugin(id))openPanel(id);
+  else if(!S.rm)t.querySelector('.ic').animate([{transform:'none'},{transform:'translateY(-14px)'},{transform:'none'}],{duration:520,easing:'cubic-bezier(.3,.7,.4,1)'});
+  return;
+ }
+ const inMenu=e.target.closest('#cm');
+ if(!e.target.closest('#pp,#sw,#apw')&&!inMenu)closePanel();
+ if(!inMenu)hideMenu();
+});
+stage.addEventListener('contextmenu',e=>{e.preventDefault();const t=e.target.closest('.dt.plug');if(t&&!t.classList.contains('leaving'))showMenu(t.dataset.id,t);else hideMenu()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.menu)hideMenu();else if($('#apw').classList.contains('show'))showApproval(false);else closePanel()}});
+
+function setView(v){S.view=v;syncSeg('view');showSettings(v==='settings')}
+function syncSeg(k){document.querySelectorAll(`.sg[data-k="${k}"] button`).forEach(b=>b.classList.toggle('on',b.dataset.v===S[k]))}
+document.querySelectorAll('.sg').forEach(sg=>sg.addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;const k=sg.dataset.k,v=b.dataset.v;
+ if(k==='installed'){
+  if(v==='none'){closePanel(true);ORDER.forEach(id=>{S.pl[id].installed=false;S.pl[id].enabled=false;S.pl[id].status='off'})}
+  else{closePanel(true);const ui=S;reset(true)}
+  S.installed=v;syncSeg('installed');renderDock();renderSettings();if($('#apw').classList.contains('show'))renderApproval();$('#bInstall').disabled=v==='none'||S.pl.tally.installed;return;
+ }
+ S[k]=v;syncSeg(k);
+ if(k==='view')showSettings(v==='settings');
+ if(k==='theme'){stage.classList.toggle('dark',v==='dark');stage.classList.toggle('light',v==='light')}
+ if(k==='placement'){renderDock();if(S.open)setTimeout(place,0)}
+ if(k==='mark')stage.classList.toggle('mark-corner',v==='corner');
+ if(k==='size')place();
+}));
+document.querySelectorAll('.btn.tog').forEach(b=>b.addEventListener('click',()=>{const t=b.dataset.t;S[t]=!S[t];b.classList.toggle('on',S[t]);stage.classList.toggle(t,S[t])}));
+$('#bCrash').addEventListener('click',()=>{
+ const pins=pinnedIds().filter(id=>S.pl[id].status==='running');
+ const id=S.open&&S.pl[S.open].status==='running'?S.open:pins.includes('build')?'build':pins[0];
+ if(id)crash(id);
+});
+$('#bInstall').addEventListener('click',()=>{S.pl.tally.installed=true;$('#bInstall').disabled=true;renderSettings();if($('#apw').classList.contains('show'))renderApproval()});
+$('#bReset').addEventListener('click',()=>{closePanel(true);hideMenu();showApproval(false);reset(true);S.installed='set';syncSeg('installed');$('#bInstall').disabled=false;renderDock();renderSettings()});
+
+reset(false);S.installed='set';
+renderSettingsShell();renderDock();renderSettings();idleTune();fit();
+</script>
+</body></html>
