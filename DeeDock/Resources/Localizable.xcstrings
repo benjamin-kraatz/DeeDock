@@ -2926,7 +2926,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-ins"
+            "value" : "Plugins"
           }
         },
         "en" : {
@@ -3670,7 +3670,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-in neu starten"
+            "value" : "Plugin neu starten"
           }
         },
         "en" : {
@@ -3688,7 +3688,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-in-Einstellungen …"
+            "value" : "Plugin-Einstellungen …"
           }
         },
         "en" : {
@@ -3724,7 +3724,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-in wird geladen"
+            "value" : "Plugin wird geladen"
           }
         },
         "en" : {
@@ -3778,7 +3778,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Plug-in läuft eigenständig, deshalb lief der Rest von DOKK weiter."
+            "value" : "Das Plugin läuft eigenständig, deshalb lief der Rest von DOKK weiter."
           }
         },
         "en" : {
@@ -3814,7 +3814,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS verwaltet, welche Plug-ins DOKK verwenden darf."
+            "value" : "macOS verwaltet, welche Plugins DOKK verwenden darf."
           }
         },
         "en" : {
@@ -3832,7 +3832,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle installierten Plug-ins sind aktiv"
+            "value" : "Alle installierten Plugins sind aktiv"
           }
         },
         "en" : {
@@ -3850,7 +3850,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installierst du eine App mit einem DOKK-Plug-in, erscheint es hier, damit du es aktivieren kannst."
+            "value" : "Installierst du eine App mit einem DOKK-Plugin, erscheint es hier, damit du es aktivieren kannst."
           }
         },
         "en" : {
@@ -3868,7 +3868,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch keine Plug-ins"
+            "value" : "Noch keine Plugins"
           }
         },
         "en" : {
@@ -3904,7 +3904,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Angepinnte Plug-ins zeigen eine Kachel im Dock. Gelöste Plug-ins bleiben installiert, laufen aber erst wieder, wenn du sie anpinnst. Um ein Plug-in ganz auszuschalten, wähle „Plug-ins verwalten“."
+            "value" : "Angepinnte Plugins zeigen eine Kachel im Dock. Gelöste Plugins bleiben installiert, laufen aber erst wieder, wenn du sie anpinnst. Um ein Plugin ganz auszuschalten, wähle „Plugins verwalten“."
           }
         },
         "en" : {
@@ -3940,7 +3940,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-ins verwalten …"
+            "value" : "Plugins verwalten …"
           }
         },
         "en" : {
@@ -3958,7 +3958,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-ins verwalten"
+            "value" : "Plugins verwalten"
           }
         },
         "en" : {
@@ -3976,7 +3976,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch keine Plug-ins aktiv."
+            "value" : "Noch keine Plugins aktiv."
           }
         },
         "en" : {
@@ -4030,7 +4030,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mit Plug-ins können andere Apps deinem Dock eine Kachel und ein Panel hinzufügen. Jedes Plug-in läuft eigenständig – hält eines an, läuft DOKK weiter."
+            "value" : "Mit Plugins können andere Apps deinem Dock eine Kachel und ein Panel hinzufügen. Jedes Plugin läuft eigenständig – hält eines an, läuft DOKK weiter."
           }
         },
         "en" : {
@@ -4048,7 +4048,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-in Plugin Erweiterung Add-on genehmigen Freigabe erlauben aktivieren Kachel Panel neu starten"
+            "value" : "Plugin Plug-in Erweiterung Add-on genehmigen Freigabe erlauben aktivieren Kachel Panel neu starten"
           }
         },
         "en" : {
@@ -4066,7 +4066,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suche nach Plug-ins"
+            "value" : "Suche nach Plugins"
           }
         },
         "en" : {
@@ -4102,7 +4102,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plug-ins"
+            "value" : "Plugins"
           }
         },
         "en" : {
@@ -4192,7 +4192,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS fragt dich einmal pro neuem Plug-in, ob es aktiv sein darf."
+            "value" : "macOS fragt dich einmal pro neuem Plugin, ob es aktiv sein darf."
           }
         },
         "en" : {
@@ -4213,13 +4213,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld Plug-in wartet auf Freigabe"
+                  "value" : "%lld Plugin wartet auf Freigabe"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld Plug-ins warten auf Freigabe"
+                  "value" : "%lld Plugins warten auf Freigabe"
                 }
               }
             }
@@ -4270,7 +4270,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffnet das Panel des Plug-ins"
+            "value" : "Öffnet das Panel des Plugins"
           }
         },
         "en" : {
