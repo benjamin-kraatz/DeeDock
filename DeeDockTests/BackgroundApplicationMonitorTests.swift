@@ -14,7 +14,7 @@ struct BackgroundApplicationMonitorTests {
         let child = try await BackgroundProcessFixture.start(.plain)
         defer { child.end() }
         let launchServices = FakeLaunchServices(.success([Self.application(child.identity)]))
-        let monitor = BackgroundApplicationMonitor(read: launchServices.read, terminationGrace: .milliseconds(100))
+        let monitor = BackgroundApplicationMonitor(read: launchServices.read)
         var reports: [LaunchServicesBackgroundReader.Unavailability] = []
         monitor.didBecomeUnavailable = { reports.append($0) }
         await monitor.refreshAndWait(timeout: .seconds(2))
@@ -43,18 +43,23 @@ struct BackgroundApplicationMonitorTests {
         monitor.stop()
     }
 
-    @Test("Without a reopen, a process that ignores SIGTERM is force-quit after the grace period")
+    @Test("Without a reopen, a process that ignores SIGTERM is force-quit when the grace period ends")
     func forceQuitAfterGrace() async throws {
         let child = try await BackgroundProcessFixture.start(.reportsTerminate)
         defer { child.end() }
+        let gate = GraceGate()
+        defer { gate.release() }
         let launchServices = FakeLaunchServices(.success([Self.application(child.identity)]))
-        let monitor = BackgroundApplicationMonitor(read: launchServices.read, terminationGrace: .milliseconds(200))
+        let monitor = BackgroundApplicationMonitor(read: launchServices.read, gracePeriod: gate.period)
         await monitor.refreshAndWait(timeout: .seconds(2))
 
         monitor.stopRunningInBackground(at: Self.url)
-        // The child survives SIGTERM by design, so its exit can only come from the SIGKILL pass.
         #expect(await child.waitForTerminateSignal())
+        // Held inside the grace period: no SIGKILL can have been sent yet.
+        #expect(await eventually { gate.isWaiting })
         #expect(child.identity.isStillRunning)
+        // The child survives SIGTERM by design, so its exit can only come from the SIGKILL pass.
+        gate.release()
         #expect(await eventually { !child.identity.isStillRunning })
         monitor.stop()
     }
@@ -63,16 +68,25 @@ struct BackgroundApplicationMonitorTests {
     func reopenCancelsForceQuit() async throws {
         let child = try await BackgroundProcessFixture.start(.reportsTerminate)
         defer { child.end() }
+        let gate = GraceGate()
+        defer { gate.release() }
         let launchServices = FakeLaunchServices(.success([Self.application(child.identity)]))
-        let monitor = BackgroundApplicationMonitor(read: launchServices.read, terminationGrace: .milliseconds(300))
+        let monitor = BackgroundApplicationMonitor(read: launchServices.read, gracePeriod: gate.period)
         await monitor.refreshAndWait(timeout: .seconds(2))
 
         monitor.stopRunningInBackground(at: Self.url)
-        // The SIGTERM pass has reached the child, so the grace period is running.
         #expect(await child.waitForTerminateSignal())
+        #expect(await eventually { gate.isWaiting })
+        // Reopened while the stop is held inside its grace period.
         monitor.applicationDidLaunch(at: Self.url)
+        await monitor.refreshAndWait(timeout: .seconds(2))
+        let reads = launchServices.readCount
         // The fake still lists the app, as if the reopened instance had quit again at once.
-        try await Task.sleep(for: .milliseconds(800))
+        // A cancelled stop ends after the grace period without another read or signal; the
+        // wait only gives a broken implementation the time to show itself.
+        gate.release()
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(launchServices.readCount == reads)
         #expect(child.identity.isStillRunning)
         monitor.stop()
     }
@@ -82,7 +96,7 @@ struct BackgroundApplicationMonitorTests {
         let child = try await BackgroundProcessFixture.start(.reportsTerminate)
         defer { child.end() }
         let launchServices = FakeLaunchServices(.success([Self.application(child.identity)]))
-        let monitor = BackgroundApplicationMonitor(read: launchServices.read, terminationGrace: .milliseconds(100))
+        let monitor = BackgroundApplicationMonitor(read: launchServices.read)
         await monitor.refreshAndWait(timeout: .seconds(2))
         let reads = launchServices.readCount
 
@@ -118,6 +132,27 @@ struct BackgroundProcessKernelIdentityTests {
         #expect(!stale.send(SIGTERM))
         #expect(child.identity.isStillRunning)
         #expect(child.identity.send(SIGTERM))
+    }
+}
+
+/// Holds a stop inside its grace period until the test releases it.
+@MainActor
+private final class GraceGate {
+    private(set) var isWaiting = false
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    var period: BackgroundApplicationMonitor.GracePeriod {
+        { [self] in
+            isWaiting = true
+            await withCheckedContinuation { continuation = $0 }
+        }
+    }
+
+    /// Ends the grace period. Safe to call more than once, and before anything waits.
+    func release() {
+        isWaiting = false
+        continuation?.resume()
+        continuation = nil
     }
 }
 

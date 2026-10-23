@@ -18,8 +18,11 @@ final class BackgroundApplicationMonitor {
     /// A Launch Services read. It blocks, so the monitor runs it on a private queue.
     typealias Read = @Sendable () -> Result<[BackgroundApplication], LaunchServicesBackgroundReader.Unavailability>
 
-    /// How long a process may handle SIGTERM before it is killed.
-    let terminationGrace: Duration
+    /// Waits out the time a process may handle SIGTERM before it is killed. Production sleeps
+    /// three seconds. Cancellation may end the wait early; the stop checks it afterwards.
+    typealias GracePeriod = @MainActor () async -> Void
+
+    private let gracePeriod: GracePeriod
 
     /// Background applications keyed by standardized bundle URL.
     private(set) var applications: [URL: BackgroundApplication] = [:]
@@ -54,10 +57,11 @@ final class BackgroundApplicationMonitor {
 
     /// - Parameters:
     ///   - read: Reads Launch Services. Tests pass a fake; production uses the private reader.
-    ///   - terminationGrace: How long a process may handle SIGTERM before it is killed.
-    init(read: @escaping Read = { LaunchServicesBackgroundReader.read() }, terminationGrace: Duration = .seconds(3)) {
+    ///   - gracePeriod: Waits between SIGTERM and SIGKILL. Tests hold it open to act inside it.
+    init(read: @escaping Read = { LaunchServicesBackgroundReader.read() },
+         gracePeriod: @escaping GracePeriod = { try? await Task.sleep(for: .seconds(3)) }) {
         reads = BackgroundApplicationReads(read: read)
-        self.terminationGrace = terminationGrace
+        self.gracePeriod = gracePeriod
     }
 
     /// Starts observing and performs the first read. Calling it again has no effect.
@@ -171,7 +175,7 @@ final class BackgroundApplicationMonitor {
     ///
     /// Each pass re-reads Launch Services, so it signals only processes that currently belong
     /// to that app, including helpers started after the first pass. Sends SIGTERM, waits
-    /// `terminationGrace`, then sends SIGKILL to whatever remains. Opening the app cancels the
+    /// out the grace period, then sends SIGKILL to whatever remains. Opening the app cancels the
     /// stop (see `applicationDidLaunch(at:)`), and neither pass signals while a regular instance
     /// runs, because it may use the same helpers. A failed read turns the feature off for the
     /// session, as any other read failure does. Failures are silent: the tile keeps its
@@ -193,7 +197,7 @@ final class BackgroundApplicationMonitor {
         guard let terminated = await signal(SIGTERM, backgroundApplicationAt: url) else { return }
         if terminated > 0 {
             Self.logger.info("Sent SIGTERM to \(terminated, privacy: .public) background processes")
-            try? await Task.sleep(for: terminationGrace)
+            await gracePeriod()
             guard !Task.isCancelled,
                   let killed = await signal(SIGKILL, backgroundApplicationAt: url) else { return }
             if killed > 0 {

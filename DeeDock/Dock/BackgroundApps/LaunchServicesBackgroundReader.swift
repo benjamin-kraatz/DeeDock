@@ -87,28 +87,35 @@ nonisolated enum LaunchServicesBackgroundReader {
     private static func application(for record: AnyObject,
                                     in source: some BackgroundRecordSource) throws(Unavailability) -> BackgroundApplication? {
         let keys = source.keys
+        // Every value a reply contains is type-checked before any of them decides whether the
+        // record counts. A filter that ran first would skip the record and hide a malformed
+        // value behind it, such as a malformed type next to a false background flag.
+        //
         // Most records are ordinary running apps, so ask for the two deciding keys first.
-        guard let state = try values(source.information(record, [keys.background, keys.type])),
-              try value(state, keys.background, as: NSNumber.self)?.boolValue == true,
-              try value(state, keys.type, as: String.self) == keys.foregroundType,
+        guard let state = try values(source.information(record, [keys.background, keys.type])) else { return nil }
+        let isBackground = try flag(state, keys.background)
+        let type = try value(state, keys.type, as: String.self)
+        guard isBackground == true, type == keys.foregroundType,
               let details = try values(source.information(record, [keys.bundlePath, keys.displayName,
                                                                    keys.bundleIdentifier, keys.coalitionPIDs,
-                                                                   keys.childApplications])),
-              let path = try value(details, keys.bundlePath, as: String.self), !path.isEmpty else { return nil }
-        // Every value is type-checked before liveness decides anything, so a malformed reply
-        // fails the read even for a record whose processes have all exited.
+                                                                   keys.childApplications])) else { return nil }
+        let path = try value(details, keys.bundlePath, as: String.self)
         let displayName = try value(details, keys.displayName, as: String.self)
         let bundleIdentifier = try value(details, keys.bundleIdentifier, as: String.self)
 
         // Coalition members that are not foreground apps, as counted by the flag itself. A
         // foreground app sharing the coalition has its own tile and must never be stopped here.
-        var pids = try (value(details, keys.coalitionPIDs, as: [NSNumber].self) ?? []).map(\.int32Value)
+        var pids: [pid_t] = []
+        for number in try value(details, keys.coalitionPIDs, as: [NSNumber].self) ?? [] {
+            pids.append(try processID(number))
+        }
         for child in try value(details, keys.childApplications, as: [AnyObject].self) ?? [] {
             if let reply = try values(source.information(child, [keys.pid])),
-               let pid = try value(reply, keys.pid, as: NSNumber.self) {
-                pids.append(pid.int32Value)
+               let number = try value(reply, keys.pid, as: NSNumber.self) {
+                pids.append(try processID(number))
             }
         }
+        guard let path, !path.isEmpty else { return nil }
         let processes = Set(pids.compactMap(BackgroundProcess.init(pid:))).sorted { $0.pid < $1.pid }
         guard !processes.isEmpty else { return nil }
 
@@ -126,6 +133,27 @@ nonisolated enum LaunchServicesBackgroundReader {
         case .malformed: throw .unexpectedResult
         case .values(let values): values
         }
+    }
+
+    /// A Boolean that Launch Services answers with `CFBoolean`. A number such as 2 would read as
+    /// true through `NSNumber`, so any other type throws.
+    private static func flag(_ values: [String: Any], _ key: String) throws(Unavailability) -> Bool? {
+        guard let number = try value(values, key, as: NSNumber.self) else { return nil }
+        guard CFGetTypeID(number) == CFBooleanGetTypeID() else { throw .unexpectedResult }
+        return number.boolValue
+    }
+
+    /// A process ID: an integer `CFNumber` that `pid_t` holds exactly.
+    ///
+    /// `int32Value` would truncate, so a malformed 2³² + P would become P, another process's
+    /// PID, whose identity both reads of a stop pass would then capture. A fraction, a Boolean,
+    /// or a value out of range throws instead.
+    private static func processID(_ number: NSNumber) throws(Unavailability) -> pid_t {
+        guard CFGetTypeID(number) == CFNumberGetTypeID(), !CFNumberIsFloatType(number),
+              let pid = pid_t(exactly: number.int64Value), NSNumber(value: pid) == number else {
+            throw .unexpectedResult
+        }
+        return pid
     }
 
     /// The value for `key`, or `nil` when the reply leaves it out. Throws when the value has

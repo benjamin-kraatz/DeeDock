@@ -75,6 +75,9 @@ struct LaunchServicesBackgroundReaderTests {
         case stateNotDictionary, flagNotNumber, typeNotString, detailsNotDictionary, pathNotString
         case nameNotString, identifierNotString, pidsNotNumbers, childrenNotArray
         case childReplyNotDictionary, childPIDNotNumber
+        case flagIsNumber, pidOutOfRange, pidFraction, pidIsBoolean, childPIDOutOfRange
+        // A malformed value next to one that would skip the record must still be caught.
+        case typeMalformedBesideFalseFlag, nameMalformedBesideEmptyPath, pidsMalformedBesideEmptyPath
 
         var testDescription: String { "\(self)" }
 
@@ -94,6 +97,16 @@ struct LaunchServicesBackgroundReaderTests {
                 .application(children: [FakeRecord(state: .vanished, details: .vanished, pid: .malformed)])
             case .childPIDNotNumber:
                 .application(children: [FakeRecord(state: .vanished, details: .vanished, pid: .values(["pid": "12"]))])
+            case .flagIsNumber: .application(flag: NSNumber(value: 1))
+            case .pidOutOfRange: .application(overrides: ["pids": [NSNumber(value: (Int64(1) << 32) + Int64(getpid()))]])
+            case .pidFraction: .application(overrides: ["pids": [NSNumber(value: 12.5)]])
+            case .pidIsBoolean: .application(overrides: ["pids": [NSNumber(value: true)]])
+            case .childPIDOutOfRange:
+                .application(children: [FakeRecord(state: .vanished, details: .vanished,
+                                                   pid: .values(["pid": NSNumber(value: Int64(1) << 32)]))])
+            case .typeMalformedBesideFalseFlag: .application(flag: false, type: NSNumber(value: 1))
+            case .nameMalformedBesideEmptyPath: .application(overrides: ["path": "", "name": NSNumber(value: 1)])
+            case .pidsMalformedBesideEmptyPath: .application(overrides: ["path": "", "pids": "12"])
             }
         }
     }
