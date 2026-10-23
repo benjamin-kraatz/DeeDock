@@ -46,9 +46,9 @@ None of these scenarios has been exercised.
   Allow DOKK there, come back, and check that the row turns to **Allowed** without a new prompt.
 - [x] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
   goes straight to the download.
-- [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
+- [x] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
   **Allowed** without a prompt.
-- [ ] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
+- [x] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
   `~/Library/Application Support/DDock/Lookout/Models/` (`Lookout-dev/Models/` for a Debug build,
   which downloads its own copy). Note the time and the free space before
   and after.
@@ -60,9 +60,9 @@ None of these scenarios has been exercised.
   appears, the partial file is deleted, and **Try Again** downloads it fresh.
 - [ ] Download, low disk space: with less than about 1 GB free, the error names the space needed
   and the space free.
-- [ ] Download in the background: close the card during the download and check the download card
+- [x] Download in the background: close the card during the download and check the download card
   and the chip's percentage in the Files search.
-- [ ] First pass: the ring moves, the feed shows file names, recently used files come first, and
+- [x] First pass: the ring moves, the feed shows file names, recently used files come first, and
   **Start searching** and **Finish in the background** both end onboarding while reading goes on.
   Check the first search after the first pass has no 5-second encoder start.
 - [ ] Status chip in every state it can reach: **Lookout off · Set up**, **Downloading model**,
@@ -87,9 +87,9 @@ None of these scenarios has been exercised.
   and ⌘1 to ⌘3 and ⌘F do nothing while the card shows.
 - [ ] Quick Look with Space on a Lookout file, a PDF page hit, and a folder hit.
 - [ ] Drag a Lookout result out to Finder and to another app, and drop files on a folder result.
-- [ ] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
+- [x] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
   status dot.
-- [ ] Reduce Transparency: the onboarding card and the result cards draw opaque.
+- [x] Reduce Transparency: the onboarding card and the result cards draw opaque.
 - [ ] Light and dark appearance for the card, every step, the results, the chips, and Settings.
 - [ ] German copy in every step, the chip, the results, the why card, the errors, and Settings.
   Check that no text is cut off.
@@ -101,13 +101,13 @@ None of these scenarios has been exercised.
   drive is connected. Lookout then catches up on changes.
 - [ ] Power policy: Low Power Mode, a serious thermal state if one can be reached, and battery with
   **Read files on battery too** off. Check that a new screenshot indexes at once in each.
-- [ ] New files: save a screenshot and check it is searchable within seconds.
-- [ ] **Read everything again**: names stay searchable while every file is read again.
-- [ ] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
+- [x] New files: save a screenshot and check it is searchable within seconds.
+- [x] **Read everything again**: names stay searchable while every file is read again.
+- [x] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
   `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up. Also
   delete during the first pass: the row shows **Deleting…** until the service answers, and the
   files go only then.
-- [ ] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
+- [x] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
   kept, and reading resumes.
 - [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query
   service 120 s after its last query, and the vectors are released 2 minutes after the Hub closes.
