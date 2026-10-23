@@ -31,8 +31,8 @@ The reader asks for the flag and the type first, because most records are ordina
 The feature must never be visible when it cannot work. If anything below fails, DOKK behaves as it did before: no background tiles, no Stop item, no banner, no alert.
 
 - The reader runs only on macOS 27. `dlsym` proves that a symbol exists, not that its signature is unchanged, and calling a changed signature could crash DOKK. A later release stays off until someone verifies it.
-- A missing function or key, or a reply that is not an array of records, switches the reader off with a reason (`unsupportedSystem`, `missingInterface`, `unexpectedResult`).
-- Every reply is type-checked before use. A record that fails a check is skipped.
+- A missing function or key switches the reader off with `missingInterface`.
+- Every reply is type-checked before use, and any reply with a shape other than the verified one switches the reader off with `unexpectedResult`: a record list that is not an array, a record reply that is not a dictionary, or a value of another type. It means the private interface changed, and the records that did parse could be wrong too, so DOKK shows none of them. A record that vanished before its reply is ordinary, because its app finished exiting, and is skipped. The parsing is separate from the private calls (`BackgroundRecordSource`), so tests feed it malformed replies.
 - A read that fails while Stop runs counts the same as any other failed read.
 - Once the reader reports a reason, `BackgroundApplicationMonitor` publishes nothing, removes its observers, and stays off for the rest of the session. DOKK logs the reason and sends the count-only `background_apps_unavailable` event once (see [Analytics](ANALYTICS.md)).
 - An app is reported only if at least one of its remaining processes belongs to the current user and is alive. DOKK never shows a background state it could not end.

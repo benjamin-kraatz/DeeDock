@@ -148,19 +148,13 @@ struct BackgroundProcessIdentityTests {
     }
 
     @Test("A live child gets an identity that stops matching once it exits")
-    func childLifecycle() throws {
-        let child = Process()
-        child.executableURL = URL(fileURLWithPath: "/bin/sleep")
-        child.arguments = ["30"]
-        try child.run()
-        defer { if child.isRunning { child.terminate() } }
-
-        let identity = try #require(BackgroundProcess(pid: child.processIdentifier))
-        #expect(identity.pid == child.processIdentifier)
+    func childLifecycle() async throws {
+        let child = try await BackgroundProcessFixture.start(.plain)
+        let identity = try #require(BackgroundProcess(pid: child.pid))
+        #expect(identity == child.identity)
         #expect(identity.isStillRunning)
 
-        child.terminate()
-        child.waitUntilExit()
+        child.end()
         #expect(!identity.isStillRunning)
         #expect(!identity.send(SIGTERM))
     }
