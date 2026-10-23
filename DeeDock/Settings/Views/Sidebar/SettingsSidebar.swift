@@ -79,9 +79,11 @@ struct SettingsSidebar: View {
 
     private func rows(_ sections: [SettingsSection]) -> some View {
         ForEach(sections) { section in
+            // The tag must stay outermost: wrapped by `.badge`, List no longer finds the row's
+            // selection value and clicks on it do nothing.
             SettingsSectionRow(section: section, isSelected: selection == section)
-                .tag(section)
                 .badge(section == .plugins ? pluginsWaiting : 0)
+                .tag(section)
         }
     }
 }
