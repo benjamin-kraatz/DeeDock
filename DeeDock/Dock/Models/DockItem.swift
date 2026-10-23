@@ -7,7 +7,13 @@ struct DockItem: Identifiable {
     /// Whether this item belongs to the persisted pinned section.
     let isFavorite: Bool
     /// True when at least one regular application process matches this identity.
+    ///
+    /// Window Peek, file routing, App Melt, Hide/Show/Bring All/Quit, and analytics read this
+    /// flag, so it stays false for an app that is only running in background.
     let isRunning: Bool
+    /// True when macOS 27 reports the app as running in background: its main process has quit,
+    /// but processes it started keep running. Never true while `isRunning` is true.
+    var isRunningInBackground = false
     /// Whether the application bundle can currently be resolved for opening.
     let isAvailable: Bool
     /// Current bundle location resolved by the catalog, including moved or bookmarked apps.

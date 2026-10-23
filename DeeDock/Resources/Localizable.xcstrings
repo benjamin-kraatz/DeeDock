@@ -5205,6 +5205,24 @@
         }
       }
     },
+    "applicationMenuStopRunningInBackground" : {
+      "comment" : "Dock context-menu and VoiceOver command, shown in place of Quit, that ends the processes a quit app left running in background. Matches the macOS Dock's own wording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ausführen im Hintergrund stoppen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop Running in Background"
+          }
+        }
+      }
+    },
     "applicationMenuUntitledWindow" : {
       "comment" : "Fallback menu title for a selectable window without a title.",
       "extractionState" : "manual",
@@ -5349,6 +5367,24 @@
         }
       }
     },
+    "appStatusRunningInBackground" : {
+      "comment" : "Accessibility value for a dock app whose main process has quit while processes it started keep running (macOS 27's Running in Background). Matches the casing of the other app status values.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Hintergrund ausgeführt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running in background"
+          }
+        }
+      }
+    },
     "appStatusUnavailable" : {
       "comment" : "Accessibility value indicating that a pinned application cannot be found.",
       "extractionState" : "manual",
@@ -5363,6 +5399,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "appTooltipRunningInBackground" : {
+      "comment" : "Second line under an app's name in the dock's hover label when the app's main process has quit but processes it started keep running. Matches the macOS Dock's own wording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Hintergrund ausgeführt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running in Background"
           }
         }
       }

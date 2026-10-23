@@ -15,7 +15,7 @@ struct DockUpdateButton: View {
     var body: some View {
         Button { interaction.openUpdate?(item) } label: {
             DockIconPresentation(
-                size: size, edge: interaction.layout.edge, available: true, running: false,
+                size: size, edge: interaction.layout.edge, available: true, running: .notRunning,
                 launching: false, keyboardSelected: selected,
                 artworkOpacity: DockAppearanceOpacity(settings: interaction.idleFade.settings,
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,

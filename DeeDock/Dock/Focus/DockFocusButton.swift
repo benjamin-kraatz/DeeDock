@@ -18,7 +18,7 @@ struct DockFocusButton: View {
     var body: some View {
         Button { interaction.openFocusSession?() } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                available: true, running: false, launching: false, keyboardSelected: selected,
+                available: true, running: .notRunning, launching: false, keyboardSelected: selected,
                 artworkOpacity: DockAppearanceOpacity(settings: interaction.idleFade.settings,
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,
                 artworkAnimation: interaction.idleFade.animation) {

@@ -380,7 +380,8 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 
 | Event | Properties |
 | --- | --- |
-| `app_menu_action` | `action` (`show_in_finder`, `hide`, `show`, `bring_all_to_front`, `quit`, `select_window`), `outcome`, `trigger` (`menu`, `voice_over`) |
+| `app_menu_action` | `action` (`show_in_finder`, `hide`, `show`, `bring_all_to_front`, `quit`, `select_window`, `stop_running_in_background`), `outcome`, `trigger` (`menu`, `voice_over`). `stop_running_in_background` is `succeeded` when DOKK asked the app's leftover processes to end and `failed` when the app was no longer running in background; neither shows a message. |
+| `background_apps_unavailable` | `reason` (`unsupported_system`, `missing_interface`, `unexpected_result`). DOKK could not read which apps macOS 27 runs in background and shows them as it did before. Sent at most once per launch. Never which app. |
 | `documents_opened` | `source` (`drop`, `picker`), `file_count`, `file_type`, `outcome`. A cancelled Open Files… picker is `outcome = canceled` with `file_count = 0`. |
 | `shortcut_run` | `source` (`tile`, `keyboard`, `drop`, `launcher`, `launcher_files`, `settings`), `file_count`, `outcome` (`succeeded`, `failed`, `canceled`), `duration` |
 | `shortcut_tile` | `action` (`pinned`, `unpinned`, `moved`, `accepts_files_on`, `accepts_files_off`, `reset`), `tile_count`. Never which Shortcut. |

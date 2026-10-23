@@ -14,7 +14,8 @@ final class DockStore {
     let displayID: String
     /// Filters running-only apps and Finder, including its pin. Other pins and section visibility remain independent.
     var visibleApplicationIDs: Set<String>?
-    /// Ordered render snapshots: this display's pins, followed by shared running applications.
+    /// Ordered render snapshots: this display's pins, followed by shared running applications,
+    /// including those running in background.
     private(set) var items: [DockItem] = []
     private(set) var folders: [FolderDockItem] = []
     /// A localized failure belonging only to this panel session.
@@ -153,22 +154,28 @@ final class DockStore {
         let pins = self.pins
         let pinnedApplications = pins.compactMap(\.application)
         let running = Dictionary(uniqueKeysWithValues: catalog.running.map { ($0.id, $0) })
+        // The catalog never lists an app as both running and running in background.
+        let background = Dictionary(uniqueKeysWithValues: catalog.background.map { ($0.id, $0) })
         let favorites = Dictionary(uniqueKeysWithValues: pinnedApplications.map { ($0.id, $0) })
         // Own windows remain reachable without Screen Recording or external-window occupancy.
-        let runningIDs = catalog.runningIDs.filter {
+        // Background apps have no windows, so filtered secondary docks drop them exactly as
+        // they drop a running app without windows there.
+        let unpinnedIDs = catalog.dockOrderIDs.filter {
             $0 == AppDockPresence.applicationID || (visibleApplicationIDs?.contains($0) ?? true)
         }
-        items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: runningIDs).compactMap { id in
+        items = DockOrdering.itemOrder(favorites: pinnedApplications, runningIDs: unpinnedIDs).compactMap { id in
             // Finder stays running for the desktop. On filtered secondary docks its saved
             // pin appears only with an actual visible window; persistence is untouched.
             if id == "com.apple.finder", let visibleApplicationIDs,
                !visibleApplicationIDs.contains(id) { return nil }
-            guard let reference = favorites[id] ?? running[id] else { return nil }
+            guard let reference = favorites[id] ?? running[id] ?? background[id] else { return nil }
             let access = ApplicationResourceAccess(reference)
             defer { withExtendedLifetime(access) {} }
             let url = catalog.service.resolvedURL(for: reference)
             return DockItem(reference: reference, icon: catalog.service.icon(for: url), isFavorite: favorites[id] != nil,
-                            isRunning: running[id] != nil, isAvailable: url != nil, resolvedURL: url)
+                            isRunning: running[id] != nil,
+                            isRunningInBackground: running[id] == nil && background[id] != nil,
+                            isAvailable: url != nil, resolvedURL: url)
         }
         folders = pins.compactMap { pin -> FolderDockItem? in
             guard let reference = pin.folder else { return nil }

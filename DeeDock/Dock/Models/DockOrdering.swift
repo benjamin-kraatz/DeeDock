@@ -20,7 +20,8 @@ enum DockOrdering {
         return retained + added.map(\.id)
     }
 
-    /// Places pinned apps first and appends running-only identities without duplicates.
+    /// Places pinned apps first and appends unpinned identities without duplicates. The dock passes
+    /// `ApplicationCatalog.dockOrderIDs`, which includes apps running in background.
     static func itemOrder(favorites: [ApplicationReference], runningIDs: [String]) -> [String] {
         let pinned = unique(favorites).map(\.id)
         let pinnedIDs = Set(pinned)

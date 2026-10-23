@@ -35,7 +35,7 @@ struct DockTooltipsOverlay: View {
                                                       edge: layout.edge, placement: interaction.tooltipPreset.placement)
                 let artwork = DockTooltipArtwork(name: slot.name, icon: slot.icon, preset: interaction.tooltipPreset,
                     edge: layout.edge, maximumWidth: max(1, region.width - 16), reduceTransparency: reduceTransparency,
-                    badge: DockTooltipBadge(slot: slot, interaction: interaction))
+                    badge: DockTooltipBadge(slot: slot, interaction: interaction), status: Self.status(for: slot))
                 artwork
                     .onGeometryChange(for: CGSize.self) { $0.size } action: {
                         if measuredSize != $0 { measuredSize = $0 }
@@ -62,8 +62,14 @@ struct DockTooltipsOverlay: View {
         .onChange(of: interaction.tooltips.visible) { _, target in
             guard let target, let slot = slots.first(where: { $0.target == target }),
                   let badge = DockTooltipBadge(slot: slot, interaction: interaction), badge.summary != nil else { return }
-            Analytics.count(.badgeDetailShown(banner: badge.banner != nil))
+            // The status line replaces the banner, so a background tile never showed one.
+            Analytics.count(.badgeDetailShown(banner: badge.banner != nil && Self.status(for: slot) == nil))
         }
         .onDisappear { interaction.tooltips.clear() }
+    }
+
+    /// The line under an app's name, shown with every preset and icon style.
+    private static func status(for slot: DockRenderSlot) -> String? {
+        slot.item?.isRunningInBackground == true ? String(localized: .appTooltipRunningInBackground) : nil
     }
 }

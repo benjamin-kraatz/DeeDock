@@ -19,7 +19,7 @@ struct DockCapsulesButton: View {
     var body: some View {
         Button { interaction.openSessionCapsules?() } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  lineIcon: interaction.lineIcon(for: .sessionCapsules)) {
@@ -68,7 +68,7 @@ struct DockSessionCapsuleButton: View {
     var body: some View {
         Button { interaction.openSessionCapsule?(item.capsuleID) } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation) {
                 SessionCapsuleStack(icons: item.applicationIcons, size: size)

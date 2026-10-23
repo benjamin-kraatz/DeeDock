@@ -13,7 +13,7 @@ struct DockActionButton: View {
     var body: some View {
         Button { interaction.actionTiles?.run(item.tile.id, source: .tile) } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected,
                                  artworkOpacity: DockAppearanceOpacity(settings: interaction.idleFade.settings,
                                     idleFraction: interaction.idleFade.fraction,

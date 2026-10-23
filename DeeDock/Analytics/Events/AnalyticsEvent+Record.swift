@@ -79,6 +79,7 @@ extension AnalyticsEvent {
         case .pinChanged: "pin_changed"
         case .islandsEdited: "islands_edited"
         case .appMenuAction: "app_menu_action"
+        case .backgroundAppsUnavailable: "background_apps_unavailable"
         case .documentsOpened: "documents_opened"
         case .shortcutRun: "shortcut_run"
         case .shortcutTile: "shortcut_tile"
@@ -275,6 +276,8 @@ extension AnalyticsEvent {
             ["action": .init(action), "island_count": .init(islandCount)]
         case let .appMenuAction(action, outcome, trigger):
             ["action": .init(action), "outcome": .init(outcome), "trigger": .init(trigger)]
+        case let .backgroundAppsUnavailable(reason):
+            ["reason": .init(reason)]
         case let .documentsOpened(source, fileCount, fileType, outcome):
             ["source": .init(source), "file_count": .init(fileCount), "file_type": fileType.map(AnalyticsValue.init),
              "outcome": .init(outcome)]

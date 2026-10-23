@@ -15,7 +15,7 @@ struct DockLaunchAnimationPicker: View {
                     request = Date()
                 } label: {
                     VStack(spacing: 8) {
-                        DockIconPresentation(size: 44, edge: edge, available: true, running: false,
+                        DockIconPresentation(size: 44, edge: edge, available: true, running: .notRunning,
                             launching: selection == style && previewBusy, keyboardSelected: false,
                             launchAnimation: style, launchRequest: selection == style ? request : nil) {
                                 Image(systemName: "app.gift.fill")

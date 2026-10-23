@@ -34,7 +34,7 @@ struct DockPluginButton: View {
     var body: some View {
         Button { interaction.openPlugin?(item.pluginID) } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  badgeLabel: badge?.label, badgeStyle: badge?.style ?? .count,

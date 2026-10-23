@@ -67,7 +67,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
             if let snapshot, snapshot.windowState == .loading {
                 discoveryID = interaction?.beginApplicationWindowDiscovery?(item, snapshot) { [weak self, weak menu] state in
                     guard let self, let menu, trackedMenu === menu, let previous = self.snapshot else { return }
-                    self.snapshot = ApplicationMenuSnapshot(processes: previous.processes, windowState: state)
+                    self.snapshot = ApplicationMenuSnapshot(processes: previous.processes, windowState: state,
+                                                            isRunningInBackground: previous.isRunningInBackground)
                     if self.meltChooser?.isTracking != true { self.rebuild(menu) }
                 }
             }
@@ -121,7 +122,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 }
             }
 
-            if snapshot.isRunning {
+            // A background app's Stop item takes Quit's slot, after the same separator.
+            if snapshot.isRunning || snapshot.isRunningInBackground {
                 menu.addItem(.separator())
                 for action in applicationActions where action != .showInFinder {
                     switch action {
@@ -132,6 +134,9 @@ struct DockContextMenuBridge: NSViewRepresentable {
                         addItem(.applicationMenuBringAllToFront, action: #selector(bringAllToFront), to: menu)
                     case .quit:
                         addItem(.applicationMenuQuit, action: #selector(quitApplication), to: menu)
+                    case .stopRunningInBackground:
+                        addItem(.applicationMenuStopRunningInBackground,
+                                action: #selector(stopRunningInBackground), to: menu)
                     case .showInFinder, .selectWindow:
                         break
                     }
@@ -289,6 +294,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func changeHiddenState() { perform(.setHidden(!(snapshot?.allProcessesHidden ?? false))) }
         @objc private func bringAllToFront() { perform(.bringAllToFront) }
         @objc private func quitApplication() { perform(.quit) }
+        @objc private func stopRunningInBackground() { perform(.stopRunningInBackground) }
 
         @objc private func selectWindow(_ sender: NSMenuItem) {
             guard let token = sender.representedObject as? ApplicationWindowToken else { return }

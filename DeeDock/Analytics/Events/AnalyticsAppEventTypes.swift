@@ -109,6 +109,8 @@ nonisolated enum AnalyticsSystemDockTuckFailure: String, AnalyticsToken {
 nonisolated enum AnalyticsAppMenuAction: String, AnalyticsToken {
     case showInFinder = "show_in_finder", hide, show, bringAllToFront = "bring_all_to_front", quit
     case selectWindow = "select_window"
+    /// `succeeded` when a stop was requested, `failed` when the app was no longer in background.
+    case stopRunningInBackground = "stop_running_in_background"
 
     init(_ action: ApplicationMenuAction) {
         switch action {
@@ -116,7 +118,26 @@ nonisolated enum AnalyticsAppMenuAction: String, AnalyticsToken {
         case .setHidden(let hidden): self = hidden ? .hide : .show
         case .bringAllToFront: self = .bringAllToFront
         case .quit: self = .quit
+        case .stopRunningInBackground: self = .stopRunningInBackground
         case .selectWindow: self = .selectWindow
+        }
+    }
+}
+
+/// Why DOKK cannot read which apps are running in background, so it shows them as before.
+nonisolated enum AnalyticsBackgroundAppsUnavailability: String, AnalyticsToken {
+    /// Not macOS 27, the only release the Launch Services calls are verified on.
+    case unsupportedSystem = "unsupported_system"
+    /// A Launch Services function or key is missing.
+    case missingInterface = "missing_interface"
+    /// Launch Services answered with something other than a list of application records.
+    case unexpectedResult = "unexpected_result"
+
+    init(_ reason: LaunchServicesBackgroundReader.Unavailability) {
+        switch reason {
+        case .unsupportedSystem: self = .unsupportedSystem
+        case .missingInterface: self = .missingInterface
+        case .unexpectedResult: self = .unexpectedResult
         }
     }
 }
