@@ -158,9 +158,13 @@ nonisolated enum LaunchServicesBackgroundReader {
 
     /// The value for `key`, or `nil` when the reply leaves it out. Throws when the value has
     /// another type, which an absent key never causes.
+    ///
+    /// Launch Services leaves absent values out of its replies; on macOS 27.0.1 none of 104
+    /// records answered a requested key with null. A present `NSNull` is therefore malformed,
+    /// not absent, and throws like any other wrong type.
     private static func value<T>(_ values: [String: Any], _ key: String, as type: T.Type) throws(Unavailability) -> T? {
-        guard let raw = values[key], !(raw is NSNull) else { return nil }
-        guard let typed = raw as? T else { throw .unexpectedResult }
+        guard let raw = values[key] else { return nil }
+        guard !(raw is NSNull), let typed = raw as? T else { throw .unexpectedResult }
         return typed
     }
 

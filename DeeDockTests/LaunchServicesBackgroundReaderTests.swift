@@ -78,6 +78,8 @@ struct LaunchServicesBackgroundReaderTests {
         case flagIsNumber, pidOutOfRange, pidFraction, pidIsBoolean, childPIDOutOfRange
         // A malformed value next to one that would skip the record must still be caught.
         case typeMalformedBesideFalseFlag, nameMalformedBesideEmptyPath, pidsMalformedBesideEmptyPath
+        // Launch Services leaves absent values out; an explicit null is malformed, not absent.
+        case flagNull, typeNull, pathNull, nameNull, pidsNull, childPIDNull
 
         var testDescription: String { "\(self)" }
 
@@ -107,6 +109,13 @@ struct LaunchServicesBackgroundReaderTests {
             case .typeMalformedBesideFalseFlag: .application(flag: false, type: NSNumber(value: 1))
             case .nameMalformedBesideEmptyPath: .application(overrides: ["path": "", "name": NSNumber(value: 1)])
             case .pidsMalformedBesideEmptyPath: .application(overrides: ["path": "", "pids": "12"])
+            case .flagNull: .application(flag: NSNull())
+            case .typeNull: .application(type: NSNull())
+            case .pathNull: .application(overrides: ["path": NSNull()])
+            case .nameNull: .application(overrides: ["name": NSNull()])
+            case .pidsNull: .application(overrides: ["pids": NSNull()])
+            case .childPIDNull:
+                .application(children: [FakeRecord(state: .vanished, details: .vanished, pid: .values(["pid": NSNull()]))])
             }
         }
     }
