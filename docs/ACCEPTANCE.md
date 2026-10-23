@@ -3528,7 +3528,7 @@ Built on `codex/dee-140-dokk-plugins` after the locked mockup `docs/mockups/dokk
   - the stopped state and restart;
   - the approval window.
 - **Dock section.** Plugin tiles render as a `DockRenderSlot.plugin` section between the applications and the utilities, with a divider on each side (`DockGeometry.layout(pluginCount:)`). With Islands on they form a `plugins` island tinted orchid (hue 312, saturation 0.55).
-- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
+- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. The scene is drawn by the plugin's process, which can take a click on it in a window of its own. The first Trendi run showed this: every click in the deck closed the panel, while clicks in DOKK's header did not. The popover's `remoteContent` option treats any click inside the panel's body as inside, whichever window or app received it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
 - **Tile and panel menus.** The same `NSMenu` serves the tile and the panel's More button.
 - **Stopped state.**
   - Tile: grey, with a restart chip, and the badge hidden.

@@ -60,6 +60,10 @@ struct MyPanelScene: AppExtensionScene {
 
 Leave the panel view without a background, so DOKK's glass shows through. Pad your content yourself. DOKK's header sits above it.
 
+Clicks anywhere on your scene keep the panel open. Your process can receive them in a window of its own, so DOKK counts any click inside the panel's body as a click on the panel. A click outside the panel closes it, including a click in an open panel or alert that your plugin shows.
+
+Finder refuses `NSWorkspace` opens that come from a plugin extension. Opening Downloads from Trendi's plugin showed "Trendi (DOKK Dev) has no permission to open Downloads", although the extension may read and write there. Have your app do the opening: Trendi's plugin records what it wants in its App Group, and the app carries it out.
+
 ### Accept DOKK's connections
 
 DOKK opens one background connection while the plugin's tile is pinned, through `AppExtensionProcess`. That connection reaches the plugin's `ConnectionHandler` and carries the tile state, whether or not the panel is open. The plugin spike measured the panel's scene and this connection reaching the same process.
@@ -113,7 +117,7 @@ With no `panelSize`, the panel is 560 × 420. A new `panelSize` while the panel 
 
 ## Lifecycle
 
-- **Approval.** macOS lists a plugin from a separate app as waiting until the person turns it on in the system window: DOKK Settings › Plugins › Manage Plugins…. DOKK can count waiting plugins but cannot name them.
+- **Approval.** macOS lists a plugin from a separate app as waiting until the person turns it on in the system window: DOKK Settings › Plugins › Manage Plugins…. DOKK can count waiting plugins but cannot name them. Every copy of a plugin counts separately: two extra builds of the same app in Xcode's build folders read as two more plugins waiting, and Manage Plugins lists each copy under the same name. `pluginkit -m -v -p de.benjaminkraatz.DeeDock.dev.plugin` shows the copy in use.
 - **Auto-pin.** The first time DOKK sees a plugin enabled, it pins its tile at the end of the plugin section. An unpinned plugin stays unpinned when it is turned off and on again.
 - **Running.** A pinned plugin runs for as long as its tile is pinned. The panel opening and closing changes only the panel's scene; closing the panel ends that scene.
 - **Ending.** Unpinning, turning the plugin off, or uninstalling it ends DOKK's session. DOKK sends `willDisconnect` first, then invalidates the connection and its `AppExtensionProcess`. The spike saw plugin processes outlive every host reference by minutes, so **exit when DOKK's last connection closes**. `DOKKPluginHostLink` does this after three seconds unless DOKK reconnects.
