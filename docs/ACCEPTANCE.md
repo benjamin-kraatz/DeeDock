@@ -9,7 +9,7 @@ validation, unless a later dated result supersedes them.
 
 Implemented on `benn/background-app-dock-status`. On macOS 27, an app whose main process quits while its helpers keep running keeps its tile with a muted indicator, a **Running in Background** line in the hover label, a VoiceOver status and action, and **Stop Running in Background** in place of Quit. The state comes from private Launch Services calls and is off, silently, wherever they cannot be read. The design and safety rules are in [Running in Background](BACKGROUND-APPS.md), and behavior is in the [user guide](GUIDE.md#use-the-dock).
 
-Validation on 2026-10-23: `xcodebuild build-for-testing` for the `DeeDock` scheme succeeds. New tests in `DeeDockTests/BackgroundApplicationTests.swift` and `DeeDockTests/ApplicationMenuTests.swift` cover the catalog's running-wins rule, tile position across running, background, and running again, removal when the background state ends, the pinned flag, section and secondary-display filtering, the Stop menu projection and its silent routing, and process identity. The tests were not run. The app was not launched, and previews were not rendered. The Launch Services reader and the stop sequence were verified earlier with a standalone harness on macOS 27.0.1, not inside DOKK.
+Validation on 2026-10-23: `xcodebuild build-for-testing` for the `DeeDock` scheme succeeds. New tests in `DeeDockTests/BackgroundApplicationTests.swift`, `DeeDockTests/BackgroundApplicationMonitorTests.swift`, and `DeeDockTests/ApplicationMenuTests.swift` cover the catalog's running-wins rule, tile position across running, background, and running again, removal when the background state ends, the pinned flag, section and secondary-display filtering, the Stop menu projection and its silent routing, process identity, the kernel refusing a stale identity, the SIGKILL pass, a reopen cancelling it, a process listed by only one read, and a failed read during Stop turning the feature off. The tests were not run. The app was not launched, and previews were not rendered. The Launch Services reader and the stop sequence were verified earlier with a standalone harness on macOS 27.0.1, not inside DOKK.
 
 ### Required hands-on acceptance
 
@@ -22,7 +22,7 @@ None of these scenarios has been exercised.
 - [ ] Stop ends the helpers. An unpinned tile then leaves the dock, and a pinned tile stays without an indicator.
 - [ ] A helper that ignores SIGTERM is force-quit about 3 seconds after Stop.
 - [ ] Clicking a background tile opens the app again, with the launch animation, and the indicator becomes the normal one in place.
-- [ ] Reopening the app before the 3-second pass ends keeps its helpers alive.
+- [ ] Reopening the app before the 3-second pass ends keeps its helpers alive, also when the app quits again before the 3 seconds are over.
 - [ ] Pinned and unpinned background apps, including one pinned under an older bundle location.
 - [ ] Inside an island, the muted indicator uses a faint island tint without the glow.
 - [ ] Every indicator style: Dot, Bar, Square, Target Lock, Orbit, Stardust (static while in background), Power Badge, and Hidden (nothing shown).

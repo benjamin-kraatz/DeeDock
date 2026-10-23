@@ -33,6 +33,7 @@ The feature must never be visible when it cannot work. If anything below fails, 
 - The reader runs only on macOS 27. `dlsym` proves that a symbol exists, not that its signature is unchanged, and calling a changed signature could crash DOKK. A later release stays off until someone verifies it.
 - A missing function or key, or a reply that is not an array of records, switches the reader off with a reason (`unsupportedSystem`, `missingInterface`, `unexpectedResult`).
 - Every reply is type-checked before use. A record that fails a check is skipped.
+- A read that fails while Stop runs counts the same as any other failed read.
 - Once the reader reports a reason, `BackgroundApplicationMonitor` publishes nothing, removes its observers, and stays off for the rest of the session. DOKK logs the reason and sends the count-only `background_apps_unavailable` event once (see [Analytics](ANALYTICS.md)).
 - An app is reported only if at least one of its remaining processes belongs to the current user and is alive. DOKK never shows a background state it could not end.
 
@@ -53,8 +54,9 @@ When an app quits, the termination notification arrives before DOKK has read the
 - Each pass re-reads Launch Services and signals only the processes that belong to the app at that moment, so a helper started after the first pass is included.
 - Only processes owned by the current user, other than launchd and DOKK itself.
 - Only non-foreground coalition members and non-foreground child applications. A foreground app that shares the coalition has its own tile and is never touched.
-- Before every signal, the process's PID and start time must still match what the read returned. The kernel reuses PIDs, so a PID alone could name an unrelated process by then.
-- If the app has been opened again, neither pass sends anything, because the new instance may use the same helpers.
+- Each process is identified by its kernel audit token, which carries a per-instance version as well as the PID. Signals go through `proc_signal_with_audittoken`, and the kernel delivers them only while that exact instance is alive. The check happens in the kernel, at delivery, so no window remains between checking and signalling. The kernel reuses PIDs, so a PID alone could name an unrelated process by then.
+- Each pass reads Launch Services twice and signals only identities that both reads list. A read captures an identity just after Launch Services lists the PID. If the PID was reused in between, the captured identity belongs to a process outside the app's coalition, which the second read does not list.
+- Opening the app cancels a pending stop for good, even if the app quits again before the grace period ends, because the helpers it leaves then are not the ones the user asked to stop. While a regular instance runs, neither pass sends anything, because the new instance may use the same helpers.
 - SIGTERM first. After 3 seconds, SIGKILL to whatever is still running.
 - Failure is silent. The tile keeps its muted indicator until the processes actually exit. The menu action reports `failed` to analytics only when the app was no longer running in background.
 - Tearing down the monitor cancels a pending SIGKILL pass.
