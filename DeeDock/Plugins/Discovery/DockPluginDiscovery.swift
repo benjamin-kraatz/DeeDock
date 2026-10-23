@@ -61,9 +61,11 @@ final class DockPluginDiscovery {
                                                       disabled: state.disabledCount))
                 }
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, let self, self.generation == generation else { return }
                 Self.logger.error("Plugin discovery failed: \(String(describing: error), privacy: .public)")
-                self?.changed?(.empty)
+                // A failed rescan keeps the last known inventory: reporting empty would end every
+                // running plugin. Before the first scan, empty lets Settings stop showing "looking".
+                if self.monitor == nil { self.changed?(.empty) }
             }
         }
     }

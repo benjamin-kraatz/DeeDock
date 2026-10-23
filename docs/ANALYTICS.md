@@ -419,7 +419,7 @@ Atmosphere has no events of its own. Its settings are reported through `setting_
 
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
 
-Plugin events are counts only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
+Plugin events carry counts, durations, surfaces, and yes/no flags only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
 The feed sends no event when a notification arrives, and none of its events carry text or app
 names. `opened` for the `notificationFeed` callout means the person turned the feed on from it.
 

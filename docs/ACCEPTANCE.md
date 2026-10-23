@@ -30,21 +30,21 @@ None of these scenarios has been exercised.
 - [ ] Onboarding opens from the status chip, from the **Set up Lookout** card, and from the
   **Search by content** switch in Settings with the Hub closed. Check that it holds an anchored Hub
   open through the folder picker and macOS's prompt, and that sleep, a display change, and ⌘W end it.
-- [ ] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
-- [ ] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
+- [x] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
+- [x] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
   Pictures and added folders, and **Estimate after access** for the protected ones. No macOS prompt
   may appear before the access step. **Add folder…** with a plain folder, a folder inside a chosen
   one, a folder around chosen ones, `/`, the home folder, a folder in `~/Library`, a hidden folder,
   `/Library`, and a link to a folder in `~/Library`. iCloud Drive, a folder in
   `~/Library/CloudStorage`, and `~/Dropbox` must be accepted, and `~/Library/CloudStorage` itself
   refused.
-- [ ] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
+- [x] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
   **Allowed**, and the Hub takes keyboard focus back.
-- [ ] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
+- [x] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
   **Continue** stays off until every folder has an answer and one is allowed.
-- [ ] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
+- [x] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
   Allow DOKK there, come back, and check that the row turns to **Allowed** without a new prompt.
-- [ ] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
+- [x] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
   goes straight to the download.
 - [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
   **Allowed** without a prompt.
@@ -3536,7 +3536,7 @@ Built on `codex/dee-140-dokk-plugins` after the locked mockup `docs/mockups/dokk
 - **Settings.** A Plugins section with the puzzle-piece symbol, and a waiting count on the sidebar row. Dock Extras moved to `plus.app.fill`.
 - **Housekeeping.** Unpinning, disabling, or uninstalling a plugin ends its session with `willDisconnect` first. Closing the panel ends its scene. The sample plugin exits three seconds after DOKK's last connection closes.
 - **Sample plugin.** The `DOKK Sample Plugin` scheme. It isn't embedded in DOKK, and DOKK doesn't depend on it.
-- **Analytics.** Count-only `plugin_*` and `plugins_*` events, listed in ANALYTICS.md.
+- **Analytics.** `plugin_*` and `plugins_*` events with counts, durations, surfaces, and flags but no plugin identity, listed in ANALYTICS.md.
 
 ### Validation status
 
