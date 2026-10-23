@@ -62,7 +62,8 @@ final class DockPluginPanelCoordinator {
         state.sceneFailed = { [weak self] in self?.plugins.sceneFailed(id) }
         state.menuActions = menuActions(for: id)
 
-        let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true,
+        // The scene is drawn by the plugin's process, which can take clicks on it directly.
+        let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true, remoteContent: true,
                                               ideal: DockPluginPanelGeometry.panelSize(for: plugin.tileState, edge: anchor.edge)) { chrome in
             state.chrome = chrome
         } content: {

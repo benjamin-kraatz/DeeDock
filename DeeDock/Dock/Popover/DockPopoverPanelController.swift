@@ -1,5 +1,8 @@
 import AppKit
+import os
 import SwiftUI
+
+private let popoverLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DeeDock", category: "Popover")
 
 private final class DockPopoverPanel: NSPanel {
     var acceptsKeyboardFocus = false
@@ -28,6 +31,7 @@ final class DockPopoverPanelController<Content: View> {
     private let keyboard: Bool
     private let clickFocus: Bool
     private let activates: Bool
+    private let remoteContent: Bool
     private let reduceMotion: Bool
     private var ideal: CGSize
     private let outline: ((DockPopoverChrome) -> DockPopoverShape)?
@@ -72,16 +76,21 @@ final class DockPopoverPanelController<Content: View> {
     ///     such as Liquid Glass with no fill beneath it. Without it, clicks and scrolls on the panel's
     ///     transparent pixels reach the window behind and count as outside clicks. With it, the panel
     ///     receives every pointer event over its frame, and only clicks outside the outline dismiss.
+    ///   - remoteContent: The content includes a view another process draws, such as a plugin's
+    ///     ExtensionKit scene. That process can receive clicks on its view in a window of its own,
+    ///     so DOKK sees them as clicks in another window or another app. With this set, a click
+    ///     inside the panel's body counts as a click on the panel, whichever window received it.
     ///   - chromeChanged: Receives the resolved chrome before the content is built, and again on
     ///     every re-anchor, so the content view can draw its pointer in the right place.
     ///   - content: Built once, after the initial chrome has been published.
     init(anchor: DockPopoverAnchor, keyboard: Bool, clickFocus: Bool = false, activates: Bool = false,
-         windowShadow: Bool = true, ideal: CGSize = DockPopoverGeometry.idealSize,
+         remoteContent: Bool = false, windowShadow: Bool = true, ideal: CGSize = DockPopoverGeometry.idealSize,
          outline: ((DockPopoverChrome) -> DockPopoverShape)? = nil,
          chromeChanged: @escaping (DockPopoverChrome) -> Void, content: () -> Content) {
         self.keyboard = keyboard || activates
         self.clickFocus = clickFocus
         self.activates = activates
+        self.remoteContent = remoteContent
         self.ideal = ideal
         self.outline = outline
         self.chromeChanged = chromeChanged
@@ -206,6 +215,27 @@ final class DockPopoverPanelController<Content: View> {
         return outline(placement.chrome).path(in: CGRect(origin: .zero, size: size)).contains(point)
     }
 
+    /// The panel's body in screen coordinates: its frame without the pointer strip on the dock's
+    /// side, whose transparent corners let clicks through to the window behind.
+    private var bodyFrame: CGRect {
+        let frame = panel.frame
+        let depth = DockPopoverGeometry.pointerDepth
+        switch placement.chrome.edge {
+        case .bottom: return CGRect(x: frame.minX, y: frame.minY + depth, width: frame.width, height: frame.height - depth)
+        case .top: return CGRect(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height - depth)
+        case .left: return CGRect(x: frame.minX + depth, y: frame.minY, width: frame.width - depth, height: frame.height)
+        case .right: return CGRect(x: frame.minX, y: frame.minY, width: frame.width - depth, height: frame.height)
+        }
+    }
+
+    /// Whether a click another window received landed on remote content inside this panel.
+    /// - Parameter location: The click in screen coordinates.
+    private func isRemoteContentClick(at location: CGPoint) -> Bool {
+        guard remoteContent, panel.isVisible, bodyFrame.contains(location) else { return false }
+        popoverLogger.debug("Kept a click on the panel's remote content")
+        return true
+    }
+
     private func installMonitors() {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         // File panels route navigation before Quick Look's responder consumes Space/Escape.
@@ -225,6 +255,12 @@ final class DockPopoverPanelController<Content: View> {
                 }
                 return event
             }
+            // The click went to another of DOKK's windows over the panel, not to the panel itself.
+            // It still belongs to the plugin's scene, and its focus stays where that window put it.
+            if let window = event.window, window !== panel, !(window is DockPanel),
+               isRemoteContentClick(at: window.convertPoint(toScreen: event.locationInWindow)) {
+                return event
+            }
             guard canDismissForOutsideClick?() != false else { return event }
             // A dock click dismisses the popover but must not reach the button underneath.
             // A click on the panel's margin outside the outline dismisses without reaching the content.
@@ -235,6 +271,8 @@ final class DockPopoverPanelController<Content: View> {
         }
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
             guard let self, canDismissForOutsideClick?() != false else { return }
+            // A global event carries no window of DOKK's; the pointer says where the click was.
+            guard !isRemoteContentClick(at: NSEvent.mouseLocation) else { return }
             close(returnFocus: false)
         }
     }

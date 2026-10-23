@@ -3556,7 +3556,7 @@ Built on `codex/dee-140-dokk-plugins` after the locked mockup `docs/mockups/dokk
   - the stopped state and restart;
   - the approval window.
 - **Dock section.** Plugin tiles render as a `DockRenderSlot.plugin` section between the applications and the utilities, with a divider on each side (`DockGeometry.layout(pluginCount:)`). With Islands on they form a `plugins` island tinted orchid (hue 312, saturation 0.55).
-- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
+- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. The scene is drawn by the plugin's process, which can take a click on it in a window of its own. The first Trendi run showed this: every click in the deck closed the panel, while clicks in DOKK's header did not. The popover's `remoteContent` option treats any click inside the panel's body as inside, whichever window or app received it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
 - **Tile and panel menus.** The same `NSMenu` serves the tile and the panel's More button.
 - **Stopped state.**
   - Tile: grey, with a restart chip, and the badge hidden.
@@ -3599,6 +3599,7 @@ The app was not launched. Not exercised:
 - the tile, badge pushes, and the panel in a real dock;
 - typing in a plugin's text field inside the non-activating panel;
 - crash and restart;
+- a menu item marked `opensPanel` (the sample's **Bump Badge in Panel**) opening the panel before the plugin hears the choice;
 - live resizing;
 - unpinning ending the plugin process;
 - auto-pin on approval;
@@ -3611,4 +3612,4 @@ The app was not launched. Not exercised:
 Also open:
 - whether DOKK and DOKK Dev, both installed and both declaring the shared point, each see and approve the same plugin;
 - loading a plugin from another team;
-- the App Store question for philos.
+- whether a Mac App Store app may ship a DOKK plugin, which Trendi's TestFlight build will answer.

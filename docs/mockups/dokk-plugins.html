@@ -371,8 +371,8 @@ const ICON={
  trash:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gtr','#f3f5f8','#b7bdc7')}</defs>
   <path d="M24 22h52l-6 66H30z" fill="url(#gtr)" stroke="#9aa1ab" stroke-width="1.5"/><ellipse cx="50" cy="22" rx="26" ry="5" fill="#e6e9ee" stroke="#9aa1ab" stroke-width="1.5"/>
   <path d="M36 30l3 52M50 30v52M64 30l-3 52" stroke="#a9afb9" stroke-width="2"/></svg>`,
- philos:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gph','#35a383','#0f4438')}</defs><g fill="url(#gph)">${SQ}</g>
-  <text x="50" y="71" text-anchor="middle" font-family="'New York',ui-serif,Georgia,serif" font-size="54" fill="#f6edd4">φ</text></svg>`,
+ reader:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gph','#35a383','#0f4438')}</defs><g fill="url(#gph)">${SQ}</g>
+  <text x="50" y="71" text-anchor="middle" font-family="'New York',ui-serif,Georgia,serif" font-size="54" fill="#f6edd4">R</text></svg>`,
  build:()=>`<svg class="app" viewBox="0 0 100 100"><defs>${g('gbu','#3d414b','#17191e')}</defs><g fill="url(#gbu)">${SQ}</g>
   <circle cx="29" cy="33" r="5" fill="#30d158"/><rect x="39" y="29" width="34" height="8" rx="4" fill="#fff" opacity=".88"/>
   <circle cx="29" cy="50" r="5" fill="#ffd60a"/><rect x="39" y="46" width="24" height="8" rx="4" fill="#fff" opacity=".88"/>
@@ -391,19 +391,19 @@ const NAMES={finder:'Finder',safari:'Safari',mail:'Mail',notes:'Notes',music:'Mu
 const APPS=['finder','safari','mail','notes','music','terminal'];
 const RUNNING=new Set(['finder','safari','mail','music']);
 const META={
- philos:{name:'philos',app:'philos',req:[360,280]},
+ reader:{name:'Reader',app:'Reader',req:[360,280]},
  build:{name:'Build Status',app:'Pipeline',req:[360,236]},
  sample:{name:'DOKK Sample Plugin',app:'DOKK Sample Plugin',req:[320,226]},
  glance:{name:'Weather Glance',app:'Glance',req:[300,190]},
  tally:{name:'Tally',app:'Tally Counter',req:[280,180]},
 };
-const ORDER=['philos','build','sample','glance','tally'];
+const ORDER=['reader','build','sample','glance','tally'];
 const isPlugin=id=>id in META;
 
 /* ───────── state ───────── */
 let S,T=[];
 function freshPlugins(){return{
- philos:{installed:true,enabled:true,pinned:true,status:'running',badge:2,read:false},
+ reader:{installed:true,enabled:true,pinned:true,status:'running',badge:2,read:false},
  build:{installed:true,enabled:true,pinned:true,status:'running',badge:1},
  sample:{installed:true,enabled:true,pinned:true,status:'running',badge:0,pid:4821},
  glance:{installed:true,enabled:false,pinned:true,status:'off',badge:0},
@@ -412,7 +412,7 @@ function freshPlugins(){return{
 function freshBuilds(){return[
  {id:'b1',name:'dokk',br:'main',st:'pass',t:'4 min ago'},
  {id:'b2',name:'dokk',br:'codex/dee-140-dokk-plugins',st:'run',t:'running'},
- {id:'b3',name:'philos',br:'release/2.0',st:'fail',t:'12 min ago'},
+ {id:'b3',name:'atlas',br:'release/2.0',st:'fail',t:'12 min ago'},
  {id:'b4',name:'site',br:'main',st:'pass',t:'1 h ago'},
 ]}
 function reset(keepUI){
@@ -538,14 +538,14 @@ function header(id){
 const CHECK='<svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>',CROSS='<svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg>';
 function view(id){
  const st=S.pl[id];
- if(id==='philos')return `<div class="pv">
+ if(id==='reader')return `<div class="pv">
   <div class="eyebrow">Continue reading</div>
   <div class="book"><div class="cover"></div><div><div class="bt">The Name of the Rose</div><div class="ba">Umberto Eco · 62% read</div><div class="bar"><i style="width:62%"></i></div></div></div>
   ${st.read?`<div class="eyebrow">Highlights</div><div class="done">${'<svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg>'}You're all caught up.</div>`:
    `<div class="eyebrow">New highlights <span class="cnt">2</span></div>
   <div class="hl">“Books are not made to be believed, but to be subjected to inquiry.”</div>
   <div class="hl">“The good of a book lies in its being read.”</div>`}
-  <div class="acts">${st.read?'':'<button class="pbtn" data-act="philos-read">Mark as read</button>'}<button class="pbtn pri" data-act="noop">Open in philos</button></div></div>`;
+  <div class="acts">${st.read?'':'<button class="pbtn" data-act="reader-read">Mark as read</button>'}<button class="pbtn pri" data-act="noop">Open in Reader</button></div></div>`;
  if(id==='build')return `<div class="pv"><div class="bl">${S.builds.map(b=>`<div class="br" data-b="${b.id}"><span class="bs ${b.st}">${b.st==='pass'?CHECK:b.st==='fail'?CROSS:''}</span>
    <div class="tx"><div class="bn">${b.name}</div><div class="bb">${b.br}</div></div><span class="bt2">${b.st==='fail'?`<button class="pbtn" data-act="rerun" data-b="${b.id}">Re-run</button>`:b.t}</span></div>`).join('')}</div></div>`;
  if(id==='sample')return `<div class="pv smp"><div class="lbl">Hello from DOKK Sample Plugin</div><div><span class="big" id="smpN">${st.badge}</span></div>
@@ -720,7 +720,7 @@ function setPinned(id,on){
 function act(a,el,e){
  const id=el.dataset.id;
  switch(a){
-  case 'philos-read':S.pl.philos.read=true;setBadge('philos',0);refresh('philos');break;
+  case 'reader-read':S.pl.reader.read=true;setBadge('reader',0);refresh('reader');break;
   case 'rerun':{const b=S.builds.find(b=>b.id===el.dataset.b);b.st='run';b.t='running';refresh('build');
    later(2600,()=>{b.st='pass';b.t='just now';if(S.pl.build.status!=='stopped'){setBadge('build',buildFails());refresh('build')}});break}
   case 'bump':setBadge('sample',S.pl.sample.badge+1);break;

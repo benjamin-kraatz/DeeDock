@@ -110,6 +110,15 @@ struct DockPluginTests {
         #expect(DOKKPluginRequest.decode(DOKKPluginRequest.openApp.encoded()) == .openApp)
     }
 
+    @Test("A menu item's opensPanel survives the round trip, and older plugins that omit it read as nil")
+    func menuItemOpensPanel() throws {
+        let state = DOKKPluginTileState(menuItems: [DOKKPluginMenuItem(id: "stats", title: "Statistics", opensPanel: true)])
+        #expect(DOKKPluginTileState.decode(state.encoded())?.menuItems.first?.opensPanel == true)
+        let older = Data(#"{"menuItems":[{"id":"a","title":"A"}]}"#.utf8)
+        let items = try #require(DOKKPluginTileState.decode(older)?.menuItems)
+        #expect(items.count == 1 && items[0].opensPanel == nil)
+    }
+
     @Test("Unknown events and requests are dropped")
     func unknownMessagesDecodeToNil() {
         #expect(DOKKPluginHostEvent.decode(Data(#"{"kind":"later"}"#.utf8)) == nil)

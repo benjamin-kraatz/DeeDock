@@ -60,6 +60,10 @@ struct MyPanelScene: AppExtensionScene {
 
 Leave the panel view without a background, so DOKK's glass shows through. Pad your content yourself. DOKK's header sits above it.
 
+Clicks anywhere on your scene keep the panel open. Your process can receive them in a window of its own, so DOKK counts any click inside the panel's body as a click on the panel. A click outside the panel closes it, including a click in an open panel or alert that your plugin shows.
+
+Finder refuses `NSWorkspace` opens that come from a plugin extension. Opening Downloads from Trendi's plugin showed "Trendi (DOKK Dev) has no permission to open Downloads", although the extension may read and write there. Have your app do the opening: Trendi's plugin records what it wants in its App Group, and the app carries it out.
+
 ### Accept DOKK's connections
 
 DOKK opens one background connection while the plugin's tile is pinned, through `AppExtensionProcess`. That connection reaches the plugin's `ConnectionHandler` and carries the tile state, whether or not the panel is open. The plugin spike measured the panel's scene and this connection reaching the same process.
@@ -88,7 +92,7 @@ All values travel as JSON over two `@objc` protocols in `DOKKPluginXPC.swift`. O
 | `accessibilityValue` | What VoiceOver reads after the title, such as "2 new highlights" |
 | `panelSize` | The content size the plugin would like, in points, below DOKK's header |
 | `primaryAction` | `openPanel` (the default) or `openApp`: what a click on the tile does |
-| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, and an optional SF Symbol name |
+| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, an optional SF Symbol name, and an optional `opensPanel` |
 
 ### Versioning
 
@@ -100,7 +104,7 @@ Both sides skip what they don't know:
 
 So adding an optional field or a new event kind doesn't change the version. The version goes up only for a change an older peer can't ignore.
 
-There is deliberately no request to open the panel. A panel opens only when the person clicks the tile.
+There is deliberately no request to open the panel. A panel opens only when the person clicks the tile, or chooses a menu item marked `opensPanel`. For that item DOKK opens the panel first and then reports the choice, so `panelOpened` arrives before `menuItemChosen`. A host that predates `opensPanel` ignores it and only reports the choice, so the plugin should be ready to show that content the next time the panel opens.
 
 ## Panel size
 
@@ -113,7 +117,7 @@ With no `panelSize`, the panel is 560 × 420. A new `panelSize` while the panel 
 
 ## Lifecycle
 
-- **Approval.** macOS lists a plugin from a separate app as waiting until the person turns it on in the system window: DOKK Settings › Plugins › Manage Plugins…. DOKK can count waiting plugins but cannot name them.
+- **Approval.** macOS lists a plugin from a separate app as waiting until the person turns it on in the system window: DOKK Settings › Plugins › Manage Plugins…. DOKK can count waiting plugins but cannot name them. Every copy of a plugin counts separately: two extra builds of the same app in Xcode's build folders read as two more plugins waiting, and Manage Plugins lists each copy under the same name. `pluginkit -m -v -p de.benjaminkraatz.DeeDock.dev.plugin` shows the copy in use.
 - **Auto-pin.** The first time DOKK sees a plugin enabled, it pins its tile at the end of the plugin section. An unpinned plugin stays unpinned when it is turned off and on again.
 - **Running.** A pinned plugin runs for as long as its tile is pinned. The panel opening and closing changes only the panel's scene; closing the panel ends that scene.
 - **Ending.** Unpinning, turning the plugin off, or uninstalling it ends DOKK's session. DOKK sends `willDisconnect` first, then invalidates the connection and its `AppExtensionProcess`. The spike saw plugin processes outlive every host reference by minutes, so **exit when DOKK's last connection closes**. `DOKKPluginHostLink` does this after three seconds unless DOKK reconnects.
@@ -128,7 +132,7 @@ With no `panelSize`, the panel is 560 × 420. A new `panelSize` while the panel 
 
 - A plugin from another developer is discovered and offered for approval. Loading it after approval has not been checked yet.
 - DOKK sets no team or code requirement on its extension point.
-- Whether a Mac App Store app (philos) may ship an extension for a third-party extension point is open. Benn is checking that with a TestFlight build.
+- Whether a Mac App Store app may ship an extension for a third-party extension point is open. Trendi's TestFlight build, the first real DOKK plugin, will answer it.
 
 ## How the extension point is declared
 

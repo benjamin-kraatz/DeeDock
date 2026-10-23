@@ -12,6 +12,7 @@ final class SamplePluginModel {
 
     private static let resetItem = "reset-badge"
     private static let openAppItem = "open-app"
+    private static let bumpInPanelItem = "bump-in-panel"
 
     private(set) var badge = 0
     /// Whether DOKK's panel is showing this plugin's scene right now.
@@ -53,6 +54,7 @@ final class SamplePluginModel {
         case .panelClosed, .willDisconnect: panelOpen = false
         case .menuItemChosen(Self.resetItem): resetBadge()
         case .menuItemChosen(Self.openAppItem): openApp()
+        case .menuItemChosen(Self.bumpInPanelItem): bumpBadge()
         case .menuItemChosen: break
         }
     }
@@ -68,6 +70,9 @@ final class SamplePluginModel {
             menuItems: [
                 DOKKPluginMenuItem(id: resetItem, title: "Reset Badge", systemImage: "arrow.counterclockwise"),
                 DOKKPluginMenuItem(id: openAppItem, title: "Show Sample App", systemImage: "macwindow"),
+                // Opens the panel first, so the bump is visible as it happens.
+                DOKKPluginMenuItem(id: bumpInPanelItem, title: "Bump Badge in Panel", systemImage: "plus.circle",
+                                   opensPanel: true),
             ])
     }
 }

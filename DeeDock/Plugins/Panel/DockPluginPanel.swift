@@ -78,7 +78,7 @@ private struct DockPluginPanelPreviewContent: View {
             Text(verbatim: "Umberto Eco · 62% read").font(.caption).foregroundStyle(.secondary)
             ProgressView(value: 0.62).tint(.green).frame(width: 170)
             Spacer()
-            HStack { Spacer(); Button(String("Open in philos")) {}.buttonStyle(.borderedProminent) }
+            HStack { Spacer(); Button(String("Open in Reader")) {}.buttonStyle(.borderedProminent) }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
@@ -86,8 +86,8 @@ private struct DockPluginPanelPreviewContent: View {
 }
 
 @MainActor private func previewPlugin(status: DockPluginStatus) -> DockPlugin {
-    DockPlugin(id: "com.example.philos.Plugin", extensionName: "philos",
-               app: DockPluginApp(name: "philos", url: nil, icon: NSWorkspace.shared.icon(for: .applicationBundle)),
+    DockPlugin(id: "com.example.Reader.Plugin", extensionName: "Reader",
+               app: DockPluginApp(name: "Reader", url: nil, icon: NSWorkspace.shared.icon(for: .applicationBundle)),
                tileState: DOKKPluginTileState(badge: .count(2), panelSize: DOKKPluginSize(width: 360, height: 280)),
                status: status)
 }

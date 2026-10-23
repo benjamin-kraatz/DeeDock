@@ -37,7 +37,12 @@ enum DockPluginMenu {
             menu.addItem(.separator())
             for entry in items {
                 // Titles come from the plugin, already localized there.
-                let item = target.item(verbatim: entry.title, symbol: entry.systemImage) { $0.chooseItem(entry.id) }
+                let item = target.item(verbatim: entry.title, symbol: entry.systemImage) { actions in
+                    // Opening first sends panelOpened ahead of the choice, so the plugin can show
+                    // the item's content in a panel it already knows is on screen.
+                    if entry.opensPanel == true, !panelOpen { actions.togglePanel() }
+                    actions.chooseItem(entry.id)
+                }
                 menu.addItem(item)
             }
         }
