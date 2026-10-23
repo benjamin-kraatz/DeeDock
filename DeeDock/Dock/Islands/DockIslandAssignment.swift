@@ -15,12 +15,12 @@ struct DockIslandSpan: Equatable, Identifiable {
 /// Groups a projected dock into islands.
 ///
 /// Pure over render slots and a plan, so the panel, previews, and tests agree on where each
-/// island starts. The tile, running apps, and utilities each form one island where they appear;
+/// island starts. The tile, running apps, plugins, and utilities each form one island where they appear;
 /// pinned slots follow the plan's counts. A slot kind that reappears after another kind (the DOKK
 /// tile placed among pins, for example) opens a new span of the same island.
 enum DockIslandAssignment {
     private enum Key: Equatable {
-        case tile, pinned(Int), running, utilities
+        case tile, pinned(Int), running, plugins, utilities
     }
 
     /// Islands for `slots`, in slot order. Empty for an empty dock.
@@ -55,6 +55,8 @@ enum DockIslandAssignment {
                 }
             } else if slot.appGroup == .running {
                 key = .running
+            } else if slot.plugin != nil {
+                key = .plugins
             } else {
                 key = .utilities
             }
@@ -68,6 +70,7 @@ enum DockIslandAssignment {
             switch key {
             case .tile: return DockIslandSpan(island: plan.island(for: .tile), range: range, customIndex: 0)
             case .running: return DockIslandSpan(island: plan.island(for: .running), range: range, customIndex: 0)
+            case .plugins: return DockIslandSpan(island: plan.island(for: .plugins), range: range, customIndex: 0)
             case .utilities: return DockIslandSpan(island: plan.island(for: .utilities), range: range, customIndex: 0)
             case .pinned(let group):
                 let island = plan.pinnedIslands.indices.contains(group) ? plan.pinnedIslands[group] : DockIsland.automatic(.pinned)

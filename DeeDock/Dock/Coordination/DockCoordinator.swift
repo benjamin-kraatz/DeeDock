@@ -12,6 +12,8 @@ final class DockCoordinator {
     let clipboardMuseum = ClipboardMuseumController()
     /// Collected notification banners, shared by every display's feed tile and Settings.
     let notificationFeed = NotificationFeedController()
+    /// DOKK's plugins: discovery, pins, and one session per pinned plugin, shared by every dock and Settings.
+    let plugins = DockPluginController()
     let sims = DockSimsStore()
     let timeline: DockTimelineController
     @ObservationIgnored private let focusPopover: FocusSessionCoordinator
@@ -43,6 +45,8 @@ final class DockCoordinator {
     var settingsHarborRequest = false
     /// One-shot route to Lookout's section, from the Files search's Lookout status chip.
     var settingsLookoutRequest = false
+    /// One-shot route to the Plugins section, from a plugin tile's menu or panel.
+    var settingsPluginsRequest = false
     /// The app-grouped window overview, shared by every display.
     let harbor = HarborCoordinator()
     /// The one DOKK Hub (Apps, Windows, Files), opened from any display's DOKK tile.
@@ -110,6 +114,7 @@ final class DockCoordinator {
     @ObservationIgnored private let fusion: FusionCoordinator
     @ObservationIgnored private let sessionCapsules: SessionCapsuleCoordinator
     @ObservationIgnored private let notificationFeedPopover: NotificationFeedCoordinator
+    @ObservationIgnored private let pluginPanels: DockPluginPanelCoordinator
     @ObservationIgnored private let shelfSemanticWarmup: ShelfSemanticWarmupController
     @ObservationIgnored private let filePicker = DockFilePickerController(makePicker: { DockNativeFilePicker() })
     private let badges = DockBadgeController()
@@ -181,6 +186,7 @@ final class DockCoordinator {
                                                     screenCapture: screenCapture)
         notificationFeedPopover = NotificationFeedCoordinator(feed: notificationFeed, presenter: popovers,
                                                               catalog: catalog)
+        pluginPanels = DockPluginPanelCoordinator(plugins: plugins, presenter: popovers)
         let shelf = self.shelf
         shelfSemanticWarmup = ShelfSemanticWarmupController(organizer: semanticStacks) {
             let items = shelf.ordered
@@ -242,6 +248,7 @@ final class DockCoordinator {
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
+        configurePlugins()
         configureHarbor()
         configureHub()
         // Lookout indexes in the background while the app runs; it does nothing until it's set up and on.
@@ -532,6 +539,7 @@ final class DockCoordinator {
             focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
             notificationFeedPopover.close(for: id)
+            pluginPanels.close(for: id)
             if focusedID == id { endFocus(restore: true) }
             if timeline.displayID == id { timeline.end() }
             panels.removeValue(forKey: id)?.stop()
@@ -568,7 +576,7 @@ final class DockCoordinator {
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !sessionCapsules.isOpen, !focusPopover.isOpen, !notificationFeedPopover.isOpen,
+                   !sessionCapsules.isOpen, !focusPopover.isOpen, !notificationFeedPopover.isOpen, !pluginPanels.isOpen,
                    !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
@@ -723,6 +731,7 @@ final class DockCoordinator {
                 notificationFeedPopover.toggle(on: panel, keyboard: false)
             }
             panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clear() }
+            connectPlugins(store: store, panel: panel, displayID: display.id)
             store.openHarbor = { [weak self] in Analytics.performing(.keyboard) { self?.harbor.toggle() } }
             panel.interaction.openHarbor = { [weak self] in self?.harbor.toggle() }
             panel.interaction.prepareNotificationFeedSettings = { [weak self] in
@@ -793,6 +802,7 @@ final class DockCoordinator {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
             panel.interaction.notificationFeed = notificationFeed
+            panel.interaction.plugins = plugins
             panel.interaction.sims = sims
             panel.interaction.updateAwareness = updateAwareness
             panel.store.configureUpdateTile(updateAwareness?.dockItem)
@@ -809,6 +819,7 @@ final class DockCoordinator {
         focusPopover.reanchor()
         sessionCapsules.reanchor()
         notificationFeedPopover.reanchor()
+        pluginPanels.reanchor()
         windowPeeks.refresh()
         hub.refreshAnchor()
         if let id = zonePreview.displayID {
@@ -1217,6 +1228,7 @@ final class DockCoordinator {
         settingsNotificationFeedRequest = false
         settingsHarborRequest = false
         settingsLookoutRequest = false
+        settingsPluginsRequest = false
         hub.files.onOpenLookoutSettings = {}
         harbor.stop()
         filePicker.stop()
@@ -1235,6 +1247,8 @@ final class DockCoordinator {
         fusion.stop()
         sessionCapsules.stop()
         notificationFeedPopover.stop()
+        pluginPanels.stop()
+        plugins.stop()
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
@@ -1264,5 +1278,44 @@ final class DockCoordinator {
         volumes.stop()
         trash.stop()
         updateAwareness = nil
+    }
+}
+
+// MARK: - Plugins
+
+extension DockCoordinator {
+    /// Starts plugin discovery and connects the plugin panel to the docks and Settings.
+    fileprivate func configurePlugins() {
+        plugins.dockItemsChanged = { [weak self] in self?.refreshPanels() }
+        plugins.closePanel = { [weak self] id in self?.pluginPanels.close(pluginID: id) }
+        plugins.isPanelOpen = { [weak self] id in self?.pluginPanels.isOpen(id) ?? false }
+        pluginPanels.prepareSettings = { [weak self] in self?.settingsPluginsRequest = true }
+        pluginPanels.keyboardDismissed = { [weak self] displayID in
+            guard let self, focusedID == displayID else { return }
+            endFocus(restore: false)
+        }
+        plugins.start()
+    }
+
+    /// Gives one display's dock its plugin tiles and the commands behind them.
+    fileprivate func connectPlugins(store: DockStore, panel: DockPanelController, displayID: String) {
+        store.plugins = plugins
+        store.openPlugin = { [weak self, weak panel] id in
+            guard let self, let panel, panels[displayID] === panel else { return }
+            Analytics.performing(.keyboard) { self.pluginPanels.activate(id, on: panel, keyboard: panel.store.keyboardFocus) }
+        }
+        panel.interaction.openPlugin = { [weak self, weak panel] id in
+            guard let self, let panel, panels[displayID] === panel else { return }
+            pluginPanels.activate(id, on: panel, keyboard: false)
+        }
+        panel.interaction.togglePluginPanel = { [weak self, weak panel] id in
+            guard let self, let panel, panels[displayID] === panel else { return }
+            pluginPanels.toggle(id, on: panel, keyboard: false)
+        }
+        panel.interaction.isPluginPanelOpen = { [weak self, weak panel] id in
+            guard let self, let panel else { return false }
+            return pluginPanels.isOpen(id, on: panel)
+        }
+        panel.interaction.preparePluginSettings = { [weak self] in self?.settingsPluginsRequest = true }
     }
 }

@@ -29,6 +29,7 @@ The dock itself matches the system Dock: Liquid Glass, magnification, running in
 - Carry files across Spaces and displays on the Shelf.
 - Save what you were working on as a Session Capsule, and start a Focus Session timer from any mode.
 - Open the DOKK Hub from its tile to launch apps, jump to windows, and browse, search, and copy files. Its search also finds Shelf files and Dock Modes. Run Shortcuts from Action Tiles, and see app badges with a history of what changed.
+- Add plugins from other apps. Once you approve a plugin, it gets a tile you can pin or unpin, usually with a panel above it. Each plugin runs in its own process, so a plugin that stops never takes DOKK down.
 - Drive the whole dock from the keyboard with Focus Dock. VoiceOver gets labels and actions for every tile, and DOKK respects Reduce Motion and Reduce Transparency.
 
 The [user guide](docs/GUIDE.md) covers every feature and setting in detail.

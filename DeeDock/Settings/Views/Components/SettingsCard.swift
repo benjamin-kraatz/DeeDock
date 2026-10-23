@@ -16,6 +16,10 @@ struct SettingsCard<Content: View>: View {
     var title: LocalizedStringResource?
     /// Explanatory copy shown under the surface in caption style.
     var footnote: LocalizedStringResource?
+    /// Where each separator starts from the leading edge. Rows that open with an icon pass the
+    /// icon's trailing edge, so the hairlines line up with the text, the way System Settings
+    /// lists do.
+    var dividerInset: CGFloat = SettingsMetrics.rowInset
     @ViewBuilder var content: Content
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.settingsPageTitleKey) private var pageTitleKey
@@ -42,7 +46,7 @@ struct SettingsCard<Content: View>: View {
                     ForEach(rows) { row in
                         if row.id != rows.first?.id {
                             Divider()
-                                .padding(.leading, SettingsMetrics.rowInset)
+                                .padding(.leading, dividerInset)
                                 .opacity(isDark ? 0.7 : 1)
                         }
                         row.frame(maxWidth: .infinity)

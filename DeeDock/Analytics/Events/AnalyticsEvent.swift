@@ -174,6 +174,20 @@ enum AnalyticsEvent {
     /// Harbor closed, with how it ended and whether search or the app filter was used.
     case harborClosed(outcome: AnalyticsHarborOutcome, duration: Double, searched: Bool, filtered: Bool,
                       closedWindows: Int)
+    /// A plugin's panel opened. Counts only: never the plugin, its app, or anything it shows.
+    case pluginPanelOpened(trigger: AnalyticsTrigger, pinnedCount: Int)
+    /// A plugin's panel closed. `stopped` is true when the plugin had stopped by then.
+    case pluginPanelClosed(duration: Double, stopped: Bool)
+    /// A plugin's process ended without DOKK asking, such as a crash.
+    case pluginStopped(panelOpen: Bool)
+    /// A stopped plugin was restarted, and from where.
+    case pluginRestarted(surface: AnalyticsPluginSurface)
+    /// A plugin tile was pinned or unpinned. Newly approved plugins report `automatic`.
+    case pluginPinChanged(pinned: Bool, surface: AnalyticsPluginSurface)
+    /// The system's plugin approval window opened from Settings.
+    case pluginsManageOpened(waitingCount: Int)
+    /// How many plugins are on, waiting, off, and pinned. Sent when the counts change.
+    case pluginsCounted(enabledCount: Int, waitingCount: Int, disabledCount: Int, pinnedCount: Int)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     /// How many installed and pinned apps have a Line glyph, with the bundle IDs of public apps
     /// that have none. Sent shortly after launch, at most every six hours.

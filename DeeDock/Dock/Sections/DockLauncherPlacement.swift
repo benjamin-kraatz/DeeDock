@@ -114,16 +114,18 @@ enum DockLauncherPlacement {
         return predecessor.map(LauncherDockPosition.afterPin) ?? .start
     }
 
-    /// Section sizes for ``DockGeometry/layout(count:favoriteCount:utilityCount:leadingUtilityCount:availableLength:availableDepth:settings:calloutReserve:)``.
+    /// Section sizes for ``DockGeometry/layout(count:favoriteCount:pluginCount:utilityCount:leadingUtilityCount:availableLength:availableDepth:settings:calloutReserve:islands:)``.
     ///
     /// A leading launcher gets its own divider, a trailing one shares the utilities' divider, and one
-    /// placed after a pin joins the pinned section so no divider splits a group of pins.
-    static func sectionCounts(_ slots: [DockRenderSlot]) -> (favorites: Int, utilities: Int, leading: Int) {
+    /// placed after a pin joins the pinned section so no divider splits a group of pins. Plugins
+    /// form their own section between the applications and the utilities.
+    static func sectionCounts(_ slots: [DockRenderSlot]) -> (favorites: Int, plugins: Int, utilities: Int, leading: Int) {
         let launcher = slots.firstIndex(where: \.isLauncher)
         let leading = launcher == 0 ? 1 : 0
         let amongPins = launcher.map { $0 > 0 && slots[$0 - 1].isPinned } ?? false
         // The launcher counts as a utility; only a trailing one belongs to the utility section.
         let utilities = slots.filter(\.isUtility).count - (leading == 1 || amongPins ? 1 : 0)
-        return (slots.filter(\.isPinned).count + (amongPins ? 1 : 0), utilities, leading)
+        return (slots.filter(\.isPinned).count + (amongPins ? 1 : 0), slots.filter { $0.plugin != nil }.count,
+                utilities, leading)
     }
 }

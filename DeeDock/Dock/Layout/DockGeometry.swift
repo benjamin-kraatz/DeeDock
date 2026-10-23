@@ -189,6 +189,8 @@ enum DockGeometry {
     /// - Parameters:
     ///   - count: Total item count.
     ///   - favoriteCount: Number of leading pinned items, between zero and `count`.
+    ///   - pluginCount: Number of plugin tiles between the applications and the utilities, set off
+    ///     by a divider on each side.
     ///   - utilityCount: Number of trailing utility items separated from application sections.
     ///   - availableLength: Chosen reference frame length along the selected edge, in logical points.
     ///   - availableDepth: Reference frame dimension perpendicular to the selected edge.
@@ -196,16 +198,18 @@ enum DockGeometry {
     ///   - calloutReserve: Override the inward label band. Timeline browsing passes a taller
     ///     reserve so the glance card is not clipped by the panel envelope.
     ///   - islands: Island bands to lay out instead of dividers. Nil draws one continuous surface.
-    static func layout(count: Int, favoriteCount: Int, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil, islands: IslandLayout? = nil) -> Layout {
+    static func layout(count: Int, favoriteCount: Int, pluginCount: Int = 0, utilityCount: Int = 0, leadingUtilityCount: Int = 0, availableLength: CGFloat, availableDepth: CGFloat = 900, settings: DockSettings = .defaults, calloutReserve: CGFloat? = nil, islands: IslandLayout? = nil) -> Layout {
         let settings = settings.normalized ?? .defaults
         let viewportLimit = max(64, availableLength - 16)
         let utilityCount = min(max(0, utilityCount), count)
-        let leading = min(max(0, leadingUtilityCount), count - utilityCount)
-        let appCount = count - utilityCount - leading
+        let pluginCount = min(max(0, pluginCount), count - utilityCount)
+        let leading = min(max(0, leadingUtilityCount), count - utilityCount - pluginCount)
+        let appCount = count - utilityCount - pluginCount - leading
         var separators = Set<Int>()
         if islands == nil {
             if favoriteCount > 0 && favoriteCount < appCount { separators.insert(leading + favoriteCount) }
-            if utilityCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
+            if pluginCount > 0 && appCount > 0 { separators.insert(leading + appCount) }
+            if utilityCount > 0 && appCount + pluginCount > 0 { separators.insert(leading + appCount + pluginCount) }
         }
         let itemSpacing = CGFloat(settings.itemSpacing)
         let extra = CGFloat(max(0, count - 1)) * itemSpacing

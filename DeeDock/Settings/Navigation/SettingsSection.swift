@@ -15,6 +15,8 @@ enum SettingsSection: Hashable, Identifiable {
     case suggestionsHistory
     /// Lookout, the Files tab's search by content. Its own page: the section is the page.
     case lookout
+    /// DOKK Plugins: installed plugins, their pins, and the system approval window. The section is the page.
+    case plugins
     /// Personality features slated for removal in 1.0.0, kept reachable but out of the way.
     case deprecated
     case display(String)
@@ -22,7 +24,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// What the app and the dock are; the sidebar's untitled first group.
     static let primary: [SettingsSection] = [.general, .dock, .atmosphere, .modes]
     /// Opt-in capabilities, listed under the sidebar's Features heading.
-    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout]
+    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout, .plugins]
     /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
     static let fixed: [SettingsSection] = primary + featureSections + [.deprecated]
 
@@ -36,6 +38,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .windowsFocus: "windowsFocus"
         case .suggestionsHistory: "suggestionsHistory"
         case .lookout: "lookout"
+        case .plugins: "plugins"
         case .deprecated: "deprecated"
         case .display(let id): "display.\(id)"
         }
@@ -52,6 +55,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .windowsFocus: .settingsWindowsFocus
         case .suggestionsHistory: .settingsSuggestionsHistory
         case .lookout: .lookoutSettingsTitle
+        case .plugins: .pluginsSettingsTitle
         case .deprecated: .settingsDeprecated
         case .display: nil
         }
@@ -67,6 +71,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .windowsFocus: .settingsWindowsFocusSummary
         case .suggestionsHistory: .settingsSuggestionsHistorySummary
         case .lookout: .lookoutSettingsSummary
+        case .plugins: .pluginsSettingsSummary
         case .deprecated: .settingsDeprecatedSummary
         case .display: .settingsDisplaySummary
         }
@@ -78,10 +83,12 @@ enum SettingsSection: Hashable, Identifiable {
         case .dock: .dock
         case .atmosphere: .symbol("sparkles")
         case .modes: .symbol("square.stack.3d.up.fill")
-        case .extras: .symbol("puzzlepiece.extension.fill")
+        // The puzzle piece belongs to Plugins (DEE-140); Dock Extras are extra tiles.
+        case .extras: .symbol("plus.app.fill")
         case .windowsFocus: .symbol("macwindow.on.rectangle")
         case .suggestionsHistory: .symbol("clock.arrow.circlepath")
         case .lookout: .lookout
+        case .plugins: .symbol("puzzlepiece.extension.fill")
         case .deprecated: .symbol("archivebox.fill")
         case .display: .symbol("display")
         }
@@ -99,6 +106,8 @@ enum SettingsSection: Hashable, Identifiable {
         // The onboarding hero's gradient (the mockup's `.hero .spybig`), top to bottom.
         case .lookout: [Color(red: 100 / 255, green: 210 / 255, blue: 1), Color(red: 10 / 255, green: 132 / 255, blue: 1),
                         Color(red: 94 / 255, green: 92 / 255, blue: 230 / 255)]
+        // The DEE-140 mockup's Plugins tile, #4CD9A3 to #16946B.
+        case .plugins: [Color(red: 76 / 255, green: 217 / 255, blue: 163 / 255), Color(red: 22 / 255, green: 148 / 255, blue: 107 / 255)]
         case .deprecated: [Color(red: 0.74, green: 0.72, blue: 0.68), Color(red: 0.50, green: 0.47, blue: 0.42)]
         }
     }
@@ -121,7 +130,7 @@ enum SettingsSection: Hashable, Identifiable {
             [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
         case .deprecated:
             [SettingsPage.deprecatedPages]
-        case .modes, .atmosphere, .lookout:
+        case .modes, .atmosphere, .lookout, .plugins:
             []
         }
     }
@@ -129,7 +138,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// Sections whose pages write dock preferences, so the window offers to restore them.
     var offersRestoreDefaults: Bool {
         switch self {
-        case .general, .atmosphere, .modes, .lookout: false
+        case .general, .atmosphere, .modes, .lookout, .plugins: false
         case .dock, .display, .extras, .windowsFocus, .suggestionsHistory, .deprecated: true
         }
     }
@@ -145,6 +154,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
         case .lookout: [.lookoutSettingsKeywords]
+        case .plugins: [.pluginsSettingsKeywords]
         case .display: []
         }
     }

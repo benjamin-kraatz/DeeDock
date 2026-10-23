@@ -6,6 +6,8 @@ struct SettingsSidebar: View {
     @Binding var selection: SettingsSection?
     @Binding var searchText: String
     let profiles: DisplayProfilesStore
+    /// Plugins waiting for approval, counted on the Plugins row. Zero shows no count.
+    var pluginsWaiting = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// A section survives the filter when it, or any page it leads to, matches the query.
@@ -79,6 +81,7 @@ struct SettingsSidebar: View {
         ForEach(sections) { section in
             SettingsSectionRow(section: section, isSelected: selection == section)
                 .tag(section)
+                .badge(section == .plugins ? pluginsWaiting : 0)
         }
     }
 }

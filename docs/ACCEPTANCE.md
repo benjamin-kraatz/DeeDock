@@ -30,25 +30,25 @@ None of these scenarios has been exercised.
 - [ ] Onboarding opens from the status chip, from the **Set up Lookout** card, and from the
   **Search by content** switch in Settings with the Hub closed. Check that it holds an anchored Hub
   open through the folder picker and macOS's prompt, and that sleep, a display change, and ⌘W end it.
-- [ ] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
-- [ ] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
+- [x] Welcome: the three examples, the privacy line, **Not now**, and **Continue**.
+- [x] Choose folders: Desktop, Documents, and Downloads checked, Pictures unchecked, estimates for
   Pictures and added folders, and **Estimate after access** for the protected ones. No macOS prompt
   may appear before the access step. **Add folder…** with a plain folder, a folder inside a chosen
   one, a folder around chosen ones, `/`, the home folder, a folder in `~/Library`, a hidden folder,
   `/Library`, and a link to a folder in `~/Library`. iCloud Drive, a folder in
   `~/Library/CloudStorage`, and `~/Dropbox` must be accepted, and `~/Library/CloudStorage` itself
   refused.
-- [ ] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
+- [x] Access, folder allowed: **Allow…** shows macOS's prompt in context, the row turns to
   **Allowed**, and the Hub takes keyboard focus back.
-- [ ] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
+- [x] Access, folder not allowed: the row shows **Not allowed · Skipped** and **Open Settings**.
   **Continue** stays off until every folder has an answer and one is allowed.
-- [ ] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
+- [x] Access, Open Settings and return: the link opens Privacy & Security › Files and Folders.
   Allow DOKK there, come back, and check that the row turns to **Allowed** without a new prompt.
-- [ ] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
+- [x] Access, already allowed: with every chosen folder allowed, **Continue** on the folders step
   goes straight to the download.
-- [ ] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
+- [x] Access, a folder that needs no prompt, such as Pictures or a project folder: it is marked
   **Allowed** without a prompt.
-- [ ] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
+- [x] Download, fresh: both files download, show **Checking…** and **Ready**, and land in
   `~/Library/Application Support/DDock/Lookout/Models/` (`Lookout-dev/Models/` for a Debug build,
   which downloads its own copy). Note the time and the free space before
   and after.
@@ -60,9 +60,9 @@ None of these scenarios has been exercised.
   appears, the partial file is deleted, and **Try Again** downloads it fresh.
 - [ ] Download, low disk space: with less than about 1 GB free, the error names the space needed
   and the space free.
-- [ ] Download in the background: close the card during the download and check the download card
+- [x] Download in the background: close the card during the download and check the download card
   and the chip's percentage in the Files search.
-- [ ] First pass: the ring moves, the feed shows file names, recently used files come first, and
+- [x] First pass: the ring moves, the feed shows file names, recently used files come first, and
   **Start searching** and **Finish in the background** both end onboarding while reading goes on.
   Check the first search after the first pass has no 5-second encoder start.
 - [ ] Status chip in every state it can reach: **Lookout off · Set up**, **Downloading model**,
@@ -87,9 +87,9 @@ None of these scenarios has been exercised.
   and ⌘1 to ⌘3 and ⌘F do nothing while the card shows.
 - [ ] Quick Look with Space on a Lookout file, a PDF page hit, and a folder hit.
 - [ ] Drag a Lookout result out to Finder and to another app, and drop files on a folder result.
-- [ ] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
+- [x] Reduce Motion: the card, the step slides, the ring, the feed, the result arrivals, and the
   status dot.
-- [ ] Reduce Transparency: the onboarding card and the result cards draw opaque.
+- [x] Reduce Transparency: the onboarding card and the result cards draw opaque.
 - [ ] Light and dark appearance for the card, every step, the results, the chips, and Settings.
 - [ ] German copy in every step, the chip, the results, the why card, the errors, and Settings.
   Check that no text is cut off.
@@ -101,13 +101,13 @@ None of these scenarios has been exercised.
   drive is connected. Lookout then catches up on changes.
 - [ ] Power policy: Low Power Mode, a serious thermal state if one can be reached, and battery with
   **Read files on battery too** off. Check that a new screenshot indexes at once in each.
-- [ ] New files: save a screenshot and check it is searchable within seconds.
-- [ ] **Read everything again**: names stay searchable while every file is read again.
-- [ ] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
+- [x] New files: save a screenshot and check it is searchable within seconds.
+- [x] **Read everything again**: names stay searchable while every file is read again.
+- [x] **Delete index and model**: the confirmation, then `index.sqlite*`, `Models/`, and
   `Partial/` are gone, `Logs/` and the person's files remain, and Lookout is not set up. Also
   delete during the first pass: the row shows **Deleting…** until the service answers, and the
   files go only then.
-- [ ] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
+- [x] Turn **Search by content** off and on: the Lookout section hides and returns, the index is
   kept, and reading resumes.
 - [ ] Memory and lifetime: the index service exits about 60 s after its work ends, the query
   service 120 s after its last query, and the vectors are released 2 minutes after the Hub closes.
@@ -3511,3 +3511,76 @@ Implemented on `feature/dee-85-islands` after the interactive mockup `docs/mocku
 `xcodebuild … build-for-testing` on the branch: see the PR description for the exact result. `DeeDockTests/DockIslandTests.swift` covers plan reconciliation, split, merge, pin following, naming, Codable, the repository, settings decoding, slot grouping (tile among pins, gaps, collapsed controls), island geometry under magnification, and the icon sampler. Tests were not run.
 
 The app was not launched. Not exercised by hand: the ice material on a real wallpaper in both appearances and on a side or top dock, the lamp with Reduce Transparency, auto-hide and the ten animation styles with several islands, the approach ghost (which still draws the union as one slab), drag insertion gaps at island boundaries, VoiceOver labels on island glass, the Discovery callout timing, and the settings list with two displays.
+
+## DOKK Plugins (DEE-140)
+
+Built on `codex/dee-140-dokk-plugins` after the locked mockup `docs/mockups/dokk-plugins.html`. The ExtensionKit spike (`codex/extensionkit-plugin-spike`, never merged) supplied the evidence. The contract and the plugin author's view are in [PLUGINS.md](PLUGINS.md).
+
+### Implemented
+
+- **Extension point.** One extension point, `de.benjaminkraatz.DeeDock.dev.plugin`, for DOKK and DOKK Dev. It is declared by the static `Configuration/DOKKPluginExtensionPoint.appexpt`, copied into `Contents/Extensions`. See PLUGINS.md for the LaunchServices probes behind that identifier.
+- **Contract.** `DOKKPluginContract/` (version 1) holds tile state, host events, plugin requests, and the XPC protocols. Decoding tolerates missing and unknown fields.
+- **Controller.** `DockPluginController` covers:
+  - discovery: `AppExtensionPoint.Monitor`, recreated when DOKK becomes active and when the Plugins page opens;
+  - pins: app-wide, with auto-pin on first approval;
+  - one `DockPluginConnection` per pinned plugin;
+  - a 15 s reply deadline;
+  - the stopped state and restart;
+  - the approval window.
+- **Dock section.** Plugin tiles render as a `DockRenderSlot.plugin` section between the applications and the utilities, with a divider on each side (`DockGeometry.layout(pluginCount:)`). With Islands on they form a `plugins` island tinted orchid (hue 312, saturation 0.55).
+- **Panel.** `DockPluginPanelCoordinator` hosts `EXHostViewController` in the shared dock popover. It is non-activating and becomes key on click, and Escape closes it. Size is the plugin's content plus a 40 pt header and a 10 pt pointer, clamped to 280 × 220 through 560 × 420. Live resizes animate.
+- **Tile and panel menus.** The same `NSMenu` serves the tile and the panel's More button.
+- **Stopped state.**
+  - Tile: grey, with a restart chip, and the badge hidden.
+  - Panel: "stopped · Restart" in place.
+- **Settings.** A Plugins section with the puzzle-piece symbol, and a waiting count on the sidebar row. Dock Extras moved to `plus.app.fill`.
+- **Housekeeping.** Unpinning, disabling, or uninstalling a plugin ends its session with `willDisconnect` first. Closing the panel ends its scene. The sample plugin exits three seconds after DOKK's last connection closes.
+- **Sample plugin.** The `DOKK Sample Plugin` scheme. It isn't embedded in DOKK, and DOKK doesn't depend on it.
+- **Analytics.** `plugin_*` and `plugins_*` events with counts, durations, surfaces, and flags but no plugin identity, listed in ANALYTICS.md.
+
+### Validation status
+
+Every build went to a scratch `-derivedDataPath`:
+
+- `xcodebuild -scheme DeeDock -configuration Debug build`: **BUILD SUCCEEDED**, no warnings in the plugin files.
+- `xcodebuild -scheme "DOKK Sample Plugin" -configuration Debug build`: **BUILD SUCCEEDED**.
+- `xcodebuild -scheme DeeDock -configuration Debug build-for-testing`: **TEST BUILD SUCCEEDED**.
+
+Checked on build products without launching anything:
+- `lsregister -dump` lists `de.benjaminkraatz.DeeDock.dev.plugin` with DOKK Dev as its parent;
+- `pluginkit -m -v -p de.benjaminkraatz.DeeDock.dev.plugin` lists the sample extension;
+- `codesign --verify --deep --strict` passes on DOKK Dev with the `.appexpt` inside.
+
+`DeeDockTests/DockPluginTests.swift` covers:
+- pins: auto-pin once, unpinned stays unpinned, and persistence;
+- panel sizing and clamping;
+- contract decoding and round trips;
+- badge display rules;
+- the plugin section's dividers and island.
+
+`DeeDockTests/DockPluginControllerTests.swift` drives the controller through fake sessions:
+- auto-pin and start;
+- `panelOpened` delivered once the plugin first answers, and after a restart with the panel open;
+- a scene failure while starting stops the plugin;
+- unpinning and removal end the session.
+
+The tests were compiled but not run, following `AGENTS.md`. Release was not built, so a Release build product with DOKK's bundle ID never entered LaunchServices.
+
+The app was not launched. Not exercised:
+- approval in the system window;
+- the tile, badge pushes, and the panel in a real dock;
+- typing in a plugin's text field inside the non-activating panel;
+- crash and restart;
+- live resizing;
+- unpinning ending the plugin process;
+- auto-pin on approval;
+- rescans after installing a plugin while DOKK runs;
+- Islands with a plugin island;
+- side and top docks;
+- VoiceOver, Reduce Motion, and Reduce Transparency;
+- two displays.
+
+Also open:
+- whether DOKK and DOKK Dev, both installed and both declaring the shared point, each see and approve the same plugin;
+- loading a plugin from another team;
+- the App Store question for philos.

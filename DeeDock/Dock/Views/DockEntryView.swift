@@ -150,6 +150,17 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.harbor.hitID, $0)
                 }
             )
+        case .plugin(let item):
+            DockPluginButton(
+                item: item,
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: {
+                    accessibilityFocus(item.id, $0)
+                }
+            )
         case .volume(let item):
             DockVolumeButton(
                 item: item,

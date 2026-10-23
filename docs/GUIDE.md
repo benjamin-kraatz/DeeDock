@@ -24,6 +24,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Lookout](#lookout)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
+- [Plugins](#plugins)
 - [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
 - [Settings](#settings)
@@ -456,6 +457,33 @@ What the feed can see:
 The feed reads notification text while it is on. That text stays in memory on this Mac. DOKK never writes it to disk, logs it, or sends it anywhere, and usage analytics never include it. The feed keeps the 100 most recent entries. Turning the feed off or quitting DOKK clears it. Reading pauses during sleep, display sleep, and when another user is active, and the feed keeps its entries across those pauses.
 
 The feed depends on how macOS draws its banners, which Apple does not document. A macOS update can change that. If it does, the feed stays empty rather than showing wrong entries. See [Notification feed](NOTIFICATION-FEED.md) for the measurements behind it and what still needs hands-on checking.
+
+## Plugins
+
+Plugins let other apps add a tile and a panel to your dock. A plugin comes inside its app: installing the app installs the plugin. Each plugin runs in its own process, so a plugin that stops never takes DOKK down.
+
+**Turn a plugin on.** macOS asks you to approve each new plugin once:
+1. Open **Settings → Plugins**. The page and its sidebar row count the plugins waiting for approval.
+2. Click **Manage Plugins…** to open the system window, and turn on the plugins you want.
+3. A newly approved plugin gets its tile right away, at the end of the plugin section. Plugins waiting for approval never appear in the dock.
+
+**The plugin section.** Plugin tiles sit in their own section between your apps and DOKK's own tiles, such as the Notification Feed, Shelf, and Trash, with a divider on each side. With [DOKK Islands](#dokk-islands) on, the section is its own orchid island. Plugin tiles look like any other tile: the app's icon and, when the plugin has news, a red badge.
+
+**Use a plugin.** Click its tile to open its panel above the tile, and click again or press Escape to close it. Everything below the panel's header comes from the plugin. Click inside the panel before typing; opening it never takes focus from the app you are using. A plugin can instead open its app when you click its tile.
+
+**The tile's menu.** Right-click the tile, or click **⋯** in the panel's header, for these commands:
+- **Open Panel** or **Close Panel**
+- **Open** followed by the app's name
+- **Restart Plugin**
+- any commands the plugin adds
+- **Unpin from Dock**
+- **Plugin Settings…**
+
+**When a plugin stops.** Its tile turns grey with a small restart mark, and its badge hides because it may be out of date. An open panel shows that the plugin stopped and offers **Restart**. Restart from there, from the tile's menu, or from Settings. A plugin that does not answer within 15 seconds of starting counts as stopped too.
+
+**Settings → Plugins** lists every plugin you turned on, with the app it comes from and whether it is running. Use the **Pinned** switch to show or hide a plugin's tile. An unpinned plugin stays installed but does not run. Turning a plugin off completely happens in **Manage Plugins…**.
+
+DOKK checks for newly installed plugins when it comes to the front and when you open the Plugins page.
 
 ## Atmosphere
 

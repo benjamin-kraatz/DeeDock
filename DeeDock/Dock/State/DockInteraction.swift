@@ -21,6 +21,8 @@ final class DockInteraction {
     var badges: DockBadgeController?
     /// Shared notification feed. The tile reads its unread count here. Nil in previews.
     var notificationFeed: NotificationFeedController?
+    /// Shared plugins. Plugin tiles read their badge and status here. Nil in previews.
+    var plugins: DockPluginController?
     /// When true, notification badges draw their count. Off draws a red dot.
     /// VoiceOver still reads the count from the badge label.
     var showAppBadgeCounts = false
@@ -96,6 +98,14 @@ final class DockInteraction {
     @ObservationIgnored var openNotificationFeed: (() -> Void)?
     /// Opens Harbor, or closes it when it is open.
     @ObservationIgnored var openHarbor: (() -> Void)?
+    /// Runs a plugin tile's click action: its panel, or its app. Keyed by the plugin's bundle identifier.
+    @ObservationIgnored var openPlugin: ((String) -> Void)?
+    /// Opens or closes a plugin's panel regardless of the plugin's click action.
+    @ObservationIgnored var togglePluginPanel: ((String) -> Void)?
+    /// Whether this dock's panel for the plugin is open, for the menu's Open/Close title.
+    @ObservationIgnored var isPluginPanelOpen: ((String) -> Bool)?
+    /// Routes the next Settings window to the Plugins page.
+    @ObservationIgnored var preparePluginSettings: (() -> Void)?
     @ObservationIgnored var clearNotificationFeed: (() -> Void)?
     /// Routes the next Settings window to the notification feed page.
     @ObservationIgnored var prepareNotificationFeedSettings: (() -> Void)?
