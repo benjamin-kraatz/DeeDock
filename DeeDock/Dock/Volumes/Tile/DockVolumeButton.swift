@@ -23,7 +23,7 @@ struct DockVolumeButton: View {
     var body: some View {
         Button { interaction.openVolume?(item) } label: {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
-                available: !item.isEjecting, running: false, launching: false,
+                available: !item.isEjecting, running: .notRunning, launching: false,
                 keyboardSelected: selected, artworkOpacity: artworkOpacity,
                 artworkAnimation: interaction.idleFade.animation,
                 lineIcon: interaction.lineIcon(for: LineIconTile(volume: item.kind), artwork: item.icon))

@@ -38,7 +38,7 @@ struct DockLauncherButton: View {
                 size: size,
                 edge: interaction.layout.edge,
                 available: true,
-                running: hubOpen,
+                running: DockRunningState(running: hubOpen),
                 launching: false,
                 keyboardSelected: selected,
                 artworkOpacity: DockAppearanceOpacity(

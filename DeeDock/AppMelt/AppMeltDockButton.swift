@@ -14,7 +14,7 @@ struct AppMeltDockButton: View {
     var body: some View {
         Button { interaction.appMelt?.restore(pair) } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                available: true, running: !pair.minimized, launching: pair.showsOperationProgress, keyboardSelected: selected,
+                available: true, running: DockRunningState(running: !pair.minimized), launching: pair.showsOperationProgress, keyboardSelected: selected,
                 artworkOpacity: DockAppearanceOpacity(settings: interaction.idleFade.settings,
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,
                 artworkAnimation: interaction.idleFade.animation,

@@ -2,6 +2,11 @@ import AppKit
 import Observation
 
 /// Application-wide workspace observation, icon cache, running order, and launch ownership.
+///
+/// `running` and `runningIDs` list regular application processes only; the Launcher, Hub,
+/// suggestions, and Window Peek depend on that. Apps that macOS 27 reports as running in
+/// background are published separately in `background`, and `dockOrderIDs` orders both
+/// together for unpinned dock tiles.
 @MainActor @Observable
 final class ApplicationCatalog {
     let launcherLibrary: LauncherLibrary
@@ -13,6 +18,15 @@ final class ApplicationCatalog {
     @ObservationIgnored private lazy var suggestionObservation = LauncherSuggestionObservation(store: suggestions)
     private(set) var running: [ApplicationReference] = []
     private(set) var runningIDs: [String] = []
+    /// Apps that are running in background, never including an app that is also in `running`.
+    /// Empty when no monitor was injected or when the system's background state cannot be read.
+    private(set) var background: [ApplicationReference] = []
+    /// Running and background identities in the order unpinned dock tiles use.
+    ///
+    /// It is kept separately from `runningIDs` because an app keeps its entry while it moves
+    /// between running and background, which is what keeps its tile in place, as in the system
+    /// Dock. `runningIDs` drops the app as soon as its main process quits.
+    private(set) var dockOrderIDs: [String] = []
     private(set) var launching: Set<String> = []
     /// Retained after completion so even a fast cold launch produces one complete visual cycle.
     private(set) var launchAnimationRequests: [String: Date] = [:]
@@ -26,12 +40,22 @@ final class ApplicationCatalog {
     @ObservationIgnored private var tasks: [String: Task<Void, Never>] = [:]
     @ObservationIgnored private var documentTasks: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private var generation = UUID()
+    /// Reads macOS 27's background state. Nil turns the feature off, as in tests and previews.
+    @ObservationIgnored private let backgroundMonitor: BackgroundApplicationMonitor?
+    /// Replaces the monitor's records; set only through `setBackgroundApplicationsForTesting`.
+    @ObservationIgnored private var backgroundOverride: [BackgroundApplication]?
+    /// The record behind each entry of `background`, by reference identity.
+    @ObservationIgnored private var backgroundRecords: [String: BackgroundApplication] = [:]
+    /// Holds back publishing while a quit is resolved; see `refreshAfterTermination()`.
+    @ObservationIgnored private var terminationRefresh: Task<Void, Never>?
+    @ObservationIgnored private var anotherTerminationPending = false
 
     init(service: any ApplicationServicing, launcherHistory: LauncherHistory? = nil, launcherLibrary: LauncherLibrary? = nil,
          suggestions: LauncherSuggestionsStore? = nil, launcherFavorites: LauncherFavorites? = nil,
-         surveyDefaults: UserDefaults? = nil) {
+         surveyDefaults: UserDefaults? = nil, backgroundMonitor: BackgroundApplicationMonitor? = nil) {
         self.launcherFavorites = launcherFavorites ?? LauncherFavorites(defaults: nil)
         self.service = service
+        self.backgroundMonitor = backgroundMonitor
         self.launcherHistory = launcherHistory ?? LauncherHistory(defaults: nil)
         self.launcherLibrary = launcherLibrary ?? LauncherLibrary()
         let suggestions = suggestions ?? LauncherSuggestionsStore(directory: nil, defaults: nil)
@@ -46,7 +70,11 @@ final class ApplicationCatalog {
                      NSWorkspace.didUnhideApplicationNotification, NSWorkspace.didWakeNotification] {
             observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
                 MainActor.assumeIsolated {
-                    self?.refresh()
+                    if notification.name == NSWorkspace.didTerminateApplicationNotification {
+                        self?.refreshAfterTermination()
+                    } else {
+                        self?.refresh()
+                    }
                     self?.suggestionObservation.workspaceEvent(notification)
                 }
             })
@@ -65,18 +93,112 @@ final class ApplicationCatalog {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
         }
+        if let backgroundMonitor {
+            backgroundMonitor.didChange = { [weak self] in self?.refresh() }
+            backgroundMonitor.start()
+        }
         refresh()
         suggestionObservation.start()
     }
 
+    /// Publishes the current running and background applications.
+    ///
+    /// While a quit is being resolved this does nothing; the pending termination refresh
+    /// publishes everything at once when it ends.
     func refresh() {
+        guard terminationRefresh == nil else { return }
+        publish()
+    }
+
+    private func publish() {
         let nextRunning = DockOrdering.unique(service.runningApplications())
         let nextIDs = DockOrdering.runningOrder(previous: runningIDs, current: nextRunning)
+        let (nextBackground, records) = backgroundSnapshot(excluding: nextRunning)
+        // A tile's identity survives running -> background -> running here, so it keeps its place.
+        let nextDockIDs = DockOrdering.runningOrder(previous: dockOrderIDs, current: nextRunning + nextBackground)
+        backgroundRecords = records
         // Unchanged arrays are not reassigned, so observers of the running set do not re-render.
         // `didChange` still fires: unhide and wake can change window occupancy without changing apps.
         if nextRunning != running { running = nextRunning }
         if nextIDs != runningIDs { runningIDs = nextIDs }
+        if nextBackground != background { background = nextBackground }
+        if nextDockIDs != dockOrderIDs { dockOrderIDs = nextDockIDs }
         didChange?()
+    }
+
+    /// Refreshes after an app quit, once the background state has caught up.
+    ///
+    /// The termination notification arrives before DOKK has read the app's background record.
+    /// Publishing at once would drop an unpinned tile that is about to become a background
+    /// tile, and the next read would bring it back: a visible flicker. Waiting for a read that
+    /// starts after the quit, bounded by a short timeout, publishes both changes together.
+    /// Every other refresh request in the meantime is folded into this one, because it would
+    /// publish the same half-updated state. A further quit during the wait waits again, at
+    /// most a few times so a burst of quits cannot hold the dock back for long.
+    private func refreshAfterTermination() {
+        guard let backgroundMonitor, backgroundMonitor.unavailability == nil else { return refresh() }
+        guard terminationRefresh == nil else {
+            anotherTerminationPending = true
+            return
+        }
+        let currentGeneration = generation
+        terminationRefresh = Task { [weak self, backgroundMonitor] in
+            var waits = 0
+            repeat {
+                self?.anotherTerminationPending = false
+                await backgroundMonitor.refreshAndWait(timeout: .milliseconds(250))
+                waits += 1
+            } while self?.anotherTerminationPending == true && waits < 4 && !Task.isCancelled
+            guard let self, !Task.isCancelled, generation == currentGeneration else { return }
+            terminationRefresh = nil
+            anotherTerminationPending = false
+            publish()
+        }
+    }
+
+    /// Background apps as dock references, minus any app that also has a regular instance.
+    private func backgroundSnapshot(excluding running: [ApplicationReference])
+        -> ([ApplicationReference], [String: BackgroundApplication]) {
+        let records = backgroundOverride
+            ?? backgroundMonitor?.applications.values.sorted { $0.bundleURL.path < $1.bundleURL.path } ?? []
+        guard !records.isEmpty else { return ([], [:]) }
+        let runningIDs = Set(running.map(\.id))
+        let runningURLs = Set(running.map(\.url.standardizedFileURL))
+        var references: [ApplicationReference] = []
+        var byID: [String: BackgroundApplication] = [:]
+        for record in records {
+            let reference = ApplicationReference(bundleIdentifier: record.bundleIdentifier, url: record.bundleURL,
+                                                 name: record.name)
+            guard !runningIDs.contains(reference.id), !runningURLs.contains(record.bundleURL),
+                  byID[reference.id] == nil else { continue }
+            references.append(reference)
+            byID[reference.id] = record
+        }
+        return (references, byID)
+    }
+
+    /// Whether the app is currently published as running in background.
+    func isRunningInBackground(_ reference: ApplicationReference) -> Bool {
+        backgroundRecords[reference.id] != nil
+    }
+
+    /// Asks the monitor to end the app's remaining processes. Returns whether a stop was
+    /// requested; false when the app is no longer running in background.
+    ///
+    /// The stop uses the record's bundle URL rather than the reference's, because a pinned
+    /// reference can hold an older location. Failures are silent by design: the tile keeps
+    /// its muted state until the processes actually exit.
+    @discardableResult
+    func stopRunningInBackground(_ reference: ApplicationReference) -> Bool {
+        guard let backgroundMonitor, let record = backgroundRecords[reference.id] else { return false }
+        backgroundMonitor.stopRunningInBackground(at: record.bundleURL)
+        return true
+    }
+
+    /// Replaces the background records without a monitor and publishes. For tests only.
+    func setBackgroundApplicationsForTesting(_ applications: [BackgroundApplication]) {
+        backgroundOverride = applications
+        refresh()
     }
 
     /// Owns app-icon toggle work so all display docks share duplicate suppression and teardown.
@@ -190,6 +312,13 @@ final class ApplicationCatalog {
         suggestionObservation.stop()
         launcherLibrary.stop()
         generation = UUID()
+        // Cancel first: stopping the monitor resumes the termination wait, which must then find
+        // its task cancelled and publish nothing.
+        terminationRefresh?.cancel()
+        terminationRefresh = nil
+        anotherTerminationPending = false
+        backgroundMonitor?.didChange = nil
+        backgroundMonitor?.stop()
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()
         if let ownedWindowsObserver { NotificationCenter.default.removeObserver(ownedWindowsObserver) }

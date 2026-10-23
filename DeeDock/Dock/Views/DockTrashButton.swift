@@ -21,7 +21,7 @@ struct DockTrashButton: View {
     var body: some View {
         Button { interaction.openTrash?() } label: {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
-                available: item.state != .unavailable, running: false, launching: false,
+                available: item.state != .unavailable, running: .notRunning, launching: false,
                 keyboardSelected: selected, artworkOpacity: artworkOpacity,
                 artworkAnimation: interaction.idleFade.animation,
                 lineIcon: interaction.lineIcon(for: item.state == .full ? .trashFull : .trash))

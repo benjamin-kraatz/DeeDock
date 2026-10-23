@@ -31,7 +31,7 @@ struct DockNotificationFeedButton: View {
     var body: some View {
         Button { interaction.openNotificationFeed?() } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  badgeLabel: unreadCount > 0 ? Self.badgeLabel(unreadCount) : nil,

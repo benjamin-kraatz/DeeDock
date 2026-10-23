@@ -31,7 +31,7 @@ struct DockShelfButton: View {
                 size: size,
                 edge: interaction.layout.edge,
                 available: true,
-                running: false,
+                running: .notRunning,
                 launching: false,
                 keyboardSelected: selected,
                 artworkOpacity: artworkOpacity,

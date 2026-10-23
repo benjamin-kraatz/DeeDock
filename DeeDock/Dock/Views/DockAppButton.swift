@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// An app icon with running, launch-progress, selection, and accessibility states.
+/// An app icon with running, running-in-background, launch-progress, selection, and accessibility states.
 ///
 /// Its closures express user intent; this component never invokes workspace APIs itself.
 struct DockAppButton: View {
@@ -62,7 +62,7 @@ struct DockAppButton: View {
         }
         Button(action: activate) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction?.layout.edge ?? .bottom,
-                                 available: item.isAvailable, running: item.isRunning,
+                                 available: item.isAvailable, running: item.runningState,
                                  launching: isLaunching, keyboardSelected: isKeyboardSelected,
                                  runningIndicatorStyle: interaction?.runningIndicatorStyle ?? .dot,
                                  indicatorVariant: indicatorVariant, indicatorAnimated: indicatorAnimated,
@@ -173,6 +173,9 @@ struct DockAppButton: View {
                 Button(.applicationMenuBringAllToFront) { menuAction(.bringAllToFront) }
                 Button(.applicationMenuQuit) { menuAction(.quit) }
             }
+            if item.isRunningInBackground {
+                Button(.applicationMenuStopRunningInBackground) { menuAction(.stopRunningInBackground) }
+            }
             ForEach(accessibilityWindows) { window in
                 Button(.applicationMenuOpenWindow(
                     title: ApplicationContextMenuProjection.windowTitle(
@@ -222,9 +225,12 @@ struct DockAppButton: View {
 
     /// - Parameter newBadge: True when a line tile's ring marks the badge as news, so VoiceOver says so too.
     private func accessibilityStatus(badgeLabel: String?, newBadge: Bool) -> Text {
-        let status = String(localized: item.isAvailable
-            ? (item.isRunning ? LocalizedStringResource.appStatusRunning : .appStatusNotRunning)
-            : .appStatusUnavailable)
+        let running: LocalizedStringResource = switch item.runningState {
+        case .running: .appStatusRunning
+        case .background: .appStatusRunningInBackground
+        case .notRunning: .appStatusNotRunning
+        }
+        let status = String(localized: item.isAvailable ? running : .appStatusUnavailable)
         let mood = interaction?.sims?.pinState(for: item.id, isFavorite: item.isFavorite).map {
             String(localized: $0.mood(at: .now).title)
         }

@@ -20,7 +20,8 @@ struct DockIconPresentation<Artwork: View>: View {
     let size: CGFloat
     let edge: DockEdge
     let available: Bool
-    let running: Bool
+    /// Running in background draws the same indicator, muted.
+    let running: DockRunningState
     let launching: Bool
     let keyboardSelected: Bool
     var runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot
@@ -41,7 +42,7 @@ struct DockIconPresentation<Artwork: View>: View {
     var launchMotionEnabled = true
     var lineIcon: DockLineIcon? = nil
 
-    init(size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
+    init(size: CGFloat, edge: DockEdge, available: Bool, running: DockRunningState, launching: Bool,
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,
@@ -94,7 +95,7 @@ struct DockIconPresentation<Artwork: View>: View {
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
                 .modifier(PinWeatherChrome(sample: pinWeatherSample))
-                .modifier(DockIconIndicator(style: runningIndicatorStyle, running: running, size: size,
+                .modifier(DockIconIndicator(style: runningIndicatorStyle, state: running, size: size,
                                             variant: indicatorVariant, animated: indicatorAnimated))
                 .overlay {
                     // Inside the launch motion and idle fade, so the ring moves and fades with its glyph.
@@ -128,8 +129,8 @@ struct DockIconPresentation<Artwork: View>: View {
                     }
                 }
                 .position(iconCenter)
-            if running {
-                DockRunningIndicator(style: runningIndicatorStyle, edge: edge)
+            if running.showsIndicator {
+                DockRunningIndicator(style: runningIndicatorStyle, edge: edge, state: running)
                     .animation(artworkAnimation) { $0.opacity(artworkOpacity) }
                     .position(marker)
             }
@@ -139,7 +140,7 @@ struct DockIconPresentation<Artwork: View>: View {
 }
 
 extension DockIconPresentation where Artwork == Image {
-    init(icon: NSImage, size: CGFloat, edge: DockEdge, available: Bool, running: Bool, launching: Bool,
+    init(icon: NSImage, size: CGFloat, edge: DockEdge, available: Bool, running: DockRunningState, launching: Bool,
          keyboardSelected: Bool, runningIndicatorStyle: DockSettings.RunningIndicatorStyle = .dot,
          indicatorVariant: DockIndicatorVariant = .neutral, indicatorAnimated: Bool = false,
          artworkOpacity: Double = 1, artworkAnimation: Animation? = nil, badgeLabel: String? = nil,

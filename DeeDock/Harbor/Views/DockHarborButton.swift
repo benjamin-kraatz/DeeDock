@@ -21,7 +21,7 @@ struct DockHarborButton: View {
     var body: some View {
         Button { interaction.openHarbor?() } label: {
             DockIconPresentation(size: size, edge: interaction.layout.edge,
-                                 available: true, running: false, launching: false,
+                                 available: true, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation) {
                 HarborGlyph(size: size)

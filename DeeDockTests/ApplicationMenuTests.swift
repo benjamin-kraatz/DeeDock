@@ -210,6 +210,83 @@ struct ApplicationMenuTests {
         controller.stop()
     }
 
+    @Test("Stop Running in Background is offered only in place of Quit for a background app")
+    func backgroundActionProjection() {
+        let background = ApplicationMenuSnapshot(processes: [], windowState: .hidden, isRunningInBackground: true)
+        #expect(ApplicationContextMenuProjection.applicationActions(isAvailable: true, snapshot: background) == [
+            .showInFinder, .stopRunningInBackground,
+        ])
+        #expect(ApplicationContextMenuProjection.applicationActions(isAvailable: false, snapshot: background) == [
+            .stopRunningInBackground,
+        ])
+
+        let running = ApplicationMenuSnapshot(
+            processes: [ApplicationProcessSnapshot(processIdentifier: 1, isHidden: false, isActive: false)],
+            windowState: .hidden, isRunningInBackground: true
+        )
+        #expect(!ApplicationContextMenuProjection.applicationActions(isAvailable: true, snapshot: running)
+            .contains(.stopRunningInBackground))
+        let closed = ApplicationMenuSnapshot(processes: [], windowState: .hidden)
+        #expect(!ApplicationContextMenuProjection.applicationActions(isAvailable: true, snapshot: closed)
+            .contains(.stopRunningInBackground))
+    }
+
+    @Test("A snapshot reports background state only while no regular process runs")
+    func backgroundSnapshot() {
+        let applications = StubApplicationMenuService()
+        let controller = ApplicationMenuController(
+            access: WindowAccessController(service: StubWindowAccessService(status: .enabled)),
+            applications: applications,
+            windows: StubApplicationWindowService()
+        )
+        let item = dockItem(running: false, available: true)
+        #expect(!controller.snapshot(for: item).isRunningInBackground)
+
+        applications.backgroundIDs = [item.id]
+        let background = controller.snapshot(for: item)
+        #expect(background.isRunningInBackground)
+        #expect(!background.isRunning)
+        #expect(background.windowState == .hidden)
+
+        applications.processSnapshots = [ApplicationProcessSnapshot(processIdentifier: 9, isHidden: false, isActive: false)]
+        #expect(!controller.snapshot(for: item).isRunningInBackground)
+        controller.stop()
+    }
+
+    @Test("Stop Running in Background reaches the stop entry point and never yields an error")
+    func backgroundStopRouting() async {
+        let applications = StubApplicationMenuService()
+        // An injected failure applies to throwing commands only; Stop has none to report.
+        applications.error = .operationRejected
+        let controller = ApplicationMenuController(
+            access: WindowAccessController(service: StubWindowAccessService(status: .notEnabled)),
+            applications: applications,
+            windows: StubApplicationWindowService()
+        )
+        let item = dockItem(running: false, available: true)
+
+        applications.backgroundIDs = [item.id]
+        #expect(await perform(controller, action: .stopRunningInBackground, item: item) == nil)
+        #expect(await outcome(controller, action: .stopRunningInBackground, item: item).isSucceeded)
+
+        // The app left the background state before the command ran: silently skipped.
+        applications.backgroundIDs = []
+        #expect(await perform(controller, action: .stopRunningInBackground, item: item) == nil)
+        let skipped = await outcome(controller, action: .stopRunningInBackground, item: item)
+        #expect(skipped.isSkipped)
+        #expect(skipped.message == nil)
+        #expect(applications.actions == Array(repeating: .stopRunningInBackground, count: 4))
+        controller.stop()
+    }
+
+    private func outcome(_ controller: ApplicationMenuController,
+                         action: ApplicationMenuAction,
+                         item: DockItem) async -> ApplicationMenuOutcome {
+        await withCheckedContinuation { continuation in
+            controller.perform(action, for: item, outcome: { continuation.resume(returning: $0) })
+        }
+    }
+
     private func discover(_ controller: ApplicationMenuController,
                           item: DockItem,
                           snapshot: ApplicationMenuSnapshot) async -> ApplicationWindowMenuState {
@@ -274,6 +351,14 @@ private final class StubApplicationMenuService: ApplicationMenuServicing {
     func bringAllToFront(_ reference: ApplicationReference) throws { try record(.bringAllToFront) }
     func quit(_ reference: ApplicationReference) throws { try record(.quit) }
 
+    /// Identities the stub reports as running in background.
+    var backgroundIDs: Set<String> = []
+    func isRunningInBackground(_ reference: ApplicationReference) -> Bool { backgroundIDs.contains(reference.id) }
+    func stopRunningInBackground(_ reference: ApplicationReference) -> Bool {
+        actions.append(.stopRunningInBackground)
+        return backgroundIDs.contains(reference.id)
+    }
+
     private func record(_ action: ApplicationMenuAction) throws {
         actions.append(action)
         if let error { throw error }
@@ -318,4 +403,9 @@ private actor StubApplicationWindowService: ApplicationWindowServicing {
 
     func discard(sessionID: UUID) { discarded.append(sessionID) }
     func stop() {}
+}
+
+private extension ApplicationMenuOutcome {
+    var isSucceeded: Bool { if case .succeeded = self { true } else { false } }
+    var isSkipped: Bool { if case .skipped = self { true } else { false } }
 }

@@ -24,7 +24,7 @@ struct DockFolderButton: View {
     var body: some View {
         Button(action: primaryAction) {
             DockIconPresentation(icon: item.icon, size: size, edge: interaction.layout.edge,
-                                 available: item.isAvailable, running: false, launching: false,
+                                 available: item.isAvailable, running: .notRunning, launching: false,
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  lineIcon: interaction.lineIcon(for: .folder))

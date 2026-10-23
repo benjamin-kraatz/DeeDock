@@ -57,6 +57,8 @@ nonisolated enum ApplicationWindowMenuState: Equatable, Sendable {
 nonisolated struct ApplicationMenuSnapshot: Equatable, Sendable {
     let processes: [ApplicationProcessSnapshot]
     let windowState: ApplicationWindowMenuState
+    /// macOS 27 reports the app as running in background. Only true while `processes` is empty.
+    var isRunningInBackground = false
 
     var isRunning: Bool { !processes.isEmpty }
     var allProcessesHidden: Bool { isRunning && processes.allSatisfy(\.isHidden) }
@@ -68,13 +70,32 @@ nonisolated enum ApplicationMenuAction: Equatable, Sendable {
     case setHidden(Bool)
     case bringAllToFront
     case quit
+    /// Ends the processes a quit app left running. Offered only for background tiles, and silent:
+    /// it never produces an error message.
+    case stopRunningInBackground
     case selectWindow(ApplicationWindowToken)
 
     var activatesApplication: Bool {
         switch self {
         case .setHidden(false), .bringAllToFront, .selectWindow: true
-        case .showInFinder, .setHidden(true), .quit: false
+        case .showInFinder, .setHidden(true), .quit, .stopRunningInBackground: false
         }
+    }
+}
+
+/// What one application-menu command did.
+nonisolated enum ApplicationMenuOutcome: Sendable {
+    case succeeded
+    /// The command failed; the dock shows `message`.
+    case failed(LocalizedStringResource)
+    /// The command did nothing and nothing is shown. Stop Running in Background reports this
+    /// when the app is no longer running in background.
+    case skipped
+
+    /// The message to show, if any. Only `failed` has one.
+    var message: LocalizedStringResource? {
+        if case .failed(let message) = self { return message }
+        return nil
     }
 }
 
@@ -87,6 +108,9 @@ nonisolated enum ApplicationContextMenuProjection {
             actions.append(.setHidden(!snapshot.allProcessesHidden))
             actions.append(.bringAllToFront)
             actions.append(.quit)
+        } else if snapshot.isRunningInBackground {
+            // Takes Quit's place, as in the system Dock.
+            actions.append(.stopRunningInBackground)
         }
         return actions
     }

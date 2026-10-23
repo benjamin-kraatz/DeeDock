@@ -22,7 +22,9 @@ final class ApplicationMenuController {
         access.refresh()
         let processes = applications.processes(for: item.reference)
         let state: ApplicationWindowMenuState = access.status == .enabled && !processes.isEmpty ? .loading : .hidden
-        return ApplicationMenuSnapshot(processes: processes, windowState: state)
+        return ApplicationMenuSnapshot(processes: processes, windowState: state,
+                                       isRunningInBackground: processes.isEmpty
+                                           && applications.isRunningInBackground(item.reference))
     }
 
     /// Returns a menu-scoped identifier whose completion is ignored after cancellation or shutdown.
@@ -90,31 +92,48 @@ final class ApplicationMenuController {
         }
     }
 
+    /// Performs `action` and reports only the message to show, if any.
     @discardableResult
     func perform(_ action: ApplicationMenuAction,
                  for item: DockItem,
                  completion: @escaping (LocalizedStringResource?) -> Void) -> UUID? {
+        perform(action, for: item, outcome: { completion($0.message) })
+    }
+
+    /// Performs `action`. Returns an identifier for a queued window selection, which
+    /// `cancelAction(_:)` can cancel; other actions complete before this returns.
+    @discardableResult
+    func perform(_ action: ApplicationMenuAction,
+                 for item: DockItem,
+                 outcome completion: @escaping (ApplicationMenuOutcome) -> Void) -> UUID? {
+        if action == .stopRunningInBackground {
+            // Ahead of the quarantine check, which would show a banner: this feature never
+            // shows one, and ending leftover processes does not run the app. A stop that cannot
+            // be requested is skipped silently, and the tile keeps its muted state.
+            completion(applications.stopRunningInBackground(item.reference) ? .succeeded : .skipped)
+            return nil
+        }
         guard !QuarantineStore.shared.contains(item.id, url: item.resolvedURL ?? item.reference.url),
               !QuarantineStore.shared.unreadable else {
-            completion(.quarantineBlocked)
+            completion(.failed(.quarantineBlocked))
             return nil
         }
         switch action {
-        case .showInFinder, .setHidden, .bringAllToFront, .quit:
+        case .showInFinder, .setHidden, .bringAllToFront, .quit, .stopRunningInBackground:
             do {
                 switch action {
                 case .showInFinder: try applications.showInFinder(item.reference)
                 case .setHidden(let hidden): try applications.setHidden(hidden, for: item.reference)
                 case .bringAllToFront: try applications.bringAllToFront(item.reference)
                 case .quit: try applications.quit(item.reference)
-                case .selectWindow: break
+                case .stopRunningInBackground, .selectWindow: break
                 }
-                completion(nil)
+                completion(.succeeded)
             } catch {
-                completion(.applicationMenuActionFailed(
+                completion(.failed(.applicationMenuActionFailed(
                     appName: item.reference.name,
                     details: String(localized: action.failureDescription)
-                ))
+                )))
             }
             return nil
         case .selectWindow(let token):
@@ -126,16 +145,16 @@ final class ApplicationMenuController {
                     try await windows.selectWindow(token)
                     guard let self, !Task.isCancelled, generation == currentGeneration, actionTasks[id] != nil else { return }
                     actionTasks[id] = nil
-                    completion(nil)
+                    completion(.succeeded)
                 } catch is CancellationError {
                     return
                 } catch {
                     guard let self, !Task.isCancelled, generation == currentGeneration, actionTasks[id] != nil else { return }
                     actionTasks[id] = nil
-                    completion(.applicationMenuActionFailed(
+                    completion(.failed(.applicationMenuActionFailed(
                         appName: item.reference.name,
                         details: String(localized: action.failureDescription)
-                    ))
+                    )))
                 }
             }
             return id
@@ -163,6 +182,8 @@ private extension ApplicationMenuAction {
         case .bringAllToFront: .applicationMenuBringAllFailed
         case .quit: .applicationMenuQuitFailed
         case .selectWindow: .applicationMenuWindowFailed
+        // Never shown: Stop Running in Background reports no failure. Kept for exhaustiveness.
+        case .stopRunningInBackground: .applicationMenuQuitFailed
         }
     }
 }

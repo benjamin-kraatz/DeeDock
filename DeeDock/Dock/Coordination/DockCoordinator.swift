@@ -160,14 +160,19 @@ final class DockCoordinator {
                                          modesRepository: DockModesRepository())
         patchBay = PatchBayController(profiles: profiles)
         let applicationService = ApplicationService()
+        let backgroundApplications = BackgroundApplicationMonitor()
+        // The feature is silent when macOS's background state cannot be read; only this count records it.
+        backgroundApplications.didBecomeUnavailable = { reason in
+            Analytics.track(.backgroundAppsUnavailable(reason: AnalyticsBackgroundAppsUnavailability(reason)))
+        }
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
                                      suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites(),
-                                     surveyDefaults: .standard)
+                                     surveyDefaults: .standard, backgroundMonitor: backgroundApplications)
         recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
         hub = HubCoordinator(launcher: LauncherState(catalog: catalog), openRadar: { [harbor] in harbor.toggle() })
         let menus = ApplicationMenuController(
             access: windowAccess,
-            applications: ApplicationMenuService(applications: applicationService),
+            applications: ApplicationMenuService(applications: applicationService, catalog: catalog),
             windows: AccessibilityApplicationWindowService()
         )
         applicationMenus = menus
@@ -646,13 +651,16 @@ final class DockCoordinator {
                 guard let self, let panel, panels[display.id] === panel else { return }
                 // Read before the asynchronous completion, after which the ambient trigger is gone.
                 let trigger = Analytics.trigger()
-                applicationMenus.perform(action, for: item) { [weak self, weak panel] error in
+                applicationMenus.perform(action, for: item, outcome: { [weak self, weak panel] outcome in
+                    let succeeded = if case .succeeded = outcome { true } else { false }
                     Analytics.track(.appMenuAction(AnalyticsAppMenuAction(action),
-                                                   outcome: error == nil ? .succeeded : .failed, trigger: trigger))
+                                                   outcome: succeeded ? .succeeded : .failed, trigger: trigger))
                     guard let self, let panel, panels[display.id] === panel else { return }
-                    if let error { panel.store.errorMessage = error }
-                    else if action.activatesApplication { panel.store.applicationOpened?() }
-                }
+                    // A skipped command, such as a Stop Running in Background that found nothing
+                    // to stop, shows nothing.
+                    if let error = outcome.message { panel.store.errorMessage = error }
+                    else if succeeded, action.activatesApplication { panel.store.applicationOpened?() }
+                })
             }
             panel.interaction.windowPeekHoverChanged = { [weak self, weak panel] item in
                 guard let self, let panel else { return }

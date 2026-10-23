@@ -64,7 +64,7 @@ struct DockSampleView: View {
                 }
                     .frame(width: rect.width, height: rect.height)
                     .modifier(DockIconIndicator(style: runningIndicatorStyle,
-                                                running: index.isMultiple(of: 2), size: sizes[index],
+                                                state: DockRunningState(running: index.isMultiple(of: 2)), size: sizes[index],
                                                 variant: DockIndicatorVariant(identity: symbols[index % symbols.count]),
                                                 animated: appearanceSettings.animateIndicators && !reduceMotion))
                     .opacity(opacity.icons)

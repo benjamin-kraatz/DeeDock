@@ -125,7 +125,7 @@ private enum DockSimsOverlayPreview {
 
     @ViewBuilder
     static func tile(_ state: DockSimsPinState, animated: Bool, size: CGFloat = 64) -> some View {
-        DockIconPresentation(size: size, edge: .bottom, available: true, running: true,
+        DockIconPresentation(size: size, edge: .bottom, available: true, running: .running,
                              launching: false, keyboardSelected: false) {
             RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.indigo.gradient)
         }
@@ -184,7 +184,7 @@ private enum DockSimsOverlayPreview {
 #Preview("Every edge") {
     HStack(spacing: 16) {
         ForEach(DockEdge.allCases, id: \.self) { edge in
-            DockIconPresentation(size: 64, edge: edge, available: true, running: true,
+            DockIconPresentation(size: 64, edge: edge, available: true, running: .running,
                                  launching: false, keyboardSelected: false) {
                 RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.indigo.gradient)
             }

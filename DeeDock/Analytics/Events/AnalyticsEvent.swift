@@ -153,6 +153,9 @@ enum AnalyticsEvent {
 
     // App tiles
     case appMenuAction(AnalyticsAppMenuAction, outcome: AnalyticsOutcome, trigger: AnalyticsTrigger)
+    /// macOS's "Running in Background" state cannot be read, so background apps show as before.
+    /// Sent at most once per launch. Never which app.
+    case backgroundAppsUnavailable(reason: AnalyticsBackgroundAppsUnavailability)
     /// Documents were handed to an app from its tile. A cancelled picker reports `canceled`.
     case documentsOpened(AnalyticsDocumentSource, fileCount: Int, fileType: AnalyticsFileType?,
                          outcome: AnalyticsOutcome)

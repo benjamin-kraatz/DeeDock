@@ -55,7 +55,7 @@ private struct RunningIndicatorThumbnail: View {
                 }
                 .padding(4)
                 .frame(width: size, height: size)
-                .modifier(DockIconIndicator(style: style, running: true, size: size,
+                .modifier(DockIconIndicator(style: style, state: .running, size: size,
                                             variant: DockIndicatorVariant(identity: style.rawValue),
                                             animated: animated))
                 .position(center)
