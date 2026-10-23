@@ -136,14 +136,22 @@ details.notes b{color:var(--foreground,#e6e7ea)}
 .cnt{font-size:12px;color:var(--fg2);font-variant-numeric:tabular-nums;white-space:nowrap;transition:opacity .2s}
 .cnt b{color:var(--fg);font-weight:600}
 .cnt .fr{color:var(--keep);font-weight:600}
-.chip{position:absolute;right:0;top:0;height:26px;display:flex;align-items:center;gap:7px;padding:0 4px 0 10px;border-radius:999px;background:var(--menu);font-size:12px;white-space:nowrap;
+.chip{position:absolute;right:0;top:0;height:26px;display:flex;align-items:center;gap:7px;padding:0 6px 0 10px;border-radius:999px;background:var(--menu);font-size:12px;white-space:nowrap;
  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ca) 35%,transparent),0 4px 12px rgba(0,0,0,.18);opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;
  transition:opacity .22s,transform .4s cubic-bezier(.3,1.35,.5,1);max-width:250px}
 .chip.show{opacity:1;transform:none;pointer-events:auto}
 .rm .chip{transition:opacity .16s;transform:none}
 .chip svg{width:13px;height:13px;flex:none;fill:var(--ca)}
 .chip .ct{font-weight:600;font-family:ui-rounded,-apple-system,system-ui;overflow:hidden;text-overflow:ellipsis}
-.chip .ub{font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;padding:3px 9px;background:var(--chipHi);color:var(--fg);cursor:pointer}
+.chip .ub{position:relative;font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;width:50px;height:20px;padding:0;background:var(--chipHi);color:var(--fg);cursor:pointer}
+/* Undo countdown: Capsule().trim(from: 0, to: remaining) in SwiftUI. Drains over UndoToast.lifetime (6 s), pauses while the pointer is on the chip. */
+.chip .ring{position:absolute;left:-2.5px;top:-2.5px;width:55px;height:25px;overflow:visible;pointer-events:none}
+.chip .ring path{fill:none;stroke:var(--ca);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:100 100;stroke-dashoffset:0;animation:drain var(--life,6s) linear forwards}
+.chip .ring .trk{stroke:color-mix(in srgb,var(--ca) 22%,transparent);animation:none}
+.chip.paused .ring path{animation-play-state:paused}
+@keyframes drain{to{stroke-dashoffset:100}}
+.chip .secs{font:600 10px ui-rounded,-apple-system,system-ui;color:var(--fg3);font-variant-numeric:tabular-nums;min-width:9px;text-align:right;margin-right:-2px;transition:opacity .2s}
+.chip.paused .secs{opacity:.45}
 .chip .ub:hover{background:color-mix(in srgb,var(--ca) 30%,var(--chipHi))}
 .prog{position:absolute;left:14px;right:14px;top:41px;height:3px;border-radius:2px;background:var(--chip);overflow:hidden}
 .prog i{display:block;height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,var(--keep),var(--file));transition:width .42s cubic-bezier(.3,1,.4,1)}
@@ -398,7 +406,7 @@ details.notes b{color:var(--foreground,#e6e7ea)}
  <li><b>Badge rule.</b> The badge shows the waiting count when one of these holds:
   <ul><li>10 or more files are waiting;</li><li>the oldest file is at least 7 days old;</li><li>24 h have passed since your last review.</li></ul>
   These are your Nudge settings. Trendi's 6 h quiet period after a notification doesn't hide the badge. While the panel is open the badge counts down with every decision, even after it drops under 10. When the panel closes, the rule is checked again. Snooze hides the badge until midnight.</li>
- <li><b>The undo chip.</b> In the window, the undo toast sits at the bottom. In the panel it becomes a chip in the top bar, so it never covers the buttons. Its lifetime is the same 6 s.</li>
+ <li><b>The undo chip.</b> In the window, the undo toast sits at the bottom. In the panel it becomes a chip in the top bar, so it never covers the buttons. Its lifetime is the same 6 s. <b>Approved, plus:</b> a ring around Undo drains over the 6 s, and a seconds count sits beside it. Both pause while the pointer is on the chip.</li>
  <li><b>Keyboard.</b> DOKK gives a plugin panel key focus on the first click, so a hint asks for that click. After it, ← → ↑ decide, ⌘Z undoes, and Space opens the file, as in Trendi's window. Esc closes the panel.</li>
 </ol>
 </details>
@@ -933,11 +941,17 @@ let toastT;
 function showToast(d,f){
  const chip=$('#chip');if(!chip)return;
  S.toast={d,f};chip.style.setProperty('--ca',ACC[d]);
- chip.innerHTML=`${SYMD[d]}<span class="ct" title="${d==='superLike'?f.n+' → '+destPath(f):f.n}">${PAST[d]}</span><button class="ub" data-act="undo">Undo</button>`;
- chip.classList.remove('show');void chip.offsetWidth;chip.classList.add('show');renderTopRight();
- clearTimeout(toastT);toastT=later(6000,hideToast);
+ const ring='<svg class="ring" viewBox="0 0 55 25"><path class="trk" d="M27.5 .8H43.3A11.7 11.7 0 0 1 43.3 24.2H11.7A11.7 11.7 0 0 1 11.7 .8Z" pathLength="100"/><path d="M27.5 .8H43.3A11.7 11.7 0 0 1 43.3 24.2H11.7A11.7 11.7 0 0 1 11.7 .8Z" pathLength="100"/></svg>';
+ chip.innerHTML=`${SYMD[d]}<span class="ct" title="${d==='superLike'?f.n+' → '+destPath(f):f.n}">${PAST[d]}</span><span class="secs" id="secs">6</span><button class="ub" data-act="undo" aria-label="Undo, 6 seconds left">${ring}Undo</button>`;
+ chip.classList.remove('show','paused');void chip.offsetWidth;chip.classList.add('show');renderTopRight();
+ toastLeft=TOAST_LIFE;toastStart=performance.now();armToast();
 }
-function hideToast(){S.toast=null;const c=$('#chip');c&&c.classList.remove('show');renderTopRight()}
+const TOAST_LIFE=6000;let toastLeft=0,toastStart=0,secsRaf=0;
+function armToast(){clearTimeout(toastT);toastT=later(toastLeft,hideToast);cancelAnimationFrame(secsRaf);
+ const tick=()=>{const e=$('#secs');if(!e||!S.toast)return;const left=Math.max(0,toastLeft-(performance.now()-toastStart));const n=Math.ceil(left/1000);if(e.textContent!=String(n)){e.textContent=n;const b=e.nextElementSibling;b&&b.setAttribute('aria-label',`Undo, ${n} seconds left`)}if(!$('#chip').classList.contains('paused'))secsRaf=requestAnimationFrame(tick)};secsRaf=requestAnimationFrame(tick)}
+function pauseToast(on){const c=$('#chip');if(!c||!S.toast)return;if(on){if(c.classList.contains('paused'))return;toastLeft=Math.max(0,toastLeft-(performance.now()-toastStart));clearTimeout(toastT);cancelAnimationFrame(secsRaf);c.classList.add('paused')}
+ else{if(!c.classList.contains('paused'))return;c.classList.remove('paused');toastStart=performance.now();armToast()}}
+function hideToast(){S.toast=null;cancelAnimationFrame(secsRaf);const c=$('#chip');c&&c.classList.remove('show');renderTopRight()}
 
 /* stats */
 function recordStat(d,f,sign){
@@ -1105,6 +1119,8 @@ function act(a,el){
  hideMenu();
 }
 stage.addEventListener('pointerdown',e=>{if(e.target.closest('.slot'))onDown(e)});
+stage.addEventListener('mouseover',e=>{if(e.target.closest('#chip'))pauseToast(true)});
+stage.addEventListener('mouseout',e=>{const c=e.target.closest('#chip');if(c&&!c.contains(e.relatedTarget))pauseToast(false)});
 stage.addEventListener('click',e=>{
  const a=e.target.closest('[data-act]');
  if(e.target.closest('#pp')&&!S.key){S.key=true;pp.classList.add('key');tune()}
