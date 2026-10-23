@@ -128,7 +128,7 @@ With no `panelSize`, the panel is 560 × 420. A new `panelSize` while the panel 
 
 - A plugin from another developer is discovered and offered for approval. Loading it after approval has not been checked yet.
 - DOKK sets no team or code requirement on its extension point.
-- Whether a Mac App Store app (philos) may ship an extension for a third-party extension point is open. Benn is checking that with a TestFlight build.
+- Whether a Mac App Store app may ship an extension for a third-party extension point is open. Trendi's TestFlight build, the first real DOKK plugin, will answer it.
 
 ## How the extension point is declared
 

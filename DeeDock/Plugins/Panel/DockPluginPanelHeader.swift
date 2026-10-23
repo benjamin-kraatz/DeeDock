@@ -131,7 +131,7 @@ private struct DockPluginMoreButtonBridge: NSViewRepresentable {
         DockPluginPanelHeader(icon: icon, title: "Build Status", appName: "Pipeline") {
             Image(systemName: "ellipsis").frame(width: 28, height: 28)
         }
-        DockPluginPanelHeader(icon: icon, title: "philos", appName: nil) {
+        DockPluginPanelHeader(icon: icon, title: "Reader", appName: nil) {
             Image(systemName: "ellipsis").frame(width: 28, height: 28)
         }
         DockPluginPanelHeader(icon: icon, title: "A Plugin With an Unusually Long and Descriptive Name",

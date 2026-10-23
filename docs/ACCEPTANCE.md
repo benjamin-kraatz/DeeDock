@@ -3583,4 +3583,4 @@ The app was not launched. Not exercised:
 Also open:
 - whether DOKK and DOKK Dev, both installed and both declaring the shared point, each see and approve the same plugin;
 - loading a plugin from another team;
-- the App Store question for philos.
+- whether a Mac App Store app may ship a DOKK plugin, which Trendi's TestFlight build will answer.

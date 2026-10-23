@@ -8,8 +8,8 @@ enum PluginsSettingsPreviewData {
     private static var icon: NSImage { NSWorkspace.shared.icon(for: .applicationBundle) }
 
     static let plugins: [DockPlugin] = [
-        DockPlugin(id: "com.example.philos.Plugin", extensionName: "philos",
-                   app: DockPluginApp(name: "philos", url: nil, icon: icon), status: .running),
+        DockPlugin(id: "com.example.Reader.Plugin", extensionName: "Reader",
+                   app: DockPluginApp(name: "Reader", url: nil, icon: icon), status: .running),
         DockPlugin(id: "com.example.Pipeline.BuildStatus", extensionName: "Build Status",
                    app: DockPluginApp(name: "Pipeline", url: nil, icon: icon), status: .stopped),
         DockPlugin(id: "de.benjaminkraatz.DOKKSamplePlugin.Extension", extensionName: "DOKK Sample Plugin",
