@@ -3571,6 +3571,7 @@ The app was not launched. Not exercised:
 - the tile, badge pushes, and the panel in a real dock;
 - typing in a plugin's text field inside the non-activating panel;
 - crash and restart;
+- a menu item marked `opensPanel` (the sample's **Bump Badge in Panel**) opening the panel before the plugin hears the choice;
 - live resizing;
 - unpinning ending the plugin process;
 - auto-pin on approval;

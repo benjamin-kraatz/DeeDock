@@ -133,10 +133,16 @@ nonisolated struct DOKKPluginMenuItem: Codable, Equatable, Sendable, Identifiabl
     var title: String
     /// An SF Symbol name for the item's image. Unknown names show no image.
     var systemImage: String?
+    /// Opens the plugin's panel before DOKK reports the choice, for an item that shows something
+    /// there. `panelOpened` arrives first, then `menuItemChosen`. The open still comes from the
+    /// person's click, so a plugin cannot open its panel on its own. Hosts that predate the field
+    /// skip it and only report the choice. Nil means false.
+    var opensPanel: Bool?
 
-    init(id: String, title: String, systemImage: String? = nil) {
+    init(id: String, title: String, systemImage: String? = nil, opensPanel: Bool? = nil) {
         self.id = id
         self.title = title
         self.systemImage = systemImage
+        self.opensPanel = opensPanel
     }
 }

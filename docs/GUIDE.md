@@ -475,7 +475,7 @@ Plugins let other apps add a tile and a panel to your dock. A plugin comes insid
 - **Open Panel** or **Close Panel**
 - **Open** followed by the app's name
 - **Restart Plugin**
-- any commands the plugin adds
+- any commands the plugin adds. Some of them open the panel to show their result there.
 - **Unpin from Dock**
 - **Plugin Settings…**
 

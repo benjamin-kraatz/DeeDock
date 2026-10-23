@@ -88,7 +88,7 @@ All values travel as JSON over two `@objc` protocols in `DOKKPluginXPC.swift`. O
 | `accessibilityValue` | What VoiceOver reads after the title, such as "2 new highlights" |
 | `panelSize` | The content size the plugin would like, in points, below DOKK's header |
 | `primaryAction` | `openPanel` (the default) or `openApp`: what a click on the tile does |
-| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, and an optional SF Symbol name |
+| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, an optional SF Symbol name, and an optional `opensPanel` |
 
 ### Versioning
 
@@ -100,7 +100,7 @@ Both sides skip what they don't know:
 
 So adding an optional field or a new event kind doesn't change the version. The version goes up only for a change an older peer can't ignore.
 
-There is deliberately no request to open the panel. A panel opens only when the person clicks the tile.
+There is deliberately no request to open the panel. A panel opens only when the person clicks the tile, or chooses a menu item marked `opensPanel`. For that item DOKK opens the panel first and then reports the choice, so `panelOpened` arrives before `menuItemChosen`. A host that predates `opensPanel` ignores it and only reports the choice, so the plugin should be ready to show that content the next time the panel opens.
 
 ## Panel size
 
