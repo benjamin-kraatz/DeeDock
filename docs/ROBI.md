@@ -74,10 +74,10 @@ Vision's first recognition in a process took 13–27 s; later ones take 50–150
 
 ## Answering
 
-Both models run through one `LanguageModelSession`:
+Every model runs through one `LanguageModelSession`:
 
 - **On-device** is `SystemLanguageModel.default`. On macOS 27 it reported an 8,192-token context, vision, and tool calling, and it answered a screenshot question in 1.5–2.2 s. It explains poorly but translates and summarizes well. Robi sends up to `(contextSize − 3,000) × 2.5` characters of context.
-- **Claude** is `ClaudeLanguageModel(name: .sonnet5_5, auth: .apiKey(key), fixedEffort: .medium or .high)` from Anthropic's `ClaudeForFoundationModels` package, pinned to exactly 0.2.3 while it is in beta. Robi sends up to 60,000 characters. The key comes from the Keychain per request and is never kept in `RobiSettings`.
+- **Claude** is `ClaudeLanguageModel(name:, auth: .apiKey(key), fixedEffort: .medium or .high)` from Anthropic's `ClaudeForFoundationModels` package, pinned to exactly 0.2.3 while it is in beta. `RobiSettings.claudeModel` picks `.haiku5_5`, `.sonnet5_5` (the default) or `.opus5_5`. It is stored by family (`haiku`, `sonnet`, `opus`), so a package update can move a family to a newer model without losing the choice. All three accept both effort levels and pictures. Robi sends up to 60,000 characters to each. The key comes from the Keychain per request and is never kept in `RobiSettings`.
 
 Both models stream in bursts: many characters at once, then nothing for a few hundred milliseconds. `RobiTextPacer` sits between `RobiModel.answer` and the card and reveals the answer word by word at an even pace. It waits 0.14 s before the first word, follows a smoothed arrival rate, and keeps about 0.2 s of text in reserve, so a short gap between bursts is covered by text that has already arrived. When the answer finishes or is stopped, the rest appears within 0.3 s. The newest words fade in over 0.24 s. With Reduce Motion the answer appears as it arrives, without fading. This only changes what the card shows; Copy, Replace and Paste use the full answer, and an answer brought back from another window appears in full at once.
 
@@ -149,7 +149,7 @@ The build compiles and the geometry and settings tests compile. DOKK was not lau
 - Real hover, clicks, drags, and resizes on Ghostty, Claude Desktop, a Chromium browser, Xcode, and Finder, on displays with different scales.
 - Spaces, full screen, Mission Control, Stage Manager, sleep and wake.
 - Selection-first flow in Electron and Chromium apps, Replace Selection, Paste into a terminal, and Run on a proposed command.
-- Claude with a real key at both effort levels, and the key prompt in the card.
+- Claude with a real key on Haiku, Sonnet and Opus at both effort levels, the model named in the card's footer, and the key prompt in the card.
 - Switch windows while an answer streams, then come back: the card returns, still streaming or complete, and Replace and Paste still reach the first window. Close that window from another one and check that the dot goes away on the next focus change.
 - Stop during a long Claude answer: the Anthropic Console's usage for that request should show fewer output tokens than an unstopped answer to the same question.
 - VoiceOver on the face and the selection sheet, Reduce Motion, and Reduce Transparency.

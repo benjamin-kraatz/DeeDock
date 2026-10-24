@@ -10,6 +10,7 @@ enum RobiPreviewData {
     static func model(_ phase: RobiPhase, dark: Bool = false, placement: RobiPlacement = .above,
                       context: RobiContext? = nil, answer: String = "", notice: RobiNotice? = nil,
                       proposal: RobiProposal? = nil, model answerModel: RobiAnswerModel = .onDevice,
+                      claude claudeModel: RobiClaudeModel = .sonnet,
                       reduceMotion: Bool = false, toast: LocalizedStringResource? = nil,
                       questions: [String] = [], reading: Bool = false) -> RobiModel {
         let model = RobiModel()
@@ -25,6 +26,7 @@ enum RobiPreviewData {
         model.notice = notice
         model.proposal = proposal
         model.answerModel = answerModel
+        model.claudeModel = claudeModel
         model.canReplace = context?.kind == .selection
         model.reduceMotion = reduceMotion
         model.toast = toast
@@ -111,9 +113,9 @@ private struct RobiPreviewStage: View {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, context: RobiPreviewData.selection,
         answer: "Wir schreiben wie eine kluge Freundin, die fünf Minuten Zeit hat.", toast: .robiToastCopied))
 }
-#Preview("Answered, long, scrolls") {
+#Preview("Answered by Opus, long, scrolls") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,
-        answer: RobiPreviewData.longAnswer, model: .claude))
+        answer: RobiPreviewData.longAnswer, model: .claude, claude: .opus))
 }
 #Preview("Answered with references to the window, dark") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.windowWithLandmarks,

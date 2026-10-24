@@ -77,6 +77,9 @@ final class RobiModel {
     /// Suggested questions may arrive for this prompt, so the panel keeps room for their row.
     var suggestsQuestions = false
     var answerModel: RobiAnswerModel = .onDevice
+    /// The Claude model that answers, named in the card's footer; read only when `answerModel` is
+    /// `.claude`.
+    var claudeModel: RobiClaudeModel = .sonnet
     var claudeEffort: RobiClaudeEffort = .medium
     /// The Attach Picture switch in the prompt bar, mirrored from `RobiSettings`.
     var attachesWindowPicture = false
@@ -134,7 +137,7 @@ final class RobiModel {
     /// card's own: `.thinking` until the answer is complete.
     var exchange: RobiExchange {
         RobiExchange(context: context, request: request, answer: answer, proposal: proposal, notice: notice,
-                     isStopped: isStopped, canReplace: canReplace, answerModel: answerModel,
+                     isStopped: isStopped, canReplace: canReplace, answerModel: answerModel, claudeModel: claudeModel,
                      phase: phase == .answered ? .answered : .thinking)
     }
 
@@ -158,6 +161,7 @@ final class RobiModel {
         isStopped = exchange.isStopped
         canReplace = exchange.canReplace
         answerModel = exchange.answerModel
+        claudeModel = exchange.claudeModel
     }
 
     /// Clears everything an interaction left behind. An answer set aside on another window and

@@ -201,8 +201,8 @@ enum AnalyticsEvent {
     /// Robi opened its prompt bar with context. Never the app, the window, or any of its text.
     case robiOpened(trigger: AnalyticsTrigger, context: AnalyticsRobiContext)
     /// A Robi request ended: which model, which suggestion, how, and how long it took. Never the
-    /// question, the context, or the answer.
-    case robiAnswered(model: AnalyticsRobiModel, intent: AnalyticsRobiIntent, outcome: AnalyticsRobiOutcome,
+    /// question, the context, or the answer. `claudeModel` is nil unless Claude answered.
+    case robiAnswered(model: AnalyticsRobiModel, claudeModel: AnalyticsRobiClaudeModel?, intent: AnalyticsRobiIntent, outcome: AnalyticsRobiOutcome,
                       duration: Double, picture: Bool)
     /// The person put a Robi answer to use.
     case robiActionTaken(AnalyticsRobiAction)

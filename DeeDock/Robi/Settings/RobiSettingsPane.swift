@@ -77,7 +77,7 @@ struct RobiGeneralSettingsCard: View {
     }
 }
 
-/// Which model answers, the Anthropic API key for Claude, and Claude's effort.
+/// Which model answers, the Anthropic API key for Claude, and which Claude model and effort.
 struct RobiAnswersSettingsCard: View {
     @Binding var settings: RobiSettings
     let hasKey: Bool
@@ -115,6 +115,11 @@ struct RobiAnswersSettingsCard: View {
                         }
                     }
                 }
+                SettingsPickerRow(title: .robiClaudeModel, options: [
+                    SettingsOption(value: RobiClaudeModel.haiku, title: .robiClaudeModelHaiku, symbol: "hare"),
+                    SettingsOption(value: RobiClaudeModel.sonnet, title: .robiClaudeModelSonnet, symbol: "sparkle"),
+                    SettingsOption(value: RobiClaudeModel.opus, title: .robiClaudeModelOpus, symbol: "sparkles"),
+                ], selection: $settings.claudeModel)
                 SettingsPickerRow(title: .robiEffort, options: [
                     SettingsOption(value: RobiClaudeEffort.medium, title: .robiEffortMedium, symbol: "gauge.medium"),
                     SettingsOption(value: RobiClaudeEffort.high, title: .robiEffortHigh, symbol: "gauge.high"),
@@ -237,6 +242,7 @@ private struct RobiSettingsPreview: View {
     var settings = RobiSettings()
     settings.isEnabled = true
     settings.answerModel = .claude
+    settings.claudeModel = .opus
     settings.claudeEffort = .high
     // Enables Reset Tab Positions.
     settings.tabPositions = ["com.apple.Terminal": 0.2]

@@ -23,6 +23,19 @@ nonisolated enum AnalyticsRobiModel: String, AnalyticsToken {
     }
 }
 
+/// Which Claude model answered a Robi request.
+nonisolated enum AnalyticsRobiClaudeModel: String, AnalyticsToken {
+    case haiku, sonnet, opus
+
+    init(_ model: RobiClaudeModel) {
+        switch model {
+        case .haiku: self = .haiku
+        case .sonnet: self = .sonnet
+        case .opus: self = .opus
+        }
+    }
+}
+
 /// The suggestion a Robi request came from; `suggested` for a question Apple Intelligence
 /// suggested, `custom` for a typed question. Never the question itself.
 nonisolated enum AnalyticsRobiIntent: String, AnalyticsToken {

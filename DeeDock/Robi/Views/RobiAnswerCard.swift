@@ -241,7 +241,7 @@ private struct RobiModelFooter: View {
 
     var body: some View {
         Label {
-            Text(model.answerModel == .claude ? .robiFooterClaude : .robiFooterOnDevice)
+            Text(text)
         } icon: {
             Image(systemName: model.answerModel == .claude ? "sparkle" : "lock.shield")
         }
@@ -249,6 +249,15 @@ private struct RobiModelFooter: View {
         .foregroundStyle(.secondary)
         .lineLimit(1)
         .truncationMode(.tail)
+    }
+
+    private var text: LocalizedStringResource {
+        guard model.answerModel == .claude else { return .robiFooterOnDevice }
+        return switch model.claudeModel {
+        case .haiku: .robiFooterClaudeHaiku
+        case .sonnet: .robiFooterClaudeSonnet
+        case .opus: .robiFooterClaudeOpus
+        }
     }
 }
 

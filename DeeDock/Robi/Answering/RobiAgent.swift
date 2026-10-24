@@ -5,9 +5,9 @@ import Foundation
 
 /// Answers one question about the window Robi sits on.
 ///
-/// Both models run through the same `LanguageModelSession` API: Apple's on-device model, or
-/// Claude Sonnet 5.5 through Anthropic's Claude for Foundation Models package with the person's
-/// own API key. Each question gets a fresh session; Robi keeps no conversation history.
+/// Every model runs through the same `LanguageModelSession` API: Apple's on-device model, or
+/// Claude Haiku, Sonnet or Opus 5.5 through Anthropic's Claude for Foundation Models package with
+/// the person's own API key. Each question gets a fresh session; Robi keeps no conversation history.
 ///
 /// Context is untrusted data. The instructions say so, the window text is quoted, and the only
 /// tool can merely propose a menu command for the person to confirm.
@@ -21,7 +21,7 @@ import Foundation
 final class RobiAgent {
     enum Model {
         case onDevice
-        case claude(key: String, effort: RobiClaudeEffort)
+        case claude(RobiClaudeModel, key: String, effort: RobiClaudeEffort)
     }
 
     struct Request {
@@ -58,10 +58,11 @@ final class RobiAgent {
             let budget = max(1_500, (system.contextSize - 3_000) * 5 / 2)
             try await run(system, budget: budget, request: request, observed: ("apple_foundation_models", "apple"),
                           secret: nil, propose: propose, update: update)
-        case let .claude(key, effort):
-            let claude = ClaudeLanguageModel(name: .sonnet5_5, auth: .apiKey(key),
+        case let .claude(choice, key, effort):
+            let name = choice.claudeModel
+            let claude = ClaudeLanguageModel(name: name, auth: .apiKey(key),
                                              fixedEffort: effort == .high ? .high : .medium, timeout: 90)
-            try await run(claude, budget: 60_000, request: request, observed: (ClaudeModel.sonnet5_5.id, "anthropic"),
+            try await run(claude, budget: 60_000, request: request, observed: (name.id, "anthropic"),
                           secret: key, propose: propose, update: update)
         }
     }
@@ -229,5 +230,16 @@ final class RobiAgent {
         }
         if let error = error as? URLError, error.code == .notConnectedToInternet { return String(localized: .robiErrorOffline) }
         return String(localized: .robiErrorGeneric(error.localizedDescription))
+    }
+}
+
+extension RobiClaudeModel {
+    /// The model each family sends. All three accept Robi's effort levels and pictures.
+    nonisolated var claudeModel: ClaudeModel {
+        switch self {
+        case .haiku: .haiku5_5
+        case .sonnet: .sonnet5_5
+        case .opus: .opus5_5
+        }
     }
 }

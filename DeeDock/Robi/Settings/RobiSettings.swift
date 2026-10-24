@@ -4,11 +4,24 @@ import Foundation
 nonisolated enum RobiAnswerModel: String, Codable, CaseIterable, Sendable {
     /// Apple's on-device model. Nothing leaves the Mac.
     case onDevice = "on_device"
-    /// Claude Sonnet 5.5 through the person's own Anthropic API key.
+    /// Claude through the person's own Anthropic API key, as the model `RobiClaudeModel` picks.
     case claude
 }
 
-/// How much effort Claude spends on one answer. Both levels are ones Sonnet 5.5 accepts.
+/// Which Claude model answers when `RobiAnswerModel.claude` is chosen.
+///
+/// Stored by family, not version, so a later package that moves a family to a newer model keeps
+/// the person's choice. `RobiAgent` maps each family to the model it currently sends.
+nonisolated enum RobiClaudeModel: String, Codable, CaseIterable, Sendable {
+    /// Claude Haiku 5.5: the fastest and cheapest per answer.
+    case haiku
+    /// Claude Sonnet 5.5: the default, and the only model older builds used.
+    case sonnet
+    /// Claude Opus 5.5: the most capable and the most expensive per answer.
+    case opus
+}
+
+/// How much effort Claude spends on one answer. Both levels are ones every `RobiClaudeModel` accepts.
 nonisolated enum RobiClaudeEffort: String, Codable, CaseIterable, Sendable {
     case medium
     case high
@@ -23,6 +36,7 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
     /// Robi is opt-in. Showing it needs Accessibility; reading pixels needs Screen Recording.
     var isEnabled = false
     var answerModel: RobiAnswerModel = .onDevice
+    var claudeModel: RobiClaudeModel = .sonnet
     var claudeEffort: RobiClaudeEffort = .medium
     /// After the person picks context, Apple's on-device model suggests a few questions about it.
     /// Always on this Mac, whichever model answers.
@@ -43,7 +57,7 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
     init() {}
 
     private enum CodingKeys: String, CodingKey {
-        case isEnabled, answerModel, claudeEffort, shortcutEnabled, excludedBundleIdentifiers, tabPositions
+        case isEnabled, answerModel, claudeModel, claudeEffort, shortcutEnabled, excludedBundleIdentifiers, tabPositions
         case suggestQuestions, attachWindowPicture
     }
 
@@ -53,6 +67,7 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         isEnabled = (try? values.decodeIfPresent(Bool.self, forKey: .isEnabled)) ?? false
         answerModel = (try? values.decodeIfPresent(RobiAnswerModel.self, forKey: .answerModel)) ?? .onDevice
+        claudeModel = (try? values.decodeIfPresent(RobiClaudeModel.self, forKey: .claudeModel)) ?? .sonnet
         claudeEffort = (try? values.decodeIfPresent(RobiClaudeEffort.self, forKey: .claudeEffort)) ?? .medium
         suggestQuestions = (try? values.decodeIfPresent(Bool.self, forKey: .suggestQuestions)) ?? true
         attachWindowPicture = (try? values.decodeIfPresent(Bool.self, forKey: .attachWindowPicture)) ?? false

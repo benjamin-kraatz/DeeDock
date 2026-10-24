@@ -129,6 +129,7 @@ final class RobiController {
     private func configure() {
         let settings = store.settings
         model.answerModel = settings.answerModel
+        model.claudeModel = settings.claudeModel
         model.claudeEffort = settings.claudeEffort
         model.attachesWindowPicture = settings.attachWindowPicture
         tracker.excludedBundleIdentifiers = Set(settings.excludedBundleIdentifiers)
@@ -893,7 +894,9 @@ final class RobiController {
         model.isStopped = false
         setPhase(.thinking)
         let choice = override ?? store.settings.answerModel
+        let claudeModel = store.settings.claudeModel
         model.answerModel = choice
+        model.claudeModel = claudeModel
         let agentModel: RobiAgent.Model
         switch choice {
         case .onDevice:
@@ -908,7 +911,7 @@ final class RobiController {
                 model.notice = .claudeKeyMissing
                 return report(intent, outcome: .keyMissing, started: Date())
             }
-            agentModel = .claude(key: key, effort: store.settings.claudeEffort)
+            agentModel = .claude(claudeModel, key: key, effort: store.settings.claudeEffort)
         }
         pending = nil
         let started = Date()
@@ -936,7 +939,7 @@ final class RobiController {
                 failure = error
             }
             guard !Task.isCancelled else { return }
-            self.complete(generation, intent: intent, text: text, started: started, model: choice,
+            self.complete(generation, intent: intent, text: text, started: started, model: choice, claudeModel: claudeModel,
                           picture: request.context?.image != nil, failure: failure)
         }
     }
@@ -976,7 +979,7 @@ final class RobiController {
 
     /// The answer finished, failed, or came back empty, on screen or set aside.
     private func complete(_ generation: Int, intent: RobiIntent, text: String, started: Date,
-                          model answerModel: RobiAnswerModel, picture: Bool, failure: Error?) {
+                          model answerModel: RobiAnswerModel, claudeModel: RobiClaudeModel, picture: Bool, failure: Error?) {
         guard let destination = destination(of: generation) else { return }
         var outcome = AnalyticsRobiOutcome.answered
         var keyMissing = false
@@ -1007,7 +1010,7 @@ final class RobiController {
             if keyMissing { parked?.pending = waiting }
             updateParkedBadge()
         }
-        report(intent, outcome: outcome, started: started, model: answerModel, picture: outcome != .failed && picture)
+        report(intent, outcome: outcome, started: started, model: (answerModel, claudeModel), picture: outcome != .failed && picture)
     }
 
     /// Stops the answer in progress and keeps whatever has arrived, with its actions enabled.
@@ -1028,8 +1031,11 @@ final class RobiController {
     }
 
     private func report(_ intent: RobiIntent, outcome: AnalyticsRobiOutcome, started: Date,
-                        model answerModel: RobiAnswerModel? = nil, picture: Bool = false) {
-        Analytics.track(.robiAnswered(model: AnalyticsRobiModel(answerModel ?? model.answerModel), intent: AnalyticsRobiIntent(intent),
+                        model answered: (model: RobiAnswerModel, claude: RobiClaudeModel)? = nil, picture: Bool = false) {
+        let (answerModel, claudeModel) = answered ?? (model.answerModel, model.claudeModel)
+        Analytics.track(.robiAnswered(model: AnalyticsRobiModel(answerModel),
+                                      claudeModel: answerModel == .claude ? AnalyticsRobiClaudeModel(claudeModel) : nil,
+                                      intent: AnalyticsRobiIntent(intent),
                                       outcome: outcome, duration: Date().timeIntervalSince(started), picture: picture))
     }
 
