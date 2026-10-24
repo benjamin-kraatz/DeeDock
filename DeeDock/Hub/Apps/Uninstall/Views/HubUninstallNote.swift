@@ -34,7 +34,8 @@ struct HubUninstallNote<Actions: View>: View {
                 .padding(.top, 1)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 9) {
-                Text("\(title.fontWeight(.semibold).foregroundStyle(.primary)) \(detail)")
+                Text("\(title.fontWeight(.semibold).foregroundStyle(.primary)) \(detail)",
+                     comment: "An uninstall sheet note: its bold title, then its detail sentence.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 // Two buttons side by side; German labels that don't fit stack instead of truncating.

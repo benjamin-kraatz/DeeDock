@@ -89,7 +89,8 @@ struct HubUninstallItemRow: View {
     private var note: Text? {
         if let other = item.sharedWith { return Text(.hubUninstallSharedWith(name: other)) }
         switch (item.domain == .allUsers, item.keepsRunning) {
-        case (true, true): return Text("\(Text(.hubUninstallAllUsers)) · \(Text(.hubUninstallKeepsRunning))")
+        case (true, true): return Text("\(Text(.hubUninstallAllUsers)) · \(Text(.hubUninstallKeepsRunning))",
+                                         comment: "Joins two notes under an uninstall row: 'For all users' and 'Keeps running'.")
         case (true, false): return Text(.hubUninstallAllUsers)
         case (false, true): return Text(.hubUninstallKeepsRunning)
         case (false, false): return nil
