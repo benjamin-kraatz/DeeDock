@@ -113,6 +113,9 @@ final class LauncherState {
     var pinDestinations: [DockPinDestination] { dockStore?.pinDestinations ?? [] }
     @ObservationIgnored weak var dockStore: DockStore?
     @ObservationIgnored var createCapsule: ((ApplicationReference) -> Void)?
+    /// Opens the uninstall sheet for an app. The Hub's Apps model sets it; without it the context menu
+    /// has no Uninstall item.
+    @ObservationIgnored var uninstall: ((LauncherApplication) -> Void)?
     /// Opens one of DDock's own windows. The owner closes the launcher first.
     @ObservationIgnored var openTool: ((LauncherTool) -> Void)?
     /// Tools are browsable only in the unfiltered app list, where they cannot be mistaken for results.

@@ -171,11 +171,39 @@ nonisolated enum AnalyticsHubTrigger: String, AnalyticsToken {
     case openFolder = "open_folder"
     /// Lookout's settings asked for its onboarding, which shows over the Hub.
     case lookoutSetup = "lookout_setup"
+    /// DOKK relaunched for Full Disk Access and reopened an uninstall sheet in the Apps tab.
+    case uninstallRelaunch = "uninstall_relaunch"
 }
 
 /// How a Hub tab was chosen.
 nonisolated enum AnalyticsHubTabSwitch: String, AnalyticsToken {
     case click, keyboard
+}
+
+/// How an uninstall from the Hub's Apps tab ended.
+nonisolated enum AnalyticsUninstallOutcome: String, AnalyticsToken {
+    /// The app and every selected item are in the Trash.
+    case completed
+    /// The app is in the Trash; some selected items aren't.
+    case partial
+    /// The sheet closed before anything was removed.
+    case dismissed
+    /// DOKK relaunched so a Full Disk Access grant applies.
+    case relaunched
+    /// The user cancelled Finder's password prompt, and the sheet closed.
+    case passwordCancelled = "password_cancelled"
+    /// The app didn't quit, and the sheet closed.
+    case stillOpen = "still_open"
+    /// macOS refused to move the app, and the sheet closed.
+    case failed
+
+    /// Whether the app itself went to the Trash.
+    var removedApp: Bool { self == .completed || self == .partial }
+}
+
+/// Where an uninstalled app came from. Never which app.
+nonisolated enum AnalyticsUninstallSource: String, AnalyticsToken {
+    case appStore = "app_store", testFlight = "test_flight", installer, downloaded, unknown
 }
 
 nonisolated enum AnalyticsHubTransferKind: String, AnalyticsToken {

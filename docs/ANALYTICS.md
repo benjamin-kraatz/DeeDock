@@ -338,7 +338,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 
 | Event | Properties |
 | --- | --- |
-| `hub_opened` | `trigger` (`tile`, `focus_dock`, `file_drop`, `open_folder`, `lookout_setup` when Lookout's settings opened its onboarding over the Hub), `tab` (`apps`, `windows`, `files`), `detached` (opened as a window rather than anchored to the dock) |
+| `hub_opened` | `trigger` (`tile`, `focus_dock`, `file_drop`, `open_folder`, `lookout_setup` when Lookout's settings opened its onboarding over the Hub, `uninstall_relaunch` when DOKK relaunched for Full Disk Access and reopened an uninstall sheet), `tab` (`apps`, `windows`, `files`), `detached` (opened as a window rather than anchored to the dock) |
 | `hub_tab_selected` | `tab`, `via` (`click`, `keyboard`) |
 | `hub_detach_changed` | `detached` (`true` when the pin button made the Hub a window, `false` when it was attached again) |
 | `hub_file_transfer` | `kind` (`copy`, `move`), `item_count`, `cross_volume`, `outcome` (`completed`, `cancelled`, `failed`). Never names or paths. |
@@ -353,6 +353,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `lookout_model_download` | `outcome` (`completed`, `failed`, `cancelled`), `seconds` (whole seconds of the run), `error` (`network`, `server`, `host`, `checksum`, `incomplete`, `write`, `disk_space`; only when it failed). One per download run, a resumed run included. Never a URL or a path. |
 | `lookout_access_result` | `outcome` (`allowed`, `denied`), `context` (`onboarding` for "Allow…", `settings` for "Add folder…"). One per request to read a folder; folders that need no prompt and quiet re-checks aren't reported. Never the folder. |
 | `hub_window_activated` | `minimized` (the window was minimized before it was brought forward). Never titles or app names. |
+| `hub_app_uninstall` | `outcome` (`completed`, `partial` when some selected items stayed, `dismissed` when the sheet closed before removal, `relaunched` when DOKK relaunched for Full Disk Access, `password_cancelled`, `still_open` when the app didn't quit, `failed` when macOS refused the app), `source` (`app_store`, `test_flight`, `installer`, `downloaded`, `unknown`), `data_count` (items found, not counting name-only matches), `selected_count`, `moved_count`, `protected_count` (items hidden without Full Disk Access), `related_selected` (name-only matches the user selected), `used_finder` (DOKK asked Finder to move something, usually with the password, even if the prompt was then cancelled), `unpinned`. Sent once per uninstall sheet. Never the app, a name, or a path. |
 
 ### Dock Modes
 

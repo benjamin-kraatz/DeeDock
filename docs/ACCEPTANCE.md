@@ -3651,3 +3651,54 @@ DOKK itself was not launched. Not exercised:
 - Claude with a real key at both efforts, and the key prompt in the card;
 - Spaces, full screen, Mission Control, Stage Manager, sleep and wake, and displays with different scales;
 - VoiceOver, Reduce Motion, and Reduce Transparency.
+
+## Hub Apps uninstall (DEE-141)
+
+Built on `codex/dee-141-hub-uninstall` after the confirmed mockup `docs/mockups/hub-uninstall.html` (attached sheet). Behavior is in [LAUNCHER.md](LAUNCHER.md#uninstall).
+
+### Implemented
+
+- **Menu.** `LauncherApplicationMenu` ends with **Uninstall…** when `LauncherState.uninstall` is set (only the Hub sets it) and `AppUninstallPathPolicy.allowsApp` accepts the bundle.
+- **Inspection and scanning.** `AppUninstallInspector` reads:
+  - Info.plist and the code signature (team, app groups);
+  - embedded bundles and helper identifiers;
+  - the `_MASReceipt` and Spotlight's receipt type (`ProductionSandbox` means TestFlight).
+- **Matching.** `AppLeftoverRules` (pure) decides what is selected, only offered, or skipped. `AppLeftoverScanner` lists the folders, marks items macOS privacy protection hides, and measures space on disk.
+- **Safety.** `AppUninstallPathPolicy` allows only:
+  - an unprotected app bundle outside `/System`;
+  - a direct child of a known per-app data folder;
+  - a home dot-folder other than `.ssh`, `.Trash`, and similar.
+
+  The session checks it again right before moving anything.
+- **Removal.** `AppUninstallSession` runs it:
+  - It quits the app, then moves root-owned items through `/usr/bin/osascript` and a Finder `delete`, all in one request. The paths travel as arguments, so a held Apple Event reply never blocks the main thread.
+  - It moves the rest with `NSWorkspace.recycle`. If App Management refuses the app bundle, it falls back to Finder.
+  - Nothing is attempted on protected items, and data is never removed when the app couldn't be.
+- **Holding the Hub open.** `HubAppsUninstaller` takes a Hub hold while removal runs. Afterwards it unpins the app on every display, drops it from Favorites, and refreshes the library.
+- **Full Disk Access.** The card opens the Privacy pane, then offers **Relaunch DOKK**. `AppUninstallRelaunch` saves the pending app for 15 minutes, and `DockCoordinator.restorePendingUninstall()` reopens the sheet.
+- **Analytics.** One `hub_app_uninstall` event per sheet, plus the `uninstall_relaunch` Hub trigger. Counts and categories only.
+
+### Validation status
+
+All builds went to a scratch `-derivedDataPath`:
+
+- `xcodebuild -scheme DeeDock -configuration Debug build`: **BUILD SUCCEEDED**, no warnings in the new files.
+- `xcodebuild -scheme DeeDock -configuration Debug build-for-testing`: **TEST BUILD SUCCEEDED**. `AppLeftoverRulesTests` and `AppUninstallPathPolicyTests` were compiled but not run, following `AGENTS.md`.
+- A read-only harness built from the scanner sources listed what the sheet would offer for Warp, Slack, Chrome, NordVPN, OrbStack, Beat (App Store), Visual Studio Code, Macs Fan Control, and Xcode, on macOS 27. It moved nothing. Findings:
+  - Safari and DOKK are refused.
+  - Sibling products (`com.google.chrome.for.testing`) and DOKK's `.dev` variants land in Possibly related.
+  - Sparse VM disks needed allocated sizes. OrbStack's group container measured 927 GB logical against 377 MB on disk.
+
+The 24 Oct spike, with a test app rather than DOKK, established:
+- Finder's password prompt for root-owned apps (right `com.apple.desktopservices.scripted`, asked per request);
+- the silent container denial without Full Disk Access;
+- that a running process gets Full Disk Access only after a relaunch.
+
+The app was not launched. Not exercised:
+- any uninstall performed by DOKK itself;
+- whether one Finder request with several root-owned items asks for the password once;
+- whether DOKK's Developer ID signature, or Full Disk Access, avoids the App Management notification;
+- the relaunch and sheet restore;
+- unpinning across several displays;
+- a standard (non-admin) user;
+- VoiceOver and keyboard use of the sheet.

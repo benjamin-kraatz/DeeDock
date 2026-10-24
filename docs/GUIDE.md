@@ -327,6 +327,9 @@ browser with browser tabs, split view, Quick Look, Spotlight search, and a copy 
 opens next to its tile and closes like a popover. The pin button turns it into a normal window that
 stays open. ⌘1, ⌘2, and ⌘3 switch tabs, and ⌘F focuses the search field.
 
+An app's context menu in **Apps** has **Uninstall…**, which moves the app and the data it left on
+disk to the Trash; see [Uninstall](LAUNCHER.md#uninstall).
+
 See the [DOKK Hub reference](HUB.md) for every tab, and the [Apps tab reference](LAUNCHER.md) for
 search, discovery, and file actions. Validation status is in the
 [acceptance notes](ACCEPTANCE.md#dee-121-dokk-hub).
