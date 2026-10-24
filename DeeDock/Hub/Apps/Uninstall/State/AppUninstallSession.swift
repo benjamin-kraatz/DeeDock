@@ -84,7 +84,7 @@ final class AppUninstallSession: Identifiable {
     private(set) var itemProgress: [String: ItemProgress] = [:]
     private(set) var accessStage: AccessStage = .idle
     private(set) var isRunning: Bool
-    /// Unpin the app from every display's dock after removing it.
+    /// Unpin the app from every connected display's dock after removing it.
     var unpin: Bool
     var relatedExpanded = false
 

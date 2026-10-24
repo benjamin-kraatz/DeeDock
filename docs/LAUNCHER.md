@@ -86,7 +86,8 @@ the Apps tab, built after `docs/mockups/hub-uninstall.html`, with three parts:
 
 - **App**: the bundle. App Store, TestFlight, and installer-package apps belong to root, so Finder
   moves them with your password; DOKK never sees it. **Unpin from the dock** appears when the app is
-  pinned and removes the pin on every display.
+  pinned and removes the pin from every connected display's dock. Pins saved for a display that
+  isn't connected stay, like any pin of an app that's gone.
 - **App data**: items named after the app's bundle identifier, an embedded extension's or helper's,
   or an app group the app declares. DOKK looks in `~/Library` (Containers, Group Containers,
   Application Scripts, Application Support, Caches, Preferences, Saved Application State,

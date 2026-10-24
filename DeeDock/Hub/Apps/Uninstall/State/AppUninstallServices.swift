@@ -32,9 +32,17 @@ struct AppUninstallServices {
                 let groups = { (url: URL) in
                     target.appGroups.isEmpty ? [] : AppUninstallInspector.appGroups(of: url, team: target.teamIdentifier)
                 }
+                // Vendors share privileged helpers between products (one updater for a whole suite), so another
+                // app declaring one of this app's helpers keeps it unselected.
+                let helpers = { (url: URL) in
+                    target.helperIdentifiers.isEmpty ? [] : AppUninstallInspector.helperIdentifiers(of: url)
+                }
                 var others = installed.filter {
                     $0.url.standardizedFileURL.path != path && $0.bundleIdentifier != target.bundleIdentifier
-                }.map { AppLeftoverRules.OtherApp(bundleIdentifier: $0.bundleIdentifier, name: $0.name, appGroups: groups($0.url)) }
+                }.map {
+                    AppLeftoverRules.OtherApp(bundleIdentifier: $0.bundleIdentifier, name: $0.name, appGroups: groups($0.url),
+                                              otherIdentifiers: helpers($0.url))
+                }
                 // Another copy of this app shares its data, including its extensions' and helpers', which then
                 // starts unselected ("Also used by …").
                 if let identifier = target.bundleIdentifier {

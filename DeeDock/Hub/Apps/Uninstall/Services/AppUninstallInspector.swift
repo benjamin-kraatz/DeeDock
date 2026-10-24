@@ -118,6 +118,12 @@ nonisolated enum AppUninstallInspector {
     /// Privileged helpers (`SMPrivilegedExecutables`), helper tools in `Contents/Library/LaunchServices`,
     /// and launchd jobs the app registers through `SMAppService` (`Contents/Library/LaunchDaemons` and
     /// `LaunchAgents`).
+    /// The helper and launchd identifiers the app at `url` declares. Cheap: Info.plist and three folder
+    /// listings, no code signature.
+    static func helperIdentifiers(of url: URL) -> [String] {
+        helperIdentifiers(in: url, info: Bundle(url: url)?.infoDictionary ?? [:])
+    }
+
     private static func helperIdentifiers(in url: URL, info: [String: Any]) -> [String] {
         var identifiers = Array((info["SMPrivilegedExecutables"] as? [String: Any] ?? [:]).keys)
         for folder in ["Contents/Library/LaunchServices", "Contents/Library/LaunchDaemons", "Contents/Library/LaunchAgents"] {

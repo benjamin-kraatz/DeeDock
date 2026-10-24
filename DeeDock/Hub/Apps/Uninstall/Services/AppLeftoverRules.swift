@@ -60,8 +60,8 @@ nonisolated struct AppLeftoverRules: Sendable {
         let name: String
         /// Every app group the app or its embedded bundles declare.
         let appGroups: [String]
-        /// Identifiers of its embedded bundles and helpers. Filled for other copies of the app being
-        /// uninstalled, whose extensions and helpers share the same data.
+        /// Identifiers of its embedded bundles and helpers. Other copies of the app being uninstalled fill
+        /// both; other apps fill their helpers when the uninstalled app has helpers of its own.
         var otherIdentifiers: [String] = []
 
         /// Whether this app uses data named after `identifier`.

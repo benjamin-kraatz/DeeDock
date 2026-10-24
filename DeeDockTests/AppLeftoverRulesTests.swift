@@ -85,6 +85,16 @@ struct AppLeftoverRulesTests {
         #expect(containers.count == 1 && helpers.count == 1)
     }
 
+    @Test func aHelperAnotherProductDeclaresIsShared() {
+        let suite = AppLeftoverRules.OtherApp(bundleIdentifier: "com.vendor.Sheets", name: "Sheets", appGroups: [],
+                                              otherIdentifiers: ["com.vendor.SharedHelper"])
+        let found = rules(identifiers: ["com.vendor.Docs"], helpers: ["com.vendor.SharedHelper"], others: [suite])
+            .leftovers(in: root("LaunchDaemons", .backgroundHelper, .launchd, domain: .allUsers),
+                       entries: ["com.vendor.SharedHelper.plist"])
+        #expect(found.first?.sharedWith == "Sheets")
+        #expect(found.first?.selectedByDefault == false)
+    }
+
     @Test func appGroupsAreSelectedUnlessAnotherAppUsesThem() {
         let word = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Word", name: "Word", appGroups: ["TEAM.Office"])
         let found = rules(groups: ["TEAM.Office", "TEAM.Editor"], others: [word])

@@ -5,7 +5,8 @@ import Observation
 /// removal runs, and tidies the dock and launcher once the app is in the Trash.
 ///
 /// ``HubAppsModel`` creates one for the Hub's lifetime and forwards tab visibility and keys.
-/// `DockCoordinator` sets ``pinnedDisplayCount`` and ``unpinEverywhere``, which need every display's dock.
+/// `DockCoordinator` sets ``pinnedDisplayCount`` and ``unpinEverywhere``, which need every connected display's
+/// dock. Pins saved for displays that aren't connected stay, like other pins of a missing app.
 @MainActor @Observable
 final class HubAppsUninstaller {
     /// The session the sheet shows, or nil when no sheet is open.
@@ -13,7 +14,7 @@ final class HubAppsUninstaller {
 
     /// How many displays' docks pin the app with this DOKK identity.
     @ObservationIgnored var pinnedDisplayCount: ((String) -> Int)?
-    /// Removes the app's pin from every display's dock.
+    /// Removes the app's pin from every connected display's dock.
     @ObservationIgnored var unpinEverywhere: ((String) -> Void)?
     /// Keeps the Hub open across focus loss (`true`) or lets it go (`false`). Set by ``HubAppsModel``.
     @ObservationIgnored var holdHub: ((Bool) -> Void)?
