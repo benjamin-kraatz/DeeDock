@@ -6,10 +6,12 @@ import SwiftUI
 enum HubUninstallPreviewData {
     private static let library = "/Users/preview/Library"
 
+    /// - Parameter groupSharedWith: Another app that uses the shared group, which leaves that row unselected.
     static func developer(phase: AppUninstallSession.Phase = .review, fullDiskAccess: Bool = false,
                           accessStage: AppUninstallSession.AccessStage = .idle,
                           itemProgress: [String: AppUninstallSession.ItemProgress] = [:],
-                          appProgress: AppUninstallSession.ItemProgress? = nil) -> AppUninstallSession {
+                          appProgress: AppUninstallSession.ItemProgress? = nil,
+                          groupSharedWith: String? = nil) -> AppUninstallSession {
         let target = AppUninstallTarget(
             url: URL(fileURLWithPath: "/Applications/Developer.app"), name: "Developer",
             bundleIdentifier: "developer.apple.wwdc-Release", version: "11.2", source: .appStore, ownedByRoot: true,
@@ -23,6 +25,7 @@ enum HubUninstallPreviewData {
             item("Containers/com.example.apple-samplecode.SwiftChartsWWDC24", .container, match: .similarName),
         ]
         for index in items.indices where items[index].match != .similarName { items[index].isProtected = !fullDiskAccess }
+        items[2].sharedWith = groupSharedWith
         let sizes: [Int64] = [7_100_000, 700_000, 23_600_000, 1_400_000]
         return AppUninstallSession(preview: target, leftovers: items, measures: measures(items, sizes), phase: phase,
                                    accessStage: accessStage, itemProgress: itemProgress, appProgress: appProgress)
@@ -98,9 +101,23 @@ private struct HubUninstallPreviewStage: View {
     HubUninstallPreviewStage(session: HubUninstallPreviewData.developer(accessStage: .openedSettings))
 }
 
+#Preview("Scanning") {
+    HubUninstallPreviewStage(session: HubUninstallPreviewData.developer(phase: .scanning))
+}
+
 #Preview("App Store app, waiting for password") {
     HubUninstallPreviewStage(session: HubUninstallPreviewData.developer(phase: .working(.waitingForPassword), fullDiskAccess: true,
                                                                         appProgress: .working))
+}
+
+#Preview("Moving: one in the Trash, one moving, one skipped") {
+    // The app and the first container are in the Trash, the widget container is moving, and the shared
+    // group was never selected (another app uses it), so it fades to 38 %.
+    HubUninstallPreviewStage(session: HubUninstallPreviewData.developer(
+        phase: .working(.moving), fullDiskAccess: true,
+        itemProgress: ["/Users/preview/Library/Containers/developer.apple.wwdc-Release": .moved,
+                       "/Users/preview/Library/Containers/developer.apple.wwdc-Release.Developer-Widget": .working],
+        appProgress: .moved, groupSharedWith: "WWDC Widgets"))
 }
 
 #Preview("Password cancelled") {
@@ -115,6 +132,13 @@ private struct HubUninstallPreviewStage: View {
 
 #Preview("Downloaded, open, pinned") {
     HubUninstallPreviewStage(session: HubUninstallPreviewData.warp())
+}
+
+#Preview("Downloaded, open, pinned, German, light") {
+    // The longest footer and note copy, in the appearance where contrast is hardest.
+    HubUninstallPreviewStage(session: HubUninstallPreviewData.warp())
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.light)
 }
 
 #Preview("System extension, German, light") {

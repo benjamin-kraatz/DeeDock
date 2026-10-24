@@ -18,8 +18,12 @@ struct HubUninstallSheet: View {
 
     /// Starts near a scanning sheet's height so the first frame doesn't jump; the spring takes it from there.
     @State private var contentHeight: CGFloat = 240
+    /// Whether `contentHeight` has been measured once. The first measurement replaces the guess without
+    /// motion, so the slide-in isn't mixed with a height change.
+    @State private var measured = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let shape = UnevenRoundedRectangle(bottomLeadingRadius: Self.cornerRadius,
@@ -32,7 +36,7 @@ struct HubUninstallSheet: View {
                 HubUninstallHeader(session: session)
                 ScrollView {
                     HubUninstallContent(session: session, uninstaller: uninstaller)
-                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { setContentHeight($0) }
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .frame(height: min(contentHeight, max(maxHeight - Self.chromeHeight, 120)))
@@ -40,15 +44,28 @@ struct HubUninstallSheet: View {
             }
         }
         .frame(width: Self.width)
-        .background { HubUninstallSheetBackground(shape: shape, opaque: reduceTransparency) }
+        .background { HubUninstallSurface(shape: shape, opaque: reduceTransparency) }
         .clipShape(shape)
         .overlay { shape.strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.5) }
-        .shadow(color: .black.opacity(0.32), radius: 30, y: 18)
+        // Mockup: `0 24px 70px rgba(0,0,0,.45)`; lighter in light mode, where a black shadow that strong
+        // reads as a smudge on the pale Hub.
+        .shadow(color: .black.opacity(colorScheme == .dark ? 0.45 : 0.24), radius: 35, y: 24)
         .animation(reduceMotion ? nil : HubStyle.motion, value: contentHeight)
         .animation(reduceMotion ? .easeOut(duration: 0.2) : HubStyle.motion, value: session.phase)
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)
         .accessibilityLabel(Text(.hubUninstallTitle(name: session.appName)))
+    }
+
+    private func setContentHeight(_ height: CGFloat) {
+        if measured {
+            contentHeight = height
+        } else {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { contentHeight = height }
+            measured = true
+        }
     }
 }
 
@@ -69,24 +86,8 @@ private struct HubUninstallContent: View {
             }
         }
         .padding(EdgeInsets(top: 0, leading: 22, bottom: 10, trailing: 22))
+        // Both progress maps drive row marks; the app's can change without the phase or the items doing so.
         .animation(reduceMotion ? nil : HubStyle.motion, value: session.itemProgress)
-    }
-}
-
-/// Frosted material over the Hub's glass, or an opaque fill under Reduce Transparency (the mockup's
-/// `--sheet`: `#23242b` dark, `#f7f7f9` light).
-private struct HubUninstallSheetBackground: View {
-    let shape: UnevenRoundedRectangle
-    let opaque: Bool
-
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        if opaque {
-            shape.fill(colorScheme == .dark ? Color(red: 35 / 255, green: 36 / 255, blue: 43 / 255)
-                : Color(red: 247 / 255, green: 247 / 255, blue: 249 / 255))
-        } else {
-            shape.fill(.regularMaterial)
-        }
+        .animation(reduceMotion ? nil : HubStyle.motion, value: session.appProgress)
     }
 }

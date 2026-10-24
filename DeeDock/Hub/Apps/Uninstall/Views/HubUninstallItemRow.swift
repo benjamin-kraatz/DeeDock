@@ -4,37 +4,43 @@ import SwiftUI
 /// icon and title, the path, a note, and the size.
 ///
 /// The whole row is the checkbox's label, so clicking anywhere on it toggles the item and VoiceOver reads
-/// it as one checkbox.
+/// it as one checkbox. While removal runs, rows that won't move fade to 38 % (mockup `.row.skip`).
 struct HubUninstallItemRow: View {
     let session: AppUninstallSession
     let item: AppLeftover
 
     var body: some View {
-        if let progress = session.itemProgress[item.id] {
-            HStack(spacing: 8) {
-                HubUninstallProgressMark(progress: progress)
-                label
+        let working = session.phase.isWorking
+        Group {
+            if let progress = session.itemProgress[item.id] {
+                HStack(spacing: 8) {
+                    HubUninstallProgressMark(progress: progress)
+                    label
+                }
+                .opacity(progress == .failed ? 0.6 : 1)
+                .accessibilityElement(children: .combine)
+                .accessibilityValue(Text(progress == .failed ? .hubUninstallNotMoved : .hubUninstallMoved))
+            } else if item.isProtected {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                        .frame(width: 18)
+                        .accessibilityLabel(Text(.hubUninstallProtected))
+                    // Locked text sits at 50 % (mockup `.row.locked`); during removal the whole row takes
+                    // the skipped rows' 38 % instead, so the two fades don't stack.
+                    label.opacity(working ? 1 : 0.5)
+                }
+                .opacity(working ? 0.38 : 1)
+                .accessibilityElement(children: .combine)
+            } else {
+                Toggle(isOn: Binding(get: { session.isSelected(item) }, set: { session.setSelected($0, item) })) { label }
+                    .toggleStyle(.checkbox)
+                    .disabled(!session.isEditable)
+                    .opacity(working && !session.isSelected(item) ? 0.38 : 1)
             }
-            .opacity(progress == .failed ? 0.6 : 1)
-            .accessibilityElement(children: .combine)
-            .accessibilityValue(Text(progress == .failed ? .hubUninstallNotMoved : .hubUninstallMoved))
-        } else if item.isProtected {
-            HStack(spacing: 8) {
-                Image(systemName: "lock.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
-                    .frame(width: 18)
-                    .accessibilityLabel(Text(.hubUninstallProtected))
-                label.opacity(0.55)
-            }
-            .accessibilityElement(children: .combine)
-        } else {
-            Toggle(isOn: Binding(get: { session.isSelected(item) }, set: { session.setSelected($0, item) })) { label }
-                .toggleStyle(.checkbox)
-                .disabled(!session.isEditable)
-                // Unselected rows fade while the selection is removed, like the mockup's skipped rows.
-                .opacity(session.phase.isWorking && !session.isSelected(item) ? 0.38 : 1)
         }
+        .hubUninstallRow(hoverable: session.isEditable)
     }
 
     private var label: some View {
@@ -59,18 +65,15 @@ struct HubUninstallItemRow: View {
                     .truncationMode(.middle)
                 if let note {
                     note.font(.system(size: 11.5)).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer(minLength: 8)
-            Group {
+            HubUninstallSizeCell {
                 if item.isProtected { Text(.hubUninstallNotChecked) } else { AppUninstallFormat.size(session.measures[item.id]) }
             }
-            .font(.system(size: 12))
-            .monospacedDigit()
-            .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity, minHeight: 42, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect)
         .help(item.url.path)
     }
@@ -112,22 +115,39 @@ struct HubUninstallAppRow: View {
                         .truncationMode(.middle)
                 }
                 Spacer(minLength: 8)
-                AppUninstallFormat.size(session.appSize)
-                    .font(.system(size: 12))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
+                HubUninstallSizeCell { AppUninstallFormat.size(session.appSize) }
             }
         }
-        .padding(.vertical, 5)
-        .frame(minHeight: 42)
+        .hubUninstallRow(hoverable: false)
         .accessibilityElement(children: .combine)
     }
 }
 
+/// The right-aligned size column (mockup `.sz`): 12 pt, tabular digits, at least 62 pt so sizes line up.
+private struct HubUninstallSizeCell<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .font(.system(size: 12))
+            .monospacedDigit()
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .frame(minWidth: 62, alignment: .trailing)
+    }
+}
+
 /// A removal mark: a spinner while the item moves, a green check once it's in the Trash, a red cross if
-/// it stayed. The check pops in on the Hub's spring.
+/// it stayed.
+///
+/// The check lands with a small bounce (mockup `pop`: 0.35 s, `cubic-bezier(.3,1.7,.5,1)`), timed by its
+/// own spring rather than the sheet's. Reduce Motion fades it in.
 struct HubUninstallProgressMark: View {
     let progress: AppUninstallSession.ItemProgress
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    static let pop = Animation.spring(response: 0.36, dampingFraction: 0.55)
 
     var body: some View {
         Group {
@@ -136,9 +156,10 @@ struct HubUninstallProgressMark: View {
                 ProgressView().controlSize(.small)
             case .moved:
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                    .transition(.scale(scale: 0.3).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : .scale(scale: 0.3).combined(with: .opacity).animation(Self.pop))
             case .failed:
                 Image(systemName: "xmark.circle.fill").foregroundStyle(.red)
+                    .transition(.opacity)
             }
         }
         .font(.system(size: 15))
@@ -147,7 +168,7 @@ struct HubUninstallProgressMark: View {
     }
 }
 
-/// The rounded tile with the kind's symbol.
+/// The rounded tile with the kind's symbol (mockup `.ki`: 26 pt, radius 7).
 struct HubUninstallKindIcon: View {
     let kind: AppLeftover.Kind
 

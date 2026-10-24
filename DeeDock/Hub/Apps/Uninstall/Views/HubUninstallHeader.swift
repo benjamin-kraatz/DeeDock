@@ -35,12 +35,7 @@ struct HubUninstallHeader: View {
                     Text(.hubUninstallVersion(version: version))
                 }
                 if let source = session.target?.source {
-                    Text(source.badge)
-                        .font(.system(size: 10.5, weight: .semibold))
-                        .foregroundStyle(source == .appStore || source == .testFlight ? Color.accentColor : .secondary)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 2)
-                        .background(Capsule(style: .continuous).fill(Color.primary.opacity(0.07)))
+                    HubUninstallSourceBadge(source: source)
                 }
                 AppUninstallFormat.size(session.appSize)
                     .monospacedDigit()
@@ -57,14 +52,30 @@ struct HubUninstallHeader: View {
     }
 }
 
-/// A small spinner and a status line.
+/// Where the app came from (mockup `.badge`): a small rounded tag, in the accent color for store installs.
+private struct HubUninstallSourceBadge: View {
+    let source: AppUninstallSource
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 6, style: .continuous)
+        Text(source.badge)
+            .font(.system(size: 10.5, weight: .semibold))
+            .foregroundStyle(source == .appStore || source == .testFlight ? Color.accentColor : .secondary)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(shape.fill(Color.primary.opacity(0.07)))
+            .overlay(shape.strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
+    }
+}
+
+/// A small spinner and a status line. The text crossfades when the step changes.
 private struct HubUninstallStatus: View {
     let text: Text
 
     var body: some View {
         HStack(spacing: 7) {
             ProgressView().controlSize(.mini)
-            text
+            text.contentTransition(.opacity)
         }
         .accessibilityElement(children: .combine)
     }

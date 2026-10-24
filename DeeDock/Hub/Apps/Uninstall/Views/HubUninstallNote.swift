@@ -14,6 +14,8 @@ struct HubUninstallNote<Actions: View>: View {
     let detail: Text
     @ViewBuilder var actions: Actions
 
+    @Environment(\.colorScheme) private var colorScheme
+
     init(tone: Tone, symbol: String, title: Text, detail: Text, @ViewBuilder actions: () -> Actions = { EmptyView() }) {
         self.tone = tone
         self.symbol = symbol
@@ -23,6 +25,7 @@ struct HubUninstallNote<Actions: View>: View {
     }
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 11, style: .continuous)
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .medium))
@@ -34,23 +37,21 @@ struct HubUninstallNote<Actions: View>: View {
                 Text("\(title.fontWeight(.semibold).foregroundStyle(.primary)) \(detail)")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 6) { actions }
-                    .controlSize(.small)
+                // Two buttons side by side; German labels that don't fit stack instead of truncating.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 6) { actions }
+                    VStack(alignment: .leading, spacing: 6) { actions }
+                }
+                .controlSize(.small)
             }
             Spacer(minLength: 0)
         }
         .font(.system(size: 12.5))
         .lineSpacing(1.5)
         .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
-        .background {
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(accent.map { $0.opacity(0.1) } ?? Color.primary.opacity(0.045))
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .strokeBorder(accent.map { $0.opacity(0.38) } ?? Color.primary.opacity(0.08), lineWidth: 0.5)
-        }
-        .padding(.bottom, 8)
+        .background { shape.fill(accent.map { $0.opacity(0.1) } ?? HubAppsStyle.card(colorScheme)) }
+        .overlay { shape.strokeBorder(accent.map { $0.opacity(0.38) } ?? HubAppsStyle.line(colorScheme), lineWidth: 0.5) }
+        .padding(EdgeInsets(top: 2, leading: 0, bottom: 8, trailing: 0))
         // Combined text reads as one sentence; notes with buttons keep them reachable.
         .accessibilityElement(children: Actions.self == EmptyView.self ? .combine : .contain)
     }
@@ -66,6 +67,8 @@ struct HubUninstallNote<Actions: View>: View {
 
 /// The notes above the sections, by phase: why removal stopped; or that the password will be asked, that
 /// the app will be quit, and that an extension needs its own uninstaller.
+///
+/// A new note drops in from 4 pt above (mockup `.ban.fresh`); the sheet's phase animation times it.
 struct HubUninstallNotices: View {
     let session: AppUninstallSession
     let uninstaller: HubAppsUninstaller

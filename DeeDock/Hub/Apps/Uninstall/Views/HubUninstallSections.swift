@@ -11,12 +11,9 @@ struct HubUninstallSectionHeader<Leading: View>: View {
             leading.frame(width: 18)
             Text(title).accessibilityAddTraits(.isHeader)
             Spacer(minLength: 8)
-            trailing.monospacedDigit()
+            trailing.fontWeight(.medium).monospacedDigit()
         }
-        .font(.system(size: 11.5, weight: .semibold))
-        .foregroundStyle(.secondary)
-        .padding(.top, 10)
-        .padding(.bottom, 2)
+        .hubUninstallSectionHeading()
     }
 }
 
@@ -33,7 +30,7 @@ struct HubUninstallAppSection: View {
             }
             .toggleStyle(.checkbox)
             .disabled(!session.isEditable)
-            .padding(.vertical, 4)
+            .padding(EdgeInsets(top: 8, leading: 8, bottom: 2, trailing: 8))
         }
     }
 }
@@ -55,18 +52,16 @@ struct HubUninstallDataSection: View {
             }
         }
         if session.phase == .scanning {
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
-                Text(.hubUninstallChecking)
-            }
-            .font(.system(size: 12.5))
-            .foregroundStyle(.secondary)
-            .padding(.vertical, 10)
+            // The header already shows the spinner; a second one here would compete with it.
+            Text(.hubUninstallChecking)
+                .font(.system(size: 12.5))
+                .foregroundStyle(.tertiary)
+                .padding(EdgeInsets(top: 10, leading: 8, bottom: 10, trailing: 8))
         } else if session.dataItems.isEmpty {
             Text(.hubUninstallNoData)
                 .font(.system(size: 12.5))
                 .foregroundStyle(.secondary)
-                .padding(.vertical, 8)
+                .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
         } else {
             if session.protectedCount > 0, session.isEditable {
                 HubUninstallAccessCard(session: session)
@@ -99,23 +94,21 @@ struct HubUninstallRelatedSection: View {
             Text(.hubUninstallRelatedHint)
                 .font(.system(size: 11.5))
                 .foregroundStyle(.tertiary)
-                .padding(.bottom, 2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(EdgeInsets(top: 0, leading: 8, bottom: 4, trailing: 8))
                 .frame(maxWidth: .infinity, alignment: .leading)
             ForEach(session.relatedItems) { item in
                 HubUninstallItemRow(session: session, item: item)
             }
         } label: {
-            HStack {
+            HStack(spacing: 9) {
                 Text(.hubUninstallSectionRelated).accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 8)
                 // The size shows even while collapsed, so a large unselected folder isn't missed.
-                Text(verbatim: relatedSummary).monospacedDigit()
+                Text(verbatim: relatedSummary).fontWeight(.medium).monospacedDigit()
             }
-            .font(.system(size: 11.5, weight: .semibold))
-            .foregroundStyle(.secondary)
-            .contentShape(.rect)
         }
-        .padding(.top, 12)
+        .disclosureGroupStyle(.hubUninstall)
     }
 
     private var relatedSummary: String {
@@ -143,7 +136,7 @@ struct HubUninstallAccessCard: View {
                              detail: Text(.hubUninstallAccessDetail(name: session.appName))) {
                 Button { session.openAccessSettings() } label: { Text(.folderStackOpenFullDiskAccess) }
             }
-            .padding(.top, 4)
+            .padding(.top, 2)
         case .openedSettings:
             HubUninstallNote(tone: .info, symbol: "arrow.clockwise",
                              title: Text(.hubUninstallAccessRelaunchTitle),
@@ -151,7 +144,7 @@ struct HubUninstallAccessCard: View {
                 Button { session.relaunch() } label: { Text(.hubUninstallRelaunch) }
                     .buttonStyle(.borderedProminent)
             }
-            .padding(.top, 4)
+            .padding(.top, 2)
             .transition(.opacity.combined(with: .offset(y: -4)))
         }
     }
