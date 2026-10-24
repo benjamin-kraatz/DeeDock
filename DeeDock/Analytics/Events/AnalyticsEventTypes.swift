@@ -207,6 +207,8 @@ nonisolated enum AnalyticsSettingArea: String, AnalyticsToken {
     case sharedDock = "shared_dock", display, atmosphere, menuBar = "menu_bar", updates
     /// App-wide feature preferences named by ``AnalyticsFeatureSetting``.
     case features
+    /// Robi's own settings document, reported field by field.
+    case robi
 }
 
 nonisolated enum AnalyticsDisplayRole: String, AnalyticsToken {

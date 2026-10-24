@@ -43,12 +43,16 @@ final class DockCoordinator {
     var settingsNotificationFeedRequest = false
     /// One-shot route to the Harbor page, from Harbor's Accessibility notice.
     var settingsHarborRequest = false
+    /// One-shot route to Robi's page, from Robi's card or Discovery.
+    var settingsRobiRequest = false
     /// One-shot route to Lookout's section, from the Files search's Lookout status chip.
     var settingsLookoutRequest = false
     /// One-shot route to the Plugins section, from a plugin tile's menu or panel.
     var settingsPluginsRequest = false
     /// The app-grouped window overview, shared by every display.
     let harbor = HarborCoordinator()
+    /// Robi on the focused window. Opt-in; started with the coordinator and inert while off.
+    let robi = RobiController()
     /// The one DOKK Hub (Apps, Windows, Files), opened from any display's DOKK tile.
     @ObservationIgnored let hub: HubCoordinator
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
@@ -223,6 +227,9 @@ final class DockCoordinator {
         guard !started else { return }
         started = true
         atmosphere.start()
+        robi.prepareSettingsRoute = { [weak self] in self?.settingsRobiRequest = true }
+        robi.didUse = { [weak self] in self?.discovery.markUsed(.robi) }
+        robi.start()
         occupancy.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
@@ -252,6 +259,7 @@ final class DockCoordinator {
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
+        if robi.store.settings.isEnabled { discovery.markUsed(.robi) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configurePlugins()
         configureHarbor()
@@ -285,6 +293,8 @@ final class DockCoordinator {
             case .islands:
                 settings.update(\.islands.isEnabled, to: true)
                 return .none
+            case .robi:
+                return enableRobiFromDiscovery()
             }
         }
         discovery.start()
@@ -1034,6 +1044,14 @@ final class DockCoordinator {
     ///
     /// Nothing prompts from here. When Accessibility access is missing, or the settings could not be
     /// saved, Settings opens on the feed's page, where the Enable button asks macOS for access.
+    /// Turns Robi on. Without Accessibility Robi cannot show itself, so Settings opens on its page.
+    private func enableRobiFromDiscovery() -> DiscoveryProposal.FollowUp {
+        robi.store.settings.isEnabled = true
+        guard !AXIsProcessTrusted() else { return .none }
+        settingsRobiRequest = true
+        return .openSettings
+    }
+
     private func enableNotificationFeedFromDiscovery() -> DiscoveryProposal.FollowUp {
         settings.update(\.showNotificationFeed, to: true)
         guard !settings.value.showNotificationFeed || !AXIsProcessTrusted() else { return .none }
@@ -1236,6 +1254,7 @@ final class DockCoordinator {
         settingsNotificationFeedRequest = false
         settingsHarborRequest = false
         settingsLookoutRequest = false
+        settingsRobiRequest = false
         settingsPluginsRequest = false
         hub.files.onOpenLookoutSettings = {}
         harbor.stop()
@@ -1278,6 +1297,7 @@ final class DockCoordinator {
         enabledDisplays = []
         badges.stop()
         notificationFeed.stop()
+        robi.stop()
         badgeMemoryWindow.stop()
         clipboardMuseum.stop()
         badges.focusSession = nil

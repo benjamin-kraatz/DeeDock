@@ -63,6 +63,10 @@ struct FeaturesPageContent: View {
                                locked: locked)
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess, screenCapture: context.screenCapture,
                                            footnote: .harborPermissionsHelp)
+        case .robi:
+            RobiSettingsPane(store: context.coordinator?.robi.store ?? RobiStore(defaults: nil),
+                             controller: context.coordinator?.robi,
+                             windowAccess: context.windowAccess, screenCapture: context.screenCapture)
         case .windowPeek:
             // Permissions stay usable on their own page even when unreadable settings block edits.
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)

@@ -29,6 +29,7 @@ The dock itself matches the system Dock: Liquid Glass, magnification, running in
 - Carry files across Spaces and displays on the Shelf.
 - Save what you were working on as a Session Capsule, and start a Focus Session timer from any mode.
 - Open the DOKK Hub from its tile to launch apps, jump to windows, and browse, search, and copy files. Its search also finds Shelf files and Dock Modes. Run Shortcuts from Action Tiles, and see app badges with a history of what changed.
+- Turn on Robi, a small face on top of the window you're working in. Select something, click Robi, and ask it to explain, translate, summarize, or take the next step in that app.
 - Add plugins from other apps. Once you approve a plugin, it gets a tile you can pin or unpin, usually with a panel above it. Each plugin runs in its own process, so a plugin that stops never takes DOKK down.
 - Drive the whole dock from the keyboard with Focus Dock. VoiceOver gets labels and actions for every tile, and DOKK respects Reduce Motion and Reduce Transparency.
 
@@ -40,11 +41,11 @@ DOKK works without special permissions. A few features need one, and DOKK asks o
 
 | Permission | Used by |
 | --- | --- |
-| Accessibility | Window lists in app menus, Window Peek window selection, Radar window control, App Fusion, app badges, the Notification Feed, and resuming Session Capsules |
-| Screen Recording | Window Peek and Radar thumbnails and features that capture window contents, such as Session Capsules, markup, and window search. Also secondary docks that show only the apps with windows on their display |
+| Accessibility | Window lists in app menus, Window Peek window selection, Radar window control, App Fusion, app badges, the Notification Feed, Robi, and resuming Session Capsules |
+| Screen Recording | Window Peek and Radar thumbnails and features that capture window contents, such as Session Capsules, markup, window search, and Robi's regions. Also secondary docks that show only the apps with windows on their display |
 | Automation for Finder | Opening and emptying the Trash, and App Fusion folder navigation |
 
-DOKK has no account. Settings, pins, and history stay on your Mac. Features that use Apple Intelligence run the on-device model. App suggestions and Peek history learn from your activity, and both stay off until you opt in. DOKK makes three kinds of network request. It checks GitHub Releases for updates. It sends anonymous usage data to PostHog, which you can turn off in **Settings → General → Privacy**; [docs/ANALYTICS.md](docs/ANALYTICS.md) lists what is sent, including the requests and answers of Apple Intelligence features. When you use **Ask Robi** in the App Launcher, it looks up short descriptions of your Mac App Store apps through Apple's public lookup service.
+DOKK has no account. Settings, pins, and history stay on your Mac. Features that use Apple Intelligence run the on-device model. App suggestions and Peek history learn from your activity, and both stay off until you opt in. DOKK makes three kinds of network request on its own. It checks GitHub Releases for updates. It sends anonymous usage data to PostHog, which you can turn off in **Settings → General → Privacy**; [docs/ANALYTICS.md](docs/ANALYTICS.md) lists what is sent, including the requests and answers of Apple Intelligence features. When you use **Ask Robi** in the App Launcher, it looks up short descriptions of your Mac App Store apps through Apple's public lookup service. If you choose Claude for Robi on your windows and enter your own Anthropic API key, your questions and what you picked go from your Mac straight to Anthropic.
 
 ## Project status
 

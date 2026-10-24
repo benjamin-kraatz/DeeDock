@@ -2055,6 +2055,60 @@
         }
       }
     },
+    "discoveryRobiMessage" : {
+      "comment" : "Discovery callout message announcing Robi on the focused window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein kleiner Begleiter für das Fenster, in dem du bist. Wähl etwas aus, klick auf Robi und frag."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A small companion for the window you’re in. Select something, click Robi, and ask."
+          }
+        }
+      }
+    },
+    "discoveryRobiTitle" : {
+      "comment" : "Discovery callout title announcing Robi. Robi is the name of DOKK’s assistant; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meet Robi"
+          }
+        }
+      }
+    },
+    "discoveryRobiTurnOn" : {
+      "comment" : "Discovery callout button that turns Robi on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn On"
+          }
+        }
+      }
+    },
     "harborAccessibilityNotice" : {
       "comment" : "Radar notice when Accessibility access is off. DOKK is the product name.",
       "extractionState" : "manual",
@@ -4295,6 +4349,1452 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ · Stopped"
+          }
+        }
+      }
+    },
+    "robiActionCancel" : {
+      "comment" : "Button that closes Robi’s card without answering.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "robiActionCopy" : {
+      "comment" : "Button in Robi’s answer card: copy the answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "robiActionDone" : {
+      "comment" : "Button that closes Robi’s answer card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "robiActionPaste" : {
+      "comment" : "Button in Robi’s answer card: paste the answer into the app. The placeholder is the app’s name as macOS reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@ einsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste into %@"
+          }
+        }
+      }
+    },
+    "robiActionReplace" : {
+      "comment" : "Button in Robi’s answer card: replace the person’s selection in the app with the answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Selection"
+          }
+        }
+      }
+    },
+    "robiAnswerOnDeviceInstead" : {
+      "comment" : "Link in Robi’s card: answer this one question with Apple’s on-device model instead of Claude.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stattdessen auf diesem Mac antworten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer on This Mac Instead"
+          }
+        }
+      }
+    },
+    "robiAnswersTitle" : {
+      "comment" : "Title of the settings card choosing which model answers Robi’s questions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answers"
+          }
+        }
+      }
+    },
+    "robiAnswerWith" : {
+      "comment" : "Label of the menu choosing Robi’s model.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworten mit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer with"
+          }
+        }
+      }
+    },
+    "robiClaudeHelp" : {
+      "comment" : "Footnote of Robi’s Answers card when Claude is chosen. Transparent about data flow and billing, not a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworten kommen von Claude Sonnet 5.5 mit deinem Anthropic-API-Schlüssel und werden deinem Anthropic-Konto berechnet. Deine Frage und ihr Kontext gehen direkt von diesem Mac an Anthropic; DOKK sieht und speichert sie nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answers come from Claude Sonnet 5.5 with your Anthropic API key, billed to your Anthropic account. Your question and its context go from this Mac straight to Anthropic; DOKK neither sees nor keeps them."
+          }
+        }
+      }
+    },
+    "robiContextReading" : {
+      "comment" : "Chip in Robi’s prompt bar while the picked region or window is still being read.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gelesen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading…"
+          }
+        }
+      }
+    },
+    "robiContextRegion" : {
+      "comment" : "Chip in Robi’s prompt bar when a dragged region is the context. The number is how many words were recognized in it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bereich · %lld Wort"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bereich · %lld Wörter"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Region · %lld word"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Region · %lld words"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "robiContextSelection" : {
+      "comment" : "Chip in Robi’s prompt bar showing the start of the text the person selected. The placeholder is that text excerpt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”"
+          }
+        }
+      }
+    },
+    "robiContextWindow" : {
+      "comment" : "Chip in Robi’s prompt bar when the whole window is the context.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ganzes Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole window"
+          }
+        }
+      }
+    },
+    "robiEffort" : {
+      "comment" : "Label of the menu choosing how much effort Claude spends on a Robi answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufwand von Claude"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude effort"
+          }
+        }
+      }
+    },
+    "robiEffortHigh" : {
+      "comment" : "Claude effort choice: high, more thorough answers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoch · gründlicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High · more thorough"
+          }
+        }
+      }
+    },
+    "robiEffortMedium" : {
+      "comment" : "Claude effort choice: medium, quicker answers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittel · schneller"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium · quicker"
+          }
+        }
+      }
+    },
+    "robiErrorEmpty" : {
+      "comment" : "The model returned an empty answer to Robi’s request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi hatte dazu nichts zu sagen. Versuche es mit einer anderen Frage."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi had nothing to say about this. Try asking differently."
+          }
+        }
+      }
+    },
+    "robiErrorGeneric" : {
+      "comment" : "Robi’s request failed. The placeholder is the system’s error description.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi konnte nicht antworten: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi couldn’t answer: %@"
+          }
+        }
+      }
+    },
+    "robiErrorGuardrail" : {
+      "comment" : "The model declined Robi’s request because of its content rules.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei diesem Inhalt kann Robi nicht helfen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi can’t help with this content."
+          }
+        }
+      }
+    },
+    "robiErrorLanguage" : {
+      "comment" : "The model does not support the language of Robi’s request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell unterstützt diese Sprache noch nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The model doesn’t support this language yet."
+          }
+        }
+      }
+    },
+    "robiErrorOffline" : {
+      "comment" : "Claude could not be reached because the Mac is offline.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bist offline. Claude braucht eine Internetverbindung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’re offline. Claude needs an internet connection."
+          }
+        }
+      }
+    },
+    "robiErrorRateLimited" : {
+      "comment" : "Too many requests reached the model in a short time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade zu viele Anfragen. Versuche es gleich noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many requests right now. Try again in a moment."
+          }
+        }
+      }
+    },
+    "robiErrorTooLong" : {
+      "comment" : "Robi’s request had more text than the model accepts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist mehr, als das Modell auf einmal verarbeiten kann. Wähle einen kleineren Teil oder wechsle zu Claude."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That’s more than the model can take at once. Pick a smaller part, or switch to Claude."
+          }
+        }
+      }
+    },
+    "robiExclusionsAdd" : {
+      "comment" : "Menu button adding a running app to the apps where Robi never appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add App"
+          }
+        }
+      }
+    },
+    "robiExclusionsEmpty" : {
+      "comment" : "Shown when no apps hide Robi.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No apps"
+          }
+        }
+      }
+    },
+    "robiExclusionsHelp" : {
+      "comment" : "Footnote of the list of apps where Robi never appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi erscheint nie auf den Fenstern dieser Apps."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi never appears on these apps’ windows."
+          }
+        }
+      }
+    },
+    "robiExclusionsRemove" : {
+      "comment" : "Accessibility label of the button removing an app from the list where Robi never appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi in dieser App wieder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Robi in this app again"
+          }
+        }
+      }
+    },
+    "robiExclusionsTitle" : {
+      "comment" : "Title of the list of apps where Robi never appears.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet in"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden in"
+          }
+        }
+      }
+    },
+    "robiFaceHintAsk" : {
+      "comment" : "VoiceOver hint of Robi’s face while it is asleep or awake.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt Robi zu diesem Fenster oder deiner Auswahl."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks Robi about this window or your selection."
+          }
+        }
+      }
+    },
+    "robiFaceHintDismiss" : {
+      "comment" : "VoiceOver hint of Robi’s face while its prompt bar or answer is open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließt Robis Frage und Antwort."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closes Robi’s question and answer."
+          }
+        }
+      }
+    },
+    "robiFooterClaude" : {
+      "comment" : "Footer of Robi’s answer card when Claude answered with the person’s own Anthropic API key. Claude Sonnet and Anthropic are product and company names.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude Sonnet 5.5 · mit deinem Schlüssel von diesem Mac an Anthropic gesendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude Sonnet 5.5 · sent from this Mac to Anthropic with your key"
+          }
+        }
+      }
+    },
+    "robiFooterOnDevice" : {
+      "comment" : "Footer of Robi’s answer card when Apple’s on-device model answered. Apple Intelligence is a product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence · bleibt auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence · stays on this Mac"
+          }
+        }
+      }
+    },
+    "robiKeyFieldLabel" : {
+      "comment" : "Accessibility label of the secure field for the Anthropic API key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic-API-Schlüssel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anthropic API key"
+          }
+        }
+      }
+    },
+    "robiKeyHelp" : {
+      "comment" : "Subtitle of the API key field in Robi’s settings. Claude Console is Anthropic’s developer site; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstelle einen Schlüssel in der Claude Console. DOKK bewahrt ihn in deinem Schlüsselbund auf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a key in the Claude Console. DOKK keeps it in your Keychain."
+          }
+        }
+      }
+    },
+    "robiKeyPrivacy" : {
+      "comment" : "Note under the API key field in Robi’s card. Transparent, not a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK bewahrt den Schlüssel in deinem Schlüsselbund auf und sendet Fragen direkt von diesem Mac an Anthropic."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK keeps the key in your Keychain and sends questions from this Mac straight to Anthropic."
+          }
+        }
+      }
+    },
+    "robiKeyRemove" : {
+      "comment" : "Button removing the saved Anthropic API key from the Keychain.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "robiKeySave" : {
+      "comment" : "Button saving the pasted Anthropic API key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "robiKeySaved" : {
+      "comment" : "Row title when an Anthropic API key is saved for Robi.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-Schlüssel gespeichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API key saved"
+          }
+        }
+      }
+    },
+    "robiKeySavedHelp" : {
+      "comment" : "Subtitle of the saved API key row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In deinem Schlüsselbund auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept in your Keychain on this Mac."
+          }
+        }
+      }
+    },
+    "robiKeySaveFailed" : {
+      "comment" : "Error when the Keychain did not accept the API key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüsselbund hat den Schlüssel nicht angenommen. Versuche es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Keychain didn’t accept the key. Try again."
+          }
+        }
+      }
+    },
+    "robiKeyTitle" : {
+      "comment" : "Heading in Robi’s card and settings asking for an Anthropic API key. Anthropic is a company name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude braucht deinen Anthropic-API-Schlüssel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude needs your Anthropic API key"
+          }
+        }
+      }
+    },
+    "robiKeyUse" : {
+      "comment" : "Button in Robi’s card that saves the pasted API key and asks Claude.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Key"
+          }
+        }
+      }
+    },
+    "robiModelClaude" : {
+      "comment" : "Menu choice: Claude answers Robi’s questions with the person’s API key. Product name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude Sonnet 5.5"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude Sonnet 5.5"
+          }
+        }
+      }
+    },
+    "robiModelOnDevice" : {
+      "comment" : "Menu choice: Apple’s on-device model answers Robi’s questions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence on this Mac"
+          }
+        }
+      }
+    },
+    "robiName" : {
+      "comment" : "VoiceOver label of Robi’s face on top of the focused window. Robi is the name of DOKK’s assistant; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        }
+      }
+    },
+    "robiNeedsAccessibility" : {
+      "comment" : "Notice when Robi is on but DOKK lacks Accessibility access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi braucht die Bedienungshilfen, um Fenstern zu folgen und deine Auswahl zu lesen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi needs Accessibility to follow windows and read your selection."
+          }
+        }
+      }
+    },
+    "robiOnDeviceHelp" : {
+      "comment" : "Footnote of Robi’s Answers card when the on-device model is chosen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antworten kommen vom geräteinternen Modell von Apple. Was du auswählst, bleibt auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answers come from Apple’s on-device model. What you pick stays on this Mac."
+          }
+        }
+      }
+    },
+    "robiOnDeviceIntelligenceOff" : {
+      "comment" : "Robi cannot use Apple’s on-device model because Apple Intelligence is turned off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schalte Apple Intelligence in den Systemeinstellungen ein, damit Robi auf diesem Mac antworten kann."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on Apple Intelligence in System Settings so Robi can answer on this Mac."
+          }
+        }
+      }
+    },
+    "robiOnDeviceNotEligible" : {
+      "comment" : "Robi cannot use Apple’s on-device model because this Mac does not support Apple Intelligence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac unterstützt Apple Intelligence nicht. Du kannst in Robis Einstellungen Claude wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This Mac can’t run Apple Intelligence. You can choose Claude in Robi’s settings."
+          }
+        }
+      }
+    },
+    "robiOnDeviceNotReady" : {
+      "comment" : "Robi cannot use Apple’s on-device model yet because it is still downloading or preparing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence wird noch vorbereitet. Versuche es in ein paar Minuten erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence is still getting ready. Try again in a few minutes."
+          }
+        }
+      }
+    },
+    "robiOpenSettings" : {
+      "comment" : "Button in Robi’s card that opens Robi’s page in DOKK Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi-Einstellungen öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Robi Settings"
+          }
+        }
+      }
+    },
+    "robiPermissionsHelp" : {
+      "comment" : "Footnote of the permissions card on Robi’s settings page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit den Bedienungshilfen folgt Robi dem vordersten Fenster und liest deine Auswahl. Mit der Bildschirmaufnahme passt Robi sich der Farbe der Titelleiste an und liest Bereiche, die du wählst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility lets Robi follow the window in front and read your selection. Screen Recording lets it match the title bar’s colour and read regions you pick."
+          }
+        }
+      }
+    },
+    "robiPrivacyNote" : {
+      "comment" : "Transparency note in Robi’s settings card. Plain and calm, not a warning.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi liest ein Fenster nur, wenn du darauf klickst oder den Kurzbefehl drückst, und behält danach nichts. Was Robi liest oder antwortet, ist nie Teil der Nutzungsstatistik von DOKK."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi reads a window only when you click it or press the shortcut, and keeps nothing afterwards. What Robi reads or answers is never part of DOKK’s usage statistics."
+          }
+        }
+      }
+    },
+    "robiPromptLabel" : {
+      "comment" : "Accessibility label of Robi’s question field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frage an Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Question for Robi"
+          }
+        }
+      }
+    },
+    "robiPromptPlaceholder" : {
+      "comment" : "Placeholder in Robi’s question field, after the person picked something in a window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frag etwas dazu …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask about this…"
+          }
+        }
+      }
+    },
+    "robiRunCommand" : {
+      "comment" : "Button in Robi’s answer card that runs a menu command the model proposed. The placeholder is the app’s menu path, such as “File > New Tab”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ausführen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run %@"
+          }
+        }
+      }
+    },
+    "robiScreenRecordingNeeded" : {
+      "comment" : "Shown in Robi’s card when reading a region or a window’s picture needs Screen Recording, which is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Lesen eines Bereichs oder Fensterbilds braucht Robi die Bildschirmaufnahme. Du kannst sie in Robis Einstellungen einschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading a region or a window’s picture needs Screen Recording. You can turn it on in Robi’s settings."
+          }
+        }
+      }
+    },
+    "robiSelectingHint" : {
+      "comment" : "Shown next to Robi’s face in selection mode, on one short line. “esc” is the Escape key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich ziehen · klicken für ganzes Fenster · esc"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag a region · click for whole window · esc"
+          }
+        }
+      }
+    },
+    "robiSelectionAccessibility" : {
+      "comment" : "VoiceOver label of the transparent area laid over a window in Robi’s selection mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robis Auswahlbereich. Ziehe, um einen Bereich zu wählen, oder drücke den Zeilenschalter für das ganze Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi selection area. Drag to pick a region, or press Return for the whole window."
+          }
+        }
+      }
+    },
+    "robiSettingsHelp" : {
+      "comment" : "Footnote under Robi’s main settings card. ⌥⇧⌘R is Option-Shift-Command-R.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi sitzt am oberen Rand des vordersten Fensters. Zeig darauf, um es zu wecken; klick darauf oder drück ⌥⇧⌘R, um zu deiner Auswahl, einem Bereich oder dem ganzen Fenster zu fragen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi sits on the top edge of the window in front. Hover to wake it; click it or press ⌥⇧⌘R to ask about your selection, a region, or the whole window."
+          }
+        }
+      }
+    },
+    "robiSettingsKeywords" : {
+      "comment" : "Search synonyms for Robi’s settings page. Separate with spaces.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begleiter Assistent KI Claude Apple Intelligence erklären übersetzen zusammenfassen Fenster Auswahl Gesicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "companion assistant AI Claude Apple Intelligence explain translate summarize window selection face"
+          }
+        }
+      }
+    },
+    "robiSettingsSubtitle" : {
+      "comment" : "Short description of Robi’s settings page on the Windows & Focus overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu jedem Fenster fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask about any window"
+          }
+        }
+      }
+    },
+    "robiSettingsTitle" : {
+      "comment" : "Settings page and card title for Robi on the focused window. Robi is the name of DOKK’s assistant; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        }
+      }
+    },
+    "robiShortcutConflict" : {
+      "comment" : "Notice when another app already owns Robi’s shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet ⌥⇧⌘R. Klick stattdessen auf Robi oder gib den Kurzbefehl in dieser App frei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app uses ⌥⇧⌘R. Click Robi instead, or free the shortcut in that app."
+          }
+        }
+      }
+    },
+    "robiShortcutToggle" : {
+      "comment" : "Switch for Robi’s global shortcut. ⌥⇧⌘R is Option-Shift-Command-R.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi mit ⌥⇧⌘R wecken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wake Robi with ⌥⇧⌘R"
+          }
+        }
+      }
+    },
+    "robiShortcutToggleHelp" : {
+      "comment" : "Subtitle of the switch for Robi’s global shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funktioniert in jeder App, ohne den Zeiger zu bewegen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Works in any app without moving the pointer."
+          }
+        }
+      }
+    },
+    "robiSuggestDoIt" : {
+      "comment" : "Suggestion button under Robi’s prompt bar: Robi proposes the next step, possibly a menu command the person confirms.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erledigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do It"
+          }
+        }
+      }
+    },
+    "robiSuggestExplain" : {
+      "comment" : "Suggestion button under Robi’s prompt bar: explain the picked content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erklären"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explain"
+          }
+        }
+      }
+    },
+    "robiSuggestSummarize" : {
+      "comment" : "Suggestion button under Robi’s prompt bar: summarize the picked content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammenfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summarize"
+          }
+        }
+      }
+    },
+    "robiSuggestTranslate" : {
+      "comment" : "Suggestion button under Robi’s prompt bar: translate the picked content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate"
+          }
+        }
+      }
+    },
+    "robiThinkingClaude" : {
+      "comment" : "Shown in Robi’s answer card while Claude answers. Claude is a product name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt Claude …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asking Claude…"
+          }
+        }
+      }
+    },
+    "robiThinkingOnDevice" : {
+      "comment" : "Shown in Robi’s answer card while Apple’s on-device model answers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denkt auf diesem Mac nach …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thinking on this Mac…"
+          }
+        }
+      }
+    },
+    "robiToastCommandMissing" : {
+      "comment" : "Brief message in Robi’s card when the proposed menu command no longer exists or is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Befehl ist gerade nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That command isn’t available now"
+          }
+        }
+      }
+    },
+    "robiToastCopied" : {
+      "comment" : "Brief confirmation in Robi’s card after copying the answer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        }
+      }
+    },
+    "robiToastDone" : {
+      "comment" : "Brief confirmation in Robi’s card after running a menu command.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erledigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "robiToastReplaced" : {
+      "comment" : "Brief confirmation in Robi’s card after replacing the selection.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replaced"
+          }
+        }
+      }
+    },
+    "robiToastReplaceFailed" : {
+      "comment" : "Brief message in Robi’s card when the app did not accept the replacement.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl konnte nicht ersetzt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t replace the selection"
+          }
+        }
+      }
+    },
+    "robiToggle" : {
+      "comment" : "Switch that turns Robi on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi auf dem aktiven Fenster zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Robi on the focused window"
+          }
+        }
+      }
+    },
+    "robiToggleHelp" : {
+      "comment" : "Subtitle of the switch that turns Robi on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein kleines Gesicht, das aus dem Fenster wächst, in dem du arbeitest."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A small face that grows out of the window you’re working in."
           }
         }
       }
