@@ -71,8 +71,11 @@ nonisolated struct RobiFlightPath: Equatable, Sendable {
                                    opacity: max(0, 1 - elapsed / Self.reducedDuration), lift: 0)
         }
         let progress = Self.progress(at: elapsed)
-        let size = CGSize(width: origin.width + (Self.landingSize.width - origin.width) * progress,
-                          height: origin.height + (Self.landingSize.height - origin.height) * progress)
+        // The spring overshoots by about 1 %. The position may follow it, but the size must not:
+        // on a very wide selection 1 % past the landing size is a negative width.
+        let shrink = min(1, max(0, progress))
+        let size = CGSize(width: origin.width + (Self.landingSize.width - origin.width) * shrink,
+                          height: origin.height + (Self.landingSize.height - origin.height) * shrink)
         let centre = point(at: progress)
         let fadeStart = Self.landing
         let opacity = elapsed < fadeStart ? 1 : max(0, 1 - (elapsed - fadeStart) / (Self.duration - fadeStart))
