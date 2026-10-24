@@ -19,7 +19,7 @@ struct HubUninstallItemRow: View {
                 }
                 .opacity(progress == .failed ? 0.6 : 1)
                 .accessibilityElement(children: .combine)
-                .accessibilityValue(Text(progress == .failed ? .hubUninstallNotMoved : .hubUninstallMoved))
+                .accessibilityValue(Text(progressValue(progress)))
             } else if item.isProtected {
                 HStack(spacing: 8) {
                     Image(systemName: "lock.fill")
@@ -76,6 +76,14 @@ struct HubUninstallItemRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect)
         .help(item.url.path)
+    }
+
+    private func progressValue(_ progress: AppUninstallSession.ItemProgress) -> LocalizedStringResource {
+        switch progress {
+        case .working: .hubUninstallMoving
+        case .moved: .hubUninstallMoved
+        case .failed: .hubUninstallNotMoved
+        }
     }
 
     private var note: Text? {

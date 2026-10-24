@@ -19,17 +19,28 @@ struct AppUninstallServices {
     var relaunch: @MainActor (URL) -> Bool
 
     /// The real services.
-    /// - Parameter installed: The other installed apps, for skipping data they own or share. Their app
-    ///   groups are read only when the uninstalled app declares groups of its own.
+    /// - Parameter installed: The installed apps as the Launcher lists them, for skipping data they own or
+    ///   share. Their app groups are read only when the uninstalled app declares groups of its own. The
+    ///   Launcher keeps one copy per bundle identifier, so other copies of the app itself are looked up
+    ///   separately.
     static func live(installed: [ApplicationReference]) -> AppUninstallServices {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return AppUninstallServices(
             inspect: { url, name in AppUninstallInspector.inspect(url, name: name) },
             scan: { target in
                 let path = target.url.standardizedFileURL.path
-                let others = installed.filter { $0.url.standardizedFileURL.path != path }.map { app in
-                    AppLeftoverRules.OtherApp(bundleIdentifier: app.bundleIdentifier, name: app.name,
-                                              appGroups: target.appGroups.isEmpty ? [] : AppUninstallInspector.signingInfo(app.url).groups)
+                let groups = { (url: URL) in target.appGroups.isEmpty ? [] : AppUninstallInspector.signingInfo(url).groups }
+                var others = installed.filter {
+                    $0.url.standardizedFileURL.path != path && $0.bundleIdentifier != target.bundleIdentifier
+                }.map { AppLeftoverRules.OtherApp(bundleIdentifier: $0.bundleIdentifier, name: $0.name, appGroups: groups($0.url)) }
+                // Another copy of this app shares its data, which then starts unselected ("Also used by …").
+                if let identifier = target.bundleIdentifier {
+                    for copy in AppUninstallInspector.otherCopies(of: identifier, excluding: target.url, home: home) {
+                        let folder = copy.deletingLastPathComponent().path
+                        let shown = folder.hasPrefix(home.path + "/") ? "~" + folder.dropFirst(home.path.count) : folder
+                        others.append(AppLeftoverRules.OtherApp(
+                            bundleIdentifier: identifier, name: "\(target.name) (\(shown))", appGroups: groups(copy)))
+                    }
                 }
                 return AppLeftoverScanner.scan(target, others: others, home: home)
             },

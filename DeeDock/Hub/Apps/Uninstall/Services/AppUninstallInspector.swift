@@ -52,6 +52,40 @@ nonisolated enum AppUninstallInspector {
             byteCount: size)
     }
 
+    /// Other bundles on this Mac with `identifier`, besides `url`: copies that share the app's data.
+    ///
+    /// The Launcher keeps one copy per bundle identifier, so its list can't answer this. Spotlight finds
+    /// copies anywhere; the Applications folders are also read directly (two levels deep) in case Spotlight
+    /// is off. Copies in a Trash and bundles nested inside other bundles don't count.
+    static func otherCopies(of identifier: String, excluding url: URL, home: URL) -> [URL] {
+        var paths = Set<String>()
+        // The identifier goes inside a query string; one that could break out of the quotes is skipped.
+        if !identifier.contains("'"), !identifier.contains("\\"), !identifier.contains("*"),
+           let query = MDQueryCreate(kCFAllocatorDefault, "kMDItemCFBundleIdentifier == '\(identifier)'" as CFString, nil, nil),
+           MDQueryExecute(query, CFOptionFlags(kMDQuerySynchronous.rawValue)) {
+            for index in 0..<MDQueryGetResultCount(query) {
+                guard let raw = MDQueryGetResultAtIndex(query, index) else { continue }
+                let item = Unmanaged<MDItem>.fromOpaque(raw).takeUnretainedValue()
+                if let path = MDItemCopyAttribute(item, kMDItemPath) as? String { paths.insert(path) }
+            }
+        }
+        for root in [URL(fileURLWithPath: "/Applications"), home.appendingPathComponent("Applications")] {
+            let top = (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []
+            let candidates = top + top.filter { $0.pathExtension != "app" }.flatMap {
+                (try? FileManager.default.contentsOfDirectory(at: $0, includingPropertiesForKeys: nil)) ?? []
+            }
+            for candidate in candidates where candidate.pathExtension == "app" && Bundle(url: candidate)?.bundleIdentifier == identifier {
+                paths.insert(candidate.path)
+            }
+        }
+        let target = url.standardizedFileURL.path
+        return paths.map { URL(fileURLWithPath: $0).standardizedFileURL }.filter { copy in
+            let parents = copy.deletingLastPathComponent().pathComponents
+            return copy.path != target && copy.pathExtension == "app" && !parents.contains(".Trash")
+                && !parents.contains { ["app", "framework", "bundle", "appex"].contains(($0 as NSString).pathExtension.lowercased()) }
+        }
+    }
+
     /// The team identifier and app groups in the code signature at `url`. Reads the signature without
     /// validating it, which is fast and needs no network.
     static func signingInfo(_ url: URL) -> (team: String?, groups: [String]) {
