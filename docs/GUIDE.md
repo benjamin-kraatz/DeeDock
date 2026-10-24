@@ -24,6 +24,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Lookout](#lookout)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
+- [Robi on your windows](#robi-on-your-windows)
 - [Plugins](#plugins)
 - [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
@@ -461,6 +462,35 @@ What the feed can see:
 The feed reads notification text while it is on. That text stays in memory on this Mac. DOKK never writes it to disk, logs it, or sends it anywhere, and usage analytics never include it. The feed keeps the 100 most recent entries. Turning the feed off or quitting DOKK clears it. Reading pauses during sleep, display sleep, and when another user is active, and the feed keeps its entries across those pauses.
 
 The feed depends on how macOS draws its banners, which Apple does not document. A macOS update can change that. If it does, the feed stays empty rather than showing wrong entries. See [Notification feed](NOTIFICATION-FEED.md) for the measurements behind it and what still needs hands-on checking.
+
+## Robi on your windows
+
+Robi, the assistant behind the Launcher's **Ask Robi** button, can also sit on the window you're working in. It is off by default. Turn it on in **Settings → Windows & Focus → Robi → Show Robi on the focused window**, and allow Accessibility with the **Enable** button there. Screen Recording is optional: it lets Robi match the title bar's colour and read regions you pick. The first launch of a version with Robi also shows a DOKK Discovery tip with a **Turn On** button.
+
+Robi is a small face on a tab that grows out of the top edge of the window in front, coloured like that window's title bar. When a window has no room above it, such as a maximized or full-screen window, the tab hangs down inside its top edge like a notch. Robi follows the window as you move, resize, or switch windows, and it never appears on DOKK's own windows, system UI, password fields, or apps you list under **Hidden in**.
+
+**Move Robi.** Press Robi and drag sideways to slide the tab anywhere along the window's top edge, whether it sits above the window or hangs inside. It stops a little short of the corners, with a small give if you pull past them. Robi remembers the spot for that window, and for the app's other windows too, even after DOKK restarts. A press that doesn't move is still a click. You can drag while the question field or an answer is open, but not while you're picking a region. **Settings → Windows & Focus → Robi → Reset Tab Positions** puts Robi back in the middle everywhere.
+
+When the tab hangs inside the window, hold Shift while you drag it to pull it away from the edge like goo. The further you pull, the harder it gets, and when you let go it snaps back with a wobble. With Reduce Motion, Shift-drag moves the tab like a normal drag.
+
+**Ask Robi.**
+1. Hover over Robi to wake it. Its eyes open and follow the pointer.
+2. Click Robi, or press **⌥⇧⌘R** anywhere. If you have text selected in the app, that selection becomes the context. Otherwise Robi dims the window: drag across the part you mean, or click once for the whole window. Escape cancels. Shift-click Robi to skip the dimming and take the whole window straight away.
+3. The tab stretches into a question field. Type a question and press Return, or choose one of the actions below it. For text you can edit, the row starts with **Proofread**, **Improve**, **Translate**, and **Make Shorter**. For anything else it starts with **Explain**, **Summarize**, **Translate**, and **Do It**. **More** lists the rest: **Make More Formal**, **Make Friendlier**, **Draft a Reply**, **List To-Dos**, and the actions not already in the row. A moment later, Apple Intelligence may add up to three questions about what you picked, marked with sparkles. Click one to ask it. They are made on this Mac even when Claude answers, and only after you've clicked Robi. Turn them off with **Suggest questions** under **Answers**.
+   Clicking Robi in the question field steps back to picking, and clicking it again closes Robi. Shift-click closes it from the question field or while picking.
+4. The answer appears in a card under the tab. **Copy** puts it on the clipboard, **Replace Selection** swaps your selected text for it where the app allows, and **Paste into** pastes it into the app, which is how answers reach terminals. **Do It** can propose one of the app's menu commands as a **Run** button; nothing runs until you click it.
+
+While an answer is being written, **Stop** (or Escape) ends it. What arrived so far stays in the card, marked **Stopped**, and you can still copy or paste it. With Claude, stopping closes the connection to Anthropic, which is how a request is cancelled.
+
+Switching to another window doesn't lose an answer. Robi sets it aside: the answer keeps being written, the card closes, and Robi follows you with a small dot on its face. The dot breathes while the answer is still coming and turns green when it's ready. Go back to the first window and the card is there again, still streaming if it isn't finished. Robi keeps one answer this way. It's dropped when you ask Robi something new, close the window, or leave it for ten minutes. Switching away while you're still picking or typing closes Robi as before.
+
+Circle the pointer around Robi while it's awake and it gets dizzy.
+
+Clicking Robi never activates DOKK, so the app keeps its selection and stays in front. While you type a question, your keystrokes go to Robi's field; closing the card gives the keyboard back to the app.
+
+**Answers.** By default Robi answers with Apple Intelligence on this Mac, and what you pick never leaves it. Under **Answers** you can choose **Claude Sonnet 5.5** instead, with your own Anthropic API key and **Medium** or **High** effort. DOKK keeps the key in your Keychain, and your question and its context go from this Mac straight to Anthropic, billed to your Anthropic account. When Claude is chosen and no key is saved, Robi's card asks for one, or answers this question on this Mac instead.
+
+Robi reads a window only when you click it or press its shortcut, and it keeps nothing afterwards: no history, and nothing written to disk. Usage analytics count what Robi does, never what it reads or answers. See [Robi](ROBI.md) for how it follows windows, what it can read in which apps, and its limits.
 
 ## Plugins
 

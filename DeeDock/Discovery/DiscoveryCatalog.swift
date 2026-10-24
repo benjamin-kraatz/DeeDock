@@ -8,7 +8,7 @@ struct DiscoveryProposal: Identifiable {
         /// it, and again on later launches until it is used, dismissed, or still snoozed.
         case launched
     }
-    enum Destination: String { case clipboardMuseum, notificationFeed, islands }
+    enum Destination: String { case clipboardMuseum, notificationFeed, islands, robi }
     /// What the callout still has to do after its destination handled the click.
     enum FollowUp { case none, openSettings }
     let id: String
@@ -37,5 +37,10 @@ struct DiscoveryProposal: Identifiable {
              title: .discoveryIslandsTitle, message: .discoveryIslandsMessage,
              action: .discoveryIslandsTurnOn, destination: .islands, snoozeInterval: 86_400,
              symbol: "rectangle.split.3x1.fill"),
+        // Announces Robi on the focused window, which stays opt-in. Queued behind Islands.
+        Self(id: "robi", signal: .launched, threshold: 1, calmInterval: 120,
+             title: .discoveryRobiTitle, message: .discoveryRobiMessage,
+             action: .discoveryRobiTurnOn, destination: .robi, snoozeInterval: 86_400,
+             symbol: "face.smiling.inverse"),
     ]
 }

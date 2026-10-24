@@ -205,7 +205,7 @@ Entry points that do not mark themselves report `click`.
 
 | Event | Properties |
 | --- | --- |
-| `setting_changed` | `key`, `old_value`, `new_value` (enum, Bool, or exact number), `area` (`shared_dock`, `display`, `atmosphere`, `menu_bar`, `updates`, `features`), `display_role` |
+| `setting_changed` | `key`, `old_value`, `new_value` (enum, Bool, or exact number), `area` (`shared_dock`, `display`, `atmosphere`, `menu_bar`, `updates`, `features`, `robi`), `display_role` |
 | `settings_viewed` | `section` (`general`, `dock`, `atmosphere`, `modes`, `extras`, `windows_focus`, `suggestions_history`, `lookout`, `plugins`, `deprecated`, `display`), `page` (the `SettingsPage` case name, such as `windowPeek`; absent for a section's overview), `via` (`sidebar`, `overview`, `request`), `display_role` for a connected display |
 | `usage_summary` | `period_seconds`, the counters below, and per-display `pinned_app_count`, `pinned_folder_count`, `running_app_count` |
 
@@ -398,7 +398,7 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `patch_bay` | `action`, `cable_count`, `outcome` |
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
 | `plugin_panel_opened` | `trigger`, `pinned_count` (plugin tiles in the dock) |
 | `plugin_panel_closed` | `duration`, `stopped` (the plugin had stopped by then) |
 | `plugin_stopped` | `panel_open`. A plugin process ended without DOKK asking, or never answered. |
@@ -415,11 +415,23 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `focus_dock_entered` | `trigger` |
 | `focus_dock_command` | `command` |
 | `focus_session` | `action` |
+| `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
+| `robi_answered` | `model` (`on_device`, `claude`), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
+| `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`) |
 
 Atmosphere has no events of its own. Its settings are reported through `setting_changed` with
 `area = atmosphere`.
 
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
+
+Robi's settings are reported through `setting_changed` with `area = robi`, by reflection over
+`RobiSettings`: `isEnabled`, `answerModel`, `claudeEffort`, `suggestQuestions`, `shortcutEnabled`, and the number of
+excluded apps (never their bundle IDs). Where the tab was dragged (`tabPositions`, keyed by bundle
+ID) is not reported at all, not even as a count. Whether an Anthropic API key is saved is not reported, and
+the key itself never leaves the Keychain except in requests to Anthropic.
+
+Robi events never include the app, the window, the selection, recognized text, the question, the
+answer, or the proposed command. Robi requests are not sent to Apple Intelligence observability.
 
 Plugin events carry counts, durations, surfaces, and yes/no flags only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
 The feed sends no event when a notification arrives, and none of its events carry text or app
@@ -560,6 +572,9 @@ prompt or answer contains:
 | `window_search_image_match` | the search phrase and the model's description of the window |
 | `window_watch_explanation` | the model's description of what changed in the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
+
+Robi is the exception: its requests carry window text the person picked, so `RobiAgent` does not
+call `AIObservability` at all, for either model.
 
 These events pass the same consent gate as everything else. The Privacy card and the tour say
 that Apple Intelligence requests and answers are shared in full. Setting `capturesContent` to

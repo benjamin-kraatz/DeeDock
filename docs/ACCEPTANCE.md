@@ -3614,6 +3614,44 @@ Also open:
 - loading a plugin from another team;
 - whether a Mac App Store app may ship a DOKK plugin, which Trendi's TestFlight build will answer.
 
+## Robi on your windows (DEE-142)
+
+Built on `benn/window-agent-companion` after the mockup `docs/mockups/robi.html`. The feasibility spike (`codex/window-companion-spike`, never merged) supplied the measurements. How it is built and why is in [ROBI.md](ROBI.md).
+
+### Implemented
+
+- **Tracking.** `RobiWindowTracker` follows the frontmost app's focused standard window through `NSWorkspace` and an AX observer. Title-bar drags are predicted from global mouse monitors and checked against real bounds after four events. Other moves come from SkyLight events 806 and 807, gated to macOS 27, with AX notifications as the fallback. Secure text fields, system UI, DOKK, and excluded apps get no Robi.
+- **Panel.** `RobiPanel` is borderless and non-activating, joins all Spaces and full-screen apps, and Mission Control hides it. The tab sits above the window, or inside its top edge when nothing fits above. It retracts into the old window and emerges from the new one when focus moves, and its colour is sampled under the tab.
+- **Context.** The AX selection comes first, with text markers for web content and Electron/Chromium accessibility switched on for the request. The selection sheet takes region drags. Whole windows use their AX text or a picture with recognized text. OCR is prewarmed when Robi starts.
+- **Answers.** `RobiAgent` runs the on-device model or Claude Sonnet 5.5 (`ClaudeForFoundationModels` 0.2.3, the person's API key in the Keychain, Medium or High effort) through one `LanguageModelSession`. The menu-command tool only proposes; commands run on a click.
+- **Actions.** Copy, Replace Selection through AX, Paste into the app with the clipboard restored, and Run for a proposed command.
+- **Settings.** A Robi page under Windows & Focus with the switch, the ⌥⇧⌘R shortcut (Carbon hot key ID 17), the answer model, the API key, effort, hidden apps, and the permissions card.
+- **Discovery and analytics.** A `robi` Discovery callout. Count-only `robi_opened`, `robi_answered`, and `robi_action` events, plus `setting_changed` with `area = robi`. No `AIObservability`.
+
+### Validation status
+
+Every build went to a scratch `-derivedDataPath` with `CODE_SIGNING_ALLOWED=NO`:
+
+- `xcodebuild -scheme DeeDock -configuration Debug build`: **BUILD SUCCEEDED**, no warnings in `DeeDock/Robi/`.
+- `xcodebuild -scheme DeeDock -configuration Debug build-for-testing`: **TEST BUILD SUCCEEDED**.
+
+`DeeDockTests/RobiGeometryTests.swift` covers placement above and inside, display clamping, coordinate conversion, drag prediction (title band, menu-bar limit, stall detection), lenient settings decoding, and keeping the API key out of UserDefaults. The tests were compiled but not run, following `AGENTS.md`.
+
+The spike's probes on macOS 27.0 exercised the mechanisms Robi is built on, against throwaway windows only:
+- tracking latency for each geometry source;
+- SkyLight events from a normal process;
+- cross-process AX replace;
+- typing into a non-activating key panel while another app stays frontmost;
+- the on-device model with an image;
+- OCR cold start.
+
+DOKK itself was not launched. Not exercised:
+- Robi in a running DOKK: hover, clicks, drags, resizes, the selection sheet, and the morph into the prompt bar and card;
+- the selection-first flow in Electron and Chromium apps, Replace Selection, Paste into a terminal, and Run;
+- Claude with a real key at both efforts, and the key prompt in the card;
+- Spaces, full screen, Mission Control, Stage Manager, sleep and wake, and displays with different scales;
+- VoiceOver, Reduce Motion, and Reduce Transparency.
+
 ## Hub Apps uninstall (DEE-141)
 
 Built on `codex/dee-141-hub-uninstall` after the confirmed mockup `docs/mockups/hub-uninstall.html` (attached sheet). Behavior is in [LAUNCHER.md](LAUNCHER.md#uninstall).

@@ -89,6 +89,11 @@ struct DockSettingsView: View {
             coordinator?.settingsHarborRequest = false
             select(.windowsFocus, page: .harbor)
         }
+        .onChange(of: coordinator?.settingsRobiRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsRobiRequest = false
+            select(.windowsFocus, page: .robi)
+        }
         .onChange(of: coordinator?.settingsLookoutRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsLookoutRequest = false

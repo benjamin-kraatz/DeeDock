@@ -99,6 +99,9 @@ extension AnalyticsEvent {
         case .pluginPinChanged: "plugin_pin_changed"
         case .pluginsManageOpened: "plugins_manage_opened"
         case .pluginsCounted: "plugins_counted"
+        case .robiOpened: "robi_opened"
+        case .robiAnswered: "robi_answered"
+        case .robiActionTaken: "robi_action"
         case .discoveryCallout: "discovery_callout"
         case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
@@ -324,6 +327,13 @@ extension AnalyticsEvent {
         case let .pluginsCounted(enabledCount, waitingCount, disabledCount, pinnedCount):
             ["enabled_count": .init(enabledCount), "waiting_count": .init(waitingCount),
              "disabled_count": .init(disabledCount), "pinned_count": .init(pinnedCount)]
+        case let .robiOpened(trigger, context):
+            ["trigger": .init(trigger), "context": .init(context)]
+        case let .robiAnswered(model, intent, outcome, duration, picture):
+            ["model": .init(model), "intent": .init(intent), "outcome": .init(outcome),
+             "duration": .init(duration), "picture": .init(picture)]
+        case let .robiActionTaken(action):
+            ["action": .init(action)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
         case let .lineIconCoverage(coverage):

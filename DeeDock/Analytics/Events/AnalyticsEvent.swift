@@ -195,6 +195,17 @@ enum AnalyticsEvent {
     case pluginsManageOpened(waitingCount: Int)
     /// How many plugins are on, waiting, off, and pinned. Sent when the counts change.
     case pluginsCounted(enabledCount: Int, waitingCount: Int, disabledCount: Int, pinnedCount: Int)
+
+    // MARK: Robi
+
+    /// Robi opened its prompt bar with context. Never the app, the window, or any of its text.
+    case robiOpened(trigger: AnalyticsTrigger, context: AnalyticsRobiContext)
+    /// A Robi request ended: which model, which suggestion, how, and how long it took. Never the
+    /// question, the context, or the answer.
+    case robiAnswered(model: AnalyticsRobiModel, intent: AnalyticsRobiIntent, outcome: AnalyticsRobiOutcome,
+                      duration: Double, picture: Bool)
+    /// The person put a Robi answer to use.
+    case robiActionTaken(AnalyticsRobiAction)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     /// How many installed and pinned apps have a Line glyph, with the bundle IDs of public apps
     /// that have none. Sent shortly after launch, at most every six hours.
