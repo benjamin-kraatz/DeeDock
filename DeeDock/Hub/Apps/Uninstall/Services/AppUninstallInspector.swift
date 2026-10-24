@@ -86,6 +86,14 @@ nonisolated enum AppUninstallInspector {
         }
     }
 
+    /// App groups the app at `url` or any of its embedded bundles declare, when the app is signed by
+    /// `team`. App groups can't cross teams, so other teams' apps need only their main signature.
+    static func appGroups(of url: URL, team: String?) -> [String] {
+        let main = signingInfo(url)
+        guard let team, main.team == team else { return main.groups }
+        return main.groups + embeddedBundles(in: url).flatMap { signingInfo($0).groups }
+    }
+
     /// The team identifier and app groups in the code signature at `url`. Reads the signature without
     /// validating it, which is fast and needs no network.
     static func signingInfo(_ url: URL) -> (team: String?, groups: [String]) {

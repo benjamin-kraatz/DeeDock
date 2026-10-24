@@ -71,6 +71,20 @@ struct AppLeftoverRulesTests {
         #expect(found.first?.selectedByDefault == false)
     }
 
+    @Test func anotherCopysExtensionAndHelperDataIsShared() {
+        let copy = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Editor", name: "Editor (~/Applications)",
+                                             appGroups: [], otherIdentifiers: ["com.example.Editor.Widget", "com.example.EditorHelper"])
+        let rules = rules(identifiers: ["com.example.Editor", "com.example.Editor.Widget"], helpers: ["com.example.EditorHelper"],
+                          others: [copy])
+        let containers = rules.leftovers(in: root("Containers", .container, .bundle), entries: ["com.example.Editor.Widget"])
+        let helpers = rules.leftovers(in: root("PrivilegedHelperTools", .backgroundHelper, .helper, domain: .allUsers),
+                                      entries: ["com.example.EditorHelper"])
+        #expect(containers.first?.sharedWith == "Editor (~/Applications)")
+        #expect(helpers.first?.sharedWith == "Editor (~/Applications)")
+        #expect(containers.allSatisfy { !$0.selectedByDefault } && helpers.allSatisfy { !$0.selectedByDefault })
+        #expect(containers.count == 1 && helpers.count == 1)
+    }
+
     @Test func appGroupsAreSelectedUnlessAnotherAppUsesThem() {
         let word = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Word", name: "Word", appGroups: ["TEAM.Office"])
         let found = rules(groups: ["TEAM.Office", "TEAM.Editor"], others: [word])

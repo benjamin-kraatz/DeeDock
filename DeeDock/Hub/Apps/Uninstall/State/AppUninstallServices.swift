@@ -29,17 +29,22 @@ struct AppUninstallServices {
             inspect: { url, name in AppUninstallInspector.inspect(url, name: name) },
             scan: { target in
                 let path = target.url.standardizedFileURL.path
-                let groups = { (url: URL) in target.appGroups.isEmpty ? [] : AppUninstallInspector.signingInfo(url).groups }
+                let groups = { (url: URL) in
+                    target.appGroups.isEmpty ? [] : AppUninstallInspector.appGroups(of: url, team: target.teamIdentifier)
+                }
                 var others = installed.filter {
                     $0.url.standardizedFileURL.path != path && $0.bundleIdentifier != target.bundleIdentifier
                 }.map { AppLeftoverRules.OtherApp(bundleIdentifier: $0.bundleIdentifier, name: $0.name, appGroups: groups($0.url)) }
-                // Another copy of this app shares its data, which then starts unselected ("Also used by …").
+                // Another copy of this app shares its data, including its extensions' and helpers', which then
+                // starts unselected ("Also used by …").
                 if let identifier = target.bundleIdentifier {
                     for copy in AppUninstallInspector.otherCopies(of: identifier, excluding: target.url, home: home) {
                         let folder = copy.deletingLastPathComponent().path
                         let shown = folder.hasPrefix(home.path + "/") ? "~" + folder.dropFirst(home.path.count) : folder
+                        let inspected = AppUninstallInspector.inspect(copy, name: target.name)
                         others.append(AppLeftoverRules.OtherApp(
-                            bundleIdentifier: identifier, name: "\(target.name) (\(shown))", appGroups: groups(copy)))
+                            bundleIdentifier: identifier, name: "\(target.name) (\(shown))", appGroups: inspected.appGroups,
+                            otherIdentifiers: inspected.embeddedIdentifiers + inspected.helperIdentifiers))
                     }
                 }
                 return AppLeftoverScanner.scan(target, others: others, home: home)

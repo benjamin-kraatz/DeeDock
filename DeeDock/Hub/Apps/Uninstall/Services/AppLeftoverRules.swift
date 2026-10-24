@@ -58,7 +58,18 @@ nonisolated struct AppLeftoverRules: Sendable {
     struct OtherApp: Sendable {
         let bundleIdentifier: String?
         let name: String
+        /// Every app group the app or its embedded bundles declare.
         let appGroups: [String]
+        /// Identifiers of its embedded bundles and helpers. Filled for other copies of the app being
+        /// uninstalled, whose extensions and helpers share the same data.
+        var otherIdentifiers: [String] = []
+
+        /// Whether this app uses data named after `identifier`.
+        func uses(_ identifier: String) -> Bool {
+            ([bundleIdentifier].compactMap { $0 } + otherIdentifiers).contains {
+                $0.caseInsensitiveCompare(identifier) == .orderedSame
+            }
+        }
     }
 
     /// Suffix components apps add to their own identifier for helpers and updaters, compared in lowercase.
@@ -120,8 +131,8 @@ nonisolated struct AppLeftoverRules: Sendable {
         case .bundle, .launchd:
             return bundleLeftover(stem, url: url, root: root)
         case .helper:
-            if identity.helperIdentifiers.contains(stem) {
-                return AppLeftover(url: url, kind: root.kind, match: .bundleIdentifier, domain: root.domain)
+            if let helper = identity.helperIdentifiers.first(where: { $0.caseInsensitiveCompare(stem) == .orderedSame }) {
+                return identifierLeftover(stem, identifier: helper, loose: false, url: url, root: root)
             }
             return bundleLeftover(stem, url: url, root: root)
         }
@@ -165,7 +176,8 @@ nonisolated struct AppLeftoverRules: Sendable {
         var kind = root.kind
         if kind == .container, let main = identity.identifiers.first, identifier != main { kind = .extensionContainer }
         var item = AppLeftover(url: url, kind: kind, match: loose ? .similarName : .bundleIdentifier, domain: root.domain)
-        item.sharedWith = others.first(where: { $0.bundleIdentifier?.caseInsensitiveCompare(identifier) == .orderedSame })?.name
+        // Another copy of the app (or anything else declaring this identifier for a bundle or helper) uses it too.
+        item.sharedWith = others.first(where: { $0.uses(identifier) })?.name
         return item
     }
 
