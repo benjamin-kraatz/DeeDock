@@ -189,6 +189,9 @@ final class RobiEyes {
     /// Set for a moment after the pointer circled the face: the pupils spin and the mouth
     /// rounds into an "o".
     var dizzy: RobiDizzy?
+    /// Set for a moment when a picked region lands in the face: the eyes widen, the pupils
+    /// jump, and the mouth rounds. The controller clears `dizzy` when it sets this.
+    var surprised: RobiSurprise?
 }
 
 /// What Robi's views can ask the controller to do.

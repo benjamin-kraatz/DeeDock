@@ -7,8 +7,10 @@ import SwiftUI
 /// own, and the smile grows with a small pop when the answer is complete. Pressed, it squashes,
 /// squeezes its eyes shut, grimaces and sweats, then shakes it off once let go. Circled by the
 /// pointer, it gets dizzy: the pupils spin in opposite directions, the mouth goes round, and the
-/// face sways. With Reduce Motion the face neither bounces, blinks, wobbles, spins, nor moves its
-/// eyes; a press only changes its expression.
+/// face sways. Hit by a picked region flying in, it is startled: the eyes widen with a pop, the
+/// pupils shrink and jump up, the mouth rounds, and the face squashes and hops before it settles.
+/// With Reduce Motion the face neither bounces, blinks, wobbles, spins, nor moves its eyes; a
+/// press only changes its expression, and a surprise is a gentle widen with the round mouth.
 struct RobiFaceView: View {
     let eyes: RobiEyes
     let phase: RobiPhase
@@ -36,7 +38,8 @@ struct RobiFaceView: View {
 
     private var size: CGSize { compact ? CGSize(width: 40, height: 26) : CGSize(width: 56, height: 32) }
     private var eyeSize: CGSize { compact ? CGSize(width: 7.5, height: 10) : CGSize(width: 10, height: 13) }
-    private var blinking: Bool { eyes.isBlinking && !reduceMotion }
+    /// Wide eyes do not blink: a blink mid-surprise would shut what should be staring.
+    private var blinking: Bool { eyes.isBlinking && !reduceMotion && eyes.surprised == nil }
     private var wandering: Bool { isWaiting && phase == .thinking && !reduceMotion }
     private var dizzy: RobiDizzy? { reduceMotion ? nil : eyes.dizzy }
 
@@ -54,12 +57,18 @@ struct RobiFaceView: View {
     }
 
     var body: some View {
-        // The timeline only ticks while the eyes wander or spin; otherwise it renders once per
-        // state change.
-        TimelineView(.animation(minimumInterval: 1 / 60, paused: !wandering && dizzy == nil)) { context in
+        // The timeline only ticks while the eyes wander, spin, or stare; otherwise it renders
+        // once per state change.
+        TimelineView(.animation(minimumInterval: 1 / 60, paused: !wandering && dizzy == nil && eyes.surprised == nil)) { context in
             let spin = dizzy.map { RobiDizzySpin($0, at: context.date) }
-            face(left: spin?.left ?? pupil(at: context.date), right: spin?.right ?? pupil(at: context.date), spin: spin)
+            let startle = eyes.surprised.map { RobiSurpriseFrame($0, at: context.date, gentle: reduceMotion) }
+            let glance = pupil(at: context.date)
+            let stare = startle?.pupil(from: glance) ?? glance
+            face(left: spin?.left ?? stare, right: spin?.right ?? stare, spin: spin, startle: startle)
                 .rotationEffect(.degrees(spin?.sway ?? 0))
+                // The hit from below: flatter and wider for an instant, lifted a little, then back.
+                .scaleEffect(x: startle?.scale.width ?? 1, y: startle?.scale.height ?? 1)
+                .offset(y: startle?.lift ?? 0)
         }
         .frame(width: size.width, height: size.height)
         // Squashed flat and wide between two fingers.
@@ -103,21 +112,25 @@ struct RobiFaceView: View {
         }
     }
 
-    private func face(left: CGSize, right: CGSize, spin: RobiDizzySpin?) -> some View {
-        ZStack {
+    private func face(left: CGSize, right: CGSize, spin: RobiDizzySpin?, startle: RobiSurpriseFrame?) -> some View {
+        // The round mouth: dizzy breathes it; startled, it opens with the surprise and closes
+        // with it, and the smile comes back by the same amount.
+        let gasp = spin == nil ? startle?.mouth ?? 0 : 0
+        let round: Double? = spin.map { 0.85 + 0.25 * $0.mouth } ?? startle.map { 0.5 + 0.7 * $0.mouth }
+        return ZStack {
             RoundedRectangle(cornerRadius: size.height * 0.38, style: .continuous)
                 .fill(Color(red: 0.17, green: 0.15, blue: 0.24))
                 .shadow(color: .black.opacity(0.28), radius: 1.5, y: 1)
             VStack(spacing: compact ? 1 : 2) {
                 HStack(spacing: size.width * 0.2) {
-                    eye(pupil: left, mirrored: false)
-                    eye(pupil: right, mirrored: true)
+                    eye(pupil: left, mirrored: false, scale: startle?.eyeScale ?? 1, pupilScale: startle?.pupilScale ?? 1)
+                    eye(pupil: right, mirrored: true, scale: startle?.eyeScale ?? 1, pupilScale: startle?.pupilScale ?? 1)
                 }
                 ZStack {
                     RobiSmileShape()
                         .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.4, lineCap: .round))
                         .frame(width: compact ? 5 : 6, height: 2.5)
-                        .opacity(phase == .idle || isSqueezed || spin != nil ? 0 : 1)
+                        .opacity(phase == .idle || isSqueezed || spin != nil ? 0 : 1 - gasp)
                         .scaleEffect(smileScale)
                         // The answered smile overshoots a little before settling: that is the pop.
                         .animation(reduceMotion ? .easeInOut(duration: 0.15)
@@ -126,12 +139,12 @@ struct RobiFaceView: View {
                         .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round))
                         .frame(width: compact ? 7 : 9, height: 2.5)
                         .opacity(isSqueezed ? 1 : 0)
-                    // Dizzy: a small round "o", breathing a little as the face sways.
+                    // Dizzy or startled: a small round "o".
                     Ellipse()
                         .stroke(.white.opacity(0.9), lineWidth: 1.3)
                         .frame(width: compact ? 3.5 : 4.5, height: compact ? 3.5 : 4.5)
-                        .scaleEffect(spin.map { 0.85 + 0.25 * $0.mouth } ?? 0.3)
-                        .opacity(spin != nil && !isSqueezed ? 1 : 0)
+                        .scaleEffect(round ?? 0.3)
+                        .opacity(isSqueezed ? 0 : spin != nil ? 1 : gasp)
                 }
             }
             .offset(y: compact ? 1 : 2)
@@ -156,12 +169,13 @@ struct RobiFaceView: View {
         }
     }
 
-    /// One eye: open as usual, or squeezed into a chevron while the face is pressed.
-    private func eye(pupil: CGSize, mirrored: Bool) -> some View {
+    /// One eye: open as usual, widened by `scale` while startled, or squeezed into a chevron
+    /// while the face is pressed.
+    private func eye(pupil: CGSize, mirrored: Bool, scale: CGFloat, pupilScale: CGFloat) -> some View {
         ZStack {
-            RobiEyeView(size: eyeSize, pupil: pupil, openness: openness, blinking: blinking)
+            RobiEyeView(size: eyeSize, pupil: pupil, openness: openness, blinking: blinking, pupilScale: pupilScale)
                 .opacity(isSqueezed ? 0 : 1)
-                .scaleEffect(isSqueezed && !reduceMotion ? 0.3 : 1)
+                .scaleEffect(isSqueezed && !reduceMotion ? 0.3 : scale)
             RobiSquintShape(mirrored: mirrored)
                 .stroke(Color(white: 0.98), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
                 .frame(width: eyeSize.width * 0.62, height: eyeSize.height * 0.62)
@@ -238,6 +252,8 @@ struct RobiEyeView: View {
     let openness: CGFloat
     /// True mid-blink, so the lid snaps shut instead of easing.
     var blinking = false
+    /// The pupil's size relative to its usual, 1 at rest; a startled eye's pupil shrinks.
+    var pupilScale: CGFloat = 1
 
     var body: some View {
         ZStack {
@@ -245,6 +261,7 @@ struct RobiEyeView: View {
             Circle()
                 .fill(Color(red: 0.12, green: 0.10, blue: 0.18))
                 .frame(width: size.width * 0.58, height: size.width * 0.58)
+                .scaleEffect(pupilScale)
                 .offset(x: pupil.width * size.width / 10, y: pupil.height * size.width / 10)
                 // Pointer events arrive in steps; a short spring turns them into one glance.
                 .animation(.interactiveSpring(response: 0.18, dampingFraction: 0.86), value: pupil)
@@ -312,6 +329,32 @@ struct RobiSmileShape: Shape {
     .padding(30)
     .background(Color(red: 0.21, green: 0.23, blue: 0.26))
 }
+
+/// Startles the faces every second and a half, so the whole reaction can be watched settle.
+private struct RobiSurprisePreview: View {
+    @State private var eyes = RobiEyes()
+    let reduceMotion: Bool
+
+    var body: some View {
+        HStack(spacing: 18) {
+            RobiFaceView(eyes: eyes, phase: .prompting, compact: true, reduceMotion: reduceMotion)
+            RobiFaceView(eyes: eyes, phase: .awake, reduceMotion: reduceMotion)
+        }
+        .padding(30)
+        .background(Color(red: 0.21, green: 0.23, blue: 0.26))
+        .task {
+            while !Task.isCancelled {
+                eyes.surprised = RobiSurprise(start: .now)
+                try? await Task.sleep(for: .seconds(RobiSurprise.duration))
+                eyes.surprised = nil
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+    }
+}
+
+#Preview("Surprised") { RobiSurprisePreview(reduceMotion: false) }
+#Preview("Surprised, Reduce Motion") { RobiSurprisePreview(reduceMotion: true) }
 
 #Preview("Faces, Reduce Motion") {
     let eyes = RobiEyes()

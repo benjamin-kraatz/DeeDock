@@ -36,6 +36,10 @@ final class RobiController {
     @ObservationIgnored private var sheet: RobiSelectionSheet?
     /// Rings a landmark the answer referred to; made the first time a reference is clicked.
     @ObservationIgnored private var spotlight: RobiSpotlight?
+    /// Flies a picked region into the face; made the first time a region is picked.
+    @ObservationIgnored private var flight: RobiFlight?
+    /// Startles the face when the flight lands and calms it again. Cancelled with the flight.
+    @ObservationIgnored private var surpriseTask: Task<Void, Never>?
     /// Groups one interaction's model calls in LLM analytics: its suggested questions and answers.
     @ObservationIgnored private var trace = AIObservability.makeTrace()
     @ObservationIgnored private var panelSize = CGSize.zero
@@ -525,6 +529,7 @@ final class RobiController {
         dizzyTask = nil
         circles.reset()
         eyes.dizzy = nil
+        calm()
         eyes.isBlinking = false
         eyes.pupil = CGSize(width: 0, height: 2)
     }
@@ -534,14 +539,24 @@ final class RobiController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in self?.eyes.isBlinking = false }
     }
 
+    /// The face's centre in AppKit screen points, read off the panel's frame: at the bar's
+    /// leading end while the bar is open (side margin, flare, the row's padding, half the compact
+    /// face), in the middle of the tab otherwise; vertically the middle of the tab, which sits
+    /// under the shadow margin when the tab is above the window. The pupils and the flight of a
+    /// picked region both aim here.
+    private func faceCentre() -> CGPoint? {
+        guard let panel else { return nil }
+        let frame = panel.frame
+        let x = model.phase.isBar ? frame.minX + RobiMetrics.sideMargin + RobiMetrics.flare + 7 + 20 : frame.midX
+        let tabTop = model.placement == .above ? frame.maxY - RobiMetrics.shadowMargin : frame.maxY
+        return CGPoint(x: x, y: tabTop - RobiMetrics.tabHeight / 2)
+    }
+
     /// Points the pupils at the pointer, reaching full deflection 140 pt away.
     private func updatePupils() {
-        guard let panel, !model.reduceMotion else { return }
+        guard !model.reduceMotion, let face = faceCentre() else { return }
         let mouse = NSEvent.mouseLocation
-        let frame = panel.frame
-        let faceX = model.phase.isBar ? frame.minX + RobiMetrics.sideMargin + RobiMetrics.flare + 7 + 20 : frame.midX
-        let tabTop = model.placement == .above ? frame.maxY - RobiMetrics.shadowMargin : frame.maxY
-        let dx = mouse.x - faceX, dy = mouse.y - (tabTop - RobiMetrics.tabHeight / 2)
+        let dx = mouse.x - face.x, dy = mouse.y - face.y
         let distance = max(1, hypot(dx, dy))
         let reach = min(1, distance / 140)
         let next = CGSize(width: dx / distance * 2.6 * reach, height: -dy / distance * 2.2 * reach)
@@ -566,6 +581,50 @@ final class RobiController {
             self.circles.reset()
             self.dizzyTask = nil
         }
+    }
+
+    // MARK: Surprise
+
+    /// Sends the picked region flying from where it was drawn into the face, and startles the
+    /// face as it lands. Runs beside the capture and the morph into the prompt bar: nothing waits
+    /// for it, and a pick made while one is still in the air starts both over. Call after
+    /// `enterPrompt()`, so the face is where the bar puts it.
+    private func fly(_ region: CGRect, from target: RobiWindowTarget) {
+        guard let face = faceCentre() else { return }
+        let window = RobiScreenSpace.current.appKitRect(fromTopLeft: target.frame)
+        let path = RobiFlightPath(region: region, window: window, face: face, reduceMotion: model.reduceMotion)
+        let flight = flight ?? RobiFlight()
+        self.flight = flight
+        flight.show(path, above: panel)
+        surpriseTask?.cancel()
+        surpriseTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(path.landing))
+            guard !Task.isCancelled, let self else { return }
+            self.startle()
+            try? await Task.sleep(for: .seconds(RobiSurprise.duration))
+            guard !Task.isCancelled else { return }
+            self.eyes.surprised = nil
+            self.surpriseTask = nil
+        }
+    }
+
+    /// The piece hit the face. A spin still going ends here: both want the pupils and the mouth,
+    /// and being hit is the better reason to stop seeing stars.
+    private func startle() {
+        if dizzyTask != nil {
+            dizzyTask?.cancel()
+            dizzyTask = nil
+            circles.reset()
+            eyes.dizzy = nil
+        }
+        eyes.surprised = RobiSurprise(start: .now)
+    }
+
+    /// Ends the surprise, landed or still on its way.
+    private func calm() {
+        surpriseTask?.cancel()
+        surpriseTask = nil
+        eyes.surprised = nil
     }
 
     private func accessibilityOptionsChanged() {
@@ -664,14 +723,22 @@ final class RobiController {
         sheet.show(over: RobiScreenSpace.current.appKitRect(fromTopLeft: target.frame), below: panel)
     }
 
+    /// A region was dragged on the sheet. The prompt bar opens at once; the region flies into the
+    /// face meanwhile and is captured and read in the background.
     private func takeRegion(_ region: CGRect) {
         guard let target = tracker.target else { return }
         contextTask?.cancel()
-        sheet?.close()
-        guard CGPreflightScreenCaptureAccess() else { return showNotice(.screenRecordingNeeded) }
+        guard CGPreflightScreenCaptureAccess() else {
+            sheet?.close()
+            return showNotice(.screenRecordingNeeded)
+        }
         model.context = RobiContext(kind: .region, text: "")
         model.isReadingContext = true
         enterPrompt()
+        // The overlay goes up before the sheet comes down, so the dashed rectangle is never
+        // missing for a frame between the two.
+        fly(region, from: target)
+        sheet?.close()
         contextTask = Task { [weak self, capture] in
             let image = await capture.image(windowID: target.windowID, region: region)
             let lines = if let image { await capture.recognizeLines(image) } else { [RobiRecognizedLine]() }
@@ -1078,6 +1145,8 @@ final class RobiController {
         answerGeneration = nextGeneration()
         sheet?.close()
         spotlight?.hide()
+        flight?.hide()
+        calm()
         RobiWebAccessibility.restore(webChange)
         webChange = .none
         panel?.allowsKey = false
