@@ -55,7 +55,7 @@ nonisolated enum AppUninstallInspector {
     /// Other bundles on this Mac with `identifier`, besides `url`: copies that share the app's data.
     ///
     /// The Launcher keeps one copy per bundle identifier, so its list can't answer this. Spotlight finds
-    /// copies anywhere; the Applications folders are also read directly (two levels deep) in case Spotlight
+    /// copies anywhere; the Applications folders are also walked directly, at any depth, in case Spotlight
     /// is off. Copies in a Trash and bundles nested inside other bundles don't count.
     static func otherCopies(of identifier: String, excluding url: URL, home: URL) -> [URL] {
         var paths = Set<String>()
@@ -69,12 +69,13 @@ nonisolated enum AppUninstallInspector {
                 if let path = MDItemCopyAttribute(item, kMDItemPath) as? String { paths.insert(path) }
             }
         }
+        // Spotlight misses copies it hasn't indexed, so walk both Applications folders too. Bundles aren't
+        // entered, which keeps the walk to folders and the apps directly inside them.
         for root in [URL(fileURLWithPath: "/Applications"), home.appendingPathComponent("Applications")] {
-            let top = (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []
-            let candidates = top + top.filter { $0.pathExtension != "app" }.flatMap {
-                (try? FileManager.default.contentsOfDirectory(at: $0, includingPropertiesForKeys: nil)) ?? []
-            }
-            for candidate in candidates where candidate.pathExtension == "app" && Bundle(url: candidate)?.bundleIdentifier == identifier {
+            guard let walk = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil,
+                                                            options: [.skipsPackageDescendants, .skipsHiddenFiles]) else { continue }
+            for case let candidate as URL in walk
+            where candidate.pathExtension == "app" && Bundle(url: candidate)?.bundleIdentifier == identifier {
                 paths.insert(candidate.path)
             }
         }
