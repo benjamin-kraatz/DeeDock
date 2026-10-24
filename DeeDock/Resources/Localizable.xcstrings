@@ -5763,6 +5763,24 @@
         }
       }
     },
+    "robiToastSelectionChanged" : {
+      "comment" : "Brief message in Robi’s card when the person selected other text after asking, and the original text is gone, so nothing was replaced.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auswahl geändert, daher nichts ersetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection changed, so nothing was replaced"
+          }
+        }
+      }
+    },
     "robiToggle" : {
       "comment" : "Switch that turns Robi on.",
       "extractionState" : "manual",

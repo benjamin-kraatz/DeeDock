@@ -9,12 +9,38 @@ enum RobiAppActions {
         NSPasteboard.general.setString(text, forType: .string)
     }
 
-    /// Replaces the selection in place through Accessibility, the way the app's own text view
-    /// would. Works in native text views and in Electron text areas; the spike verified it
-    /// across processes.
-    static func replace(_ selection: RobiSelection, with text: String) -> Bool {
-        AXUIElementSetAttributeValue(selection.element, kAXSelectedTextAttribute as CFString, text as CFString) == .success
+    enum ReplaceResult {
+        case replaced
+        /// The person selected something else and the original text could not be found again.
+        case selectionChanged
+        case failed
     }
+
+    /// Replaces the selection Robi answered about, in place through Accessibility, the way the
+    /// app's own text view would. Works in native text views and in Electron text areas; the spike
+    /// verified it across processes.
+    ///
+    /// The person may have selected something else in the same field since asking. Robi then
+    /// selects the original range again, but only when it still holds exactly the original text,
+    /// and refuses otherwise, so an answer never overwrites text it was not about.
+    static func replace(_ selection: RobiSelection, with text: String) -> ReplaceResult {
+        let element = selection.element
+        let current = RobiAX.value(element, kAXSelectedTextAttribute) as? String
+        let currentRange = RobiAX.selectedRange(of: element)
+        let unchanged = current == selection.text
+            && (selection.range == nil || (currentRange.map { same($0, selection.range!) } ?? false))
+        if !unchanged {
+            guard var original = selection.range, RobiAX.string(of: element, in: original) == selection.text,
+                  let value = AXValueCreate(.cfRange, &original),
+                  AXUIElementSetAttributeValue(element, kAXSelectedTextRangeAttribute as CFString, value) == .success,
+                  (RobiAX.value(element, kAXSelectedTextAttribute) as? String) == selection.text
+            else { return .selectionChanged }
+        }
+        return AXUIElementSetAttributeValue(element, kAXSelectedTextAttribute as CFString, text as CFString) == .success
+            ? .replaced : .failed
+    }
+
+    private static func same(_ a: CFRange, _ b: CFRange) -> Bool { a.location == b.location && a.length == b.length }
 
     /// Pastes through the clipboard and ⌘V, for apps without writable Accessibility text such as
     /// terminals. The person's clipboard is restored a moment later, unless they copied something

@@ -523,9 +523,13 @@ final class RobiController {
 
     private func replaceSelection() {
         guard let selection else { return }
-        let replaced = RobiAppActions.replace(selection, with: model.answer)
-        flash(replaced ? .robiToastReplaced : .robiToastReplaceFailed)
-        guard replaced else { return }
+        let result = RobiAppActions.replace(selection, with: model.answer)
+        switch result {
+        case .replaced: flash(.robiToastReplaced)
+        case .selectionChanged: flash(.robiToastSelectionChanged)
+        case .failed: flash(.robiToastReplaceFailed)
+        }
+        guard result == .replaced else { return }
         Analytics.track(.robiActionTaken(.replace))
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in self?.dismiss() }
     }

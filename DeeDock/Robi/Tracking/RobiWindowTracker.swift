@@ -39,6 +39,9 @@ final class RobiWindowTracker {
     private var monitors: [Any] = []
     private let serverEvents = RobiWindowServerEvents()
     private var drag: RobiDragPrediction?
+    /// True once a drag since the last mouse-down moved the tab by prediction, so mouse-up
+    /// reconciles with the real frame even if the prediction was abandoned on the way.
+    private var predictedSinceMouseDown = false
     private var refreshPending = false
     private var running = false
 
@@ -270,6 +273,7 @@ final class RobiWindowTracker {
     private func pointer() -> CGPoint { RobiScreenSpace.current.topLeftPoint(fromAppKit: NSEvent.mouseLocation) }
 
     private func mouseDown() {
+        predictedSinceMouseDown = false
         guard let target, !target.isFullScreen else { drag = nil; return }
         drag = RobiDragPrediction(pointer: pointer(), frame: target.frame)
     }
@@ -278,18 +282,24 @@ final class RobiWindowTracker {
         guard var prediction = drag, let current = target else { return }
         let point = pointer()
         let predicted = prediction.frame(pointer: point, topLimit: RobiScreenSpace.current.topLimit(at: point))
-        if prediction.events == RobiDragPrediction.verificationEvents,
-           prediction.isStalled(actual: RobiWindowServer.bounds(of: current.windowID)) {
-            drag = nil
-            return
+        if prediction.events == RobiDragPrediction.verificationEvents {
+            let actual = RobiWindowServer.bounds(of: current.windowID)
+            if prediction.isStalled(actual: actual) {
+                // Not a window drag after all: put the tab back where the window really is.
+                drag = nil
+                frameChanged?(actual ?? current.frame)
+                return
+            }
         }
         drag = prediction
+        predictedSinceMouseDown = true
         frameChanged?(predicted)
     }
 
     private func mouseUp() {
-        guard drag != nil else { return }
+        guard drag != nil || predictedSinceMouseDown else { return }
         drag = nil
+        predictedSinceMouseDown = false
         // Reconcile with where the window server really put it (tiling can snap it elsewhere).
         if let current = target, let frame = RobiWindowServer.bounds(of: current.windowID) {
             var updated = current
@@ -320,6 +330,23 @@ nonisolated enum RobiAX {
     static func isSettable(_ element: AXUIElement, _ attribute: String) -> Bool {
         var settable: DarwinBoolean = false
         return AXUIElementIsAttributeSettable(element, attribute as CFString, &settable) == .success && settable.boolValue
+    }
+
+    /// The selected character range of a text element, if it reports one.
+    static func selectedRange(of element: AXUIElement) -> CFRange? {
+        guard let value = value(element, kAXSelectedTextRangeAttribute), CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
+        var range = CFRange()
+        return AXValueGetValue(value as! AXValue, .cfRange, &range) ? range : nil
+    }
+
+    /// The text of a character range of a text element.
+    static func string(of element: AXUIElement, in range: CFRange) -> String? {
+        var range = range
+        guard let parameter = AXValueCreate(.cfRange, &range) else { return nil }
+        var result: CFTypeRef?
+        guard AXUIElementCopyParameterizedAttributeValue(element, kAXStringForRangeParameterizedAttribute as CFString,
+                                                         parameter, &result) == .success else { return nil }
+        return result as? String
     }
 
     /// Position and size of an AX element in global top-left points.

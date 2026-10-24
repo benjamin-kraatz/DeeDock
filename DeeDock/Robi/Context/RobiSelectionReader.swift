@@ -6,6 +6,9 @@ struct RobiSelection {
     /// The focused element holding the selection. Replacing writes `kAXSelectedTextAttribute` here.
     let element: AXUIElement
     let isReplaceable: Bool
+    /// Where the selection was, in the element's characters. Replace checks it so an answer never
+    /// lands on text the person selected afterwards. Nil for web text-marker selections.
+    var range: CFRange?
 }
 
 /// Reads the current selection without touching the clipboard.
@@ -19,7 +22,8 @@ enum RobiSelectionReader {
         guard let focused = RobiAX.element(application, kAXFocusedUIElementAttribute) else { return nil }
         if let text = RobiAX.value(focused, kAXSelectedTextAttribute) as? String, Self.hasContent(text) {
             return RobiSelection(text: text, element: focused,
-                                 isReplaceable: RobiAX.isSettable(focused, kAXSelectedTextAttribute))
+                                 isReplaceable: RobiAX.isSettable(focused, kAXSelectedTextAttribute),
+                                 range: RobiAX.selectedRange(of: focused))
         }
         // WebKit and Chromium report a selection in web content through text markers.
         if let range = RobiAX.value(focused, "AXSelectedTextMarkerRange") {
