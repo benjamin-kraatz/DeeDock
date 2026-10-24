@@ -39,6 +39,17 @@ enum RobiPreviewData {
     /// Suggested questions as the on-device model might phrase them; the last one is too wide
     /// for the row and lands in the More menu.
     static let questions = ["Is this too casual for a client?", "Add a friendly sign-off", "Turn this into a short Slack message"]
+    /// A mail window read with its landmarks, for answers that point at things in it.
+    static let windowWithLandmarks = RobiContext(
+        kind: .window, text: "Inbox\nSend\nMeeting moved to 3 pm on Thursday", landmarks: [
+            RobiLandmark(id: 1, kind: .heading, label: "Inbox", frame: CGRect(x: 16, y: 12, width: 60, height: 22)),
+            RobiLandmark(id: 2, kind: .button, label: "Send", frame: CGRect(x: 640, y: 12, width: 56, height: 24)),
+            RobiLandmark(id: 3, kind: .text, label: "Meeting moved to 3 pm on Thursday", frame: CGRect(x: 16, y: 96, width: 260, height: 18)),
+        ], windowSize: CGSize(width: 720, height: 480))
+    static let referencedAnswer = """
+    The thread says the [meeting moved to 3 pm on Thursday](#3). To confirm, reply and press \
+    [Send](#2) at the top right.
+    """
     static let region = RobiContext(kind: .region, text: "error: main actor-isolated property 'items' can not be referenced from a nonisolated context")
     static let longAnswer = """
     LibraryStore.items is isolated to the main actor, but sync() is nonisolated, so line 42 reads \
@@ -103,6 +114,15 @@ private struct RobiPreviewStage: View {
 #Preview("Answered, long, scrolls") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,
         answer: RobiPreviewData.longAnswer, model: .claude))
+}
+#Preview("Answered with references to the window, dark") {
+    RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.windowWithLandmarks,
+        answer: RobiPreviewData.referencedAnswer, model: .claude))
+}
+#Preview("Prompting on a window, picture attached") {
+    let model = RobiPreviewData.model(.prompting, dark: true, context: RobiPreviewData.window)
+    let _ = model.attachesWindowPicture = true
+    RobiPreviewStage(model: model)
 }
 #Preview("Proposed command, dark") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,

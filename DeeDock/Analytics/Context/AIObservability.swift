@@ -1,6 +1,7 @@
 import Foundation
 
-/// Manual AI Observability capture for Apple Foundation Models, which has no supported SDK wrapper.
+/// Manual AI Observability capture for Foundation Models sessions, which have no supported SDK
+/// wrapper: Apple's on-device model, and Claude through the same `LanguageModelSession` API in Robi.
 ///
 /// Calls stay anonymous because DeeDock has no authenticated account identity. One process owns one
 /// AI session; callers create one trace for each user-triggered generation workflow and reuse it for
@@ -17,21 +18,48 @@ nonisolated enum AIObservability {
 
     static func makeTrace() -> Trace { Trace() }
 
+    /// Token counts a model reported for one generation.
+    nonisolated struct Usage: Sendable {
+        let input: Int
+        let output: Int
+    }
+
+    /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
+    /// another model passes its own `model` and `provider`. Credentials are never part of a
+    /// generation: callers pass only the prompt, the instructions and the answer.
+    ///
+    /// - Parameters:
+    ///   - instructions: The session's instructions, sent as a system message before `input`.
+    ///   - usage: Token counts, when the model reports them.
+    ///   - error: A message safe to show the person, for a generation that failed.
     static func capture(trace: Trace, name: String, input: String, output: String? = nil,
-                        startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false) async {
+                        startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
+                        model: String = "apple_foundation_models", provider: String = "apple",
+                        instructions: String? = nil, usage: Usage? = nil, error: String? = nil) async {
         var properties: [String: Any] = [
             "$ai_trace_id": trace.id,
             "$ai_session_id": sessionID,
             "$ai_span_id": UUID().uuidString,
             "$ai_span_name": name,
-            "$ai_model": "apple_foundation_models",
-            "$ai_provider": "apple",
+            "$ai_model": model,
+            "$ai_provider": provider,
             "$ai_latency": max(0, Date().timeIntervalSince(startedAt)),
             "$ai_stream": stream,
         ]
         if let maximumResponseTokens { properties["$ai_max_tokens"] = maximumResponseTokens }
+        if let usage {
+            properties["$ai_input_tokens"] = usage.input
+            properties["$ai_output_tokens"] = usage.output
+        }
+        if let error {
+            properties["$ai_is_error"] = true
+            properties["$ai_error"] = error
+        }
         if capturesContent {
-            properties["$ai_input"] = [["role": "user", "content": input]]
+            var messages: [[String: String]] = []
+            if let instructions { messages.append(["role": "system", "content": instructions]) }
+            messages.append(["role": "user", "content": input])
+            properties["$ai_input"] = messages
             if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": output]] }
         }
         await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))

@@ -27,6 +27,10 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
     /// After the person picks context, Apple's on-device model suggests a few questions about it.
     /// Always on this Mac, whichever model answers.
     var suggestQuestions = true
+    /// A picture of the whole window goes with every question about it, beside its text. Off,
+    /// Robi takes the picture only when the window has too little accessibility text to read.
+    /// Switched from the prompt bar; needs Screen Recording.
+    var attachWindowPicture = false
     /// The global Option-Shift-Command-R shortcut that wakes Robi on the focused window.
     var shortcutEnabled = true
     /// Apps whose windows never get Robi, by bundle identifier.
@@ -40,7 +44,7 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case isEnabled, answerModel, claudeEffort, shortcutEnabled, excludedBundleIdentifiers, tabPositions
-        case suggestQuestions
+        case suggestQuestions, attachWindowPicture
     }
 
     /// Every field falls back to its default, so a document written by an older or newer build
@@ -51,6 +55,7 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
         answerModel = (try? values.decodeIfPresent(RobiAnswerModel.self, forKey: .answerModel)) ?? .onDevice
         claudeEffort = (try? values.decodeIfPresent(RobiClaudeEffort.self, forKey: .claudeEffort)) ?? .medium
         suggestQuestions = (try? values.decodeIfPresent(Bool.self, forKey: .suggestQuestions)) ?? true
+        attachWindowPicture = (try? values.decodeIfPresent(Bool.self, forKey: .attachWindowPicture)) ?? false
         shortcutEnabled = (try? values.decodeIfPresent(Bool.self, forKey: .shortcutEnabled)) ?? true
         excludedBundleIdentifiers = (try? values.decodeIfPresent([String].self, forKey: .excludedBundleIdentifiers)) ?? []
         tabPositions = (try? values.decodeIfPresent([String: Double].self, forKey: .tabPositions)) ?? [:]

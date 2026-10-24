@@ -50,11 +50,20 @@ actor RobiCapture {
     }
 
     func recognizeText(_ image: CGImage) async -> String {
+        await recognizeLines(image).map(\.text).joined(separator: "\n")
+    }
+
+    /// The lines of text in a picture, in Vision's reading order, each with its normalized box.
+    func recognizeLines(_ image: CGImage) async -> [RobiRecognizedLine] {
         var request = RecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.automaticallyDetectsLanguage = true
-        guard let observations = try? await request.perform(on: image) else { return "" }
-        return observations.map(\.transcript).joined(separator: "\n")
+        guard let observations = try? await request.perform(on: image) else { return [] }
+        return observations.map { observation in
+            let box = observation.boundingBox
+            return RobiRecognizedLine(text: observation.transcript,
+                                      box: CGRect(origin: box.origin, size: CGSize(width: box.width, height: box.height)))
+        }
     }
 
     /// The first recognition in a process loads Vision's models, which took 13–27 s in the spike;

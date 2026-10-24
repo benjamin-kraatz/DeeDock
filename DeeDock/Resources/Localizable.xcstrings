@@ -776,19 +776,19 @@
       }
     },
     "analyticsIntelligenceNote" : {
-      "comment" : "Caveat under the two lists in the Privacy card and the tour: Apple Intelligence features are an exception to the 'Stays on this Mac' list.",
+      "comment" : "Caveat under the two lists in the Privacy card and the tour: AI features, Robi and Apple Intelligence ones, are an exception to the 'Stays on this Mac' list.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausnahme: Wenn du eine Apple-Intelligence-Funktion nutzt, werden Anfrage und Antwort vollständig geteilt. Sie können App-Namen, Fenstertitel und kopierten Text enthalten."
+            "value" : "Ausnahme: Wenn du eine KI-Funktion nutzt, etwa Robi oder eine Apple-Intelligence-Funktion, werden Anfrage und Antwort vollständig geteilt. Sie können App-Namen, Fenstertitel, kopierten Text und das enthalten, was du Robi gibst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exception: when you use an Apple Intelligence feature, its request and its answer are shared in full. They can contain app names, window titles, and text you copied."
+            "value" : "Exception: when you use an AI feature, such as Robi or an Apple Intelligence feature, its request and its answer are shared in full. They can contain app names, window titles, text you copied, and what you hand to Robi."
           }
         }
       }
@@ -4574,13 +4574,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Antworten kommen von Claude Sonnet 5.5 mit deinem Anthropic-API-Schlüssel und werden deinem Anthropic-Konto berechnet. Deine Frage und ihr Kontext gehen direkt von diesem Mac an Anthropic; DOKK sieht und speichert sie nicht."
+            "value" : "Antworten kommen von Claude Sonnet 5.5 mit deinem Anthropic-API-Schlüssel und werden deinem Anthropic-Konto berechnet. Deine Frage und ihr Kontext gehen direkt von diesem Mac an Anthropic, und dein Schlüssel geht nirgendwo anders hin."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Answers come from Claude Sonnet 5.5 with your Anthropic API key, billed to your Anthropic account. Your question and its context go from this Mac straight to Anthropic; DOKK neither sees nor keeps them."
+            "value" : "Answers come from Claude Sonnet 5.5 with your Anthropic API key, billed to your Anthropic account. Your question and its context go from this Mac straight to Anthropic, and your key goes nowhere else."
           }
         }
       }
@@ -5012,13 +5012,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence · bleibt auf diesem Mac"
+            "value" : "Apple Intelligence · auf diesem Mac beantwortet"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence · stays on this Mac"
+            "value" : "Apple Intelligence · answered on this Mac"
           }
         }
       }
@@ -5282,13 +5282,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Antworten kommen vom geräteinternen Modell von Apple. Was du auswählst, bleibt auf diesem Mac."
+            "value" : "Antworten kommen vom geräteinternen Modell von Apple, direkt auf diesem Mac."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Answers come from Apple’s on-device model. What you pick stays on this Mac."
+            "value" : "Answers come from Apple’s on-device model, right on this Mac."
           }
         }
       }
@@ -5419,6 +5419,132 @@
         }
       }
     },
+    "robiPictureToggleHelpOff" : {
+      "comment" : "Tooltip of Robi’s Attach Picture switch when it is off. Explains that a picture is still added when the window has too little text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hängt jeder Frage ein Bild des Fensters an. Ohne das fügt Robi nur dann eins hinzu, wenn das Fenster zu wenig lesbaren Text hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attach a picture of the window to every question. Without it, Robi adds one only when the window has too little text to read."
+          }
+        }
+      }
+    },
+    "robiPictureToggleHelpOn" : {
+      "comment" : "Tooltip of Robi’s Attach Picture switch when it is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Bild des Fensters geht mit deiner Frage mit, neben seinem Text."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A picture of the window goes with your question, next to its text."
+          }
+        }
+      }
+    },
+    "robiPictureToggleLabel" : {
+      "comment" : "Accessibility label of the switch at the end of Robi’s prompt bar that attaches a picture of the whole window to questions about it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild anhängen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attach picture"
+          }
+        }
+      }
+    },
+    "robiPictureToggleNeedsAccess" : {
+      "comment" : "Tooltip of Robi’s Attach Picture switch when Screen Recording is off, so the switch is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für ein Bild braucht Robi die Bildschirmaufnahme. Du kannst sie in Robis Einstellungen einschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attaching a picture needs Screen Recording. You can turn it on in Robi’s settings."
+          }
+        }
+      }
+    },
+    "robiPictureToggleOff" : {
+      "comment" : "Accessibility value of Robi’s Attach Picture switch when it is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "robiPictureToggleOn" : {
+      "comment" : "Accessibility value of Robi’s Attach Picture switch when it is on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
+          }
+        }
+      }
+    },
+    "robiPointAnnouncement" : {
+      "comment" : "VoiceOver announcement when Robi highlights part of the window that its answer referred to. The placeholder is that part’s text as the app reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ wird im Fenster gezeigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Showing “%@” in the window"
+          }
+        }
+      }
+    },
     "robiPrivacyNote" : {
       "comment" : "Transparency note in Robi’s settings card. Plain and calm, not a warning.",
       "extractionState" : "manual",
@@ -5426,13 +5552,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Robi liest ein Fenster nur, wenn du darauf klickst oder den Kurzbefehl drückst, und behält danach nichts. Was Robi liest oder antwortet, ist nie Teil der Nutzungsstatistik von DOKK."
+            "value" : "Robi liest ein Fenster nur, wenn du darauf klickst oder den Kurzbefehl drückst, und behält danach nichts. Wenn du Nutzungsstatistiken teilst, werden Robis Anfragen und Antworten vollständig geteilt, wie bei den anderen KI-Funktionen von DOKK."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Robi reads a window only when you click it or press the shortcut, and keeps nothing afterwards. What Robi reads or answers is never part of DOKK’s usage statistics."
+            "value" : "Robi reads a window only when you click it or press the shortcut, and keeps nothing afterwards. If you share usage statistics, Robi’s requests and answers are shared in full, like those of DOKK’s other AI features."
           }
         }
       }
@@ -5469,6 +5595,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ask about this…"
+          }
+        }
+      }
+    },
+    "robiReferenceHelp" : {
+      "comment" : "Tooltip over Robi’s answer when it contains underlined phrases that point at parts of the window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke auf eine unterstrichene Stelle, um zu sehen, wo sie im Fenster ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click an underlined phrase to see where it is in the window."
           }
         }
       }
@@ -6135,6 +6279,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "robiToastPointGone" : {
+      "comment" : "Brief note in Robi’s card when the part of the window an answer pointed at is no longer inside the window, for example after a resize.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht mehr im Fenster"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No longer in the window"
           }
         }
       }

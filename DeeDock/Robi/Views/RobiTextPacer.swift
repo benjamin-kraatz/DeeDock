@@ -9,8 +9,8 @@ import SwiftUI
 /// fifth of a second of text in reserve so a gap between bursts is covered by text already
 /// received. The newest words fade in over a quarter second instead of popping in.
 ///
-/// This is presentation only. Copy, Replace and Paste read `RobiModel.answer`, which always holds
-/// the full text. With Reduce Motion the pacer shows the target as it arrives, without fading.
+/// This is presentation only. Copy, Replace and Paste read `RobiModel.answerText`, which always
+/// holds the full text. With Reduce Motion the pacer shows the target as it arrives, without fading.
 ///
 /// One pacer belongs to one answer card. It owns a single tick task, which runs while text is
 /// waiting or still fading and ends when it catches up; `pause()` cancels it when the answer

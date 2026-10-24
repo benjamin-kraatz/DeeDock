@@ -34,6 +34,10 @@ final class RobiController {
     @ObservationIgnored private let shortcut = RobiShortcut()
     @ObservationIgnored private var panel: RobiPanel?
     @ObservationIgnored private var sheet: RobiSelectionSheet?
+    /// Rings a landmark the answer referred to; made the first time a reference is clicked.
+    @ObservationIgnored private var spotlight: RobiSpotlight?
+    /// Groups one interaction's model calls in LLM analytics: its suggested questions and answers.
+    @ObservationIgnored private var trace = AIObservability.makeTrace()
     @ObservationIgnored private var panelSize = CGSize.zero
     @ObservationIgnored private var tokens: [NSObjectProtocol] = []
     @ObservationIgnored private var pointerMonitors: [Any] = []
@@ -122,6 +126,7 @@ final class RobiController {
         let settings = store.settings
         model.answerModel = settings.answerModel
         model.claudeEffort = settings.claudeEffort
+        model.attachesWindowPicture = settings.attachWindowPicture
         tracker.excludedBundleIdentifiers = Set(settings.excludedBundleIdentifiers)
         // Reset Tab Positions empties the saved ones; this session's per-window ones go with them.
         if settings.tabPositions.isEmpty, !windowPositions.isEmpty {
@@ -186,6 +191,8 @@ final class RobiController {
         actions.replace = { [weak self] in self?.replaceSelection() }
         actions.paste = { [weak self] in self?.pasteAnswer() }
         actions.runProposal = { [weak self] in self?.runProposal() }
+        actions.point = { [weak self] landmark in self?.point(at: landmark) }
+        actions.toggleWindowPicture = { [weak self] in self?.toggleWindowPicture() }
         actions.saveClaudeKey = { [weak self] key in self?.saveClaudeKey(key) }
         actions.answerOnDevice = { [weak self] in self?.answerPendingOnDevice() }
         actions.openSettings = { [weak self] in self?.openSettings() }
@@ -256,6 +263,7 @@ final class RobiController {
                                           stretch: drag?.stretch ?? settleStretch)
         if panel.frame != frame { panel.setFrame(frame, display: true) }
         sheet?.move(over: window)
+        spotlight?.move(over: window)
     }
 
     private func setPhase(_ phase: RobiPhase) {
@@ -618,6 +626,7 @@ final class RobiController {
     private func begin(_ trigger: AnalyticsTrigger, wholeWindow: Bool = false) {
         guard let target = tracker.target else { return }
         self.trigger = trigger
+        trace = AIObservability.makeTrace()
         isPickingAgain = false
         tracker.isPinned = true
         didUse()
@@ -665,15 +674,17 @@ final class RobiController {
         enterPrompt()
         contextTask = Task { [weak self, capture] in
             let image = await capture.image(windowID: target.windowID, region: region)
-            let text = if let image { await capture.recognizeText(image) } else { "" }
+            let lines = if let image { await capture.recognizeLines(image) } else { [RobiRecognizedLine]() }
             guard !Task.isCancelled, let self else { return }
-            self.model.context = RobiContext(kind: .region, text: text, image: image)
+            // The region is in window-local points, so its lines are too, like the window's landmarks.
+            self.model.context = RobiContext(kind: .region, text: lines.map(\.text).joined(separator: "\n"), image: image,
+                                             landmarks: RobiLandmark.recognized(lines, in: region), windowSize: target.frame.size)
             self.model.isReadingContext = false
             self.suggestQuestions()
         }
     }
 
-    /// The window's accessibility text when it has some, otherwise its picture and the text in it.
+    /// The whole window as context: its accessibility text and landmarks, then its picture.
     private func takeWindow() {
         guard let target = tracker.target else { return }
         contextTask?.cancel()
@@ -681,20 +692,70 @@ final class RobiController {
         model.context = RobiContext(kind: .window, text: "")
         model.isReadingContext = true
         enterPrompt()
+        readWindow(target)
+    }
+
+    /// Reads the window's accessibility text and landmarks. A picture goes with them when Attach
+    /// Picture is on, and as a fallback when the text is too thin to answer from (under 200
+    /// characters); then the text Vision recognizes in the picture replaces the accessibility
+    /// text if it found more, and its lines become the landmarks.
+    private func readWindow(_ target: RobiWindowTarget) {
         let canCapture = CGPreflightScreenCaptureAccess()
+        let attach = store.settings.attachWindowPicture
+        model.canAttachPicture = canCapture
         contextTask = Task { [weak self, capture] in
-            var text = await RobiWindowText.read(processIdentifier: target.processIdentifier)
+            let reading = await RobiWindowText.read(processIdentifier: target.processIdentifier)
+            var text = reading.text, landmarks = reading.landmarks
+            let isThin = text.count < 200
             var image: CGImage?
-            if text.count < 200, canCapture, let picture = await capture.image(windowID: target.windowID) {
+            if isThin || attach, canCapture, let picture = await capture.image(windowID: target.windowID) {
                 image = picture
-                let recognized = await capture.recognizeText(picture)
-                if recognized.count > text.count { text = recognized }
+                if isThin {
+                    let lines = await capture.recognizeLines(picture)
+                    let recognized = lines.map(\.text).joined(separator: "\n")
+                    if recognized.count > text.count {
+                        text = recognized
+                        landmarks = RobiLandmark.recognized(lines, in: CGRect(origin: .zero, size: target.frame.size))
+                    }
+                }
             }
             guard !Task.isCancelled, let self else { return }
-            self.model.context = RobiContext(kind: .window, text: text, image: image)
+            self.model.context = RobiContext(kind: .window, text: text, image: image, landmarks: landmarks,
+                                             windowSize: target.frame.size, pictureIsFallback: isThin && image != nil)
             self.model.isReadingContext = false
             self.suggestQuestions()
             if text.isEmpty, image == nil, !canCapture { self.showNotice(.screenRecordingNeeded) }
+        }
+    }
+
+    /// Flips Attach Picture from the prompt bar and applies it to the window already read: on
+    /// takes the picture now, off drops one taken only because the switch was on. A fallback
+    /// picture stays, since without it Robi would have almost nothing to read. An answer asked
+    /// meanwhile waits for the picture, through `contextTask`.
+    private func toggleWindowPicture() {
+        store.settings.attachWindowPicture.toggle()
+        let attach = store.settings.attachWindowPicture
+        model.attachesWindowPicture = attach
+        guard model.phase == .prompting, let target = tracker.target, let context = model.context, context.kind == .window else { return }
+        if model.isReadingContext {
+            // The read in progress decided before the switch flipped; read again with the new choice.
+            contextTask?.cancel()
+            return readWindow(target)
+        }
+        if attach, context.image == nil {
+            guard CGPreflightScreenCaptureAccess() else {
+                model.canAttachPicture = false
+                return
+            }
+            model.isReadingContext = true
+            contextTask = Task { [weak self, capture] in
+                let picture = await capture.image(windowID: target.windowID)
+                guard !Task.isCancelled, let self else { return }
+                self.model.context?.image = picture
+                self.model.isReadingContext = false
+            }
+        } else if !attach, context.image != nil, !context.pictureIsFallback {
+            model.context?.image = nil
         }
     }
 
@@ -732,9 +793,11 @@ final class RobiController {
         guard model.suggestsQuestions, model.phase == .prompting, let context = model.context,
               !context.text.isEmpty else { return }
         let applicationName = model.applicationName
+        let trace = trace
         let builtIns = RobiIntent.actions(canReplace: model.canReplace).map { String(localized: $0.title) }
         suggestTask = Task { [weak self] in
-            let questions = await RobiSuggester.questions(about: context, applicationName: applicationName, excluding: builtIns)
+            let questions = await RobiSuggester.questions(about: context, applicationName: applicationName,
+                                                          excluding: builtIns, trace: trace)
             guard !Task.isCancelled, let self, self.model.phase == .prompting, !questions.isEmpty else { return }
             self.model.generatedSuggestions = questions
         }
@@ -754,6 +817,7 @@ final class RobiController {
         cancelSuggestions()
         // One answer at a time: a new question drops the one waiting on another window.
         dropParked()
+        spotlight?.hide()
         model.request = text
         model.answer = ""
         model.proposal = nil
@@ -786,13 +850,14 @@ final class RobiController {
         answerGeneration = nextGeneration()
         let generation = answerGeneration
         answering = (intent, started)
+        let trace = trace
         answerTask = Task { [weak self, agent, contextTask, menuTask] in
             await contextTask?.value
             let commands = acts ? await menuTask?.value ?? [] : []
             // Read through the generation: the answer may have been set aside while it waited.
             guard !Task.isCancelled, let self, let exchange = self.exchange(generation) else { return }
             let request = RobiAgent.Request(intent: intent, text: text, context: exchange.context,
-                                            applicationName: target.applicationName, menuCommands: commands)
+                                            applicationName: target.applicationName, menuCommands: commands, trace: trace)
             var failure: Error?
             do {
                 try await agent.answer(request, model: agentModel,
@@ -918,14 +983,14 @@ final class RobiController {
     // MARK: Putting the answer back
 
     private func copyAnswer() {
-        RobiAppActions.copy(model.answer)
+        RobiAppActions.copy(model.answerText)
         flash(.robiToastCopied)
         Analytics.track(.robiActionTaken(.copy))
     }
 
     private func replaceSelection() {
         guard let selection else { return }
-        let result = RobiAppActions.replace(selection, with: model.answer)
+        let result = RobiAppActions.replace(selection, with: model.answerText)
         switch result {
         case .replaced: flash(.robiToastReplaced)
         case .selectionChanged: flash(.robiToastSelectionChanged)
@@ -938,7 +1003,7 @@ final class RobiController {
 
     private func pasteAnswer() {
         guard let target = tracker.target else { return }
-        let text = model.answer
+        let text = model.answerText
         dismiss()
         Analytics.track(.robiActionTaken(.paste))
         // Give the app its key window back before ⌘V arrives.
@@ -954,6 +1019,28 @@ final class RobiController {
         guard pressed else { return }
         Analytics.track(.robiActionTaken(.runCommand))
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.dismiss() }
+    }
+
+    /// Spotlights a landmark the answer referred to on the window it was read from, which is the
+    /// pinned window while the card shows. Landmarks keep their place relative to the window's
+    /// top-left corner; one that no longer falls inside the window, after a resize, says so.
+    private func point(at id: Int) {
+        guard model.phase.showsCard, let landmark = model.context?.landmark(id), let target = tracker.target else { return }
+        let space = RobiScreenSpace.current
+        let window = space.appKitRect(fromTopLeft: target.frame)
+        let visible = landmark.frame.intersection(CGRect(origin: .zero, size: target.frame.size))
+        guard !visible.isNull, visible.width >= 2, visible.height >= 2 else { return flash(.robiToastPointGone) }
+        let spotlight = spotlight ?? RobiSpotlight()
+        self.spotlight = spotlight
+        spotlight.show(visible, over: window, below: panel, reduceMotion: model.reduceMotion,
+                       reduceTransparency: model.reduceTransparency)
+        if let panel {
+            NSAccessibility.post(element: panel, notification: .announcementRequested, userInfo: [
+                .announcement: String(localized: .robiPointAnnouncement(String(landmark.label.prefix(80)))),
+                .priority: NSAccessibilityPriorityLevel.high.rawValue,
+            ])
+        }
+        Analytics.track(.robiActionTaken(.point))
     }
 
     private func flash(_ toast: LocalizedStringResource) {
@@ -990,6 +1077,7 @@ final class RobiController {
         answering = nil
         answerGeneration = nextGeneration()
         sheet?.close()
+        spotlight?.hide()
         RobiWebAccessibility.restore(webChange)
         webChange = .none
         panel?.allowsKey = false

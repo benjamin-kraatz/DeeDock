@@ -78,8 +78,24 @@ final class RobiModel {
     var suggestsQuestions = false
     var answerModel: RobiAnswerModel = .onDevice
     var claudeEffort: RobiClaudeEffort = .medium
+    /// The Attach Picture switch in the prompt bar, mirrored from `RobiSettings`.
+    var attachesWindowPicture = false
+    /// Screen Recording allows a picture of the window, checked when the window is read.
+    var canAttachPicture = true
     var reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
     var reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
+
+    /// The answer with its links to landmarks taken out and kept as references. While the
+    /// answer streams, a link that has not fully arrived is held back.
+    var referencedAnswer: RobiReferencedAnswer {
+        RobiReferencedAnswer(answer, landmarks: Set(context?.landmarks.map(\.id) ?? []),
+                             isFinished: phase == .answered || isStopped)
+    }
+
+    /// The answer as Copy, Replace and Paste put it into the app: references are plain words.
+    var answerText: String {
+        RobiReferencedAnswer(answer, landmarks: [], isFinished: true).text
+    }
 
     /// Text and controls on the tab: light on dark title bars, dark on light ones.
     var ink: Color { tintIsDark ? .white : Color(red: 0.13, green: 0.12, blue: 0.17) }
@@ -190,6 +206,10 @@ struct RobiActions {
     var replace: () -> Void = {}
     var paste: () -> Void = {}
     var runProposal: () -> Void = {}
+    /// Spotlights a landmark the answer referred to, by its number.
+    var point: (Int) -> Void = { _ in }
+    /// Flips Attach Picture for questions about the whole window.
+    var toggleWindowPicture: () -> Void = {}
     /// Stops the answer being generated and keeps what has arrived.
     var stop: () -> Void = {}
     var saveClaudeKey: (String) -> Void = { _ in }

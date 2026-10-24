@@ -70,4 +70,6 @@ nonisolated enum AnalyticsRobiOutcome: String, AnalyticsToken {
 nonisolated enum AnalyticsRobiAction: String, AnalyticsToken {
     case copy, replace, paste
     case runCommand = "run_command"
+    /// Clicked a reference in the answer, which spotlights it on the window.
+    case point
 }
