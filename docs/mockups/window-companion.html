@@ -1,0 +1,849 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Window companion · mockup</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 20px 28px;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de);background:var(--background,#131316)}
+h1{font-size:17px;margin:0 0 6px;font-weight:650}
+h1 span{font-weight:400;color:var(--muted-foreground,#9a9ca6);font-size:13px;margin-left:6px}
+p.lede{margin:0 0 10px;color:var(--muted-foreground,#9a9ca6);line-height:1.5;max-width:1040px}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.btn.tog.on,.btn.play.on{background:#0a84ff;color:#fff}
+.ctl input{font:inherit;font-size:12px;background:#ffffff10;border:0;border-radius:6px;padding:4px 8px;color:inherit;width:150px;outline:none;box-shadow:0 0 0 1px #ffffff1a}
+.ctl input:focus{box-shadow:0 0 0 2px #0a84ff}
+.viewport{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14}
+.readout{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;color:var(--muted-foreground,#9a9ca6);font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+.readout b{color:var(--foreground,#e6e7ea);font-weight:500}
+.readout i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;box-shadow:0 0 0 1px #ffffff30}
+details.notes{margin-top:12px;color:var(--muted-foreground,#9a9ca6);max-width:1040px;line-height:1.5}
+details.notes summary{cursor:pointer;color:var(--foreground,#d8d9de)}
+details.notes li{margin:3px 0}
+details.notes b{color:var(--foreground,#e6e7ea)}
+details.notes code{font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--foreground,#d8d9de)}
+
+/* ───────── stage ───────── */
+.stage{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0;overflow:hidden;cursor:default;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;
+ background:radial-gradient(1200px 700px at 15% 0%,#ece7fb 0%,transparent 60%),linear-gradient(135deg,#ddd5f5 0%,#c9bfea 48%,#b4a8de 100%)}
+.menubar{position:absolute;left:0;right:0;top:0;height:24px;display:flex;align-items:center;gap:18px;padding:0 14px;font-size:13px;color:#1d1a2a;
+ background:rgba(255,255,255,.28);backdrop-filter:blur(20px);z-index:900}
+.menubar b{font-weight:700}
+.menubar .right{margin-left:auto;font-variant-numeric:tabular-nums}
+.menubar .apple{font-size:15px;margin-right:-4px}
+
+.win{position:absolute;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(40,24,90,.32),0 2px 8px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.35)}
+.win.focused{box-shadow:0 30px 80px rgba(40,24,90,.42),0 4px 12px rgba(0,0,0,.22),0 0 0 .5px rgba(0,0,0,.4)}
+.titlebar{position:relative;display:flex;align-items:center;cursor:default}
+.lights{display:flex;gap:8px;padding:0 14px;position:relative;z-index:2}
+.lights i{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.18)}
+.win:not(.focused) .lights i{background:#c9c9cc !important}
+.win.dark:not(.focused) .lights i{background:#555a62 !important}
+.lights .r{background:#ff5f57}.lights .y{background:#febc2e}.lights .g{background:#28c840;cursor:pointer}
+.ttl{position:absolute;left:0;right:0;text-align:center;font-size:13px;font-weight:600;pointer-events:none}
+.content{position:absolute;left:0;right:0;bottom:0;overflow:hidden}
+.sel{user-select:text;-webkit-user-select:text;cursor:text}
+.sel::selection,.sel *::selection{background:rgba(10,132,255,.32)}
+.flash{background:rgba(52,199,89,.28);border-radius:4px;transition:background 1.4s ease}
+
+/* Petal Studio (light, from the Figma) */
+#w-petal .titlebar{height:52px;background:#ffffff;border-bottom:1px solid #ecebe8}
+#w-petal .ttl{color:#7b7787;font-weight:600}
+#w-petal .content{top:52px;background:#f9f8f6;display:flex;color:#2a2638}
+#w-petal .side{width:178px;background:#f3f1ee;border-right:1px solid #ecebe8;padding:22px 12px;font-size:13px}
+#w-petal .side .lab{font-size:10.5px;letter-spacing:.12em;color:#9a96a3;font-weight:600;margin:0 8px 12px}
+#w-petal .side .it{padding:9px 12px;border-radius:10px;margin-bottom:4px;color:#4a4658}
+#w-petal .side .it.on{background:#e7e3f7;color:#231f33;font-weight:600}
+#w-petal .main{flex:1;padding:22px 28px;overflow:hidden}
+#w-petal .date{font-size:10.5px;letter-spacing:.12em;color:#9a96a3;font-weight:600}
+#w-petal h2{margin:6px 0 14px;font-size:25px;letter-spacing:-.02em;font-weight:650}
+#w-petal .hero{border-radius:16px;padding:16px 18px;background:linear-gradient(110deg,#f1dcef,#e4def7 55%,#efe4dc);margin-bottom:16px}
+#w-petal .hero small{color:#7b7787}
+#w-petal .hero div{font-size:19px;font-weight:650;letter-spacing:-.02em;margin-top:2px}
+#w-petal .cards{display:flex;gap:12px}
+#w-petal .card{flex:1;border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.45;border:1px solid rgba(0,0,0,.06)}
+#w-petal .card h4{margin:0 0 4px;font-size:14px}
+#w-petal .card.c1{background:#e8e7f6}#w-petal .card.c2{background:#f4ecd7}#w-petal .card.c3{background:#f3dfe3}
+#w-petal .card.new{background:#fff;border:1px dashed #b9b2d6;animation:pop .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+
+/* Ghostty running Claude Code (dark) */
+#w-ghostty .titlebar{height:32px;background:#363a42}
+#w-ghostty .ttl{color:#c6cad2;font-weight:500;font-size:12.5px}
+#w-ghostty .content{top:32px;background:#2b2f36;color:#d7dae0;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;padding:12px 16px;white-space:pre}
+#w-ghostty .dim{color:#7f8691}.gr{color:#98c379}.or{color:#e5a06b}.rd{color:#ef6b73}.bl{color:#7fb4ff}.vi{color:#c7a3ff}
+#w-ghostty .cursor{display:inline-block;width:7px;height:14px;background:#d7dae0;vertical-align:-2px;animation:blinkc 1s steps(1) infinite}
+@keyframes blinkc{50%{opacity:0}}
+
+/* Helium (Chromium) */
+#w-helium .titlebar{height:40px;background:#222a3e}
+#w-helium .tabs{position:absolute;left:84px;top:6px;display:flex;gap:2px}
+#w-helium .tab{height:34px;border-radius:10px 10px 0 0;padding:8px 14px;font-size:12px;color:#aab3c9;width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#w-helium .tab.on{background:#3e455a;color:#eef1f8}
+#w-helium .addr{position:absolute;left:0;right:0;top:40px;height:38px;background:#3e455a;display:flex;align-items:center;padding:0 14px}
+#w-helium .addr span{flex:1;height:26px;border-radius:13px;background:#2a3044;color:#b9c1d6;font-size:12px;display:flex;align-items:center;padding:0 12px}
+#w-helium .content{top:78px;background:#171b27;color:#dfe3ee;padding:26px 44px;font-size:14px;line-height:1.6}
+#w-helium h3{margin:0 0 10px;font-size:26px;letter-spacing:-.02em}
+#w-helium p{margin:0 0 12px;max-width:560px;color:#b9c0d2}
+
+/* selection overlay */
+#overlay{position:absolute;z-index:950;border-radius:14px;background:rgba(0,0,0,.12);cursor:crosshair;display:none}
+#marquee{position:absolute;border-radius:6px;border:2px dashed #0a84ff;background:rgba(10,132,255,.10);box-shadow:0 0 0 9999px rgba(0,0,0,.06);display:none;pointer-events:none}
+
+/* companion */
+#comp{position:absolute;left:0;top:0;width:0;height:0;z-index:1000}
+#tabSvg{position:absolute;overflow:visible;pointer-events:none}
+#face{position:absolute;border-radius:12px;background:#2b263d;box-shadow:0 1px 1.5px rgba(0,0,0,.28);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#face .eyes{display:flex}
+#face .eye{background:#fafafa;border-radius:999px;position:relative;overflow:hidden}
+#face .pupil{position:absolute;left:50%;top:50%;border-radius:50%;background:#1f1a2e}
+#face svg{display:block;overflow:visible}
+#hint{position:absolute;font-size:11px;letter-spacing:-.1px;font-weight:500;white-space:nowrap;pointer-events:none}
+#bar{position:absolute;display:flex;align-items:center;gap:8px;height:30px}
+#chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 8px;border-radius:999px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+#chip svg{flex:none}
+#prompt{flex:1;min-width:0;border:0;outline:0;background:transparent;font:13px -apple-system,system-ui,sans-serif;caret-color:#0a84ff}
+#spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;opacity:.6;animation:spin .8s linear infinite;display:none;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+#suggest{position:absolute;display:flex;gap:6px;white-space:nowrap}
+#suggest button{font:500 11.5px -apple-system,system-ui,sans-serif;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;border:0;cursor:pointer;
+ backdrop-filter:blur(16px) saturate(1.4);transition:transform .15s}
+#suggest button:hover{transform:translateY(-1px)}
+#card{position:absolute;width:470px;border-radius:16px;padding:14px;backdrop-filter:blur(30px) saturate(1.5);transform-origin:50% 0}
+#card .ans{font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:190px;overflow:auto;user-select:text;-webkit-user-select:text}
+#card .busy{display:flex;align-items:center;gap:8px;font-size:12px;opacity:.7}
+#card .row{display:flex;align-items:center;gap:8px;margin-top:12px}
+#card .row button,#card .keyrow button{font:500 12px -apple-system,system-ui,sans-serif;border:0;border-radius:6px;padding:4px 10px;cursor:pointer}
+#card .row button:disabled{opacity:.35;cursor:default}
+#card .row .sp{flex:1}
+#card .toast{font-size:11px;opacity:.65}
+#card .run{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:#0a84ff !important;color:#fff !important;font-weight:600 !important;padding:6px 12px !important;border-radius:8px !important;border:0;cursor:pointer;font:600 12px -apple-system,system-ui,sans-serif}
+#card .meta{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;opacity:.6}
+#card .keyrow{display:flex;gap:8px;margin-top:10px}
+#card .keyrow input{flex:1;font:12px ui-monospace,Menlo,monospace;border-radius:7px;border:0;padding:6px 9px;outline:none}
+#card .link{background:none !important;padding:0 !important;text-decoration:underline;color:inherit !important;opacity:.8}
+
+#cursor{position:absolute;z-index:2000;pointer-events:none;display:none;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45))}
+#caption{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:1900;background:rgba(20,18,30,.78);color:#fff;font-size:13px;font-weight:500;
+ padding:8px 14px;border-radius:999px;backdrop-filter:blur(12px);opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+</style></head><body>
+<h1>Window companion <span>interactive mockup · constants from the companion spike</span></h1>
+<p class="lede">A small face sits in a tab that grows out of the focused window, tinted like its title bar. <b>Hover</b> wakes it. <b>Click</b> it: a text selection in the window becomes context right away. Without one, you get selection mode, where its eyes follow the pointer and you <b>drag a region</b> or <b>click for the whole window</b>. The tab stretches into a prompt bar, the answer card drops into the window, and you can copy, replace the selection, paste, or run a proposed command. Click another window to move it, drag a title bar to watch it stay attached, use the green light to maximize. <b>Esc</b> backs out.</p>
+<div class="ctl">
+  <button class="btn play" id="tourBtn">▶ Play tour</button>
+  <div class="grp">Tracking <div class="sg" id="trackSg"><button data-v="predict" class="on">Predict · 0 pt</button><button data-v="sls">SkyLight · 6 pt</button><button data-v="ax">AX only · 24 pt</button></div></div>
+  <div class="grp">Answer with <div class="sg" id="modelSg"><button data-v="device" class="on">On-device</button><button data-v="claude">Claude · your API key</button></div></div>
+  <div class="grp">Anthropic key <input id="keyInput" type="password" placeholder="sk-ant-…" autocomplete="off"></div>
+  <button class="btn tog" id="rmBtn">Reduce Motion</button>
+</div>
+<div class="viewport" id="viewport">
+ <div class="stage" id="stage">
+  <div class="menubar"><b id="mbApp">Petal Studio</b><span>File</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span><span class="right" id="clock">Mon 24 Jun 9:41</span></div>
+
+  <div class="win" id="w-helium">
+   <div class="titlebar"><div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+    <div class="tabs" id="heliumTabs"><div class="tab on">Liquid Glass · Apple Developer</div><div class="tab">Playful Agent Window – Figma</div></div></div>
+   <div class="addr"><span>developer.apple.com/design/liquid-glass</span></div>
+   <div class="content sel" data-ctx="glass">
+    <h3>Liquid Glass</h3>
+    <p data-ctx="glass">Liquid Glass is a translucent material that reflects and refracts its surroundings while dynamically transforming to bring greater focus to content.</p>
+    <p data-ctx="glass">Controls, navigation and app icons share one design language, so an interface feels familiar across every Apple platform without losing its personality.</p>
+    <p data-ctx="glass">Use it for the navigation layer that floats above content. Keep content itself opaque so the material has something to reflect.</p>
+   </div>
+  </div>
+
+  <div class="win dark" id="w-ghostty">
+   <div class="titlebar"><div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div><div class="ttl">claude — petal-app</div></div>
+   <div class="content sel" id="term" data-ctx="error"><span class="dim">~/Developer/petal-app</span> <span class="bl">main</span> <span class="gr">✓</span>
+<span class="vi">❯</span> claude
+<span class="or">╭──────────────────────────────────────────╮</span>
+<span class="or">│</span> <span class="or">✻</span> Welcome back, Maya                        <span class="or">│</span>
+<span class="or">╰──────────────────────────────────────────╯</span>
+
+<span class="dim">&gt;</span> Run the build and fix what breaks
+
+<span class="gr">⏺</span> Bash(xcodebuild -scheme Petal build)
+  <span class="dim">⎿</span> <span class="rd" data-ctx="error">error: main actor-isolated property 'items' can not be</span>
+    <span class="rd" data-ctx="error">referenced from a nonisolated context</span>
+    <span class="dim" data-ctx="error">Sources/Petal/LibraryStore.swift:42:17</span>
+    <span class="dim" data-ctx="error">** BUILD FAILED **</span>
+
+<span class="gr">⏺</span> Waiting for your input.
+
+<span class="dim">&gt;</span> <span id="termInput"></span><span class="cursor"></span></div>
+  </div>
+
+  <div class="win" id="w-petal">
+   <div class="titlebar"><div class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></div><div class="ttl">Petal Studio</div></div>
+   <div class="content">
+    <div class="side"><div class="lab">WORKSPACE</div><div class="it on">⌁ Overview</div><div class="it">◇ Ideas</div><div class="it">✓ Tasks</div></div>
+    <div class="main sel" data-ctx="voice">
+     <div class="date">MONDAY, 24 JUNE</div>
+     <h2>Good morning, Maya</h2>
+     <div class="hero"><small>✦ Start with a thought</small><div>What shall we make today?</div></div>
+     <div class="cards" id="petalCards">
+      <div class="card c1" data-ctx="voice"><h4>Brand voice</h4><span id="voiceText">We write like a smart friend who has five minutes: warm, curious and precise. Short sentences, no jargon.</span></div>
+      <div class="card c2" data-ctx="voice"><h4>Launch ideas</h4>Exploring campaign concepts for the spring release.</div>
+      <div class="card c3" data-ctx="voice"><h4>Product story</h4>Building the first narrative for the website.</div>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <div id="overlay"><div id="marquee"></div></div>
+
+  <div id="comp">
+   <svg id="tabSvg"><path id="tabFill"/><path id="tabRim" fill="none" stroke-width="1"/></svg>
+   <div id="face"><div class="eyes"><div class="eye"><i class="pupil"></i></div><div class="eye"><i class="pupil"></i></div></div>
+    <svg id="smile" width="6" height="4"><path d="M0 0 Q3 4 6 0" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+   <div id="hint">Drag a region · click for whole window · esc</div>
+   <div id="bar"><span id="chip"></span><input id="prompt" placeholder="Ask about this…" autocomplete="off"><span id="spin"></span></div>
+   <div id="suggest"></div>
+   <div id="card"></div>
+  </div>
+
+  <svg id="cursor" width="22" height="22" viewBox="0 0 22 22"><path d="M3 2 L3 18 L7.5 13.8 L10.6 20.6 L13.4 19.4 L10.4 12.8 L16.6 12.6 Z" fill="#000" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  <div id="caption"></div>
+ </div>
+</div>
+<div class="readout" id="readout"></div>
+<details class="notes"><summary>What's real, what's simulated</summary>
+<ul>
+<li><b>Geometry from the lab</b> (<code>spikes/companion-lab/lab/CompanionModel.swift</code>, <code>CompanionViews.swift</code>): tab 108×42, flare 11, corner 15; selecting width 330; prompt bar 470 + 2 × flare; face 56×32, compact 40×26, corner 0.38 × height; eyes 10×13 (compact 7.5×10), pupil 0.58 × eye width; pupil reach 2.6 / 2.2 scaled over 140 pt; card 470 wide, radius 16.</li>
+<li><b>Motion from the lab</b>: morph spring response 0.42 / damping 0.8, face spring 0.28 / 0.55, eye spring 0.3 / 0.7, hover scale 1.06, answered smile 1.4×, blink every 3.4 s for 0.12 s, falls asleep 1.6 s after the pointer leaves. Retract-and-emerge when focus moves is a proposal (spring 0.42 / 0.72).</li>
+<li><b>Tracking modes use the spike's measurements</b> at 360 pt/s: Predict trails 0 pt (moves from the same drag events as the window), SkyLight 806 one frame (6 pt), AX notifications arrive at about 10 Hz and 37 ms late (24 pt median). The readout shows the live offset while you drag.</li>
+<li><b>Tints</b> are the sampled title-bar colors: Petal <code>#FFFFFF</code>, Ghostty <code>#363A42</code>, Helium <code>#222A3E</code> (the strip under the tab, not the active tab's <code>#3E455A</code>).</li>
+<li><b>Simulated</b>: answers are canned. On-device timing follows the lab (first token about 1.5 s); Claude timing is a guess. Menu commands, paste and Replace only change this page. The API key never leaves the page.</li>
+<li><b>Reduce Motion</b>: springs become short eases, the face doesn't bounce or blink, and the eyes stop following the pointer.</li>
+</ul></details>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const stage = $('#stage'), viewport = $('#viewport');
+const C = { tabW: 108, tabH: 42, flare: 11, corner: 15, selW: 330, card: 470, faceW: 56, faceH: 32, cFaceW: 40, cFaceH: 26, eyeW: 10, eyeH: 13, cEyeW: 7.5, cEyeH: 10, reach: 140, menu: 24 };
+const state = {
+  phase: 'idle', tracking: 'predict', model: 'device', apiKey: '', reduceMotion: false,
+  context: null, intent: null, answer: '', proposal: null, toast: '', keyNeeded: false,
+  pointer: { x: 640, y: 400 }, hovering: false, sleepTimer: null, tour: false,
+};
+
+/* ── springs (SwiftUI response / dampingFraction, unit mass) ── */
+class Spring {
+  constructor(v, response, damping) { this.v = v; this.t = v; this.vel = 0; this.set(response, damping); }
+  set(r, d) { this.r = r; this.d = d; }
+  step(dt) {
+    const r = state.reduceMotion ? 0.14 : this.r, d = state.reduceMotion ? 1 : this.d;
+    const k = (2 * Math.PI / r) ** 2, c = 4 * Math.PI * d / r;
+    for (let i = 0; i < 4; i++) { const h = dt / 4; const a = -k * (this.v - this.t) - c * this.vel; this.vel += a * h; this.v += this.vel * h; }
+    if (Math.abs(this.v - this.t) < 1e-3 && Math.abs(this.vel) < 1e-3) { this.v = this.t; this.vel = 0; }
+  }
+}
+const S = {
+  width: new Spring(C.tabW, 0.42, 0.8),
+  height: new Spring(0, 0.42, 0.72),
+  align: new Spring(0, 0.42, 0.8),        // 0 face centred, 1 face at the bar's leading edge
+  compact: new Spring(0, 0.42, 0.8),
+  scale: new Spring(1, 0.28, 0.55),
+  open: new Spring(0.28, 0.3, 0.7),
+  smile: new Spring(0, 0.28, 0.55),
+  bar: new Spring(0, 0.42, 0.8),          // prompt bar content
+  hint: new Spring(0, 0.42, 0.8),
+  suggest: new Spring(0, 0.42, 0.8),
+  card: new Spring(0, 0.42, 0.8),
+};
+const pupil = { x: 0, y: 2 };
+
+/* ── windows ── */
+const W = {
+  helium: { el: $('#w-helium'), app: 'Helium', x: 330, y: 92, w: 720, h: 430, tint: '#222A3E', light: false, ctx: 'glass', title: 40 },
+  ghostty: { el: $('#w-ghostty'), app: 'Ghostty', x: 640, y: 300, w: 590, h: 400, tint: '#363A42', light: false, ctx: 'error', title: 32 },
+  petal: { el: $('#w-petal'), app: 'Petal Studio', x: 90, y: 170, w: 780, h: 470, tint: '#FFFFFF', light: true, ctx: 'voice', title: 52 },
+};
+let order = ['helium', 'ghostty', 'petal'];
+let focused = 'petal', attached = 'petal';
+let tint = hex('#FFFFFF'), tintTarget = hex('#FFFFFF');
+function hex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+function rgb(c, a = 1) { return `rgba(${c.map(Math.round).join(',')},${a})`; }
+function lum(c) { return (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; }
+function layoutWindows() {
+  order.forEach((k, i) => { const w = W[k]; Object.assign(w.el.style, { left: w.x + 'px', top: w.y + 'px', width: w.w + 'px', height: w.h + 'px', zIndex: 10 + i }); w.el.classList.toggle('focused', k === focused); });
+  $('#mbApp').textContent = W[focused].app;
+}
+
+/* ── tracking history for the lag simulation ── */
+const hist = [];   // {t, x, y}
+let axHeld = null, axNext = 0, dragging = null, lastOffset = 0;
+function anchorFor(k, now) {
+  const w = W[k];
+  const live = { x: w.x + w.w / 2, y: w.y };
+  if (k !== attached || !dragging || dragging.key !== k) { axHeld = null; return live; }
+  if (state.tracking === 'predict') return live;
+  if (state.tracking === 'sls') return sampleAt(now - 17) || live;
+  // AX: notifications at ~10 Hz, each describing where the window was ~37 ms earlier
+  if (!axHeld || now >= axNext) { axHeld = sampleAt(now - 37) || live; axNext = now + 100; }
+  return axHeld;
+}
+function sampleAt(t) { for (let i = hist.length - 1; i >= 0; i--) if (hist[i].t <= t) return hist[i]; return hist[0]; }
+
+/* ── geometry helpers ── */
+function placement() { const w = W[attached]; return (w.maxed || w.y - C.menu < C.tabH) ? 'inside' : 'above'; }
+function tabRect() {
+  const a = curAnchor, w = S.width.v, h = Math.max(0, S.height.v);
+  return placement() === 'above' ? { x: a.x - w / 2, y: a.y + 1 - h, w, h } : { x: a.x - w / 2, y: a.y, w, h };
+}
+let curAnchor = { x: 0, y: 0 };
+function tabPath(w, h, inverted, closed) {
+  const r = C.flare, c = Math.max(0, Math.min(C.corner, (w - 2 * r) / 2, h - r));
+  const Y = y => inverted ? h - y : y;
+  let p = `M0 ${Y(h)} Q${r} ${Y(h)} ${r} ${Y(h - r)} L${r} ${Y(c)} Q${r} ${Y(0)} ${r + c} ${Y(0)} L${w - r - c} ${Y(0)} Q${w - r} ${Y(0)} ${w - r} ${Y(c)} L${w - r} ${Y(h - r)} Q${w - r} ${Y(h)} ${w} ${Y(h)}`;
+  return closed ? p + ' Z' : p;
+}
+
+/* ── phases ── */
+function targets() {
+  const p = state.phase, bar = ['prompting', 'thinking', 'answered'].includes(p);
+  S.width.t = p === 'selecting' ? C.selW : bar ? C.card + 2 * C.flare : C.tabW;
+  S.align.t = bar || p === 'selecting' ? 1 : 0;
+  S.compact.t = bar ? 1 : 0;
+  S.scale.t = p === 'awake' && !state.reduceMotion ? 1.06 : 1;
+  S.open.t = p === 'idle' ? 0.28 : 1;
+  S.smile.t = p === 'idle' ? 0 : p === 'answered' ? 1.4 : 1;
+  S.bar.t = bar ? 1 : 0;
+  S.hint.t = p === 'selecting' ? 1 : 0;
+  S.suggest.t = p === 'prompting' ? 1 : 0;
+  S.card.t = p === 'thinking' || p === 'answered' ? 1 : 0;
+}
+function setPhase(p) {
+  if (state.phase === p) return;
+  state.phase = p;
+  targets();
+  $('#overlay').style.display = p === 'selecting' ? 'block' : 'none';
+  $('#marquee').style.display = 'none';
+  if (p === 'prompting') { renderSuggest(); setTimeout(() => { $('#prompt').disabled = false; $('#prompt').focus({ preventScroll: true }); }, 60); }
+  if (p === 'thinking') $('#prompt').disabled = true;
+  renderBar(); renderCard();
+}
+function wake() { clearTimeout(state.sleepTimer); if (state.phase === 'idle') setPhase('awake'); }
+function sleepSoon() {
+  clearTimeout(state.sleepTimer);
+  state.sleepTimer = setTimeout(() => { if (state.phase === 'awake' && !state.hovering) setPhase('idle'); }, 1600);
+}
+
+/* ── focus transfer: retract into the old window, emerge from the new one ── */
+let transfer = null;
+function focusWindow(k) {
+  if (focused === k) return;
+  focused = k; order = order.filter(o => o !== k).concat(k); layoutWindows();
+  if (state.phase !== 'idle' && state.phase !== 'awake') dismiss(true);
+  transfer = k; S.height.t = 0;
+}
+function finishTransfer() {
+  attached = transfer; transfer = null;
+  tintTarget = hex(W[attached].tint);
+  S.height.t = C.tabH;
+}
+
+/* ── context capture ── */
+let savedRange = null;
+function ctxOf(node, fallback) {
+  const el = node && (node.nodeType === 1 ? node : node.parentElement);
+  const tagged = el && el.closest('[data-ctx]');
+  return tagged ? tagged.dataset.ctx : fallback;
+}
+function companionClick() {
+  if (['prompting', 'thinking', 'answered'].includes(state.phase)) { dismiss(); return; }
+  if (state.phase === 'selecting') { takeWindow(); return; }
+  const sel = document.getSelection();
+  const win = W[attached].el;
+  if (sel && !sel.isCollapsed && win.contains(sel.anchorNode) && sel.toString().trim()) {
+    savedRange = sel.getRangeAt(0).cloneRange();
+    const text = sel.toString().trim();
+    state.context = { type: 'text', text, ctx: ctxOf(sel.anchorNode, W[attached].ctx), label: '“' + text.slice(0, 18).trim() + '…”' };
+    sel.removeAllRanges();
+    highlightSaved(true);
+    setPhase('prompting');
+  } else {
+    savedRange = null;
+    setPhase('selecting');
+    positionOverlay();
+  }
+}
+let savedMark = null;
+function highlightSaved(on) {
+  if (on && savedRange) {
+    try { savedMark = document.createElement('span'); savedMark.style.background = 'rgba(10,132,255,.22)'; savedMark.style.borderRadius = '3px'; savedRange.surroundContents(savedMark); savedRange.selectNodeContents(savedMark); }
+    catch { savedMark = null; }
+  } else if (!on && savedMark) {
+    const parent = savedMark.parentNode; while (savedMark.firstChild) parent.insertBefore(savedMark.firstChild, savedMark); parent.removeChild(savedMark); parent.normalize(); savedMark = null;
+  }
+}
+function positionOverlay() {
+  const w = W[attached];
+  Object.assign($('#overlay').style, { left: w.x + 'px', top: w.y + 'px', width: w.w + 'px', height: w.h + 'px' });
+}
+function wordsIn(rect) {
+  const w = W[attached], parts = []; let ctx = null;
+  w.el.querySelectorAll('.content [data-ctx], .content p, .content h2, .content h3, .content h4, .content .card, #term span').forEach(el => {
+    const r = el.getBoundingClientRect(), s = stageRect();
+    const box = { x: (r.left - s.left) / scale, y: (r.top - s.top) / scale, w: r.width / scale, h: r.height / scale };
+    if (box.x < rect.x + rect.w && box.x + box.w > rect.x && box.y < rect.y + rect.h && box.y + box.h > rect.y && !el.querySelector('[data-ctx]')) {
+      parts.push(el.textContent.trim()); if (!ctx && el.dataset.ctx) ctx = el.dataset.ctx;
+    }
+  });
+  const text = [...new Set(parts)].join(' ');
+  return { text, ctx: ctx || w.ctx, words: text.split(/\s+/).filter(Boolean).length };
+}
+function takeRegion(rect) {
+  const r = wordsIn(rect);
+  state.context = { type: 'region', text: r.text, ctx: r.ctx, label: `Region · ${r.words} words` };
+  setPhase('prompting');
+}
+function takeWindow() {
+  const w = W[attached];
+  state.context = { type: 'window', text: w.el.innerText, ctx: w.ctx, label: `Whole window · ${w.app === 'Ghostty' ? 'terminal text' : 'accessibility'}` };
+  setPhase('prompting');
+}
+
+/* ── answers (canned) ── */
+const A = {
+  error: {
+    explain: {
+      device: "Swift says sync() runs off the main actor but reads items, which only the main actor may touch. Mark sync() @MainActor, or copy items before leaving the main actor.",
+      claude: "LibraryStore.items is isolated to the main actor (the class is @MainActor), but sync() is nonisolated, so line 42 reads main-actor state from an arbitrary thread.\n\nTwo fixes:\n• If sync() only updates UI state, mark it @MainActor.\n• If it does slow work, read items on the main actor first (let snapshot = await items), do the work, then hop back to assign the result."
+    },
+    translate: {
+      device: "Fehler: Auf die Main-Actor-isolierte Eigenschaft „items“ kann nicht aus einem nicht isolierten Kontext zugegriffen werden.",
+      claude: "Fehler: Die Main-Actor-isolierte Eigenschaft „items“ darf nicht aus einem nicht isolierten Kontext referenziert werden.\n(Datei: Sources/Petal/LibraryStore.swift, Zeile 42)"
+    },
+    summarize: { device: "• The build failed.\n• sync() touches items off the main actor.\n• Fix it in LibraryStore.swift line 42.", claude: "• xcodebuild failed on one concurrency error.\n• LibraryStore.sync() (nonisolated) reads the main-actor property items at line 42.\n• Claude Code is waiting for input, so you can hand it the fix." },
+    doit: { text: "Claude Code is waiting for input. I can hand it the fix.", proposal: { label: 'Paste into Claude Code', detail: 'Make LibraryStore.sync() @MainActor and rebuild', kind: 'terminal' } },
+  },
+  voice: {
+    explain: { device: "It's Petal's style guide in one line: write friendly, brief and exact, like talking to a busy friend.", claude: "It's a tone brief. “Smart friend with five minutes” sets two rules at once: assume the reader is capable (no over-explaining) and respect their time (short sentences, no jargon). Warm, curious, precise are the three checks for every line of copy." },
+    translate: { device: "Wir schreiben wie eine kluge Freundin, die fünf Minuten Zeit hat: warm, neugierig und präzise. Kurze Sätze, kein Fachjargon.", claude: "Wir schreiben wie eine kluge Freundin mit fünf Minuten Zeit: herzlich, neugierig und präzise. Kurze Sätze, kein Jargon." },
+    summarize: { device: "• Warm, curious, precise.\n• Short sentences.\n• No jargon.", claude: "• Voice: a smart friend who's short on time.\n• Tone: warm, curious, precise.\n• Style: short sentences, no jargon." },
+    doit: { text: "Want a fresh project for this?", proposal: { label: 'Run File › New Project', kind: 'menu' } },
+  },
+  glass: {
+    explain: { device: "Liquid Glass is a see-through material for buttons and bars. It shows a bit of what's behind it so the content stays in focus.", claude: "It's Apple's material for the navigation layer: controls float above content and pick up its color and light, so the UI feels like one layer on top of your content rather than a frame around it. Keep content opaque; the glass needs something to reflect." },
+    translate: { device: "Liquid Glass ist ein durchscheinendes Material, das seine Umgebung spiegelt und bricht und sich dynamisch verändert, um den Inhalt stärker in den Fokus zu rücken.", claude: "Liquid Glass ist ein durchscheinendes Material, das seine Umgebung reflektiert und bricht und sich dabei dynamisch wandelt, damit der Inhalt stärker im Mittelpunkt steht." },
+    summarize: { device: "• A translucent material.\n• Used for controls and navigation.\n• Keeps content in focus.", claude: "• Liquid Glass is the material for the floating navigation layer.\n• One design language across Apple platforms.\n• Content stays opaque underneath so the glass has something to reflect." },
+    doit: { text: "I can open this in a new tab for reading later.", proposal: { label: 'Run File › New Tab', kind: 'menu' } },
+  },
+};
+function intentOf(text) {
+  const t = text.toLowerCase();
+  if (/translat|übersetz/.test(t)) return 'translate';
+  if (/summar|zusammenf/.test(t)) return 'summarize';
+  if (/\bdo it\b|fix|run|mach|open|new/.test(t)) return 'doit';
+  if (/explain|erklär|what|was ist|why/.test(t)) return 'explain';
+  return 'custom';
+}
+function answerFor(intent, ctx, prompt) {
+  const set = A[ctx] || A.voice, m = state.model;
+  if (intent === 'doit') return { text: set.doit.text, proposal: set.doit.proposal };
+  if (set[intent]) {
+    const a = set[intent][m];
+    if (state.context.type === 'text' && !matchesKnown(state.context.text, ctx) && intent === 'translate')
+      return { text: `(mockup) Die Übersetzung von „${state.context.text.slice(0, 60)}…“ erscheint hier.` };
+    return { text: a };
+  }
+  return { text: `(mockup) An answer to “${prompt}” about ${state.context.label.toLowerCase()} would stream here from ${m === 'claude' ? 'Claude' : 'the on-device model'}.` };
+}
+function matchesKnown(text, ctx) {
+  const t = text.toLowerCase();
+  return ctx === 'voice' ? t.includes('smart friend') : ctx === 'glass' ? t.includes('translucent') : true;
+}
+
+let streamTimer = null;
+function submit(text, intent) {
+  text = (text || '').trim(); if (!text || state.phase !== 'prompting') return;
+  $('#prompt').value = text;
+  state.intent = intent || intentOf(text); state.answer = ''; state.proposal = null; state.toast = '';
+  if (state.model === 'claude' && !state.apiKey) { state.keyNeeded = true; setPhase('thinking'); renderCard(); return; }
+  state.keyNeeded = false;
+  setPhase('thinking');
+  const ans = answerFor(state.intent, state.context.ctx, text);
+  const first = state.model === 'claude' ? 1100 : 1500, per = state.model === 'claude' ? 16 : 28;
+  const tokens = ans.text.split(/(\s+)/);
+  let i = 0;
+  clearTimeout(streamTimer);
+  streamTimer = setTimeout(function tick() {
+    if (state.phase !== 'thinking') return;
+    state.answer += tokens[i++] || ''; renderCard();
+    if (i < tokens.length) streamTimer = setTimeout(tick, per);
+    else { state.proposal = ans.proposal || null; setPhase('answered'); }
+  }, first);
+}
+function useKey(k) {
+  state.apiKey = k.trim(); $('#keyInput').value = state.apiKey;
+  if (state.apiKey && state.keyNeeded) { state.keyNeeded = false; state.phase = 'prompting'; submit($('#prompt').value, state.intent); }
+}
+
+/* ── actions back into the app ── */
+function copyAnswer() { navigator.clipboard?.writeText(state.answer).catch(() => {}); toast('Copied'); }
+function replaceSelection() {
+  if (!savedMark) return;
+  savedMark.textContent = state.answer; savedMark.style.background = 'rgba(52,199,89,.30)';
+  const mark = savedMark; savedMark = null; savedRange = null;
+  setTimeout(() => { mark.style.transition = 'background 1.4s'; mark.style.background = 'transparent'; }, 60);
+  toast('Replaced'); setTimeout(() => dismiss(), 650);
+}
+function typeInto(el, text, done) {
+  let i = 0; const step = () => { el.textContent = text.slice(0, ++i); if (i < text.length) setTimeout(step, 22); else done && done(); }; step();
+}
+function pasteIntoApp() {
+  const app = W[attached].app;
+  if (attached === 'ghostty') { const t = state.answer.split('\n')[0]; dismiss(); typeInto($('#termInput'), t); }
+  else if (savedMark) { replaceSelection(); return; }
+  else { toast(`Pasted into ${app}`); setTimeout(() => dismiss(), 650); }
+}
+function runProposal() {
+  const p = state.proposal; if (!p) return;
+  if (p.kind === 'terminal') { dismiss(); typeInto($('#termInput'), p.detail); return; }
+  if (attached === 'petal') {
+    const c = document.createElement('div'); c.className = 'card new'; c.innerHTML = '<h4>Untitled project</h4>Just created from the menu.'; $('#petalCards').appendChild(c);
+    const cards = $('#petalCards').children; if (cards.length > 4) cards[cards.length - 2].remove();
+  }
+  if (attached === 'helium') { const t = document.createElement('div'); t.className = 'tab'; t.textContent = 'New Tab'; $('#heliumTabs').appendChild(t); }
+  toast('Done'); setTimeout(() => dismiss(), 600);
+}
+function toast(t) { state.toast = t; renderCard(); }
+function dismiss(silent) {
+  clearTimeout(streamTimer);
+  highlightSaved(false);
+  state.context = null; state.answer = ''; state.proposal = null; state.toast = ''; state.keyNeeded = false;
+  $('#prompt').value = ''; $('#prompt').blur();
+  setPhase(state.hovering && !silent ? 'awake' : 'idle');
+  if (state.phase === 'awake') sleepSoon();
+}
+
+/* ── rendering ── */
+const icons = {
+  text: '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M1 3h10M1 6h7M1 9h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  region: '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  window: '<svg width="11" height="11" viewBox="0 0 12 12"><rect x="1" y="1.5" width="10" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M1 4.2h10" stroke="currentColor" stroke-width="1.3"/></svg>',
+  device: '<svg width="11" height="11" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4 0v2M8 0v2M4 10v2M8 10v2M0 4h2M0 8h2M10 4h2M10 8h2" stroke="currentColor" stroke-width="1.1"/></svg>',
+  claude: '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 0.5l1.1 3.4 3.4 1.1-3.4 1.1L6 9.5 4.9 6.1 1.5 5l3.4-1.1z" fill="#d97757"/></svg>',
+  lock: '<svg width="10" height="11" viewBox="0 0 10 11"><rect x="1" y="4.5" width="8" height="6" rx="1.5" fill="currentColor"/><path d="M3 4.5V3a2 2 0 0 1 4 0v1.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+};
+function ink(a = 1) { return lum(tint) < 0.5 ? `rgba(255,255,255,${a})` : `rgba(33,31,43,${a})`; }
+function renderBar() {
+  const c = state.context;
+  $('#chip').innerHTML = c ? `${icons[c.type]}<span>${escapeHTML(c.label)}</span>` : '';
+  $('#chip').style.display = c ? 'inline-flex' : 'none';
+  $('#spin').style.display = state.phase === 'thinking' && !state.keyNeeded ? 'block' : 'none';
+}
+const SUGG = [['Explain', 'explain'], ['Translate', 'translate'], ['Summarize', 'summarize'], ['Do it', 'doit']];
+function renderSuggest() {
+  $('#suggest').innerHTML = SUGG.map(([l, i]) => `<button data-i="${i}">${l}</button>`).join('');
+  $('#suggest').querySelectorAll('button').forEach(b => b.onclick = () => submit(b.textContent, b.dataset.i));
+}
+function renderCard() {
+  const card = $('#card');
+  const light = W[attached].light;
+  const ansHTML = state.keyNeeded
+    ? `<div style="font-size:13px;font-weight:600">Claude needs your Anthropic API key</div>
+       <div class="keyrow"><input id="cardKey" type="password" placeholder="sk-ant-…" autocomplete="off"><button id="cardKeyBtn">Use key</button></div>
+       <div class="meta">${icons.lock}<span>DOKK keeps the key in your Keychain and sends requests from this Mac straight to Anthropic.</span></div>
+       <div class="row"><button class="link" id="useDevice">Answer on-device instead</button><span class="sp"></span><button id="doneBtn">Cancel</button></div>`
+    : `${state.answer ? `<div class="ans">${escapeHTML(state.answer)}</div>` : `<div class="busy"><span id="spin2" style="width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span>${state.model === 'claude' ? 'Asking Claude…' : 'Thinking on-device…'}</div>`}
+       ${state.proposal ? `<button class="run" id="runBtn">▶ ${escapeHTML(state.proposal.label)}${state.proposal.detail ? `: “${escapeHTML(state.proposal.detail)}”` : ''}</button>` : ''}
+       <div class="row">
+         <button id="copyBtn" ${state.phase !== 'answered' ? 'disabled' : ''}>Copy</button>
+         ${savedMark ? `<button id="replBtn" ${state.phase !== 'answered' ? 'disabled' : ''}>Replace selection</button>` : ''}
+         <button id="pasteBtn" ${state.phase !== 'answered' ? 'disabled' : ''}>Paste into ${W[attached].app}</button>
+         <span class="sp"></span><span class="toast">${state.toast}</span><button id="doneBtn">Done</button></div>
+       <div class="meta">${state.model === 'claude' ? `${icons.claude}<span>Claude Sonnet 5 · your API key · sent from this Mac to Anthropic</span>` : `${icons.device}<span>On-device · Apple Intelligence · stays on this Mac</span>`}</div>`;
+  card.innerHTML = ansHTML;
+  card.style.background = light ? 'rgba(252,251,255,.86)' : 'rgba(38,40,48,.84)';
+  card.style.color = light ? '#24212f' : '#eceef3';
+  card.style.boxShadow = light ? '0 16px 40px rgba(40,24,90,.22),0 0 0 .5px rgba(0,0,0,.12)' : '0 16px 40px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.1)';
+  card.querySelectorAll('.row button:not(.link), .keyrow button').forEach(b => { b.style.background = light ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.1)'; b.style.color = 'inherit'; });
+  const ki = $('#cardKey'); if (ki) { ki.style.background = light ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.08)'; ki.style.color = 'inherit'; ki.onkeydown = e => { if (e.key === 'Enter') useKey(ki.value); }; setTimeout(() => ki.focus({ preventScroll: true }), 50); }
+  const on = (id, fn) => { const b = $(id); if (b) b.onclick = fn; };
+  on('#copyBtn', copyAnswer); on('#replBtn', replaceSelection); on('#pasteBtn', pasteIntoApp); on('#runBtn', runProposal); on('#doneBtn', () => dismiss());
+  on('#cardKeyBtn', () => useKey($('#cardKey').value));
+  on('#useDevice', () => { setModel('device'); state.keyNeeded = false; state.phase = 'prompting'; submit($('#prompt').value, state.intent); });
+}
+function escapeHTML(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+let lastT = performance.now(), blinkAt = performance.now() + 3400, blinkUntil = 0, thinkPhase = 0;
+let quietFrames = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+  for (const s of Object.values(S)) s.step(dt);
+  // Skip DOM writes while nothing moves (idle, settled, no drag, colour settled).
+  const settled = Object.values(S).every(s => s.v === s.t && s.vel === 0) && !dragging && !transfer && !marquee
+    && state.phase === 'idle' && tint.every((c, i) => Math.abs(c - tintTarget[i]) < 0.5);
+  quietFrames = settled ? quietFrames + 1 : 0;
+  if (quietFrames > 2) { renderReadout(); requestAnimationFrame(frame); return; }
+  if (transfer && S.height.v < 2) finishTransfer();
+  tint = tint.map((c, i) => c + (tintTarget[i] - c) * Math.min(1, dt * 9));
+
+  const w = W[attached];
+  if (dragging) hist.push({ t: now, x: W[dragging.key].x + W[dragging.key].w / 2, y: W[dragging.key].y });
+  while (hist.length && hist[0].t < now - 400) hist.shift();
+  curAnchor = anchorFor(attached, now);
+  const live = { x: w.x + w.w / 2, y: w.y };
+  lastOffset = Math.hypot(live.x - curAnchor.x, live.y - curAnchor.y);
+
+  const inside = placement() === 'inside';
+  const tr = tabRect(), h = tr.h;
+  const svg = $('#tabSvg');
+  Object.assign(svg.style, { left: tr.x + 'px', top: tr.y + 'px', width: tr.w + 'px', height: Math.max(h, 1) + 'px' });
+  svg.setAttribute('viewBox', `0 0 ${tr.w} ${Math.max(h, 1)}`);
+  const visible = h > C.flare + 1;
+  $('#tabFill').setAttribute('d', visible ? tabPath(tr.w, h, inside, true) : '');
+  $('#tabFill').setAttribute('fill', rgb(tint));
+  $('#tabRim').setAttribute('d', visible ? tabPath(tr.w, h, inside, false) : '');
+  $('#tabRim').setAttribute('stroke', lum(tint) < 0.5 ? 'rgba(255,255,255,.14)' : 'rgba(0,0,0,.10)');
+  svg.style.filter = `drop-shadow(0 ${inside ? 2 : -1}px 4px rgba(0,0,0,.16))`;
+
+  // face: size, alignment, eyes
+  const k = S.compact.v, fw = C.faceW + (C.cFaceW - C.faceW) * k, fh = C.faceH + (C.cFaceH - C.faceH) * k;
+  const ew = C.eyeW + (C.cEyeW - C.eyeW) * k, eh = C.eyeH + (C.cEyeH - C.eyeH) * k;
+  const centreY = tr.y + (inside ? h / 2 - 1 : h / 2 + 2);
+  const leadX = tr.x + C.flare + 7 + fw / 2;
+  const fx = curAnchor.x + (leadX - curAnchor.x) * S.align.v;
+  const face = $('#face');
+  const faceScale = S.scale.v * Math.min(1, Math.max(0, (h - 8) / (C.tabH - 8)));
+  Object.assign(face.style, { left: fx - fw / 2 + 'px', top: centreY - fh / 2 + 'px', width: fw + 'px', height: fh + 'px', borderRadius: fh * 0.38 + 'px', transform: `scale(${faceScale})`, opacity: visible ? 1 : 0 });
+  face.querySelector('.eyes').style.gap = fw * 0.2 + 'px';
+  face.style.paddingTop = (k ? 1 : 2) + 'px';
+
+  // pupils: follow the pointer while awake or busy; look around while thinking
+  let tx = 0, ty = 2;
+  if (state.phase !== 'idle' && !state.reduceMotion) {
+    if (state.phase === 'thinking' && !state.answer) { thinkPhase += dt * 2.2; tx = Math.cos(thinkPhase) * 2.2; ty = -1.4 + Math.sin(thinkPhase * 1.7) * 0.6; }
+    else {
+      const dx = state.pointer.x - fx, dy = state.pointer.y - centreY, d = Math.max(1, Math.hypot(dx, dy)), reach = Math.min(1, d / C.reach);
+      tx = dx / d * 2.6 * reach; ty = dy / d * 2.2 * reach;
+    }
+  } else if (state.phase !== 'idle') { tx = 0; ty = 0; }
+  pupil.x += (tx - pupil.x) * Math.min(1, dt * 18); pupil.y += (ty - pupil.y) * Math.min(1, dt * 18);
+  if (!state.reduceMotion && state.phase !== 'idle' && now > blinkAt) { blinkUntil = now + 120; blinkAt = now + 3400; }
+  const openness = now < blinkUntil ? 0.12 : S.open.v;
+  face.querySelectorAll('.eye').forEach(e => {
+    Object.assign(e.style, { width: ew + 'px', height: eh + 'px', transform: `scaleY(${Math.max(0.05, openness)})` });
+    const p = e.firstChild, pd = ew * 0.58;
+    Object.assign(p.style, { width: pd + 'px', height: pd + 'px', transform: `translate(${-pd / 2 + pupil.x * ew / 10}px, ${-pd / 2 + pupil.y * ew / 10}px)` });
+  });
+  const sm = $('#smile'); sm.style.opacity = Math.min(1, S.smile.v); sm.style.transform = `scale(${Math.max(0.01, S.smile.v)})`; sm.style.marginTop = (k ? 1 : 2) + 'px';
+
+  // hint (selecting) and prompt bar (prompting / answered)
+  const hint = $('#hint');
+  Object.assign(hint.style, { left: leadX + fw / 2 + 10 + 'px', top: centreY - 8 + 'px', opacity: S.hint.v * (visible ? 1 : 0), color: ink(0.72) });
+  const bar = $('#bar'), barX = leadX + fw / 2 + 10, barW = Math.max(0, tr.x + tr.w - C.flare - 10 - barX);
+  Object.assign(bar.style, { left: barX + 'px', top: centreY - 15 + 'px', width: barW + 'px', opacity: Math.max(0, S.bar.v * 1.4 - 0.4), pointerEvents: S.bar.v > 0.5 ? 'auto' : 'none', color: ink() });
+  $('#prompt').style.color = ink();
+  $('#chip').style.background = ink(0.10); $('#chip').style.color = ink(0.85);
+
+  const below = inside ? tr.y + h : curAnchor.y;
+  const sug = $('#suggest');
+  Object.assign(sug.style, { left: curAnchor.x + 'px', top: below + 8 + 'px', opacity: S.suggest.v, transform: `translate(-50%, ${(1 - S.suggest.v) * -8}px)`, pointerEvents: S.suggest.v > 0.5 ? 'auto' : 'none' });
+  sug.querySelectorAll('button').forEach(b => { b.style.background = W[attached].light ? 'rgba(255,255,255,.72)' : 'rgba(44,46,56,.72)'; b.style.color = W[attached].light ? '#2a2638' : '#e9ebf1'; b.style.boxShadow = W[attached].light ? '0 2px 8px rgba(40,24,90,.14),0 0 0 .5px rgba(0,0,0,.08)' : '0 2px 8px rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.12)'; });
+  const card = $('#card');
+  Object.assign(card.style, { left: curAnchor.x - C.card / 2 + 'px', top: below + 8 + 'px', opacity: S.card.v, transform: `scale(${0.92 + 0.08 * S.card.v})`, pointerEvents: S.card.v > 0.5 ? 'auto' : 'none', display: S.card.v < 0.01 && state.phase !== 'thinking' ? 'none' : 'block' });
+
+  if (state.phase === 'selecting') positionOverlay();
+  renderReadout();
+  requestAnimationFrame(frame);
+}
+
+let readoutHTML = '';
+function renderReadout() {
+  const html = [
+    `phase <b>${state.phase}</b>`, `window <b>${W[attached].app}</b>`,
+    `<i style="background:${rgb(tint)}"></i>tint <b>${W[attached].tint}</b>`, `placement <b>${placement()}</b>`,
+    `tracking <b>${state.tracking}</b>`, `offset now <b>${lastOffset.toFixed(1)} pt</b>`,
+    `model <b>${state.model === 'claude' ? (state.apiKey ? 'Claude · key set' : 'Claude · no key') : 'on-device'}</b>`,
+  ].map(s => `<span>${s}</span>`).join('');
+  if (html !== readoutHTML) { readoutHTML = html; $('#readout').innerHTML = html; }
+}
+
+/* ── input ── */
+let scale = 1;
+function stageRect() { return stage.getBoundingClientRect(); }
+function fit() { const cs = getComputedStyle(document.body); scale = Math.min(1, (document.body.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) / 1280); stage.style.transform = `scale(${scale})`; viewport.style.height = 800 * scale + 'px'; viewport.style.width = 1280 * scale + 'px'; }
+window.addEventListener('resize', fit); fit();
+function toStage(e) { const r = stageRect(); return { x: (e.clientX - r.left) / scale, y: (e.clientY - r.top) / scale }; }
+function inRect(p, r) { return p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h; }
+function windowAt(p) { for (let i = order.length - 1; i >= 0; i--) { const w = W[order[i]]; if (inRect(p, { x: w.x, y: w.y, w: w.w, h: w.h })) return order[i]; } return null; }
+function companionHit(p) { const r = tabRect(); return r.h > 20 && inRect(p, { x: r.x + C.flare, y: r.y, w: r.w - 2 * C.flare, h: r.h }); }
+
+let marquee = null, lastClick = 0;
+function pointerDown(p, target, e) {
+  if (target && (target.closest('#card') || target.closest('#suggest') || target.closest('#bar'))) return;
+  if (companionHit(p)) { e && e.preventDefault(); companionClick(); return; }
+  if (state.phase === 'selecting') {
+    const w = W[attached];
+    if (inRect(p, { x: w.x, y: w.y, w: w.w, h: w.h })) { e && e.preventDefault(); marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y }; return; }
+    dismiss();
+  }
+  const k = windowAt(p);
+  if (!k) { if (['prompting', 'answered', 'thinking'].includes(state.phase)) dismiss(); return; }
+  if (k !== focused) focusWindow(k);
+  const w = W[k];
+  if (p.y - w.y < w.title) {
+    if (target && target.classList.contains('g')) { e && e.preventDefault(); toggleMax(k); return; }
+    if (performance.now() - lastClick < 320) { toggleMax(k); return; }
+    lastClick = performance.now();
+    e && e.preventDefault();
+    dragging = { key: k, dx: p.x - w.x, dy: p.y - w.y }; hist.length = 0;
+  }
+}
+function pointerMove(p) {
+  state.pointer = p;
+  if (dragging) {
+    const w = W[dragging.key];
+    if (w.maxed) { w.maxed = false; Object.assign(w, w.saved); dragging.dx = w.w / 2; }
+    w.x = p.x - dragging.dx; w.y = Math.max(C.menu, p.y - dragging.dy); layoutWindows();
+  }
+  if (marquee) {
+    marquee.x1 = p.x; marquee.y1 = p.y;
+    const w = W[attached], m = $('#marquee');
+    Object.assign(m.style, { display: 'block', left: Math.min(marquee.x0, marquee.x1) - w.x + 'px', top: Math.min(marquee.y0, marquee.y1) - w.y + 'px', width: Math.abs(marquee.x1 - marquee.x0) + 'px', height: Math.abs(marquee.y1 - marquee.y0) + 'px' });
+  }
+  const over = companionHit(p);
+  if (over !== state.hovering) { state.hovering = over; if (over) wake(); else if (state.phase === 'awake') sleepSoon(); }
+  stage.style.cursor = over ? 'pointer' : 'default';
+}
+function pointerUp(p) {
+  if (dragging) { dragging = null; hist.length = 0; }
+  if (marquee) {
+    const r = { x: Math.min(marquee.x0, marquee.x1), y: Math.min(marquee.y0, marquee.y1), w: Math.abs(marquee.x1 - marquee.x0), h: Math.abs(marquee.y1 - marquee.y0) };
+    marquee = null;
+    if (r.w > 12 && r.h > 12) takeRegion(r); else takeWindow();
+  }
+}
+function toggleMax(k) {
+  const w = W[k];
+  if (!w.maxed) { w.saved = { x: w.x, y: w.y, w: w.w, h: w.h }; Object.assign(w, { x: 0, y: C.menu, w: 1280, h: 800 - C.menu, maxed: true }); }
+  else { Object.assign(w, w.saved); w.maxed = false; }
+  layoutWindows();
+}
+stage.addEventListener('pointerdown', e => { if (state.tour && e.isTrusted) stopTour(); pointerDown(toStage(e), e.target, e); });
+window.addEventListener('pointermove', e => { if (!state.tour) pointerMove(toStage(e)); });
+window.addEventListener('pointerup', e => { if (!state.tour) pointerUp(toStage(e)); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (state.phase !== 'idle' && state.phase !== 'awake') { e.preventDefault(); dismiss(); } }
+});
+$('#prompt').addEventListener('keydown', e => { if (e.key === 'Enter') submit($('#prompt').value); });
+
+/* ── controls ── */
+function seg(id, key, fn) { $(id).querySelectorAll('button').forEach(b => b.onclick = () => { fn ? fn(b.dataset.v) : (state[key] = b.dataset.v); $(id).querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }); }
+seg('#trackSg', 'tracking');
+function setModel(v) { state.model = v; $('#modelSg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.v === v)); renderCard(); }
+seg('#modelSg', 'model', setModel);
+$('#keyInput').addEventListener('input', e => { state.apiKey = e.target.value.trim(); });
+$('#rmBtn').onclick = () => { state.reduceMotion = !state.reduceMotion; $('#rmBtn').classList.toggle('on', state.reduceMotion); targets(); };
+
+/* ── tour: drives the same handlers with a scripted pointer ── */
+const cur = $('#cursor'), cap = $('#caption');
+const sleep = ms => new Promise((res, rej) => { const t = setTimeout(() => state.tour ? res() : rej('stop'), ms); });
+function say(t) { cap.textContent = t; cap.style.opacity = t ? 1 : 0; }
+let cp = { x: 640, y: 420 };
+async function moveTo(x, y, ms = 650) {
+  const a = { ...cp }, t0 = performance.now();
+  await new Promise((res, rej) => {
+    const step = now => {
+      if (!state.tour) return rej('stop');
+      const u = Math.min(1, (now - t0) / ms), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+      cp = { x: a.x + (x - a.x) * e, y: a.y + (y - a.y) * e };
+      cur.style.left = cp.x - 3 + 'px'; cur.style.top = cp.y - 2 + 'px'; pointerMove(cp);
+      if (u < 1) requestAnimationFrame(step); else res();
+    };
+    requestAnimationFrame(step);
+  });
+}
+async function click(x, y) { await moveTo(x, y); pointerDown(cp, document.elementFromPoint(...toClient(cp))); await sleep(70); pointerUp(cp); }
+async function drag(x0, y0, x1, y1, ms = 800) { await moveTo(x0, y0); pointerDown(cp, null); await moveTo(x1, y1, ms); pointerUp(cp); }
+function toClient(p) { const r = stageRect(); return [r.left + p.x * scale, r.top + p.y * scale]; }
+function centreOf(el) { const r = el.getBoundingClientRect(), s = stageRect(); return { x: (r.left - s.left + r.width / 2) / scale, y: (r.top - s.top + r.height / 2) / scale }; }
+async function press(el) { const c = centreOf(el); await moveTo(c.x, c.y, 520); await sleep(120); el.click(); }
+async function type(text) { const i = $('#prompt'); for (const ch of text) { i.value += ch; await sleep(55); } }
+function tabCentre() { const r = tabRect(); return { x: r.x + r.w / 2, y: r.y + r.h / 2 }; }
+
+async function tour() {
+  reset();
+  state.tour = true; $('#tourBtn').classList.add('on'); $('#tourBtn').textContent = '■ Stop tour'; cur.style.display = 'block';
+  try {
+    say('Idle: still and quiet, tinted like the window it sits on'); await sleep(1800);
+    let t = tabCentre(); say('Hover wakes it'); await moveTo(t.x, t.y, 900); await sleep(1500);
+    say('Select text in the app as usual');
+    const v = $('#voiceText'); const vc = centreOf(v);
+    await moveTo(vc.x - 90, vc.y - 9, 700);
+    const range = document.createRange(); range.selectNodeContents(v); document.getSelection().removeAllRanges(); document.getSelection().addRange(range);
+    await moveTo(vc.x + 70, vc.y + 18, 500); await sleep(500);
+    t = tabCentre(); say('Click: the selection becomes the context'); await click(t.x, t.y); await sleep(1300);
+    say('Ask, or pick a suggestion'); await press($('#suggest').children[1]); await sleep(state.model === 'claude' && !state.apiKey ? 1800 : 3600);
+    if (state.keyNeeded) { say('Claude is opt-in: it needs your own API key'); await sleep(2200); $('#useDevice').click(); await sleep(3400); }
+    say('Write the answer back into the app'); const rb = $('#replBtn'); if (rb) { await press(rb); } await sleep(1600);
+
+    const g = W.ghostty; say('It follows focus and takes the new window’s color'); await click(g.x + 300, g.y + 16); await sleep(1400);
+    say('Drag the window: it stays attached'); await drag(g.x + 300, g.y + 16, g.x + 120, g.y - 70, 1100); await sleep(700);
+    t = tabCentre(); await moveTo(t.x, t.y, 600); await sleep(500);
+    say('No selection: selection mode, eyes follow the pointer'); await click(t.x, t.y); await sleep(400);
+    await moveTo(W.ghostty.x + 80, W.ghostty.y + 330, 900); await moveTo(W.ghostty.x + 500, W.ghostty.y + 200, 900);
+    const err = $('#term .rd'); const ec = centreOf(err);
+    say('Drag a region'); await drag(ec.x - 200, ec.y - 14, ec.x + 210, ec.y + 50, 900); await sleep(1100);
+    say('“Do it” proposes an action you confirm'); await press($('#suggest').children[3]); await sleep(state.model === 'claude' ? 1800 : 2400);
+    const run = $('#runBtn'); if (run) { await sleep(700); say('Hand the fix to Claude Code in the terminal'); await press(run); } await sleep(2600);
+
+    const h = W.helium; say('Maximized window: no room above, so it hangs inside like a notch'); await click(h.x + 360, h.y + 20); await sleep(900);
+    await click(h.x + 14 + 8 + 40, h.y + 20); await sleep(2400);
+    say(''); await sleep(300);
+  } catch (e) { /* stopped */ }
+  stopTour();
+}
+function stopTour() { state.tour = false; cur.style.display = 'none'; say(''); $('#tourBtn').classList.remove('on'); $('#tourBtn').textContent = '▶ Play tour'; }
+$('#tourBtn').onclick = () => state.tour ? stopTour() : tour();
+
+function reset() {
+  dismiss(true);
+  Object.assign(W.helium, { x: 330, y: 92, w: 720, h: 430, maxed: false });
+  Object.assign(W.ghostty, { x: 640, y: 300, w: 590, h: 400, maxed: false });
+  Object.assign(W.petal, { x: 90, y: 170, w: 780, h: 470, maxed: false });
+  $('#termInput').textContent = '';
+  $('#voiceText').textContent = 'We write like a smart friend who has five minutes: warm, curious and precise. Short sentences, no jargon.';
+  document.querySelectorAll('#petalCards .new').forEach(n => n.remove());
+  document.querySelectorAll('#heliumTabs .tab:not(:nth-child(-n+2))').forEach(n => n.remove());
+  order = ['helium', 'ghostty', 'petal']; focused = 'petal';
+  if (attached !== 'petal') { transfer = 'petal'; S.height.t = 0; }
+  layoutWindows();
+}
+
+/* ── start ── */
+layoutWindows(); targets(); renderSuggest(); renderCard();
+tint = hex(W.petal.tint); tintTarget = tint.slice();
+setTimeout(() => { S.height.t = C.tabH; }, 250);
+setInterval(() => { const d = new Date(); $('#clock').textContent = 'Mon 24 Jun ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }, 10000);
+requestAnimationFrame(frame);
+
+/* ── review hooks: #demo=awake|select|region|prompt|answer|claude-key|notch jumps to a state ── */
+(function demo() {
+  const d = (location.hash.match(/demo=([\w-]+)/) || [])[1]; if (!d) return;
+  // Headless capture runs on virtual time, where requestAnimationFrame never fires: drive frames from a timer.
+  setInterval(() => { if (performance.now() - lastT > 60) frame(performance.now()); }, 16);
+  const at = (ms, fn) => setTimeout(fn, ms);
+  if (d === 'awake') at(400, () => setPhase('awake'));
+  if (d === 'select') at(400, () => { state.pointer = { x: 760, y: 420 }; setPhase('selecting'); positionOverlay(); });
+  if (d === 'region' || d === 'prompt' || d === 'answer' || d === 'claude-key') at(300, () => {
+    const r = document.createRange(); r.selectNodeContents($('#voiceText')); document.getSelection().removeAllRanges(); document.getSelection().addRange(r);
+    companionClick();
+    if (d === 'answer') at(500, () => submit('Translate', 'translate'));
+    if (d === 'claude-key') at(500, () => { setModel('claude'); submit('Explain', 'explain'); });
+  });
+  if (d === 'ghostty') at(300, () => { focusWindow('ghostty'); at(900, () => { companionClick(); state.pointer = { x: 900, y: 600 };
+    at(400, () => { const e = $('#term .rd').getBoundingClientRect(), s = stageRect(); takeRegion({ x: (e.left - s.left) / scale - 10, y: (e.top - s.top) / scale - 4, w: 420, h: 70 }); at(400, () => submit('Do it', 'doit')); }); }); });
+  if (d === 'notch') at(300, () => { focusWindow('helium'); toggleMax('helium'); at(900, () => setPhase('awake')); });
+})();
+</script>
+</body></html>

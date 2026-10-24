@@ -1,0 +1,4 @@
+CompanionLabBin
+*.log
+probes/*
+!probes/*.swift
