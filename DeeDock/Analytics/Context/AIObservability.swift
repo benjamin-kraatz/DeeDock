@@ -18,6 +18,16 @@ nonisolated enum AIObservability {
 
     static func makeTrace() -> Trace { Trace() }
 
+    /// Anthropic API keys (`sk-ant-…`). Window text, copied text or an error can contain one, so
+    /// every payload is scrubbed before it is captured, whichever feature or model produced it.
+    private static let anthropicKey = #"sk-ant-[A-Za-z0-9_\-]{16,}"#
+
+    /// Replaces anything that looks like an Anthropic API key with a placeholder.
+    static func redacted(_ text: String) -> String {
+        guard text.contains("sk-ant-") else { return text }
+        return text.replacingOccurrences(of: anthropicKey, with: "[API key]", options: .regularExpression)
+    }
+
     /// Token counts a model reported for one generation.
     nonisolated struct Usage: Sendable {
         let input: Int
@@ -26,7 +36,8 @@ nonisolated enum AIObservability {
 
     /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
     /// another model passes its own `model` and `provider`. Credentials are never part of a
-    /// generation: callers pass only the prompt, the instructions and the answer.
+    /// generation: callers pass only the prompt, the instructions and the answer, and anything in
+    /// them that looks like an Anthropic API key is replaced (`redacted(_:)`) before sending.
     ///
     /// - Parameters:
     ///   - instructions: The session's instructions, sent as a system message before `input`.
@@ -53,14 +64,14 @@ nonisolated enum AIObservability {
         }
         if let error {
             properties["$ai_is_error"] = true
-            properties["$ai_error"] = error
+            properties["$ai_error"] = redacted(error)
         }
         if capturesContent {
             var messages: [[String: String]] = []
-            if let instructions { messages.append(["role": "system", "content": instructions]) }
-            messages.append(["role": "user", "content": input])
+            if let instructions { messages.append(["role": "system", "content": redacted(instructions)]) }
+            messages.append(["role": "user", "content": redacted(input)])
             properties["$ai_input"] = messages
-            if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": output]] }
+            if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": redacted(output)]] }
         }
         await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))
     }

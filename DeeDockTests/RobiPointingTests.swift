@@ -110,6 +110,15 @@ struct RobiPointingTests {
         #expect(RobiAgent.contextText(RobiContext(kind: .selection, text: "Hi")) == "Hi")
     }
 
+    // MARK: LLM analytics
+
+    @Test("Anthropic keys are scrubbed from anything sent to LLM analytics")
+    func redactsKeys() {
+        let text = "export ANTHROPIC_API_KEY=sk-ant-api03-AbC_def-1234567890xyz\nok"
+        #expect(AIObservability.redacted(text) == "export ANTHROPIC_API_KEY=[API key]\nok")
+        #expect(AIObservability.redacted("sk-ant- is a prefix") == "sk-ant- is a prefix")
+    }
+
     // MARK: Settings
 
     @Test("Attach Picture is off by default and survives a round trip; older settings load without it")

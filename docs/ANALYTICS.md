@@ -562,7 +562,9 @@ and `apple`, or `claude-sonnet-5-5` and `anthropic`), latency, and, because `cap
 caller passes them) and the full answer (`$ai_output_choices`). Robi's answers also carry
 `$ai_input_tokens` and `$ai_output_tokens` from the session's usage, and `$ai_is_error` with
 `$ai_error` (the message the card shows) when a request fails. A stopped answer is reported with
-what arrived before the stop. API keys are never part of an event: callers pass only text.
+what arrived before the stop. API keys are never part of an event: callers pass only text, and
+anything in it that looks like an Anthropic API key (`sk-ant-…`) is replaced with `[API key]`
+before sending, for every feature.
 Pictures are not sent; a prompt that had one says `[Picture attached: …]`.
 
 This is the one place where prohibited content leaves the device. Depending on the feature the
