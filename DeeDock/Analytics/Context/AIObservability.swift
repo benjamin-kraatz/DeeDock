@@ -18,14 +18,26 @@ nonisolated enum AIObservability {
 
     static func makeTrace() -> Trace { Trace() }
 
-    /// Anthropic API keys (`sk-ant-…`). Window text, copied text or an error can contain one, so
-    /// every payload is scrubbed before it is captured, whichever feature or model produced it.
-    private static let anthropicKey = #"sk-ant-[A-Za-z0-9_\-]{16,}"#
+    /// Credential shapes scrubbed from every payload: Anthropic and OpenAI keys (`sk-…`), GitHub
+    /// tokens, AWS access key IDs, Google API keys and Slack tokens. Window text, copied text or an
+    /// error can contain one, so every payload is scrubbed before it is captured, whichever
+    /// feature or model produced it. Anthropic's pattern comes first, so its keys are replaced
+    /// whole before the broader `sk-` pattern runs.
+    private static let credentialPatterns = [
+        #"\bsk-ant-[A-Za-z0-9_\-]{16,}"#,
+        #"\bsk-[A-Za-z0-9_\-]{20,}"#,
+        #"gh[pousr]_[A-Za-z0-9]{36,}"#,
+        #"github_pat_[A-Za-z0-9_]{22,}"#,
+        #"\bAKIA[0-9A-Z]{16}\b"#,
+        #"AIza[0-9A-Za-z_\-]{35}"#,
+        #"xox[abposr]-[A-Za-z0-9\-]{10,}"#,
+    ]
 
-    /// Replaces anything that looks like an Anthropic API key with a placeholder.
+    /// Replaces anything that looks like an API key or access token with a placeholder.
     static func redacted(_ text: String) -> String {
-        guard text.contains("sk-ant-") else { return text }
-        return text.replacingOccurrences(of: anthropicKey, with: "[API key]", options: .regularExpression)
+        credentialPatterns.reduce(text) { result, pattern in
+            result.replacingOccurrences(of: pattern, with: "[API key]", options: .regularExpression)
+        }
     }
 
     /// Token counts a model reported for one generation.
@@ -37,7 +49,7 @@ nonisolated enum AIObservability {
     /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
     /// another model passes its own `model` and `provider`. Credentials are never part of a
     /// generation: callers pass only the prompt, the instructions and the answer, and anything in
-    /// them that looks like an Anthropic API key is replaced (`redacted(_:)`) before sending.
+    /// them that looks like an API key or access token is replaced (`redacted(_:)`) before sending.
     ///
     /// - Parameters:
     ///   - instructions: The session's instructions, sent as a system message before `input`.

@@ -782,13 +782,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausnahme: Wenn du eine KI-Funktion nutzt, etwa Robi oder eine Apple-Intelligence-Funktion, werden Anfrage und Antwort vollständig geteilt. Sie können App-Namen, Fenstertitel, kopierten Text und das enthalten, was du Robi gibst."
+            "value" : "Ausnahme: Wenn du eine KI-Funktion nutzt, etwa Robi oder eine Apple-Intelligence-Funktion, werden Anfrage und Antwort vollständig geteilt. Sie können App-Namen, Fenstertitel, kopierten Text und das enthalten, was du Robi gibst. Bilder werden nicht geteilt, API-Schlüssel werden entfernt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exception: when you use an AI feature, such as Robi or an Apple Intelligence feature, its request and its answer are shared in full. They can contain app names, window titles, text you copied, and what you hand to Robi."
+            "value" : "Exception: when you use an AI feature, such as Robi or an Apple Intelligence feature, its request and its answer are shared in full. They can contain app names, window titles, text you copied, and what you hand to Robi. Pictures are left out, and API keys are removed."
           }
         }
       }
@@ -5660,13 +5660,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Robi liest ein Fenster nur, wenn du darauf klickst oder den Kurzbefehl drückst, und behält danach nichts. Wenn du Nutzungsstatistiken teilst, werden Robis Anfragen und Antworten vollständig geteilt, wie bei den anderen KI-Funktionen von DOKK."
+            "value" : "Robi liest ein Fenster nur, wenn du darauf klickst oder den Kurzbefehl drückst, und behält danach nichts. Wenn du Nutzungsstatistiken teilst, werden Robis Anfragen und Antworten vollständig geteilt, wie bei den anderen KI-Funktionen von DOKK. Bilder werden nicht geteilt, API-Schlüssel werden entfernt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Robi reads a window only when you click it or press the shortcut, and keeps nothing afterwards. If you share usage statistics, Robi’s requests and answers are shared in full, like those of DOKK’s other AI features."
+            "value" : "Robi reads a window only when you click it or press the shortcut, and keeps nothing afterwards. If you share usage statistics, Robi’s requests and answers are shared in full, like those of DOKK’s other AI features. Pictures are left out, and API keys are removed."
           }
         }
       }

@@ -112,11 +112,25 @@ struct RobiPointingTests {
 
     // MARK: LLM analytics
 
-    @Test("Anthropic keys are scrubbed from anything sent to LLM analytics")
+    @Test("API keys and access tokens are scrubbed from anything sent to LLM analytics")
     func redactsKeys() {
         let text = "export ANTHROPIC_API_KEY=sk-ant-api03-AbC_def-1234567890xyz\nok"
         #expect(AIObservability.redacted(text) == "export ANTHROPIC_API_KEY=[API key]\nok")
         #expect(AIObservability.redacted("sk-ant- is a prefix") == "sk-ant- is a prefix")
+        let tokens = [
+            "sk-proj-AbCdEfGhIjKlMnOpQrStUvWx",                      // OpenAI
+            "ghp_" + String(repeating: "a1B2", count: 9),             // GitHub classic
+            "github_pat_" + String(repeating: "Ab1_", count: 6),      // GitHub fine-grained
+            "AKIAIOSFODNN7EXAMPLE",                                    // AWS access key ID
+            "AIza" + String(repeating: "Xy9_-", count: 7),            // Google API key
+            "xoxb-1234567890-abcdefghij",                              // Slack
+        ]
+        for token in tokens {
+            #expect(AIObservability.redacted("key: \(token) end") == "key: [API key] end", "\(token)")
+        }
+        // A word that merely ends in "sk-" is not a key.
+        let prose = "ask-me later, task-0123456789abcdefghijkl"
+        #expect(AIObservability.redacted(prose) == prose)
     }
 
     // MARK: Settings

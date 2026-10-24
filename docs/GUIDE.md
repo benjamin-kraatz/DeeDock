@@ -491,7 +491,7 @@ Clicking Robi never activates DOKK, so the app keeps its selection and stays in 
 
 **Answers.** By default Robi answers with Apple Intelligence on this Mac, and what you pick never leaves it. Under **Answers** you can choose **Claude** instead, with your own Anthropic API key. Pick **Haiku 5.5** for the fastest and cheapest answers, **Sonnet 5.5** (the default) for a balance, or **Opus 5.5** for the most capable and most expensive ones, and set **Medium** or **High** effort. The card's footer names the model that answered. DOKK keeps the key in your Keychain, and your question and its context go from this Mac straight to Anthropic, billed to your Anthropic account. When Claude is chosen and no key is saved, Robi's card asks for one, or answers this question on this Mac instead.
 
-Robi reads a window only when you click it or press its shortcut, and it keeps nothing afterwards: no history, and nothing written to disk. If you share usage statistics, Robi's requests and answers are shared in full, like those of DOKK's other AI features: your question, what you picked, and the answer, never your API key. Pictures are not sent there. See [Robi](ROBI.md) for how it follows windows, what it can read in which apps, and its limits.
+Robi reads a window only when you click it or press its shortcut, and it keeps nothing afterwards: no history, and nothing written to disk. If you share usage statistics, Robi's requests and answers are shared in full, like those of DOKK's other AI features: your question, what you picked, and the answer, never your API key: anything that looks like an API key is removed. Pictures are not sent there. See [Robi](ROBI.md) for how it follows windows, what it can read in which apps, and its limits.
 
 ## Plugins
 
