@@ -38,7 +38,7 @@ struct RobiGeometryTests {
         let size = CGSize(width: RobiMetrics.barWidth + 2 * RobiMetrics.sideMargin, height: 400)
         let frame = RobiLayout.panelFrame(window: window, placement: .above, size: size, display: display)
         #expect(frame.maxX <= display.frame.maxX)
-        #expect(RobiLayout.anchorX(window: window, display: display) == (1200 + 1440) / 2)
+        #expect(RobiLayout.anchorX(window: window, display: display) == CGFloat(1200 + 1440) / 2)
     }
 
     @Test("Top-left and AppKit rects convert around the primary display's height")
