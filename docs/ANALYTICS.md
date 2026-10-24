@@ -7,7 +7,7 @@ and the rules for adding to it. It is linked from Settings › General › Priva
 ## What is never collected
 
 These are prohibited in every product event, property, and person property. There are three
-exceptions, all described below: [Apple Intelligence observability](#apple-intelligence-observability),
+exceptions, all described below: [AI observability](#ai-observability),
 which sends prompt and answer text; [surveys](#surveys), which send what a person chose or typed in
 answer to a survey; and [Line icon coverage](#line-icon-coverage), which sends the bundle IDs of
 public apps that have no Line glyph yet.
@@ -416,8 +416,8 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `focus_dock_command` | `command` |
 | `focus_session` | `action` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
-| `robi_answered` | `model` (`on_device`, `claude`), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
-| `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`) |
+| `robi_answered` | `model` (`on_device`, `claude`), `claude_model` (`haiku`, `sonnet`, `opus`; only when Claude answered), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
+| `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`, `point` for clicking a reference in the answer, which spotlights it on the window) |
 
 Atmosphere has no events of its own. Its settings are reported through `setting_changed` with
 `area = atmosphere`.
@@ -425,13 +425,14 @@ Atmosphere has no events of its own. Its settings are reported through `setting_
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
 
 Robi's settings are reported through `setting_changed` with `area = robi`, by reflection over
-`RobiSettings`: `isEnabled`, `answerModel`, `claudeEffort`, `suggestQuestions`, `shortcutEnabled`, and the number of
+`RobiSettings`: `isEnabled`, `answerModel`, `claudeModel`, `claudeEffort`, `suggestQuestions`, `attachWindowPicture`, `shortcutEnabled`, and the number of
 excluded apps (never their bundle IDs). Where the tab was dragged (`tabPositions`, keyed by bundle
 ID) is not reported at all, not even as a count. Whether an Anthropic API key is saved is not reported, and
 the key itself never leaves the Keychain except in requests to Anthropic.
 
-Robi events never include the app, the window, the selection, recognized text, the question, the
-answer, or the proposed command. Robi requests are not sent to Apple Intelligence observability.
+Robi's product events never include the app, the window, the selection, recognized text, the
+question, the answer, or the proposed command. Its model calls go to LLM analytics in full, like
+DOKK's other model calls; see [AI observability](#ai-observability).
 
 Plugin events carry counts, durations, surfaces, and yes/no flags only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
 The feed sends no event when a notification arrives, and none of its events carry text or app
@@ -551,12 +552,20 @@ Events that involve a file send its uniform type identifier as `file_type`.
 - The type is derived from the file extension. The file is not read.
 - A drop of mixed types sends no `file_type`.
 
-## Apple Intelligence observability
+## AI observability
 
-Every request DOKK makes to the on-device model is also sent as a PostHog `$ai_generation`
-event (`DeeDock/Analytics/Context/AIObservability.swift`). It carries a trace and session ID,
-the span name, latency, and, because `capturesContent` is `true`, the full prompt (`$ai_input`)
-and the full answer (`$ai_output_choices`).
+Every request DOKK makes to the on-device model, and every request Robi makes to Claude, is also
+sent as a PostHog `$ai_generation` event (`DeeDock/Analytics/Context/AIObservability.swift`). It
+carries a trace and session ID, the span name, the model and provider (`apple_foundation_models`
+and `apple`, or `claude-haiku-5-5`, `claude-sonnet-5-5` or `claude-opus-5-5` and `anthropic`), latency, and, because `capturesContent` is
+`true`, the full prompt (`$ai_input`, with the session's instructions as a system message where a
+caller passes them) and the full answer (`$ai_output_choices`). Robi's answers also carry
+`$ai_input_tokens` and `$ai_output_tokens` from the session's usage, and `$ai_is_error` with
+`$ai_error` (the message the card shows) when a request fails. A stopped answer is reported with
+what arrived before the stop. API keys are never part of an event: callers pass only text, and
+anything in it shaped like an API key or access token (Anthropic, OpenAI, GitHub, AWS, Google,
+Slack) is replaced with `[API key]` before sending, for every feature.
+Pictures are not sent; a prompt that had one says `[Picture attached: …]`.
 
 This is the one place where prohibited content leaves the device. Depending on the feature the
 prompt or answer contains:
@@ -572,12 +581,15 @@ prompt or answer contains:
 | `window_search_image_match` | the search phrase and the model's description of the window |
 | `window_watch_explanation` | the model's description of what changed in the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
+| `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu commands for Do It, and the answer, on this Mac or from Claude |
+| `robi_suggest_questions` | Robi's instructions, what the person picked, and the suggested questions |
 
-Robi is the exception: its requests carry window text the person picked, so `RobiAgent` does not
-call `AIObservability` at all, for either model.
+One Robi interaction, from the click to the card closing, is one trace: its suggested questions
+and every answer asked in it share a `$ai_trace_id`.
 
 These events pass the same consent gate as everything else. The Privacy card and the tour say
-that Apple Intelligence requests and answers are shared in full. Setting `capturesContent` to
+that requests and answers of AI features, Robi and Apple Intelligence ones, are shared in full, and
+Robi's settings say so too. Setting `capturesContent` to
 `false` keeps latency and span names and drops the text.
 
 ## Surveys

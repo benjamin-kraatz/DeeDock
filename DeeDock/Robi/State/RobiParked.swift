@@ -12,6 +12,8 @@ struct RobiExchange {
     var isStopped = false
     var canReplace = false
     var answerModel: RobiAnswerModel = .onDevice
+    /// The Claude model that answered; read only when `answerModel` is `.claude`.
+    var claudeModel: RobiClaudeModel = .sonnet
     /// `.thinking` while the answer is still being written, `.answered` once it is complete.
     var phase: RobiPhase = .thinking
 }

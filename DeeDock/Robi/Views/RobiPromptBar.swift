@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// The prompt bar the tab becomes: the context chip, then the question field or the request
-/// being answered, with the system's small spinner while a model works. It is the only spinner:
+/// being answered, with the system's small spinner while a model works. For the whole window,
+/// the field ends in the Attach Picture switch. It is the only spinner:
 /// it stays in one place from the question until the last streamed word.
 struct RobiPromptBar: View {
     @Bindable var model: RobiModel
@@ -24,6 +25,10 @@ struct RobiPromptBar: View {
                 .foregroundStyle(model.ink)
                 .focused($focused)
                 .onSubmit { actions.submit(model.prompt) }
+                if model.context?.kind == .window {
+                    RobiPictureToggle(model: model, toggle: actions.toggleWindowPicture)
+                        .transition(.opacity)
+                }
             } else {
                 Text(model.request)
                     .font(.system(size: 13))

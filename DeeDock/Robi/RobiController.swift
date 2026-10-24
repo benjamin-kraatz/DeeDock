@@ -34,6 +34,14 @@ final class RobiController {
     @ObservationIgnored private let shortcut = RobiShortcut()
     @ObservationIgnored private var panel: RobiPanel?
     @ObservationIgnored private var sheet: RobiSelectionSheet?
+    /// Rings a landmark the answer referred to; made the first time a reference is clicked.
+    @ObservationIgnored private var spotlight: RobiSpotlight?
+    /// Flies a picked region into the face; made the first time a region is picked.
+    @ObservationIgnored private var flight: RobiFlight?
+    /// Startles the face when the flight lands and calms it again. Cancelled with the flight.
+    @ObservationIgnored private var surpriseTask: Task<Void, Never>?
+    /// Groups one interaction's model calls in LLM analytics: its suggested questions and answers.
+    @ObservationIgnored private var trace = AIObservability.makeTrace()
     @ObservationIgnored private var panelSize = CGSize.zero
     @ObservationIgnored private var tokens: [NSObjectProtocol] = []
     @ObservationIgnored private var pointerMonitors: [Any] = []
@@ -121,7 +129,9 @@ final class RobiController {
     private func configure() {
         let settings = store.settings
         model.answerModel = settings.answerModel
+        model.claudeModel = settings.claudeModel
         model.claudeEffort = settings.claudeEffort
+        model.attachesWindowPicture = settings.attachWindowPicture
         tracker.excludedBundleIdentifiers = Set(settings.excludedBundleIdentifiers)
         // Reset Tab Positions empties the saved ones; this session's per-window ones go with them.
         if settings.tabPositions.isEmpty, !windowPositions.isEmpty {
@@ -186,6 +196,8 @@ final class RobiController {
         actions.replace = { [weak self] in self?.replaceSelection() }
         actions.paste = { [weak self] in self?.pasteAnswer() }
         actions.runProposal = { [weak self] in self?.runProposal() }
+        actions.point = { [weak self] landmark in self?.point(at: landmark) }
+        actions.toggleWindowPicture = { [weak self] in self?.toggleWindowPicture() }
         actions.saveClaudeKey = { [weak self] key in self?.saveClaudeKey(key) }
         actions.answerOnDevice = { [weak self] in self?.answerPendingOnDevice() }
         actions.openSettings = { [weak self] in self?.openSettings() }
@@ -256,6 +268,7 @@ final class RobiController {
                                           stretch: drag?.stretch ?? settleStretch)
         if panel.frame != frame { panel.setFrame(frame, display: true) }
         sheet?.move(over: window)
+        spotlight?.move(over: window)
     }
 
     private func setPhase(_ phase: RobiPhase) {
@@ -517,6 +530,7 @@ final class RobiController {
         dizzyTask = nil
         circles.reset()
         eyes.dizzy = nil
+        calm()
         eyes.isBlinking = false
         eyes.pupil = CGSize(width: 0, height: 2)
     }
@@ -526,14 +540,24 @@ final class RobiController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in self?.eyes.isBlinking = false }
     }
 
+    /// The face's centre in AppKit screen points, read off the panel's frame: at the bar's
+    /// leading end while the bar is open (side margin, flare, the row's padding, half the compact
+    /// face), in the middle of the tab otherwise; vertically the middle of the tab, which sits
+    /// under the shadow margin when the tab is above the window. The pupils and the flight of a
+    /// picked region both aim here.
+    private func faceCentre() -> CGPoint? {
+        guard let panel else { return nil }
+        let frame = panel.frame
+        let x = model.phase.isBar ? frame.minX + RobiMetrics.sideMargin + RobiMetrics.flare + 7 + 20 : frame.midX
+        let tabTop = model.placement == .above ? frame.maxY - RobiMetrics.shadowMargin : frame.maxY
+        return CGPoint(x: x, y: tabTop - RobiMetrics.tabHeight / 2)
+    }
+
     /// Points the pupils at the pointer, reaching full deflection 140 pt away.
     private func updatePupils() {
-        guard let panel, !model.reduceMotion else { return }
+        guard !model.reduceMotion, let face = faceCentre() else { return }
         let mouse = NSEvent.mouseLocation
-        let frame = panel.frame
-        let faceX = model.phase.isBar ? frame.minX + RobiMetrics.sideMargin + RobiMetrics.flare + 7 + 20 : frame.midX
-        let tabTop = model.placement == .above ? frame.maxY - RobiMetrics.shadowMargin : frame.maxY
-        let dx = mouse.x - faceX, dy = mouse.y - (tabTop - RobiMetrics.tabHeight / 2)
+        let dx = mouse.x - face.x, dy = mouse.y - face.y
         let distance = max(1, hypot(dx, dy))
         let reach = min(1, distance / 140)
         let next = CGSize(width: dx / distance * 2.6 * reach, height: -dy / distance * 2.2 * reach)
@@ -558,6 +582,50 @@ final class RobiController {
             self.circles.reset()
             self.dizzyTask = nil
         }
+    }
+
+    // MARK: Surprise
+
+    /// Sends the picked region flying from where it was drawn into the face, and startles the
+    /// face as it lands. Runs beside the capture and the morph into the prompt bar: nothing waits
+    /// for it, and a pick made while one is still in the air starts both over. Call after
+    /// `enterPrompt()`, so the face is where the bar puts it.
+    private func fly(_ region: CGRect, from target: RobiWindowTarget) {
+        guard let face = faceCentre() else { return }
+        let window = RobiScreenSpace.current.appKitRect(fromTopLeft: target.frame)
+        let path = RobiFlightPath(region: region, window: window, face: face, reduceMotion: model.reduceMotion)
+        let flight = flight ?? RobiFlight()
+        self.flight = flight
+        flight.show(path, above: panel)
+        surpriseTask?.cancel()
+        surpriseTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(path.landing))
+            guard !Task.isCancelled, let self else { return }
+            self.startle()
+            try? await Task.sleep(for: .seconds(RobiSurprise.duration))
+            guard !Task.isCancelled else { return }
+            self.eyes.surprised = nil
+            self.surpriseTask = nil
+        }
+    }
+
+    /// The piece hit the face. A spin still going ends here: both want the pupils and the mouth,
+    /// and being hit is the better reason to stop seeing stars.
+    private func startle() {
+        if dizzyTask != nil {
+            dizzyTask?.cancel()
+            dizzyTask = nil
+            circles.reset()
+            eyes.dizzy = nil
+        }
+        eyes.surprised = RobiSurprise(start: .now)
+    }
+
+    /// Ends the surprise, landed or still on its way.
+    private func calm() {
+        surpriseTask?.cancel()
+        surpriseTask = nil
+        eyes.surprised = nil
     }
 
     private func accessibilityOptionsChanged() {
@@ -618,6 +686,7 @@ final class RobiController {
     private func begin(_ trigger: AnalyticsTrigger, wholeWindow: Bool = false) {
         guard let target = tracker.target else { return }
         self.trigger = trigger
+        trace = AIObservability.makeTrace()
         isPickingAgain = false
         tracker.isPinned = true
         didUse()
@@ -655,25 +724,35 @@ final class RobiController {
         sheet.show(over: RobiScreenSpace.current.appKitRect(fromTopLeft: target.frame), below: panel)
     }
 
+    /// A region was dragged on the sheet. The prompt bar opens at once; the region flies into the
+    /// face meanwhile and is captured and read in the background.
     private func takeRegion(_ region: CGRect) {
         guard let target = tracker.target else { return }
         contextTask?.cancel()
-        sheet?.close()
-        guard CGPreflightScreenCaptureAccess() else { return showNotice(.screenRecordingNeeded) }
+        guard CGPreflightScreenCaptureAccess() else {
+            sheet?.close()
+            return showNotice(.screenRecordingNeeded)
+        }
         model.context = RobiContext(kind: .region, text: "")
         model.isReadingContext = true
         enterPrompt()
+        // The overlay goes up before the sheet comes down, so the dashed rectangle is never
+        // missing for a frame between the two.
+        fly(region, from: target)
+        sheet?.close()
         contextTask = Task { [weak self, capture] in
             let image = await capture.image(windowID: target.windowID, region: region)
-            let text = if let image { await capture.recognizeText(image) } else { "" }
+            let lines = if let image { await capture.recognizeLines(image) } else { [RobiRecognizedLine]() }
             guard !Task.isCancelled, let self else { return }
-            self.model.context = RobiContext(kind: .region, text: text, image: image)
+            // The region is in window-local points, so its lines are too, like the window's landmarks.
+            self.model.context = RobiContext(kind: .region, text: lines.map(\.text).joined(separator: "\n"), image: image,
+                                             landmarks: RobiLandmark.recognized(lines, in: region), windowSize: target.frame.size)
             self.model.isReadingContext = false
             self.suggestQuestions()
         }
     }
 
-    /// The window's accessibility text when it has some, otherwise its picture and the text in it.
+    /// The whole window as context: its accessibility text and landmarks, then its picture.
     private func takeWindow() {
         guard let target = tracker.target else { return }
         contextTask?.cancel()
@@ -681,20 +760,70 @@ final class RobiController {
         model.context = RobiContext(kind: .window, text: "")
         model.isReadingContext = true
         enterPrompt()
+        readWindow(target)
+    }
+
+    /// Reads the window's accessibility text and landmarks. A picture goes with them when Attach
+    /// Picture is on, and as a fallback when the text is too thin to answer from (under 200
+    /// characters); then the text Vision recognizes in the picture replaces the accessibility
+    /// text if it found more, and its lines become the landmarks.
+    private func readWindow(_ target: RobiWindowTarget) {
         let canCapture = CGPreflightScreenCaptureAccess()
+        let attach = store.settings.attachWindowPicture
+        model.canAttachPicture = canCapture
         contextTask = Task { [weak self, capture] in
-            var text = await RobiWindowText.read(processIdentifier: target.processIdentifier)
+            let reading = await RobiWindowText.read(processIdentifier: target.processIdentifier)
+            var text = reading.text, landmarks = reading.landmarks
+            let isThin = text.count < 200
             var image: CGImage?
-            if text.count < 200, canCapture, let picture = await capture.image(windowID: target.windowID) {
+            if isThin || attach, canCapture, let picture = await capture.image(windowID: target.windowID) {
                 image = picture
-                let recognized = await capture.recognizeText(picture)
-                if recognized.count > text.count { text = recognized }
+                if isThin {
+                    let lines = await capture.recognizeLines(picture)
+                    let recognized = lines.map(\.text).joined(separator: "\n")
+                    if recognized.count > text.count {
+                        text = recognized
+                        landmarks = RobiLandmark.recognized(lines, in: CGRect(origin: .zero, size: target.frame.size))
+                    }
+                }
             }
             guard !Task.isCancelled, let self else { return }
-            self.model.context = RobiContext(kind: .window, text: text, image: image)
+            self.model.context = RobiContext(kind: .window, text: text, image: image, landmarks: landmarks,
+                                             windowSize: target.frame.size, pictureIsFallback: isThin && image != nil)
             self.model.isReadingContext = false
             self.suggestQuestions()
             if text.isEmpty, image == nil, !canCapture { self.showNotice(.screenRecordingNeeded) }
+        }
+    }
+
+    /// Flips Attach Picture from the prompt bar and applies it to the window already read: on
+    /// takes the picture now, off drops one taken only because the switch was on. A fallback
+    /// picture stays, since without it Robi would have almost nothing to read. An answer asked
+    /// meanwhile waits for the picture, through `contextTask`.
+    private func toggleWindowPicture() {
+        store.settings.attachWindowPicture.toggle()
+        let attach = store.settings.attachWindowPicture
+        model.attachesWindowPicture = attach
+        guard model.phase == .prompting, let target = tracker.target, let context = model.context, context.kind == .window else { return }
+        if model.isReadingContext {
+            // The read in progress decided before the switch flipped; read again with the new choice.
+            contextTask?.cancel()
+            return readWindow(target)
+        }
+        if attach, context.image == nil {
+            guard CGPreflightScreenCaptureAccess() else {
+                model.canAttachPicture = false
+                return
+            }
+            model.isReadingContext = true
+            contextTask = Task { [weak self, capture] in
+                let picture = await capture.image(windowID: target.windowID)
+                guard !Task.isCancelled, let self else { return }
+                self.model.context?.image = picture
+                self.model.isReadingContext = false
+            }
+        } else if !attach, context.image != nil, !context.pictureIsFallback {
+            model.context?.image = nil
         }
     }
 
@@ -732,9 +861,11 @@ final class RobiController {
         guard model.suggestsQuestions, model.phase == .prompting, let context = model.context,
               !context.text.isEmpty else { return }
         let applicationName = model.applicationName
+        let trace = trace
         let builtIns = RobiIntent.actions(canReplace: model.canReplace).map { String(localized: $0.title) }
         suggestTask = Task { [weak self] in
-            let questions = await RobiSuggester.questions(about: context, applicationName: applicationName, excluding: builtIns)
+            let questions = await RobiSuggester.questions(about: context, applicationName: applicationName,
+                                                          excluding: builtIns, trace: trace)
             guard !Task.isCancelled, let self, self.model.phase == .prompting, !questions.isEmpty else { return }
             self.model.generatedSuggestions = questions
         }
@@ -754,6 +885,7 @@ final class RobiController {
         cancelSuggestions()
         // One answer at a time: a new question drops the one waiting on another window.
         dropParked()
+        spotlight?.hide()
         model.request = text
         model.answer = ""
         model.proposal = nil
@@ -762,7 +894,9 @@ final class RobiController {
         model.isStopped = false
         setPhase(.thinking)
         let choice = override ?? store.settings.answerModel
+        let claudeModel = store.settings.claudeModel
         model.answerModel = choice
+        model.claudeModel = claudeModel
         let agentModel: RobiAgent.Model
         switch choice {
         case .onDevice:
@@ -777,7 +911,7 @@ final class RobiController {
                 model.notice = .claudeKeyMissing
                 return report(intent, outcome: .keyMissing, started: Date())
             }
-            agentModel = .claude(key: key, effort: store.settings.claudeEffort)
+            agentModel = .claude(claudeModel, key: key, effort: store.settings.claudeEffort)
         }
         pending = nil
         let started = Date()
@@ -786,13 +920,14 @@ final class RobiController {
         answerGeneration = nextGeneration()
         let generation = answerGeneration
         answering = (intent, started)
+        let trace = trace
         answerTask = Task { [weak self, agent, contextTask, menuTask] in
             await contextTask?.value
             let commands = acts ? await menuTask?.value ?? [] : []
             // Read through the generation: the answer may have been set aside while it waited.
             guard !Task.isCancelled, let self, let exchange = self.exchange(generation) else { return }
             let request = RobiAgent.Request(intent: intent, text: text, context: exchange.context,
-                                            applicationName: target.applicationName, menuCommands: commands)
+                                            applicationName: target.applicationName, menuCommands: commands, trace: trace)
             var failure: Error?
             do {
                 try await agent.answer(request, model: agentModel,
@@ -804,7 +939,7 @@ final class RobiController {
                 failure = error
             }
             guard !Task.isCancelled else { return }
-            self.complete(generation, intent: intent, text: text, started: started, model: choice,
+            self.complete(generation, intent: intent, text: text, started: started, model: choice, claudeModel: claudeModel,
                           picture: request.context?.image != nil, failure: failure)
         }
     }
@@ -844,7 +979,7 @@ final class RobiController {
 
     /// The answer finished, failed, or came back empty, on screen or set aside.
     private func complete(_ generation: Int, intent: RobiIntent, text: String, started: Date,
-                          model answerModel: RobiAnswerModel, picture: Bool, failure: Error?) {
+                          model answerModel: RobiAnswerModel, claudeModel: RobiClaudeModel, picture: Bool, failure: Error?) {
         guard let destination = destination(of: generation) else { return }
         var outcome = AnalyticsRobiOutcome.answered
         var keyMissing = false
@@ -875,7 +1010,7 @@ final class RobiController {
             if keyMissing { parked?.pending = waiting }
             updateParkedBadge()
         }
-        report(intent, outcome: outcome, started: started, model: answerModel, picture: outcome != .failed && picture)
+        report(intent, outcome: outcome, started: started, model: (answerModel, claudeModel), picture: outcome != .failed && picture)
     }
 
     /// Stops the answer in progress and keeps whatever has arrived, with its actions enabled.
@@ -896,8 +1031,11 @@ final class RobiController {
     }
 
     private func report(_ intent: RobiIntent, outcome: AnalyticsRobiOutcome, started: Date,
-                        model answerModel: RobiAnswerModel? = nil, picture: Bool = false) {
-        Analytics.track(.robiAnswered(model: AnalyticsRobiModel(answerModel ?? model.answerModel), intent: AnalyticsRobiIntent(intent),
+                        model answered: (model: RobiAnswerModel, claude: RobiClaudeModel)? = nil, picture: Bool = false) {
+        let (answerModel, claudeModel) = answered ?? (model.answerModel, model.claudeModel)
+        Analytics.track(.robiAnswered(model: AnalyticsRobiModel(answerModel),
+                                      claudeModel: answerModel == .claude ? AnalyticsRobiClaudeModel(claudeModel) : nil,
+                                      intent: AnalyticsRobiIntent(intent),
                                       outcome: outcome, duration: Date().timeIntervalSince(started), picture: picture))
     }
 
@@ -918,14 +1056,14 @@ final class RobiController {
     // MARK: Putting the answer back
 
     private func copyAnswer() {
-        RobiAppActions.copy(model.answer)
+        RobiAppActions.copy(model.answerText)
         flash(.robiToastCopied)
         Analytics.track(.robiActionTaken(.copy))
     }
 
     private func replaceSelection() {
         guard let selection else { return }
-        let result = RobiAppActions.replace(selection, with: model.answer)
+        let result = RobiAppActions.replace(selection, with: model.answerText)
         switch result {
         case .replaced: flash(.robiToastReplaced)
         case .selectionChanged: flash(.robiToastSelectionChanged)
@@ -938,7 +1076,7 @@ final class RobiController {
 
     private func pasteAnswer() {
         guard let target = tracker.target else { return }
-        let text = model.answer
+        let text = model.answerText
         dismiss()
         Analytics.track(.robiActionTaken(.paste))
         // Give the app its key window back before ⌘V arrives.
@@ -954,6 +1092,28 @@ final class RobiController {
         guard pressed else { return }
         Analytics.track(.robiActionTaken(.runCommand))
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.dismiss() }
+    }
+
+    /// Spotlights a landmark the answer referred to on the window it was read from, which is the
+    /// pinned window while the card shows. Landmarks keep their place relative to the window's
+    /// top-left corner; one that no longer falls inside the window, after a resize, says so.
+    private func point(at id: Int) {
+        guard model.phase.showsCard, let landmark = model.context?.landmark(id), let target = tracker.target else { return }
+        let space = RobiScreenSpace.current
+        let window = space.appKitRect(fromTopLeft: target.frame)
+        let visible = landmark.frame.intersection(CGRect(origin: .zero, size: target.frame.size))
+        guard !visible.isNull, visible.width >= 2, visible.height >= 2 else { return flash(.robiToastPointGone) }
+        let spotlight = spotlight ?? RobiSpotlight()
+        self.spotlight = spotlight
+        spotlight.show(visible, over: window, below: panel, reduceMotion: model.reduceMotion,
+                       reduceTransparency: model.reduceTransparency)
+        if let panel {
+            NSAccessibility.post(element: panel, notification: .announcementRequested, userInfo: [
+                .announcement: String(localized: .robiPointAnnouncement(String(landmark.label.prefix(80)))),
+                .priority: NSAccessibilityPriorityLevel.high.rawValue,
+            ])
+        }
+        Analytics.track(.robiActionTaken(.point))
     }
 
     private func flash(_ toast: LocalizedStringResource) {
@@ -990,6 +1150,9 @@ final class RobiController {
         answering = nil
         answerGeneration = nextGeneration()
         sheet?.close()
+        spotlight?.hide()
+        flight?.hide()
+        calm()
         RobiWebAccessibility.restore(webChange)
         webChange = .none
         panel?.allowsKey = false

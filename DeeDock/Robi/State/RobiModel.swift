@@ -77,9 +77,28 @@ final class RobiModel {
     /// Suggested questions may arrive for this prompt, so the panel keeps room for their row.
     var suggestsQuestions = false
     var answerModel: RobiAnswerModel = .onDevice
+    /// The Claude model that answers, named in the card's footer; read only when `answerModel` is
+    /// `.claude`.
+    var claudeModel: RobiClaudeModel = .sonnet
     var claudeEffort: RobiClaudeEffort = .medium
+    /// The Attach Picture switch in the prompt bar, mirrored from `RobiSettings`.
+    var attachesWindowPicture = false
+    /// Screen Recording allows a picture of the window, checked when the window is read.
+    var canAttachPicture = true
     var reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
     var reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
+
+    /// The answer with its links to landmarks taken out and kept as references. While the
+    /// answer streams, a link that has not fully arrived is held back.
+    var referencedAnswer: RobiReferencedAnswer {
+        RobiReferencedAnswer(answer, landmarks: Set(context?.landmarks.map(\.id) ?? []),
+                             isFinished: phase == .answered || isStopped)
+    }
+
+    /// The answer as Copy, Replace and Paste put it into the app: references are plain words.
+    var answerText: String {
+        RobiReferencedAnswer(answer, landmarks: [], isFinished: true).text
+    }
 
     /// Text and controls on the tab: light on dark title bars, dark on light ones.
     var ink: Color { tintIsDark ? .white : Color(red: 0.13, green: 0.12, blue: 0.17) }
@@ -118,7 +137,7 @@ final class RobiModel {
     /// card's own: `.thinking` until the answer is complete.
     var exchange: RobiExchange {
         RobiExchange(context: context, request: request, answer: answer, proposal: proposal, notice: notice,
-                     isStopped: isStopped, canReplace: canReplace, answerModel: answerModel,
+                     isStopped: isStopped, canReplace: canReplace, answerModel: answerModel, claudeModel: claudeModel,
                      phase: phase == .answered ? .answered : .thinking)
     }
 
@@ -142,6 +161,7 @@ final class RobiModel {
         isStopped = exchange.isStopped
         canReplace = exchange.canReplace
         answerModel = exchange.answerModel
+        claudeModel = exchange.claudeModel
     }
 
     /// Clears everything an interaction left behind. An answer set aside on another window and
@@ -173,6 +193,9 @@ final class RobiEyes {
     /// Set for a moment after the pointer circled the face: the pupils spin and the mouth
     /// rounds into an "o".
     var dizzy: RobiDizzy?
+    /// Set for a moment when a picked region lands in the face: the eyes widen, the pupils
+    /// jump, and the mouth rounds. The controller clears `dizzy` when it sets this.
+    var surprised: RobiSurprise?
 }
 
 /// What Robi's views can ask the controller to do.
@@ -190,6 +213,10 @@ struct RobiActions {
     var replace: () -> Void = {}
     var paste: () -> Void = {}
     var runProposal: () -> Void = {}
+    /// Spotlights a landmark the answer referred to, by its number.
+    var point: (Int) -> Void = { _ in }
+    /// Flips Attach Picture for questions about the whole window.
+    var toggleWindowPicture: () -> Void = {}
     /// Stops the answer being generated and keeps what has arrived.
     var stop: () -> Void = {}
     var saveClaudeKey: (String) -> Void = { _ in }

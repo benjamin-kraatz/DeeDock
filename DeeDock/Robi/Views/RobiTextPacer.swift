@@ -9,8 +9,8 @@ import SwiftUI
 /// fifth of a second of text in reserve so a gap between bursts is covered by text already
 /// received. The newest words fade in over a quarter second instead of popping in.
 ///
-/// This is presentation only. Copy, Replace and Paste read `RobiModel.answer`, which always holds
-/// the full text. With Reduce Motion the pacer shows the target as it arrives, without fading.
+/// This is presentation only. Copy, Replace and Paste read `RobiModel.answerText`, which always
+/// holds the full text. With Reduce Motion the pacer shows the target as it arrives, without fading.
 ///
 /// One pacer belongs to one answer card. It owns a single tick task, which runs while text is
 /// waiting or still fading and ends when it catches up; `pause()` cancels it when the answer
@@ -27,7 +27,8 @@ final class RobiTextPacer {
         var reduceMotion: Bool
     }
 
-    /// The revealed text. Its last few words carry a lower foreground opacity while they fade in.
+    /// The revealed text. Its last few words carry a lower foreground opacity while they fade
+    /// in, and the same opacity as `robiFade`, so a view that recolours runs can keep the fade.
     private(set) var text = AttributedString()
     /// At least one character is revealed. Changes only when that flips, so views that switch on
     /// it do not redraw every tick.
@@ -244,7 +245,9 @@ final class RobiTextPacer {
             let progress = min(max((now - fade.time) / Self.fadeDuration, 0), 1)
             // Ease-out, so a word is legible early and settles gently.
             let eased = 1 - (1 - progress) * (1 - progress)
-            group.foregroundColor = Color.primary.opacity(Self.fadeFloor + (1 - Self.fadeFloor) * eased)
+            let opacity = Self.fadeFloor + (1 - Self.fadeFloor) * eased
+            group.foregroundColor = Color.primary.opacity(opacity)
+            group.robiFade = opacity
             result.append(group)
             groupStart = fade.end
         }
@@ -253,4 +256,27 @@ final class RobiTextPacer {
     }
 
     private static func now() -> TimeInterval { ProcessInfo.processInfo.systemUptime }
+}
+
+/// The opacity of a word still fading in, from the pacer's floor to 1. A `Color` cannot give its
+/// opacity back, so the pacer writes it beside the faded `foregroundColor`; the answer card reads
+/// it to colour a reference link's fading words in the link colour at the same opacity.
+nonisolated enum RobiFadeAttribute: AttributedStringKey {
+    typealias Value = Double
+    static let name = "dev.dokk.robi.fade"
+}
+
+nonisolated extension AttributeScopes {
+    /// Robi's own text attributes, reachable as `text.robiFade`.
+    struct RobiAttributes: AttributeScope {
+        let robiFade: RobiFadeAttribute
+    }
+
+    var robi: RobiAttributes.Type { RobiAttributes.self }
+}
+
+nonisolated extension AttributeDynamicLookup {
+    subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<AttributeScopes.RobiAttributes, T>) -> T {
+        self[T.self]
+    }
 }

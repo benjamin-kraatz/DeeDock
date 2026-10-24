@@ -329,8 +329,8 @@ extension AnalyticsEvent {
              "disabled_count": .init(disabledCount), "pinned_count": .init(pinnedCount)]
         case let .robiOpened(trigger, context):
             ["trigger": .init(trigger), "context": .init(context)]
-        case let .robiAnswered(model, intent, outcome, duration, picture):
-            ["model": .init(model), "intent": .init(intent), "outcome": .init(outcome),
+        case let .robiAnswered(model, claudeModel, intent, outcome, duration, picture):
+            ["model": .init(model), "claude_model": claudeModel.map(AnalyticsValue.init), "intent": .init(intent), "outcome": .init(outcome),
              "duration": .init(duration), "picture": .init(picture)]
         case let .robiActionTaken(action):
             ["action": .init(action)]

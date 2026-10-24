@@ -1,6 +1,7 @@
 import Foundation
 
-/// Manual AI Observability capture for Apple Foundation Models, which has no supported SDK wrapper.
+/// Manual AI Observability capture for Foundation Models sessions, which have no supported SDK
+/// wrapper: Apple's on-device model, and Claude through the same `LanguageModelSession` API in Robi.
 ///
 /// Calls stay anonymous because DeeDock has no authenticated account identity. One process owns one
 /// AI session; callers create one trace for each user-triggered generation workflow and reuse it for
@@ -17,22 +18,72 @@ nonisolated enum AIObservability {
 
     static func makeTrace() -> Trace { Trace() }
 
+    /// Credential shapes scrubbed from every payload: Anthropic and OpenAI keys (`sk-…`), GitHub
+    /// tokens, AWS access key IDs, Google API keys and Slack tokens. Window text, copied text or an
+    /// error can contain one, so every payload is scrubbed before it is captured, whichever
+    /// feature or model produced it. Anthropic's pattern comes first, so its keys are replaced
+    /// whole before the broader `sk-` pattern runs.
+    private static let credentialPatterns = [
+        #"\bsk-ant-[A-Za-z0-9_\-]{16,}"#,
+        #"\bsk-[A-Za-z0-9_\-]{20,}"#,
+        #"gh[pousr]_[A-Za-z0-9]{36,}"#,
+        #"github_pat_[A-Za-z0-9_]{22,}"#,
+        #"\bAKIA[0-9A-Z]{16}\b"#,
+        #"AIza[0-9A-Za-z_\-]{35}"#,
+        #"xox[abposr]-[A-Za-z0-9\-]{10,}"#,
+    ]
+
+    /// Replaces anything that looks like an API key or access token with a placeholder.
+    static func redacted(_ text: String) -> String {
+        credentialPatterns.reduce(text) { result, pattern in
+            result.replacingOccurrences(of: pattern, with: "[API key]", options: .regularExpression)
+        }
+    }
+
+    /// Token counts a model reported for one generation.
+    nonisolated struct Usage: Sendable {
+        let input: Int
+        let output: Int
+    }
+
+    /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
+    /// another model passes its own `model` and `provider`. Credentials are never part of a
+    /// generation: callers pass only the prompt, the instructions and the answer, and anything in
+    /// them that looks like an API key or access token is replaced (`redacted(_:)`) before sending.
+    ///
+    /// - Parameters:
+    ///   - instructions: The session's instructions, sent as a system message before `input`.
+    ///   - usage: Token counts, when the model reports them.
+    ///   - error: A message safe to show the person, for a generation that failed.
     static func capture(trace: Trace, name: String, input: String, output: String? = nil,
-                        startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false) async {
+                        startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
+                        model: String = "apple_foundation_models", provider: String = "apple",
+                        instructions: String? = nil, usage: Usage? = nil, error: String? = nil) async {
         var properties: [String: Any] = [
             "$ai_trace_id": trace.id,
             "$ai_session_id": sessionID,
             "$ai_span_id": UUID().uuidString,
             "$ai_span_name": name,
-            "$ai_model": "apple_foundation_models",
-            "$ai_provider": "apple",
+            "$ai_model": model,
+            "$ai_provider": provider,
             "$ai_latency": max(0, Date().timeIntervalSince(startedAt)),
             "$ai_stream": stream,
         ]
         if let maximumResponseTokens { properties["$ai_max_tokens"] = maximumResponseTokens }
+        if let usage {
+            properties["$ai_input_tokens"] = usage.input
+            properties["$ai_output_tokens"] = usage.output
+        }
+        if let error {
+            properties["$ai_is_error"] = true
+            properties["$ai_error"] = redacted(error)
+        }
         if capturesContent {
-            properties["$ai_input"] = [["role": "user", "content": input]]
-            if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": output]] }
+            var messages: [[String: String]] = []
+            if let instructions { messages.append(["role": "system", "content": redacted(instructions)]) }
+            messages.append(["role": "user", "content": redacted(input)])
+            properties["$ai_input"] = messages
+            if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": redacted(output)]] }
         }
         await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))
     }

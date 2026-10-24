@@ -14,7 +14,7 @@ struct RobiAnswerCard: View {
                 RobiNoticeView(notice: notice, model: model, actions: actions)
                     .transition(.opacity)
             } else {
-                RobiAnswerText(model: model, pacer: pacer)
+                RobiAnswerText(model: model, pacer: pacer, point: actions.point)
                 if let proposal = model.proposal {
                     RobiProposalButton(proposal: proposal, isReady: model.phase == .answered,
                                        reduceMotion: model.reduceMotion, run: actions.runProposal)
@@ -45,15 +45,16 @@ struct RobiAnswerCard: View {
 /// The answer as it streams in, or the waiting line before the first words arrive. The spinner
 /// for both is in the prompt bar. A stopped answer keeps what arrived and says it was stopped.
 ///
-/// Feeds `model.answer` to the pacer and shows what the pacer has revealed. The waiting line stays
-/// until the first words are revealed, so it does not give way to an empty line during the pacer's
-/// initial hold.
+/// Feeds the answer's readable text to the pacer and shows what the pacer has revealed, with the
+/// answer's references as links. The waiting line stays until the first words are revealed, so it
+/// does not give way to an empty line during the pacer's initial hold.
 private struct RobiAnswerText: View {
     let model: RobiModel
     let pacer: RobiTextPacer
+    let point: (Int) -> Void
 
     private var input: RobiTextPacer.Input {
-        RobiTextPacer.Input(target: model.answer, isFinished: model.phase == .answered || model.isStopped,
+        RobiTextPacer.Input(target: model.referencedAnswer.text, isFinished: model.phase == .answered || model.isStopped,
                             reduceMotion: model.reduceMotion)
     }
 
@@ -73,7 +74,8 @@ private struct RobiAnswerText: View {
                 .frame(height: 20)
                 .transition(.opacity)
             } else {
-                RobiAnswerScroll(pacer: pacer, reduceMotion: model.reduceMotion)
+                RobiAnswerScroll(pacer: pacer, references: model.referencedAnswer.references,
+                                 reduceMotion: model.reduceMotion, point: point)
                     .transition(.opacity)
                 if model.isStopped {
                     RobiStoppedLabel()
@@ -107,15 +109,45 @@ private struct RobiStoppedLabel: View {
 /// fading words differ only in colour, so they never change the measured height.
 private struct RobiAnswerScroll: View {
     let pacer: RobiTextPacer
+    /// Runs of the answer that point at a landmark, as character offsets into the pacer's text.
+    let references: [RobiReferencedAnswer.Reference]
     let reduceMotion: Bool
+    let point: (Int) -> Void
     /// Starts at zero for each answer: the view is rebuilt whenever the revealed text empties.
     @State private var textHeight: CGFloat = 0
 
     private static let maxHeight: CGFloat = 190
 
+    /// How much lighter the dotted underline is than the link's words, so a reference reads as
+    /// clickable without the weight of a web link.
+    private static let underlineOpacity = 0.45
+
+    /// The revealed text with each revealed reference as a link: the accent colour with a lighter
+    /// dotted underline. A reference still being revealed is linked as far as it goes, and its
+    /// words still fading in fade in the link colour, so they never switch colour once the fade
+    /// ends. The link adds no characters, so linking never changes the measured height.
+    private var linkedText: AttributedString {
+        var text = pacer.text
+        let count = text.characters.count
+        for reference in references where reference.range.lowerBound < count {
+            guard let url = RobiReferenceLink.url(reference.landmark) else { continue }
+            let lower = text.characters.index(text.startIndex, offsetBy: reference.range.lowerBound)
+            let upper = text.characters.index(text.startIndex, offsetBy: min(reference.range.upperBound, count))
+            text[lower..<upper].link = url
+            // Collected before the writes below: changing attributes keeps indices valid, but not
+            // a runs view being iterated.
+            let fades = text[lower..<upper].runs.map { ($0.range, $0.robiFade ?? 1) }
+            for (range, fade) in fades {
+                text[range].foregroundColor = Color.accentColor.opacity(fade)
+                text[range].underlineStyle = Text.LineStyle(pattern: .dot, color: Color.accentColor.opacity(Self.underlineOpacity * fade))
+            }
+        }
+        return text
+    }
+
     var body: some View {
         ScrollView {
-            Text(pacer.text)
+            Text(linkedText)
                 .font(.system(size: 13))
                 .lineSpacing(2)
                 .textSelection(.enabled)
@@ -125,11 +157,18 @@ private struct RobiAnswerScroll: View {
                     // grows in the same transaction as its frame.
                     withAnimation(.easeOut(duration: reduceMotion ? 0.1 : 0.22)) { textHeight = height }
                 }
+                .help(references.isEmpty ? Text(verbatim: "") : Text(.robiReferenceHelp))
         }
         // `.never`, unlike `.hidden`, also holds when scroll bars are set to always show.
         .scrollIndicators(textHeight > Self.maxHeight ? .automatic : .never)
         .scrollBounceBehavior(.basedOnSize)
         .frame(height: min(textHeight, Self.maxHeight))
+        // A reference's link spotlights its landmark on the window; it never opens anything.
+        .environment(\.openURL, OpenURLAction { url in
+            guard let landmark = RobiReferenceLink.landmark(from: url) else { return .discarded }
+            point(landmark)
+            return .handled
+        })
     }
 }
 
@@ -202,7 +241,7 @@ private struct RobiModelFooter: View {
 
     var body: some View {
         Label {
-            Text(model.answerModel == .claude ? .robiFooterClaude : .robiFooterOnDevice)
+            Text(text)
         } icon: {
             Image(systemName: model.answerModel == .claude ? "sparkle" : "lock.shield")
         }
@@ -210,6 +249,15 @@ private struct RobiModelFooter: View {
         .foregroundStyle(.secondary)
         .lineLimit(1)
         .truncationMode(.tail)
+    }
+
+    private var text: LocalizedStringResource {
+        guard model.answerModel == .claude else { return .robiFooterOnDevice }
+        return switch model.claudeModel {
+        case .haiku: .robiFooterClaudeHaiku
+        case .sonnet: .robiFooterClaudeSonnet
+        case .opus: .robiFooterClaudeOpus
+        }
     }
 }
 

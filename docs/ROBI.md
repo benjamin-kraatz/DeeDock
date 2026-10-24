@@ -13,10 +13,10 @@ Everything is in `DeeDock/Robi/`. `DockCoordinator` owns one `RobiController`, s
 | `RobiController.swift` | Lifecycle, phases, and the flow from a click to an answer. The only writer of `RobiModel`. |
 | `Tracking/` | `RobiWindowTracker` follows the focused window. `RobiDragPrediction`, `RobiWindowServer` and `RobiWindowServerEvents` supply its geometry. |
 | `Layout/` | `RobiLayout` and `RobiScreenSpace`: pure geometry and coordinate conversion. |
-| `Panels/` | `RobiPanel`, the non-activating panel, and `RobiSelectionSheet`, the sheet laid over the window in selection mode. |
-| `State/` | `RobiModel`, `RobiEyes`, `RobiContext`, and `RobiIntent`. |
+| `Panels/` | `RobiPanel`, the non-activating panel, `RobiSelectionSheet`, the sheet laid over the window in selection mode, `RobiSpotlight`, the click-through overlay that points at a landmark, and `RobiFlight`, the one that flies a picked region into the face. |
+| `State/` | `RobiModel`, `RobiEyes`, `RobiContext`, `RobiLandmark`, and `RobiIntent`. |
 | `Context/` | Reading the selection, the window's accessibility text, and pictures, plus waking Electron and Chromium accessibility. |
-| `Answering/` | `RobiAgent`, the menu-command tool, the actions that put answers back, and the ⌥⇧⌘R shortcut. |
+| `Answering/` | `RobiAgent`, `RobiReferencedAnswer`, the menu-command tool, the actions that put answers back, and the ⌥⇧⌘R shortcut. |
 | `Views/` | The tab, face, prompt bar, suggestions, and answer card. |
 | `Settings/` | `RobiSettings`, `RobiStore`, the Keychain wrapper, and the Settings page. |
 
@@ -61,23 +61,37 @@ The face's press is one `DragGesture(minimumDistance: 0)` in `RobiFaceHandle`. I
 
 1. **Selection.** `RobiSelectionReader` reads `kAXSelectedTextAttribute` from the focused element. Web content falls back to `AXSelectedTextMarkerRange` and `AXStringForTextMarkerRange`. Clicking Robi's non-activating panel leaves the app frontmost, so the selection is still the person's. Replace Selection writes the same attribute and works in native text views and Electron text areas.
 2. **Web apps.** Electron and Chromium build their accessibility tree only for assistive apps. Robi sets `AXManualAccessibility` (Electron, no side effects) and, for apps that ship `chrome_100_percent.pak`, `AXEnhancedUserInterface` (Chromium). It reads the selection again 300 ms later. Chromium returns -25208 for that flag but builds the tree anyway: Helium went from 43 to 1,303 elements. Rectangle and Hammerspoon document that the flag can disturb window animations and adds Chromium work, so Robi restores it when the interaction ends.
-3. **Whole window.** `RobiWindowText` walks the focused window's tree off the main actor, bounded to 0.4 s and 16,000 characters. A full walk of Finder or System Settings took over a second in the spike. Ghostty keeps the visible terminal, Claude Code included, in one `AXTextArea`. When the tree has under 200 characters, Robi captures the window and recognizes its text.
-4. **Region.** The selection sheet takes the drag, so the app underneath never sees it. `RobiCapture.image` captures only the target window (`desktopIndependentWindow`), so Robi's panels and overlapping windows never appear. Pictures are capped at 1,568 px on the long side.
+3. **Whole window.** `RobiWindowText` walks the focused window's tree off the main actor, bounded to 0.4 s and 16,000 characters. A full walk of Finder or System Settings took over a second in the spike. Ghostty keeps the visible terminal, Claude Code included, in one `AXTextArea`. Besides text, the walk keeps headings, fields, and labelled controls (buttons, links, checkboxes, pop-ups, images with a description) as landmarks, up to 500. A labelled control is read by its title or description without its children; an unlabelled one is descended into, so a web link's text still counts. When the tree has under 200 characters, Robi captures the window and recognizes its text, and Vision's lines become the landmarks if they found more. With **Attach picture** on in the prompt bar (`RobiSettings.attachWindowPicture`), the picture goes with every whole-window question, beside the accessibility text; the switch only adds a picture, so the fallback for thin text still applies when it is off. Flipping it after the window was read adds the picture or drops one the switch added, without reading again. A fallback picture stays.
+4. **Region.** The selection sheet takes the drag, so the app underneath never sees it. `RobiCapture.image` captures only the target window (`desktopIndependentWindow`), so Robi's panels and overlapping windows never appear. Pictures are capped at 1,568 px on the long side. The lines Vision recognizes become landmarks, placed in the window by the region's origin.
+
+   On mouse-up the prompt bar opens at once and the capture runs behind it. Meanwhile the dashed rectangle flies into Robi's face: `RobiFlight` is a click-through panel like the spotlight, ordered above Robi's own panel and sized to the window, the region and the face together, so the piece can land in view and no click or keystroke is taken from the app. `RobiFlightPath` fixes the geometry when the flight starts: the region in window-local top-left points, the window and the face in AppKit points, both turned into the overlay's own top-left points. The piece follows a quadratic curve bowed up to 48 pt above the chord, shrinks to 20 × 13 pt along a spring with a 0.38 s response (half the way in 0.1 s, arrived at 0.26 s), and fades from arrival to 0.5 s. It is the rectangle as the sheet drew it, not a picture: the capture is asynchronous (a `SCShareableContent` lookup and a screenshot) and swapping a picture in mid-flight would flicker, while a synchronous capture would hold up the bar. At 0.26 s the controller sets `RobiEyes.surprised` (`RobiSurprise`, a start time like `RobiDizzy`) for 0.55 s: `RobiSurpriseFrame` widens the eyes by 30 % with a small pop, shrinks the pupils and pulls them up, opens a round mouth, and squashes and lifts the face in a damped bounce that settles in 0.3 s. A spin still going ends there, and wide eyes do not blink. The flight is not started for a whole-window click. `endInteraction()` hides the overlay and cancels the surprise task; picking again mid-flight restarts both. Reduce Motion fades the rectangle where it is over 0.28 s and widens the eyes by 12 % with the round mouth, without pop, squash or hop.
+
+### Landmarks
+
+A `RobiLandmark` is a number, a kind, its text, and a frame in window-local top-left points: the window's top-left corner, as AX and the window server report it, is the origin. AX frames are global top-left points, so `RobiLandmark.windowLocal` subtracts the window's origin (displays left of or above the primary one have negative coordinates) and clips to the window, which drops content scrolled out of view. Vision boxes are normalized with a lower-left origin; `RobiLandmark.recognized` flips them into the captured rect. Pixels never enter: the boxes are fractions of the picture, which was captured from that rect.
 
 Vision's first recognition in a process took 13–27 s; later ones take 50–150 ms. `RobiCapture.prewarm()` runs once in the background when Robi starts.
 
 ## Answering
 
-Both models run through one `LanguageModelSession`:
+Every model runs through one `LanguageModelSession`:
 
 - **On-device** is `SystemLanguageModel.default`. On macOS 27 it reported an 8,192-token context, vision, and tool calling, and it answered a screenshot question in 1.5–2.2 s. It explains poorly but translates and summarizes well. Robi sends up to `(contextSize − 3,000) × 2.5` characters of context.
-- **Claude** is `ClaudeLanguageModel(name: .sonnet5_5, auth: .apiKey(key), fixedEffort: .medium or .high)` from Anthropic's `ClaudeForFoundationModels` package, pinned to exactly 0.2.3 while it is in beta. Robi sends up to 60,000 characters. The key comes from the Keychain per request and is never kept in `RobiSettings`.
+- **Claude** is `ClaudeLanguageModel(name:, auth: .apiKey(key), fixedEffort: .medium or .high)` from Anthropic's `ClaudeForFoundationModels` package, pinned to exactly 0.2.3 while it is in beta. `RobiSettings.claudeModel` picks `.haiku5_5`, `.sonnet5_5` (the default) or `.opus5_5`. It is stored by family (`haiku`, `sonnet`, `opus`), so a package update can move a family to a newer model without losing the choice. All three accept both effort levels and pictures. Robi sends up to 60,000 characters to each. The key comes from the Keychain per request and is never kept in `RobiSettings`.
 
 Both models stream in bursts: many characters at once, then nothing for a few hundred milliseconds. `RobiTextPacer` sits between `RobiModel.answer` and the card and reveals the answer word by word at an even pace. It waits 0.14 s before the first word, follows a smoothed arrival rate, and keeps about 0.2 s of text in reserve, so a short gap between bursts is covered by text that has already arrived. When the answer finishes or is stopped, the rest appears within 0.3 s. The newest words fade in over 0.24 s. With Reduce Motion the answer appears as it arrives, without fading. This only changes what the card shows; Copy, Replace and Paste use the full answer, and an answer brought back from another window appears in full at once.
 
 **Stop** cancels the answer's task, which ends the response stream. On the Mac that ends generation. For Claude, the package then cancels its `URLSession` task, which closes the streaming connection. The Messages API has no call to cancel one request, so closing the stream is the only way to stop it. Anthropic's documentation does not say whether generation and billing stop the moment the connection closes; the hands-on check below covers it.
 
+When the context has landmarks, the model reads them instead of the plain text, one per line as `[#12 button @ 812,44] Send`, where the position is the element's centre in window points, and the instructions give the window's size. It is asked to link what it mentions as `[the Send button](#12)`, to use only listed numbers, and to add no links to a rewrite or translation. The listing is cut to the same character budget as plain text.
+
 Each question gets a fresh session with no history. The instructions quote the context as untrusted data. For **Do It**, typed questions, and suggested questions, the session also gets the app's enabled menu commands (up to 140, read off the main actor within 0.5 s) and `propose_menu_command`. That tool only accepts paths from the list and only proposes; the command runs when the person clicks **Run**, through `AXPress`.
+
+### Pointing at the window
+
+`RobiReferencedAnswer` takes the links out of the answer: their words stay and become references, and the syntax goes. A link to a number the context doesn't have keeps its words and points nowhere, so a made-up number can't ring the wrong thing. While the answer streams, text from a `[` that may still become a link is held back until it closes as one or turns out not to be (a newline, a second `[`, or 200 characters ends it), so the card never shows half the syntax and the pacer's text only grows. The card gives each revealed reference a private `x-dokk-robi-landmark:` link with a dotted underline, and its `openURL` action calls the controller. Copy, Replace, and Paste use `RobiModel.answerText`, with every link reduced to its words.
+
+`RobiSpotlight` is a click-through `RobiPanel` laid over the target window, ordered just under Robi's panel, so it never takes a click, the keyboard, or focus. `RobiSpotlightView` dims the window by 20 % with a rounded cut-out around the landmark (5 pt of room, at least 28 × 22 pt, corners between 6 and 12 pt by its size) and a 2 pt accent ring on the cut-out's edge, with a glow on the dimmed side only, so the landmark stays sharp. A show lands the ring from 8 pt out and sends one pulse 14 pt outwards; both are distances, not scale factors, so a checkbox and a paragraph move the same. Another reference slides the cut-out and ring there. It fades after 5 s, when a new question is asked, and when the interaction ends, and it follows the window through `layout()`. Reduce Motion fades in place; Reduce Transparency drops the glow and dims by 32 %. VoiceOver hears "Showing “…” in the window" instead, and the overlay itself is hidden from it. A landmark that no longer falls inside the window, after a resize, gives a short "No longer in the window" note.
 
 ### Actions and suggested questions
 
@@ -107,13 +121,13 @@ The card is not kept on screen for the background window. Robi's panel floats ab
 
 `RobiStore` keeps `RobiSettings` under `robi.settings.v1`, apart from `DockSettings`, because no display can override Robi. Every field decodes leniently. `RobiAPIKeyStore` keeps the key as a this-device-only generic password that is not synchronized.
 
-Analytics are count-only: `robi_opened`, `robi_answered`, `robi_action`, and `setting_changed` with `area = robi`. See [ANALYTICS.md](ANALYTICS.md). Robi never calls `AIObservability`, which would send prompts and answers in full.
+Product analytics are count-only: `robi_opened`, `robi_answered`, `robi_action` (including `point` for a clicked reference), and `setting_changed` with `area = robi`. Model calls go to PostHog LLM analytics through `AIObservability`, like DOKK's other model calls: `robi_answer` for both models, with token usage, errors, and stopped answers, and `robi_suggest_questions`, under one trace per interaction. They carry the prompt, the instructions, and the answer in full. The API key is never part of them, and pictures are noted, not sent. See [ANALYTICS.md](ANALYTICS.md#ai-observability).
 
 The Discovery callout `robi` announces Robi once on launch. **Turn On** enables it and opens Settings when Accessibility is still missing.
 
 ## Privacy
 
-Robi reads a window only after a click or the shortcut. Text and pictures live in memory for one request and are dropped when the card closes. Nothing is written to disk or logged. With the on-device model nothing leaves the Mac. Suggested questions always come from the on-device model. With Claude, the question and its context go from the Mac straight to Anthropic with the person's key. DOKK runs no server in between.
+Robi reads a window only after a click or the shortcut. Text and pictures live in memory for one request and are dropped when the card closes. Nothing is written to disk. Suggested questions always come from the on-device model. With Claude, the question and its context go from the Mac straight to Anthropic with the person's key. DOKK runs no server in between. When the person shares usage statistics, each request and answer also goes to PostHog in full, as for DOKK's other AI features; Robi's settings, the Privacy card, and the tour say so.
 
 ## Known limitations
 
@@ -124,6 +138,8 @@ Robi reads a window only after a click or the shortcut. Text and pictures live i
 - Inside placement on a maximized window covers the middle of its title bar. Benn accepted this on 2026-10-24.
 - The tab moves along the top edge only. The side and bottom edges would need the prompt bar and card to open sideways or upwards.
 - The prompt bar and card stay centred on the tab, so with the tab near a corner they overhang the window's side, kept on the display. Shifting them back over the window would make the tab jump sideways as it widens into the bar.
+- Landmarks are read once, when the context is picked. Content that scrolls or reflows afterwards leaves the spotlight on the old spot, and a resize moves elements anchored to the right or bottom edge away from where it rings them.
+- Only text, headings, fields, and labelled controls become landmarks. Unlabelled icons, canvas content, and pictures inside a web page can be pointed at only when Vision reads text in them.
 - Tab positions are saved per app, so two windows of an app share one position after DOKK restarts. Per-window positions last until DOKK quits.
 
 ## Not yet exercised by hand
@@ -133,9 +149,13 @@ The build compiles and the geometry and settings tests compile. DOKK was not lau
 - Real hover, clicks, drags, and resizes on Ghostty, Claude Desktop, a Chromium browser, Xcode, and Finder, on displays with different scales.
 - Spaces, full screen, Mission Control, Stage Manager, sleep and wake.
 - Selection-first flow in Electron and Chromium apps, Replace Selection, Paste into a terminal, and Run on a proposed command.
-- Claude with a real key at both effort levels, and the key prompt in the card.
+- Claude with a real key on Haiku, Sonnet and Opus at both effort levels, the model named in the card's footer, and the key prompt in the card.
 - Switch windows while an answer streams, then come back: the card returns, still streaming or complete, and Replace and Paste still reach the first window. Close that window from another one and check that the dot goes away on the next focus change.
 - Stop during a long Claude answer: the Anthropic Console's usage for that request should show fewer output tokens than an unstopped answer to the same question.
 - VoiceOver on the face and the selection sheet, Reduce Motion, and Reduce Transparency.
 - The More menu from the non-activating panel, with the app staying in front. Suggested questions on a selection, a region, and a window, including how often the first one after launch misses the 4.5 s timeout.
+- Pointing: references in answers from both models, the spotlight on windows on displays with different scales and on a display left of the primary one, following a moved window, Reduce Motion and Reduce Transparency, and the VoiceOver announcement.
+- Attach picture: on, off, and flipped after the window was read; without Screen Recording; and the fallback picture with the switch off.
+- LLM analytics: `robi_answer` and `robi_suggest_questions` arriving in PostHog with token counts for Claude, a failed request's `$ai_error`, and a stopped answer.
 - Dragging the tab, above and inside, idle and with the bar open: clicks still click, the tab follows the pointer without lag, rubber-bands at the corners, and comes back in the same spot after switching windows and after relaunching.
+- The region flight: the rectangle leaves the sheet without a missing frame, lands on the face above and inside the window and on a display left of the primary one, the face startles as it lands and is calm again before typing begins, picking again mid-flight restarts it cleanly, and Reduce Motion fades it in place.

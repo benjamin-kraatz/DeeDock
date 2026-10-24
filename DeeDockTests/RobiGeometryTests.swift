@@ -149,6 +149,7 @@ struct RobiSettingsTests {
         let settings = RobiSettings()
         #expect(!settings.isEnabled)
         #expect(settings.answerModel == .onDevice)
+        #expect(settings.claudeModel == .sonnet)
         #expect(settings.claudeEffort == .medium)
         #expect(settings.shortcutEnabled)
         #expect(settings.excludedBundleIdentifiers.isEmpty)
@@ -156,10 +157,11 @@ struct RobiSettingsTests {
 
     @Test("A document with missing or unknown values still loads instead of resetting Robi")
     func decodesLeniently() throws {
-        let json = #"{"isEnabled":true,"answerModel":"someFutureModel","excludedBundleIdentifiers":["com.example.app"]}"#
+        let json = #"{"isEnabled":true,"answerModel":"someFutureModel","claudeModel":"someFutureModel","excludedBundleIdentifiers":["com.example.app"]}"#
         let settings = try JSONDecoder().decode(RobiSettings.self, from: Data(json.utf8))
         #expect(settings.isEnabled)
         #expect(settings.answerModel == .onDevice)
+        #expect(settings.claudeModel == .sonnet)
         #expect(settings.shortcutEnabled)
         #expect(settings.excludedBundleIdentifiers == ["com.example.app"])
     }
@@ -169,6 +171,7 @@ struct RobiSettingsTests {
         var settings = RobiSettings()
         settings.isEnabled = true
         settings.answerModel = .claude
+        settings.claudeModel = .opus
         settings.claudeEffort = .high
         settings.shortcutEnabled = false
         let decoded = try JSONDecoder().decode(RobiSettings.self, from: JSONEncoder().encode(settings))

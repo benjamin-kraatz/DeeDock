@@ -18,8 +18,28 @@ nonisolated struct RobiContext: @unchecked Sendable {
     var text: String
     /// The region or window picture, when Screen Recording allowed one.
     var image: CGImage?
+    /// What Robi read, with where each piece sits in the window, so the answer can point at it.
+    /// Empty for a selection.
+    var landmarks: [RobiLandmark] = []
+    /// The window's size when the context was read, in points. Zero for a selection.
+    var windowSize: CGSize = .zero
+    /// The whole window's picture was taken because its accessibility text was too thin, not
+    /// because the person asked for pictures. Such a picture stays when Attach Picture is off.
+    var pictureIsFallback = false
+
+    init(kind: RobiContextKind, text: String, image: CGImage? = nil, landmarks: [RobiLandmark] = [],
+         windowSize: CGSize = .zero, pictureIsFallback: Bool = false) {
+        self.kind = kind
+        self.text = text
+        self.image = image
+        self.landmarks = landmarks
+        self.windowSize = windowSize
+        self.pictureIsFallback = pictureIsFallback
+    }
 
     var wordCount: Int { text.split(whereSeparator: \.isWhitespace).count }
+
+    func landmark(_ id: Int) -> RobiLandmark? { landmarks.first { $0.id == id } }
 
     /// A short preview of selected text for the context chip.
     var excerpt: String {
