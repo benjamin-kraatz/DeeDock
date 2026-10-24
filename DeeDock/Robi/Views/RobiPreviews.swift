@@ -10,7 +10,8 @@ enum RobiPreviewData {
     static func model(_ phase: RobiPhase, dark: Bool = false, placement: RobiPlacement = .above,
                       context: RobiContext? = nil, answer: String = "", notice: RobiNotice? = nil,
                       proposal: RobiProposal? = nil, model answerModel: RobiAnswerModel = .onDevice,
-                      reduceMotion: Bool = false, toast: LocalizedStringResource? = nil) -> RobiModel {
+                      reduceMotion: Bool = false, toast: LocalizedStringResource? = nil,
+                      questions: [String] = [], reading: Bool = false) -> RobiModel {
         let model = RobiModel()
         model.phase = phase
         model.placement = placement
@@ -27,10 +28,17 @@ enum RobiPreviewData {
         model.canReplace = context?.kind == .selection
         model.reduceMotion = reduceMotion
         model.toast = toast
+        model.generatedSuggestions = questions
+        model.suggestsQuestions = !questions.isEmpty
+        model.isReadingContext = reading
         return model
     }
 
     static let selection = RobiContext(kind: .selection, text: "We write like a smart friend who has five minutes.")
+    static let window = RobiContext(kind: .window, text: "Release notes 0.22: Robi on your windows, faster Radar, fixes for Islands.")
+    /// Suggested questions as the on-device model might phrase them; the last one is too wide
+    /// for the row and lands in the More menu.
+    static let questions = ["Is this too casual for a client?", "Add a friendly sign-off", "Turn this into a short Slack message"]
     static let region = RobiContext(kind: .region, text: "error: main actor-isolated property 'items' can not be referenced from a nonisolated context")
     static let longAnswer = """
     LibraryStore.items is isolated to the main actor, but sync() is nonisolated, so line 42 reads \
@@ -70,6 +78,14 @@ private struct RobiPreviewStage: View {
 }
 #Preview("Prompting with selection") {
     RobiPreviewStage(model: RobiPreviewData.model(.prompting, context: RobiPreviewData.selection))
+}
+#Preview("Prompting with suggested questions") {
+    RobiPreviewStage(model: RobiPreviewData.model(.prompting, context: RobiPreviewData.selection,
+                                                  questions: RobiPreviewData.questions))
+}
+#Preview("Prompting on a window, dark") {
+    RobiPreviewStage(model: RobiPreviewData.model(.prompting, dark: true, context: RobiPreviewData.window,
+                                                  questions: Array(RobiPreviewData.questions.prefix(2))))
 }
 #Preview("Prompting inside, dark") {
     RobiPreviewStage(model: RobiPreviewData.model(.prompting, dark: true, placement: .inside, context: RobiPreviewData.region))

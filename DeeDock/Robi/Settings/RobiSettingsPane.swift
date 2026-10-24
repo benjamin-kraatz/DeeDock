@@ -32,7 +32,8 @@ struct RobiSettingsPane: View {
     }
 }
 
-/// The opt-in switch, the Accessibility notice, and the global shortcut.
+/// The opt-in switch, the Accessibility notice, the global shortcut, and resetting where the tab
+/// was dragged.
 struct RobiGeneralSettingsCard: View {
     @Binding var settings: RobiSettings
     let accessGranted: Bool
@@ -58,6 +59,11 @@ struct RobiGeneralSettingsCard: View {
                 .disabled(!settings.isEnabled)
             if settings.isEnabled && settings.shortcutEnabled && !shortcutAvailable {
                 SettingsStatusRow(symbol: "exclamationmark.triangle.fill", tint: .orange, message: Text(.robiShortcutConflict))
+            }
+            // Left enabled while Robi is off, so saved positions can still be cleared.
+            SettingsRow(title: .robiTabPositions, subtitle: .robiTabPositionsHelp) {
+                Button(.robiTabPositionsReset) { settings.tabPositions = [:] }
+                    .disabled(settings.tabPositions.isEmpty)
             }
             SettingsStackedRow {
                 Label { Text(.robiPrivacyNote) } icon: {
@@ -114,6 +120,11 @@ struct RobiAnswersSettingsCard: View {
                     SettingsOption(value: RobiClaudeEffort.high, title: .robiEffortHigh, symbol: "gauge.high"),
                 ], selection: $settings.claudeEffort)
             }
+            // Suggestions always come from the on-device model, so the switch depends on it
+            // even when Claude answers.
+            SettingsToggleRow(title: .robiSuggestQuestionsToggle,
+                              subtitle: onDeviceUnavailable == nil ? .robiSuggestQuestionsHelp : .robiSuggestQuestionsUnavailable,
+                              isOn: $settings.suggestQuestions, disabled: onDeviceUnavailable != nil)
         }
     }
 
@@ -227,6 +238,8 @@ private struct RobiSettingsPreview: View {
     settings.isEnabled = true
     settings.answerModel = .claude
     settings.claudeEffort = .high
+    // Enables Reset Tab Positions.
+    settings.tabPositions = ["com.apple.Terminal": 0.2]
     return RobiSettingsPreview(settings: settings, hasKey: true).environment(\.locale, Locale(identifier: "de"))
 }
 #endif

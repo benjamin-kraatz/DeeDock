@@ -4443,6 +4443,24 @@
         }
       }
     },
+    "robiActionStop" : {
+      "comment" : "Button in Robi’s answer card that stops the answer while it is being written. What arrived so far stays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stoppen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
     "robiAnswerOnDeviceInstead" : {
       "comment" : "Link in Robi’s card: answer this one question with Apple’s on-device model instead of Claude.",
       "extractionState" : "manual",
@@ -4475,6 +4493,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Answers"
+          }
+        }
+      }
+    },
+    "robiAnswerStopped" : {
+      "comment" : "Shown under a Robi answer the person stopped before it was complete.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestoppt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
           }
         }
       }
@@ -5295,6 +5331,42 @@
         }
       }
     },
+    "robiParkedReady" : {
+      "comment" : "VoiceOver value of Robi’s face while a finished answer waits on a window of another app or another window. The placeholder is the app’s name as macOS reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwort bereit in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer ready in %@"
+          }
+        }
+      }
+    },
+    "robiParkedWorking" : {
+      "comment" : "VoiceOver value of Robi’s face while an answer is still being written for a window the person switched away from. The placeholder is the app’s name as macOS reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwortet noch in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still answering in %@"
+          }
+        }
+      }
+    },
     "robiPermissionsHelp" : {
       "comment" : "Footnote of the permissions card on Robi’s settings page.",
       "extractionState" : "manual",
@@ -5565,6 +5637,24 @@
         }
       }
     },
+    "robiSuggestActionItems" : {
+      "comment" : "Action under Robi’s prompt bar, usually in its More menu: list the to-dos (action items) in the picked content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufgaben auflisten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List To-Dos"
+          }
+        }
+      }
+    },
     "robiSuggestDoIt" : {
       "comment" : "Suggestion button under Robi’s prompt bar: Robi proposes the next step, possibly a menu command the person confirms.",
       "extractionState" : "manual",
@@ -5583,6 +5673,42 @@
         }
       }
     },
+    "robiSuggestedHint" : {
+      "comment" : "VoiceOver hint on a question button under Robi’s prompt bar. The question was suggested by Apple’s on-device model for the content the person picked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellt Robi diese Frage. Von Apple Intelligence auf diesem Mac vorgeschlagen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks Robi this question. Suggested by Apple Intelligence on this Mac."
+          }
+        }
+      }
+    },
+    "robiSuggestedSection" : {
+      "comment" : "Heading in Robi’s More menu above questions Apple Intelligence suggested for the picked content.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested"
+          }
+        }
+      }
+    },
     "robiSuggestExplain" : {
       "comment" : "Suggestion button under Robi’s prompt bar: explain the picked content.",
       "extractionState" : "manual",
@@ -5597,6 +5723,204 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Explain"
+          }
+        }
+      }
+    },
+    "robiSuggestFormal" : {
+      "comment" : "Action under Robi’s prompt bar, usually in its More menu: rewrite the picked text in a more formal, professional tone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Förmlicher formulieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make More Formal"
+          }
+        }
+      }
+    },
+    "robiSuggestFriendly" : {
+      "comment" : "Action under Robi’s prompt bar, usually in its More menu: rewrite the picked text in a warmer, friendlier tone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freundlicher formulieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Friendlier"
+          }
+        }
+      }
+    },
+    "robiSuggestImprove" : {
+      "comment" : "Action button under Robi’s prompt bar: rewrite the picked text so it reads more clearly. Keep it short; it shares one row with three other buttons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbessern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Improve"
+          }
+        }
+      }
+    },
+    "robiSuggestMore" : {
+      "comment" : "Button at the end of the row under Robi’s prompt bar that opens a menu with more actions. Keep it short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "robiSuggestMoreLabel" : {
+      "comment" : "VoiceOver label of the More button under Robi’s prompt bar, which opens a menu with more actions.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Aktionen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More actions"
+          }
+        }
+      }
+    },
+    "robiSuggestProofread" : {
+      "comment" : "Action button under Robi’s prompt bar: fix the spelling, grammar and punctuation of the picked text. Keep it short; it shares one row with three other buttons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korrigieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proofread"
+          }
+        }
+      }
+    },
+    "robiSuggestQuestionsHelp" : {
+      "comment" : "Subtitle of the Robi setting that lets Apple’s on-device model suggest questions about what the person picked. Claude is Anthropic’s model, which the person can choose for answers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du etwas ausgewählt hast, schlägt Apple Intelligence ein paar Fragen dazu vor. Die Vorschläge entstehen immer auf diesem Mac, auch wenn Claude antwortet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After you pick something, Apple Intelligence suggests a few questions about it. Suggestions are always made on this Mac, even when Claude answers."
+          }
+        }
+      }
+    },
+    "robiSuggestQuestionsToggle" : {
+      "comment" : "Switch in Robi’s Answers settings: let Apple’s on-device model suggest questions about what the person picked.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragen vorschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest questions"
+          }
+        }
+      }
+    },
+    "robiSuggestQuestionsUnavailable" : {
+      "comment" : "Subtitle of the Suggest questions switch when Apple’s on-device model can’t run on this Mac; the switch is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Braucht Apple Intelligence auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs Apple Intelligence on this Mac."
+          }
+        }
+      }
+    },
+    "robiSuggestReply" : {
+      "comment" : "Action under Robi’s prompt bar, usually in its More menu: draft a reply to the picked message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwort entwerfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draft a Reply"
+          }
+        }
+      }
+    },
+    "robiSuggestShorten" : {
+      "comment" : "Action button under Robi’s prompt bar: rewrite the picked text shorter. Keep it short; it shares one row with three other buttons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Shorter"
           }
         }
       }
@@ -5633,6 +5957,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Translate"
+          }
+        }
+      }
+    },
+    "robiTabPositions" : {
+      "comment" : "Settings row title for where Robi’s tab sits along the top edge of windows. Robi is the name of DOKK’s assistant; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robis Position"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi’s position"
+          }
+        }
+      }
+    },
+    "robiTabPositionsHelp" : {
+      "comment" : "Subtitle of the settings row for Robi’s tab position. Explains dragging the tab along a window’s top edge and that the spot is remembered per app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zieh Robi an der Oberkante eines Fensters entlang, um es zu verschieben. Robi merkt sich die Stelle für jede App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag Robi along a window’s top edge to move it. Robi remembers the spot for each app."
+          }
+        }
+      }
+    },
+    "robiTabPositionsReset" : {
+      "comment" : "Button that forgets every place Robi’s tab was dragged to, so it sits in the middle of windows again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Positionen zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Tab Positions"
           }
         }
       }

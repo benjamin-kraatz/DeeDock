@@ -37,10 +37,16 @@ struct RobiTabView: View {
     private var inverted: Bool { model.placement == .inside }
     private var centred: Bool { model.phase == .idle || model.phase == .awake }
     private var selecting: Bool { model.phase == .selecting }
+    /// Pulled away from the edge by a Shift-drag; the controller allows it only hanging inside.
+    private var isGooey: Bool { model.goo != .zero && inverted }
 
     var body: some View {
-        ZStack {
-            RobiTabSurface(tint: model.tint, rim: model.rim, inverted: inverted)
+        ZStack(alignment: .top) {
+            if isGooey {
+                RobiGooSurface(tint: model.tint, rim: model.rim, goo: model.goo)
+            } else {
+                RobiTabSurface(tint: model.tint, rim: model.rim, inverted: inverted)
+            }
             HStack(spacing: selecting ? 8 : 10) {
                 RobiFaceButton(model: model, eyes: eyes, actions: actions)
                 if selecting {
@@ -62,16 +68,21 @@ struct RobiTabView: View {
             .padding(.leading, RobiMetrics.flare + 7)
             .padding(.trailing, RobiMetrics.flare + (selecting ? 5 : 7))
             .frame(maxWidth: .infinity, alignment: centred ? .center : .leading)
+            .frame(height: RobiMetrics.tabHeight)
             .offset(y: inverted ? -1 : 2)
+            // The face rides in the goo's bulb.
+            .offset(x: isGooey ? model.goo.width : 0, y: isGooey ? model.goo.height : 0)
         }
-        .frame(width: model.tabWidth, height: RobiMetrics.tabHeight)
+        // The goo's neck adds to the tab's height; the panel already has room for it.
+        .frame(width: model.tabWidth, height: RobiMetrics.tabHeight + (isGooey ? model.goo.height : 0), alignment: .top)
         .scaleEffect(x: 1, y: model.isPresent ? 1 : 0.02, anchor: inverted ? .top : .bottom)
         .opacity(model.isPresent ? 1 : 0)
         .animation(RobiMotion.presence(model.reduceMotion), value: model.isPresent)
     }
 }
 
-/// The face as a button. A view of its own so streaming answer text, which decides whether the
+/// The face: a button to VoiceOver, and to the pointer a handle that clicks or drags the tab
+/// (`RobiFaceHandle`). A view of its own so streaming answer text, which decides whether the
 /// eyes wander, redraws only the face and not the whole tab.
 private struct RobiFaceButton: View {
     let model: RobiModel
@@ -79,13 +90,23 @@ private struct RobiFaceButton: View {
     let actions: RobiActions
 
     var body: some View {
-        Button(action: actions.tapFace) {
-            RobiFaceView(eyes: eyes, phase: model.phase, compact: model.phase.isBar,
-                         isWaiting: model.answer.isEmpty && model.notice == nil, reduceMotion: model.reduceMotion)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text(.robiName))
-        .accessibilityHint(Text(model.phase.isEngaged ? .robiFaceHintDismiss : .robiFaceHintAsk))
+        RobiFaceView(eyes: eyes, phase: model.phase, compact: model.phase.isBar,
+                     isWaiting: model.answer.isEmpty && model.notice == nil, badge: model.parkedBadge,
+                     reduceMotion: model.reduceMotion)
+            .modifier(RobiFaceHandle(report: actions.faceGesture))
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityLabel(Text(.robiName))
+            .accessibilityValue(badgeDescription)
+            .accessibilityHint(Text(model.phase.isEngaged ? .robiFaceHintDismiss : .robiFaceHintAsk))
+            .accessibilityAction { actions.tapFace() }
+    }
+}
+
+private extension RobiFaceButton {
+    var badgeDescription: Text {
+        guard let badge = model.parkedBadge else { return Text(verbatim: "") }
+        return Text(badge.isWorking ? .robiParkedWorking(badge.applicationName) : .robiParkedReady(badge.applicationName))
     }
 }
 

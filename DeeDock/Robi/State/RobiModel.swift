@@ -62,8 +62,20 @@ final class RobiModel {
     var proposal: RobiProposal?
     var notice: RobiNotice?
     var toast: LocalizedStringResource?
+    /// The person stopped the answer; what arrived before that stays in the card.
+    var isStopped = false
+    /// An answer is waiting on another window; Robi's face shows a dot for it.
+    var parkedBadge: RobiParkedBadge?
+    /// A hanging tab pulled away from the window's edge by a Shift-drag: the bulb's sideways lean
+    /// and how far down it is pulled, in points. Zero when nothing pulls. See `RobiGoo`.
+    var goo: CGSize = .zero
     /// The selection can be replaced in place through Accessibility.
     var canReplace = false
+    /// Questions the on-device model suggested for this context, already cleaned. Empty until
+    /// they arrive, and for good if suggestions are off, unavailable, or failed.
+    var generatedSuggestions: [String] = []
+    /// Suggested questions may arrive for this prompt, so the panel keeps room for their row.
+    var suggestsQuestions = false
     var answerModel: RobiAnswerModel = .onDevice
     var claudeEffort: RobiClaudeEffort = .medium
     var reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -93,12 +105,47 @@ final class RobiModel {
         case .prompting, .thinking, .answered: RobiMetrics.barWidth
         }
         var height = RobiMetrics.tabHeight + RobiMetrics.shadowMargin
-        if phase == .prompting { height += RobiMetrics.suggestionHeight }
+        if phase == .prompting {
+            height += RobiMetrics.suggestionHeight
+            // Reserved before the suggestions arrive, so the panel never resizes for them.
+            if suggestsQuestions { height += RobiMetrics.generatedSuggestionHeight }
+        }
         if phase.showsCard { height += RobiMetrics.cardHeight }
         return CGSize(width: width + 2 * RobiMetrics.sideMargin, height: height)
     }
 
-    /// Clears everything an interaction left behind.
+    /// The card's content, to set it aside or to change it through `apply(_:)`. Its phase is the
+    /// card's own: `.thinking` until the answer is complete.
+    var exchange: RobiExchange {
+        RobiExchange(context: context, request: request, answer: answer, proposal: proposal, notice: notice,
+                     isStopped: isStopped, canReplace: canReplace, answerModel: answerModel,
+                     phase: phase == .answered ? .answered : .thinking)
+    }
+
+    /// Writes back what a streamed update can change. Only fields that differ are set, so a new
+    /// chunk of answer redraws the answer and nothing else. The phase is the controller's to set.
+    func apply(_ exchange: RobiExchange) {
+        if answer != exchange.answer { answer = exchange.answer }
+        if proposal != exchange.proposal { proposal = exchange.proposal }
+        if notice != exchange.notice { notice = exchange.notice }
+        if isStopped != exchange.isStopped { isStopped = exchange.isStopped }
+    }
+
+    /// Shows an answer that was set aside, replacing whatever the card held.
+    func restore(_ exchange: RobiExchange) {
+        resetInteraction()
+        context = exchange.context
+        request = exchange.request
+        answer = exchange.answer
+        proposal = exchange.proposal
+        notice = exchange.notice
+        isStopped = exchange.isStopped
+        canReplace = exchange.canReplace
+        answerModel = exchange.answerModel
+    }
+
+    /// Clears everything an interaction left behind. An answer set aside on another window and
+    /// its `parkedBadge` are not part of it.
     func resetInteraction() {
         context = nil
         isReadingContext = false
@@ -108,7 +155,10 @@ final class RobiModel {
         proposal = nil
         notice = nil
         toast = nil
+        isStopped = false
         canReplace = false
+        generatedSuggestions = []
+        suggestsQuestions = false
     }
 }
 
@@ -120,17 +170,28 @@ final class RobiEyes {
     /// Offset of both pupils, in tenths of an eye width. Zero looks straight ahead.
     var pupil: CGSize = CGSize(width: 0, height: 2)
     var isBlinking = false
+    /// Set for a moment after the pointer circled the face: the pupils spin and the mouth
+    /// rounds into an "o".
+    var dizzy: RobiDizzy?
 }
 
 /// What Robi's views can ask the controller to do.
 struct RobiActions {
+    /// Clicks the face. VoiceOver's default action; a pointer click goes through `faceGesture`.
     var tapFace: () -> Void = {}
+    /// The pointer pressing, dragging, or releasing the face. The controller tells a click from a
+    /// drag of the tab along the window's top edge.
+    var faceGesture: (RobiFaceGesture) -> Void = { _ in }
     var submit: (String) -> Void = { _ in }
     var suggest: (RobiIntent) -> Void = { _ in }
+    /// Asks one of the suggested questions, like a typed one.
+    var askSuggested: (String) -> Void = { _ in }
     var copy: () -> Void = {}
     var replace: () -> Void = {}
     var paste: () -> Void = {}
     var runProposal: () -> Void = {}
+    /// Stops the answer being generated and keeps what has arrived.
+    var stop: () -> Void = {}
     var saveClaudeKey: (String) -> Void = { _ in }
     var answerOnDevice: () -> Void = {}
     var openSettings: () -> Void = {}

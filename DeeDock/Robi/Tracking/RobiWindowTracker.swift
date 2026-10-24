@@ -24,9 +24,18 @@ final class RobiWindowTracker {
     /// While true, focus changes are not followed. Robi pins the target during selection and
     /// answering so its own key panel never retargets it.
     var isPinned = false
-    /// While pinned, called when the person moved to a different window or app, so the
-    /// interaction can end and the tracker can follow them.
-    var leftWhilePinned: (() -> Void)?
+    /// While pinned, called when the person moved to a different window or app, or the window
+    /// went away, so the interaction can end or be set aside and the tracker can follow them.
+    var leftWhilePinned: ((Departure) -> Void)?
+
+    /// Why a pinned interaction lost its window.
+    enum Departure {
+        /// Focus moved to another window, another app, or something Robi does not sit on.
+        /// The window is still there and can come back.
+        case switchedAway
+        /// The window closed or was minimized.
+        case windowGone
+    }
 
     private(set) var target: RobiWindowTarget?
     private(set) var window: AXUIElement?
@@ -122,7 +131,7 @@ final class RobiWindowTracker {
             let axApplication = AXUIElementCreateApplication(pid)
             AXUIElementSetMessagingTimeout(axApplication, 0.15)
             if let focused = RobiAX.element(axApplication, kAXFocusedWindowAttribute), !Self.same(focused, window) {
-                leftWhilePinned?()
+                leftWhilePinned?(.switchedAway)
             }
             return
         }
@@ -149,7 +158,7 @@ final class RobiWindowTracker {
 
     /// No window to follow: ends a pinned interaction, otherwise clears the target.
     private func clear() {
-        if isPinned { leftWhilePinned?() } else { setTarget(nil, window: nil) }
+        if isPinned { leftWhilePinned?(.switchedAway) } else { setTarget(nil, window: nil) }
     }
 
     private func setTarget(_ next: RobiWindowTarget?, window nextWindow: AXUIElement?) {
@@ -247,7 +256,7 @@ final class RobiWindowTracker {
         case kAXUIElementDestroyedNotification, kAXWindowMiniaturizedNotification:
             // Registered on the target window only: it closed or went to the Dock. A pinned
             // interaction has nothing left to answer about, so it ends before following focus.
-            if isPinned { leftWhilePinned?() } else { scheduleRefresh() }
+            if isPinned { leftWhilePinned?(.windowGone) } else { scheduleRefresh() }
         default:
             scheduleRefresh()
         }

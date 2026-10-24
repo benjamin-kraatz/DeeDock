@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// The prompt bar the tab becomes: the context chip, then the question field or the request
-/// being answered, with a small spinner in Robi's ink while a model works.
+/// being answered, with the system's small spinner while a model works. It is the only spinner:
+/// it stays in one place from the question until the last streamed word.
 struct RobiPromptBar: View {
     @Bindable var model: RobiModel
     let actions: RobiActions
@@ -32,7 +33,13 @@ struct RobiPromptBar: View {
                 Spacer(minLength: 0)
             }
             if model.phase == .thinking && model.notice == nil {
-                RobiSpinner(color: model.ink.opacity(0.6), label: thinkingLabel)
+                // The system spinner draws for its colour scheme, not a tint, so it takes the
+                // tab's scheme to stay visible on a dark title bar in a light appearance.
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .controlSize(.small)
+                    .environment(\.colorScheme, model.tintIsDark ? .dark : .light)
+                    .accessibilityLabel(Text(thinkingLabel))
                     .transition(.opacity)
             }
         }

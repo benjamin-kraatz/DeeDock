@@ -75,6 +75,71 @@ struct RobiGeometryTests {
         #expect(prediction.isStalled(actual: frame))
         #expect(!prediction.isStalled(actual: frame.offsetBy(dx: 20, dy: 0)))
     }
+
+    // MARK: Moving the tab
+
+    /// How far the tab's centre stays from a side of the window it is dragged towards.
+    private var reach: CGFloat { RobiMetrics.tabWidth / 2 + RobiMetrics.edgeInset }
+
+    @Test("A dragged tab reaches the corners but keeps its whole width over the window")
+    func clampsToCorners() {
+        let window = CGRect(x: 200, y: 300, width: 800, height: 400)
+        #expect(RobiLayout.tabX(window: window, position: 0, display: display) == window.minX + reach)
+        #expect(RobiLayout.tabX(window: window, position: 1, display: display) == window.maxX - reach)
+        #expect(RobiLayout.tabX(window: window, position: -3, display: display) == window.minX + reach)
+        #expect(RobiLayout.tabX(window: window, position: nil, display: display) == window.midX)
+        let size = CGSize(width: RobiMetrics.tabWidth + 2 * RobiMetrics.sideMargin, height: RobiMetrics.tabHeight + RobiMetrics.shadowMargin)
+        let frame = RobiLayout.panelFrame(window: window, placement: .above, size: size, display: display, position: 0)
+        #expect(frame.midX - RobiMetrics.tabWidth / 2 >= window.minX + RobiMetrics.edgeInset)
+    }
+
+    @Test("A window barely wider than the tab keeps it near the middle, and a narrower one pins it there")
+    func clampsNarrowWindow() {
+        let narrow = CGRect(x: 200, y: 300, width: 240, height: 400)
+        let track = RobiLayout.tabTrack(window: narrow, display: display)
+        #expect(track == (narrow.minX + reach)...(narrow.maxX - reach))
+        #expect(RobiLayout.tabX(window: narrow, position: 0.9, display: display) == narrow.maxX - reach)
+        let tiny = CGRect(x: 200, y: 300, width: 120, height: 400)
+        #expect(RobiLayout.tabX(window: tiny, position: 0, display: display) == tiny.midX)
+        #expect(RobiLayout.tabX(window: tiny, position: 1, display: display) == tiny.midX)
+    }
+
+    @Test("A window partly off its display keeps the tab on the part that shows")
+    func clampsToVisibleEdge() {
+        let window = CGRect(x: 1200, y: 300, width: 600, height: 400)
+        #expect(RobiLayout.tabX(window: window, position: 1, display: display) == display.frame.maxX - reach)
+        #expect(RobiLayout.tabX(window: window, position: 0, display: display) == window.minX + reach)
+        let stored = RobiLayout.position(forTabX: 5_000, window: window, display: display)
+        #expect(abs(stored - Double((display.frame.maxX - reach - window.minX) / window.width)) < 1e-9)
+    }
+
+    @Test("A pointer position maps back to the position that puts the tab under it")
+    func invertsPointer() {
+        let window = CGRect(x: 200, y: 300, width: 800, height: 400)
+        let position = RobiLayout.position(forTabX: 440, window: window, display: display)
+        #expect(abs(position - 0.3) < 1e-9)
+        #expect(abs(RobiLayout.tabX(window: window, position: position, display: display) - 440) < 1e-9)
+        // Past the track, the position stored is the one at its end.
+        let past = RobiLayout.position(forTabX: -500, window: window, display: display)
+        #expect(RobiLayout.tabX(window: window, position: past, display: display) == window.minX + reach)
+    }
+
+    @Test("Dragging past the end of the track rubber-bands, never further than its limit")
+    func rubberBands() {
+        #expect(RobiLayout.rubberBand(0) == 0)
+        #expect(RobiLayout.rubberBand(4) > 0 && RobiLayout.rubberBand(4) < 4)
+        #expect(RobiLayout.rubberBand(-4) == -RobiLayout.rubberBand(4))
+        #expect(RobiLayout.rubberBand(10_000) < RobiMetrics.rubberBandLimit)
+        #expect(RobiTabSpring.remaining(after: 0) == 1)
+        #expect(RobiTabSpring.remaining(after: RobiTabSpring.duration) == 0)
+    }
+
+    @Test("A press is a click until it moves past the drag threshold")
+    func tellsClickFromDrag() {
+        let press = RobiFacePress(start: CGPoint(x: 500, y: 800), canDrag: true, grip: 0)
+        #expect(!press.hasLeftClickDistance(CGPoint(x: 503, y: 801)))
+        #expect(press.hasLeftClickDistance(CGPoint(x: 505, y: 800)))
+    }
 }
 
 @Suite("Robi settings")
@@ -127,5 +192,35 @@ struct RobiSettingsTests {
         #expect(!String(decoding: stored, as: UTF8.self).contains("sk-ant"))
         store.removeClaudeKey()
         #expect(!store.hasClaudeKey)
+    }
+
+    @Test("Tab positions default to none, survive a missing or malformed value, and round-trip")
+    func decodesTabPositions() throws {
+        let missing = try JSONDecoder().decode(RobiSettings.self, from: Data(#"{"isEnabled":true}"#.utf8))
+        #expect(missing.tabPositions.isEmpty)
+        #expect(missing.isEnabled)
+        let malformed = try JSONDecoder().decode(RobiSettings.self, from: Data(#"{"isEnabled":true,"tabPositions":[0.2]}"#.utf8))
+        #expect(malformed.tabPositions.isEmpty)
+        #expect(malformed.isEnabled)
+        var settings = RobiSettings()
+        settings.tabPositions = ["com.example.app": 0.25]
+        let decoded = try JSONDecoder().decode(RobiSettings.self, from: JSONEncoder().encode(settings))
+        #expect(decoded.tabPositions == ["com.example.app": 0.25])
+    }
+
+    @Test("Saving a dropped tab persists it without reapplying settings; resetting does reapply")
+    @MainActor
+    func savesTabPositionQuietly() throws {
+        let suite = "robi.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = RobiStore(defaults: defaults, keychain: RobiMemoryKeyStore())
+        var applied = 0
+        store.changed = { applied += 1 }
+        store.setTabPosition(0.8, for: "com.example.app")
+        #expect(applied == 0)
+        #expect(RobiStore(defaults: defaults, keychain: RobiMemoryKeyStore()).settings.tabPositions == ["com.example.app": 0.8])
+        store.settings.tabPositions = [:]
+        #expect(applied == 1)
     }
 }

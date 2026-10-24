@@ -5,6 +5,8 @@ import SwiftUI
 struct RobiAnswerCard: View {
     let model: RobiModel
     let actions: RobiActions
+    /// Lives as long as the card, so an answer that is briefly replaced by a notice keeps its place.
+    @State private var pacer = RobiTextPacer()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -12,7 +14,7 @@ struct RobiAnswerCard: View {
                 RobiNoticeView(notice: notice, model: model, actions: actions)
                     .transition(.opacity)
             } else {
-                RobiAnswerText(model: model)
+                RobiAnswerText(model: model, pacer: pacer)
                 if let proposal = model.proposal {
                     RobiProposalButton(proposal: proposal, isReady: model.phase == .answered,
                                        reduceMotion: model.reduceMotion, run: actions.runProposal)
@@ -30,41 +32,104 @@ struct RobiAnswerCard: View {
             .strokeBorder(model.cardIsDark ? Color.white.opacity(0.10) : Color.black.opacity(0.08)))
         .shadow(color: .black.opacity(model.cardIsDark ? 0.36 : 0.18), radius: 16, y: 8)
         .environment(\.colorScheme, model.cardIsDark ? .dark : .light)
-        // The card grows with the answer instead of jumping a line at a time, and a proposal or
-        // notice settles in with the same spring as the rest of Robi.
-        .animation(.easeOut(duration: model.reduceMotion ? 0.1 : 0.22), value: model.answer)
+        // The first words fade in over the waiting line; `RobiAnswerScroll` animates the growth
+        // after that. A proposal or notice settles in with the same spring as the rest of Robi.
+        // Keyed on the revealed text, not `model.answer`, which fills a moment earlier.
+        .animation(.easeOut(duration: model.reduceMotion ? 0.1 : 0.22), value: pacer.hasText)
         .animation(RobiMotion.morph(model.reduceMotion), value: model.proposal)
         .animation(RobiMotion.morph(model.reduceMotion), value: model.notice)
+        .animation(.easeOut(duration: model.reduceMotion ? 0.1 : 0.22), value: model.isStopped)
     }
 }
 
-/// The answer as it streams in, or the waiting line before the first words arrive.
+/// The answer as it streams in, or the waiting line before the first words arrive. The spinner
+/// for both is in the prompt bar. A stopped answer keeps what arrived and says it was stopped.
+///
+/// Feeds `model.answer` to the pacer and shows what the pacer has revealed. The waiting line stays
+/// until the first words are revealed, so it does not give way to an empty line during the pacer's
+/// initial hold.
 private struct RobiAnswerText: View {
     let model: RobiModel
+    let pacer: RobiTextPacer
+
+    private var input: RobiTextPacer.Input {
+        RobiTextPacer.Input(target: model.answer, isFinished: model.phase == .answered || model.isStopped,
+                            reduceMotion: model.reduceMotion)
+    }
 
     var body: some View {
-        if model.answer.isEmpty {
-            HStack(spacing: 8) {
-                RobiSpinner(color: .secondary)
-                Text(model.answerModel == .claude ? .robiThinkingClaude : .robiThinkingOnDevice)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+        // A stack rather than bare content, so the modifiers below apply once and not to each child.
+        VStack(alignment: .leading, spacing: 10) {
+            if !pacer.hasText {
+                Group {
+                    if model.isStopped && model.answer.isEmpty {
+                        RobiStoppedLabel()
+                    } else {
+                        Text(model.answerModel == .claude ? .robiThinkingClaude : .robiThinkingOnDevice)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(height: 20)
+                .transition(.opacity)
+            } else {
+                RobiAnswerScroll(pacer: pacer, reduceMotion: model.reduceMotion)
+                    .transition(.opacity)
+                if model.isStopped {
+                    RobiStoppedLabel()
+                        .transition(.opacity)
+                }
             }
-            .frame(height: 20)
-            .transition(.opacity)
-        } else {
-            ScrollView {
-                Text(model.answer)
-                    .font(.system(size: 13))
-                    .lineSpacing(2)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .scrollBounceBehavior(.basedOnSize)
-            .frame(maxHeight: 190)
-            .fixedSize(horizontal: false, vertical: true)
-            .transition(.opacity)
         }
+        .onChange(of: input, initial: true) { pacer.update(input) }
+        .onDisappear { pacer.pause() }
+    }
+}
+
+/// Says the person stopped the answer, so a cut-off sentence reads as stopped, not broken.
+private struct RobiStoppedLabel: View {
+    var body: some View {
+        Label { Text(.robiAnswerStopped) } icon: { Image(systemName: "stop.circle") }
+            .font(.system(size: 11))
+            .foregroundStyle(.secondary)
+    }
+}
+
+/// The revealed answer text, growing with the stream up to `maxHeight` and scrolling beyond it.
+///
+/// The height comes from measuring the text, not from the scroll view's ideal size. Each growth
+/// step animates, and during that animation the text is already taller than its frame, so a
+/// scroll view sized by its content flashed its scroller on every streamed chunk. The scroller is
+/// allowed only once the text is taller than `maxHeight`. A stream only adds text, so that
+/// happens at most once per answer and the scroller does not come and go.
+///
+/// This is the only view that reads `pacer.text`, so the pacer's ticks redraw nothing else. The
+/// fading words differ only in colour, so they never change the measured height.
+private struct RobiAnswerScroll: View {
+    let pacer: RobiTextPacer
+    let reduceMotion: Bool
+    /// Starts at zero for each answer: the view is rebuilt whenever the revealed text empties.
+    @State private var textHeight: CGFloat = 0
+
+    private static let maxHeight: CGFloat = 190
+
+    var body: some View {
+        ScrollView {
+            Text(pacer.text)
+                .font(.system(size: 13))
+                .lineSpacing(2)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                    // Animated here rather than on the text, so the card around the scroll view
+                    // grows in the same transaction as its frame.
+                    withAnimation(.easeOut(duration: reduceMotion ? 0.1 : 0.22)) { textHeight = height }
+                }
+        }
+        // `.never`, unlike `.hidden`, also holds when scroll bars are set to always show.
+        .scrollIndicators(textHeight > Self.maxHeight ? .automatic : .never)
+        .scrollBounceBehavior(.basedOnSize)
+        .frame(height: min(textHeight, Self.maxHeight))
     }
 }
 
@@ -87,7 +152,8 @@ private struct RobiProposalButton: View {
 }
 
 /// Copy, Replace, Paste and Done, with a passing confirmation between them. The first three stay
-/// disabled until the answer is complete.
+/// disabled until the answer is complete or stopped. While it streams, Stop takes Done's place
+/// and its Esc key, so Esc stops first and closes second.
 private struct RobiAnswerActions: View {
     let model: RobiModel
     let actions: RobiActions
@@ -115,8 +181,15 @@ private struct RobiAnswerActions: View {
                     .truncationMode(.tail)
                     .transition(toastTransition)
             }
-            Button(action: actions.dismiss) { Text(.robiActionDone) }
+            if model.phase == .thinking {
+                Button(action: actions.stop) {
+                    Label { Text(.robiActionStop) } icon: { Image(systemName: "stop.fill") }
+                }
                 .keyboardShortcut(.cancelAction)
+            } else {
+                Button(action: actions.dismiss) { Text(.robiActionDone) }
+                    .keyboardShortcut(.cancelAction)
+            }
         }
         .controlSize(.small)
         .animation(RobiMotion.feedback(model.reduceMotion), value: model.toast)
@@ -247,3 +320,52 @@ struct RobiCardBackground: NSViewRepresentable {
         view.material = reduceTransparency ? .windowBackground : .popover
     }
 }
+
+#if DEBUG
+/// Replays a fixed, bursty stream into a card, the way models deliver text: uneven chunks after
+/// uneven gaps, then a pause and the same answer again. The pacer should turn it into an even flow.
+private struct RobiStreamingPreview: View {
+    @State private var model: RobiModel
+
+    init(reduceMotion: Bool = false) {
+        _model = State(initialValue: RobiPreviewData.model(.thinking, dark: true, context: RobiPreviewData.region,
+                                                           model: .claude, reduceMotion: reduceMotion))
+    }
+
+    /// Characters per chunk and the wait before it, in seconds, repeated over the answer.
+    private static let bursts: [(size: Int, wait: Double)] = [
+        (4, 0.05), (26, 0.32), (7, 0.06), (48, 0.42), (12, 0.10), (3, 0.04), (36, 0.28),
+    ]
+
+    var body: some View {
+        RobiAnswerCard(model: model, actions: RobiActions())
+            .padding(24)
+            .frame(width: RobiMetrics.cardWidth + 48, height: 360, alignment: .top)
+            .background(Color(red: 0.12, green: 0.13, blue: 0.16))
+            .task { await replay() }
+    }
+
+    private func replay() async {
+        let answer = Array(RobiPreviewData.longAnswer)
+        while !Task.isCancelled {
+            model.answer = ""
+            model.phase = .thinking
+            try? await Task.sleep(for: .seconds(0.6))
+            var count = 0
+            var burst = 0
+            while count < answer.count, !Task.isCancelled {
+                let next = Self.bursts[burst % Self.bursts.count]
+                try? await Task.sleep(for: .seconds(next.wait))
+                count = min(count + next.size, answer.count)
+                model.answer = String(answer[..<count])
+                burst += 1
+            }
+            model.phase = .answered
+            try? await Task.sleep(for: .seconds(2.5))
+        }
+    }
+}
+
+#Preview("Streaming in bursts, paced") { RobiStreamingPreview() }
+#Preview("Streaming in bursts, Reduce Motion") { RobiStreamingPreview(reduceMotion: true) }
+#endif

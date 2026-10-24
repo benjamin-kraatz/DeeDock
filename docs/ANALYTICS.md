@@ -415,7 +415,7 @@ Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace
 | `focus_dock_command` | `command` |
 | `focus_session` | `action` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
-| `robi_answered` | `model` (`on_device`, `claude`), `intent` (`explain`, `translate`, `summarize`, `do_it`, `custom`), `outcome` (`answered`, `proposed`, `failed`, `unavailable`, `key_missing`), `duration`, `picture` (a region or window picture went to the model) |
+| `robi_answered` | `model` (`on_device`, `claude`), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
 | `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`) |
 
 Atmosphere has no events of its own. Its settings are reported through `setting_changed` with
@@ -424,8 +424,9 @@ Atmosphere has no events of its own. Its settings are reported through `setting_
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
 
 Robi's settings are reported through `setting_changed` with `area = robi`, by reflection over
-`RobiSettings`: `isEnabled`, `answerModel`, `claudeEffort`, `shortcutEnabled`, and the number of
-excluded apps (never their bundle IDs). Whether an Anthropic API key is saved is not reported, and
+`RobiSettings`: `isEnabled`, `answerModel`, `claudeEffort`, `suggestQuestions`, `shortcutEnabled`, and the number of
+excluded apps (never their bundle IDs). Where the tab was dragged (`tabPositions`, keyed by bundle
+ID) is not reported at all, not even as a count. Whether an Anthropic API key is saved is not reported, and
 the key itself never leaves the Keychain except in requests to Anthropic.
 
 Robi events never include the app, the window, the selection, recognized text, the question, the

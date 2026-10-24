@@ -34,6 +34,15 @@ nonisolated enum RobiWindowServer {
         return matches[0][kCGWindowNumber as String] as? CGWindowID
     }
 
+    /// True while the window server still has the window: on any Space, hidden, or minimized.
+    /// False once it closed or its app quit.
+    static func exists(_ windowID: CGWindowID) -> Bool {
+        var ids: [UnsafeRawPointer?] = [UnsafeRawPointer(bitPattern: UInt(windowID))]
+        guard let array = CFArrayCreate(nil, &ids, 1, nil),
+              let info = CGWindowListCreateDescriptionFromArray(array) as? [[String: Any]] else { return false }
+        return !info.isEmpty
+    }
+
     /// Live bounds of one window in global top-left points, straight from the window server.
     /// Measured at about 80 µs, cheap enough to call on every drag event.
     static func bounds(of windowID: CGWindowID) -> CGRect? {
