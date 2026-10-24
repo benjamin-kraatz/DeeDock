@@ -707,7 +707,7 @@ $('#notif').addEventListener('click', () => $('#notif').classList.remove('on'));
 document.addEventListener('keydown', e => {
  if ($('#auth').classList.contains('on')) return;
  if (e.key === 'Escape') { if ($('#ctx').style.display === 'block') closeCtx(); else if (S.sheet && ['review', 'cancelled'].includes(S.phase)) closeSheet(); }
- if (e.key === 'Enter' && S.sheet) { if (S.phase === 'review' && !cur().ext) uninstall(); else if (S.phase === 'done') finish(); }
+ if (e.key === 'Enter' && S.sheet && !e.target.closest('button')) { if (S.phase === 'review' && !cur().ext) uninstall(); else if (S.phase === 'done') finish(); }
 });
 
 /* ───────── controls ───────── */

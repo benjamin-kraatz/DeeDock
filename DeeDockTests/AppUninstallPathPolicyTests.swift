@@ -15,7 +15,7 @@ struct AppUninstallPathPolicyTests {
     }
 
     @Test func dataFoldersThemselvesAndAnythingElseAreRefused() {
-        for path in ["Library/Caches", "Library", "Documents/com.example.Editor", "Library/Caches/com.example.Editor/Sub",
+        for path in ["Library/Caches", "Library/Preferences/ByHost", "Library","Documents/com.example.Editor", "Library/Caches/com.example.Editor/Sub",
                      "Library/Caches/.DS_Store", "Library/Keychains/login.keychain-db", "Desktop"] {
             #expect(!AppUninstallPathPolicy.allowsData(home.appendingPathComponent(path), home: home), "\(path)")
         }

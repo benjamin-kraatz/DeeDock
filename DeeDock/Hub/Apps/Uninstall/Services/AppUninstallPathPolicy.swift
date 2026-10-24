@@ -73,6 +73,8 @@ nonisolated enum AppUninstallPathPolicy {
         let parent = item.deletingLastPathComponent().standardizedFileURL.path
         let homePath = home.standardizedFileURL.path
         let dataFolders = userDataFolders.map { home.appendingPathComponent($0).standardizedFileURL.path } + systemDataFolders
+        // `Preferences/ByHost` is a data folder inside another one, so it would otherwise pass as a child.
+        if dataFolders.contains(item.path) { return false }
         if dataFolders.contains(parent) { return !name.hasPrefix(".") }
         if parent == homePath {
             return name.hasPrefix(".") && name.count > 2 && !protectedHomeItems.contains(name)

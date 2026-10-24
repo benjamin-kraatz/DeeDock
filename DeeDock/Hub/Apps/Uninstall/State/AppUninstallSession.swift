@@ -264,7 +264,11 @@ final class AppUninstallSession: Identifiable {
         let appPresent = services.exists(appURL)
         if appPresent, !AppUninstallPathPolicy.allowsApp(appURL) { return stop(.failed) }
         let selected = selectedItems
-        let viaFinder = Set(selected.filter { services.needsFinder($0.url) }.map(\.id))
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        // Items the policy refuses stay out of the Finder request; the loop below marks them not moved.
+        let viaFinder = Set(selected.filter {
+            services.needsFinder($0.url) && AppUninstallPathPolicy.allowsData($0.url, home: home)
+        }.map(\.id))
         // Finder fails the whole request when one path is missing, so only send what's still there.
         let finderData = selected.filter { viaFinder.contains($0.id) && services.exists($0.url) }
 
@@ -302,7 +306,7 @@ final class AppUninstallSession: Identifiable {
 
         setPhase(.working(.moving))
         for item in selected where !viaFinder.contains(item.id) {
-            guard AppUninstallPathPolicy.allowsData(item.url, home: FileManager.default.homeDirectoryForCurrentUser) else {
+            guard AppUninstallPathPolicy.allowsData(item.url, home: home) else {
                 itemProgress[item.id] = .failed
                 continue
             }
