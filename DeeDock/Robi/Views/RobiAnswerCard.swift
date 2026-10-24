@@ -118,9 +118,14 @@ private struct RobiAnswerScroll: View {
 
     private static let maxHeight: CGFloat = 190
 
-    /// The revealed text with each revealed reference as a link. A reference still being
-    /// revealed is linked as far as it goes. The link adds a dotted underline but no characters,
-    /// so linking never changes the measured height.
+    /// How much lighter the dotted underline is than the link's words, so a reference reads as
+    /// clickable without the weight of a web link.
+    private static let underlineOpacity = 0.45
+
+    /// The revealed text with each revealed reference as a link: the accent colour with a lighter
+    /// dotted underline. A reference still being revealed is linked as far as it goes, and its
+    /// words still fading in fade in the link colour, so they never switch colour once the fade
+    /// ends. The link adds no characters, so linking never changes the measured height.
     private var linkedText: AttributedString {
         var text = pacer.text
         let count = text.characters.count
@@ -129,7 +134,13 @@ private struct RobiAnswerScroll: View {
             let lower = text.characters.index(text.startIndex, offsetBy: reference.range.lowerBound)
             let upper = text.characters.index(text.startIndex, offsetBy: min(reference.range.upperBound, count))
             text[lower..<upper].link = url
-            text[lower..<upper].underlineStyle = Text.LineStyle(pattern: .dot)
+            // Collected before the writes below: changing attributes keeps indices valid, but not
+            // a runs view being iterated.
+            let fades = text[lower..<upper].runs.map { ($0.range, $0.robiFade ?? 1) }
+            for (range, fade) in fades {
+                text[range].foregroundColor = Color.accentColor.opacity(fade)
+                text[range].underlineStyle = Text.LineStyle(pattern: .dot, color: Color.accentColor.opacity(Self.underlineOpacity * fade))
+            }
         }
         return text
     }
