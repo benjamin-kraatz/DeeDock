@@ -66,6 +66,9 @@ These keep an anchored Hub open through outside clicks, focus loss, and Escape:
 - An open file chooser, an alert or confirmation dialog, or Quick Look.
 - A context menu or options menu from Hub content.
 - A copy or move in the Files tab.
+- An uninstall from the Apps tab while it quits the app and moves it to the Trash, so Finder's
+  password prompt doesn't close the Hub. An uninstall sheet waiting for Full Disk Access stays open
+  for when the Hub opens again.
 - Lookout's onboarding card. It closes when the Hub closes, and opens again where it left off.
 
 Focus moving to a menu, Quick Look, or a sheet or child window of the Hub does not count as focus

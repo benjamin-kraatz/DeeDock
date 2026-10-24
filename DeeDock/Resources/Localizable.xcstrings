@@ -59054,6 +59054,1554 @@
         }
       }
     },
+    "hubUninstallMenu" : {
+      "comment" : "Context menu item in the Hub's Apps tab that opens the uninstall sheet for the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deinstallieren…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uninstall…"
+          }
+        }
+      }
+    },
+    "hubUninstallTitle" : {
+      "comment" : "Title of the uninstall sheet. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ deinstallieren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uninstall %1$(name)@?"
+          }
+        }
+      }
+    },
+    "hubUninstallVersion" : {
+      "comment" : "Line under the uninstall sheet's title. version is the app's version, such as 11.2.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$(version)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %1$(version)@"
+          }
+        }
+      }
+    },
+    "hubUninstallSourceAppStore" : {
+      "comment" : "Badge on the uninstall sheet: the app came from the Mac App Store.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store"
+          }
+        }
+      }
+    },
+    "hubUninstallSourceTestFlight" : {
+      "comment" : "Badge on the uninstall sheet: the app is a TestFlight beta build.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TestFlight"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TestFlight"
+          }
+        }
+      }
+    },
+    "hubUninstallSourceInstaller" : {
+      "comment" : "Badge on the uninstall sheet: an installer package installed the app for all users.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installationsprogramm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installer"
+          }
+        }
+      }
+    },
+    "hubUninstallSourceDownloaded" : {
+      "comment" : "Badge on the uninstall sheet: the app was downloaded or copied in by the user.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heruntergeladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded"
+          }
+        }
+      }
+    },
+    "hubUninstallCalculating" : {
+      "comment" : "Shown in place of a size while DOKK measures it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird berechnet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating…"
+          }
+        }
+      }
+    },
+    "hubUninstallChecking" : {
+      "comment" : "Status under the uninstall sheet's title while DOKK looks for the data the app left on disk.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche nach den Daten der App …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looking for the app's data…"
+          }
+        }
+      }
+    },
+    "hubUninstallPasswordAppStore" : {
+      "comment" : "Bold start of a note on the uninstall sheet: the app came from the App Store, so removing it needs the user's password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über den App Store installiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed by the App Store."
+          }
+        }
+      }
+    },
+    "hubUninstallPasswordTestFlight" : {
+      "comment" : "Bold start of a note on the uninstall sheet: TestFlight installed the app, so removing it needs the user's password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über TestFlight installiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed by TestFlight."
+          }
+        }
+      }
+    },
+    "hubUninstallPasswordInstaller" : {
+      "comment" : "Bold start of a note on the uninstall sheet: an installer put the app there for all users, so removing it needs the user's password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für alle Benutzer installiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed for all users."
+          }
+        }
+      }
+    },
+    "hubUninstallPasswordShared" : {
+      "comment" : "Bold start of a note on the uninstall sheet: some selected items belong to all users, so removing them needs the user's password.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Objekte gehören allen Benutzern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some items belong to all users."
+          }
+        }
+      }
+    },
+    "hubUninstallPasswordDetail" : {
+      "comment" : "Follows the bold start of the password note on the uninstall sheet. Finder is the macOS app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS fragt nach deinem Passwort, dann legt der Finder sie in den Papierkorb."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS asks for your password, then Finder moves them to the Trash."
+          }
+        }
+      }
+    },
+    "hubUninstallRunningTitle" : {
+      "comment" : "Bold start of a note on the uninstall sheet: the app is running. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ ist geöffnet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ is open."
+          }
+        }
+      }
+    },
+    "hubUninstallRunningDetail" : {
+      "comment" : "Follows the bold start of the note that the app is running.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK beendet die App zuerst. Bei ungesicherten Änderungen fragt sie nach."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK quits it first. If it has unsaved changes, it asks you."
+          }
+        }
+      }
+    },
+    "hubUninstallExtensionTitle" : {
+      "comment" : "Bold start of a note on the uninstall sheet: the app installed a system or network extension. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ hat eine Systemerweiterung installiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ installed a system extension."
+          }
+        }
+      }
+    },
+    "hubUninstallExtensionDetail" : {
+      "comment" : "Follows the bold start of the system extension note on the uninstall sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Papierkorb entfernt sie nicht zuverlässig. Starte zuerst das Deinstallationsprogramm der App oder entferne die Erweiterung in den Systemeinstellungen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Trash doesn't reliably remove it. Run the app's own uninstaller first, or remove the extension in System Settings."
+          }
+        }
+      }
+    },
+    "hubUninstallOpenUninstaller" : {
+      "comment" : "Button that opens the uninstaller the app's developer ships.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deinstallationsprogramm öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Uninstaller"
+          }
+        }
+      }
+    },
+    "hubUninstallExtensionSettings" : {
+      "comment" : "Button that opens System Settings at Login Items & Extensions. Use Apple's localized wording.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen für Erweiterungen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extensions Settings…"
+          }
+        }
+      }
+    },
+    "hubUninstallMoveAnyway" : {
+      "comment" : "Uninstall button for an app with a system extension, used instead of running the developer's uninstaller.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trotzdem in den Papierkorb legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Trash Anyway"
+          }
+        }
+      }
+    },
+    "hubUninstallSectionApp" : {
+      "comment" : "Section heading on the uninstall sheet: the app bundle itself.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        }
+      }
+    },
+    "hubUninstallSectionData" : {
+      "comment" : "Section heading on the uninstall sheet: files and folders the app keeps outside its bundle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Daten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App data"
+          }
+        }
+      }
+    },
+    "hubUninstallSectionRelated" : {
+      "comment" : "Collapsible section heading on the uninstall sheet: items that only share the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vielleicht zugehörig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Possibly related"
+          }
+        }
+      }
+    },
+    "hubUninstallRelatedHint" : {
+      "comment" : "Explains the Possibly related section on the uninstall sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur über den Namen gefunden, daher ist hier nichts ausgewählt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Found by name only, so nothing here is selected."
+          }
+        }
+      }
+    },
+    "hubUninstallNameMatch" : {
+      "comment" : "Small tag on a row found only because its name matches the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namenstreffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name match"
+          }
+        }
+      }
+    },
+    "hubUninstallNoData" : {
+      "comment" : "Shown in the App data section when nothing was found.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK hat keine Daten außerhalb der App gefunden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK found no data outside the app."
+          }
+        }
+      }
+    },
+    "hubUninstallNotChecked" : {
+      "comment" : "Shown in place of a size for a folder macOS keeps DOKK from reading.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht geprüft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked"
+          }
+        }
+      }
+    },
+    "hubUninstallUnreadable" : {
+      "comment" : "Shown in place of a size when only an administrator can read the item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe unbekannt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size unknown"
+          }
+        }
+      }
+    },
+    "hubUninstallProtected" : {
+      "comment" : "VoiceOver label for the lock on a row macOS keeps DOKK from reading.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von macOS geschützt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protected by macOS"
+          }
+        }
+      }
+    },
+    "hubUninstallSharedWith" : {
+      "comment" : "Note on a row another installed app also uses. name is the app's name supplied by macOS. The name is of the other app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird auch von %1$(name)@ genutzt und ist daher nicht ausgewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also used by %1$(name)@, so it's not selected"
+          }
+        }
+      }
+    },
+    "hubUninstallAllUsers" : {
+      "comment" : "Note on a row in /Library, shared by all users of the Mac.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für alle Benutzer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For all users"
+          }
+        }
+      }
+    },
+    "hubUninstallKeepsRunning" : {
+      "comment" : "Note on a background helper row: moving it to the Trash doesn't stop it until restart.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft bis zum nächsten Neustart weiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps running until you restart your Mac"
+          }
+        }
+      }
+    },
+    "hubUninstallSelectAllData" : {
+      "comment" : "VoiceOver label for the checkbox that selects all rows in the App data section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle App-Daten auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select all app data"
+          }
+        }
+      }
+    },
+    "hubUninstallUnpin" : {
+      "comment" : "Checkbox on the uninstall sheet. The number is how many displays' docks pin the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Aus dem Dock ablösen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Auf %lld Bildschirmen aus dem Dock ablösen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Unpin from the dock"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Unpin from the dock on %lld displays"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallAccessTitle" : {
+      "comment" : "Bold start of the Full Disk Access card on the uninstall sheet. The number is how many folders macOS hides. Use Apple's localized name for Full Disk Access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Für 1 Ordner ist Festplattenvollzugriff nötig."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Für %lld Ordner ist Festplattenvollzugriff nötig."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Full Disk Access is needed to check 1 folder."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Full Disk Access is needed to check %lld folders."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallAccessDetail" : {
+      "comment" : "Follows the bold start of the Full Disk Access card. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS schützt den Ort, an dem %1$(name)@ diese Daten ablegt. Mit Festplattenvollzugriff kann DOKK sie messen und entfernen. DOKK fasst nur Ordner an, die zu der App gehören, die du entfernst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS protects where %1$(name)@ keeps this data. With Full Disk Access, DOKK can measure and remove it. DOKK only touches folders that belong to the app you're removing."
+          }
+        }
+      }
+    },
+    "hubUninstallAccessRelaunchTitle" : {
+      "comment" : "Bold start of the Full Disk Access card after System Settings opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachdem du DOKK erlaubt hast, starte es neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After you allow DOKK, relaunch it."
+          }
+        }
+      }
+    },
+    "hubUninstallAccessRelaunchDetail" : {
+      "comment" : "Follows the bold start of the relaunch card on the uninstall sheet. Use Apple's localized name for Full Disk Access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS übernimmt den Festplattenvollzugriff, wenn DOKK neu startet. Dieses Fenster öffnet sich danach wieder."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS applies Full Disk Access when DOKK starts again. This sheet reopens where you left it."
+          }
+        }
+      }
+    },
+    "hubUninstallRelaunch" : {
+      "comment" : "Button that quits DOKK and opens it again so Full Disk Access applies.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relaunch DOKK"
+          }
+        }
+      }
+    },
+    "hubUninstallMoves" : {
+      "comment" : "Footer of the uninstall sheet. size is a file size such as “31.4 MB”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt %1$(size)@ in den Papierkorb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves %1$(size)@ to the Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallMovesAtLeast" : {
+      "comment" : "Footer of the uninstall sheet while sizes are still measured. size is a file size such as “31.4 MB”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legt mindestens %1$(size)@ in den Papierkorb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves at least %1$(size)@ to the Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallStays" : {
+      "comment" : "Footer note on the uninstall sheet. The number is how many folders macOS keeps DOKK from removing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 Ordner bleibt erhalten"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner bleiben erhalten"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 folder stays in place"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders stay in place"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallConfirm" : {
+      "comment" : "Default button of the uninstall sheet: moves the app and the selected items to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Papierkorb legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallTryAgain" : {
+      "comment" : "Button that starts the uninstall again after it stopped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "hubUninstallQuitting" : {
+      "comment" : "Status while DOKK quits the app before removing it. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ wird beendet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitting %1$(name)@…"
+          }
+        }
+      }
+    },
+    "hubUninstallWaitingForPassword" : {
+      "comment" : "Status while macOS asks for the user's password to remove the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warte auf dein Passwort …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for your password…"
+          }
+        }
+      }
+    },
+    "hubUninstallMoving" : {
+      "comment" : "Status while items go to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird in den Papierkorb gelegt …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving to the Trash…"
+          }
+        }
+      }
+    },
+    "hubUninstallStoppedTitle" : {
+      "comment" : "Bold start of an error note on the uninstall sheet: nothing was removed. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ wurde nicht entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ wasn't removed."
+          }
+        }
+      }
+    },
+    "hubUninstallStoppedPassword" : {
+      "comment" : "Follows the bold start of the error note when the user cancelled the password prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS braucht dein Passwort, um diese App zu entfernen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS needs your password to remove this app."
+          }
+        }
+      }
+    },
+    "hubUninstallStoppedOpen" : {
+      "comment" : "Follows the bold start of the error note when the app didn't quit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App ist noch geöffnet. Beende sie und versuche es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's still open. Quit it, then try again."
+          }
+        }
+      }
+    },
+    "hubUninstallStoppedFailed" : {
+      "comment" : "Follows the bold start of the error note when macOS refused to move the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS hat DOKK nicht erlaubt, sie in den Papierkorb zu legen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS didn't let DOKK move it to the Trash."
+          }
+        }
+      }
+    },
+    "hubUninstallDoneTitle" : {
+      "comment" : "Title after an uninstall finished. name is the app's name supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ liegt im Papierkorb"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(name)@ is in the Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallDoneAppOnly" : {
+      "comment" : "Detail after an uninstall that moved only the app. Put Back is the Finder command; use Apple's localized name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Wiederherstellen öffne den Papierkorb und wähle „Zurücklegen“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To restore it, open the Trash and choose Put Back."
+          }
+        }
+      }
+    },
+    "hubUninstallDoneItems" : {
+      "comment" : "Detail after an uninstall. The number is how many items besides the app went to the Trash. Put Back is the Finder command; use Apple's localized name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Die App und 1 weiteres Objekt liegen im Papierkorb. Zum Wiederherstellen öffne den Papierkorb und wähle „Zurücklegen“."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Die App und %lld weitere Objekte liegen im Papierkorb. Zum Wiederherstellen öffne den Papierkorb und wähle „Zurücklegen“."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The app and 1 other item went to the Trash. To restore them, open the Trash and choose Put Back."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The app and %lld other items went to the Trash. To restore them, open the Trash and choose Put Back."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallDoneTotal" : {
+      "comment" : "Size line after an uninstall. size is a file size such as “31.4 MB”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insgesamt %1$(size)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(size)@ in total"
+          }
+        }
+      }
+    },
+    "hubUninstallDoneProtected" : {
+      "comment" : "Note after an uninstall. The number is how many folders macOS kept DOKK from removing. Use Apple's localized name for Full Disk Access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 Datenordner ist geblieben, weil DOKK keinen Festplattenvollzugriff hat."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datenordner sind geblieben, weil DOKK keinen Festplattenvollzugriff hat."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 data folder stayed in place because DOKK doesn't have Full Disk Access."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld data folders stayed in place because DOKK doesn't have Full Disk Access."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallDoneFailed" : {
+      "comment" : "Note after an uninstall. The number is how many selected items couldn't go to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 Objekt konnte nicht in den Papierkorb gelegt werden."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte konnten nicht in den Papierkorb gelegt werden."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 item couldn't be moved to the Trash."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items couldn't be moved to the Trash."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hubUninstallDoneExtension" : {
+      "comment" : "Note after uninstalling an app with a system extension.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Systemerweiterung kann aktiv bleiben, bis du sie in den Systemeinstellungen entfernst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system extension can stay active until you remove it in System Settings."
+          }
+        }
+      }
+    },
+    "hubUninstallDoneHelpers" : {
+      "comment" : "Note after an uninstall that moved background helpers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrundhelfer laufen bis zum nächsten Neustart weiter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background helpers keep running until you restart your Mac."
+          }
+        }
+      }
+    },
+    "hubUninstallShowInTrash" : {
+      "comment" : "Button after an uninstall that opens the Trash in Finder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Papierkorb zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallDone" : {
+      "comment" : "Button that closes the uninstall sheet after it finished.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "hubUninstallMoved" : {
+      "comment" : "VoiceOver value of a row that went to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Papierkorb gelegt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved to the Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallNotMoved" : {
+      "comment" : "VoiceOver value of a row that couldn't go to the Trash.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht in den Papierkorb gelegt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not moved to the Trash"
+          }
+        }
+      }
+    },
+    "hubUninstallKindContainer" : {
+      "comment" : "Row title on the uninstall sheet for the app's sandbox container.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Container"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App container"
+          }
+        }
+      }
+    },
+    "hubUninstallKindExtensionContainer" : {
+      "comment" : "Row title on the uninstall sheet for the sandbox container of one of the app's extensions or widgets.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterungs-Container"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extension container"
+          }
+        }
+      }
+    },
+    "hubUninstallKindGroupContainer" : {
+      "comment" : "Row title on the uninstall sheet for an app group container the app shares with its extensions or sibling apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geteilte App-Gruppe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared app group"
+          }
+        }
+      }
+    },
+    "hubUninstallKindScripts" : {
+      "comment" : "Row title on the uninstall sheet for the app's Application Scripts folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Skripte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App scripts"
+          }
+        }
+      }
+    },
+    "hubUninstallKindApplicationSupport" : {
+      "comment" : "Row title on the uninstall sheet for a folder in Library/Application Support; keep the folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Application Support"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Application Support"
+          }
+        }
+      }
+    },
+    "hubUninstallKindCaches" : {
+      "comment" : "Row title on the uninstall sheet for a folder in Library/Caches.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caches"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caches"
+          }
+        }
+      }
+    },
+    "hubUninstallKindPreferences" : {
+      "comment" : "Row title on the uninstall sheet for the app's preferences file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "hubUninstallKindSavedState" : {
+      "comment" : "Row title on the uninstall sheet for the windows macOS restores when the app opens.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesicherter Fensterzustand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved window state"
+          }
+        }
+      }
+    },
+    "hubUninstallKindWebData" : {
+      "comment" : "Row title on the uninstall sheet for cookies and web storage of the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webdaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web data"
+          }
+        }
+      }
+    },
+    "hubUninstallKindLogs" : {
+      "comment" : "Row title on the uninstall sheet for the app's log files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protokolle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs"
+          }
+        }
+      }
+    },
+    "hubUninstallKindLaunchAgent" : {
+      "comment" : "Row title on the uninstall sheet for a launch agent that starts when the user logs in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldehelfer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login helper"
+          }
+        }
+      }
+    },
+    "hubUninstallKindBackgroundHelper" : {
+      "comment" : "Row title on the uninstall sheet for a launch daemon or privileged helper tool.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrundhelfer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background helper"
+          }
+        }
+      }
+    },
+    "hubUninstallKindFolder" : {
+      "comment" : "Row title on the uninstall sheet for a folder that shares the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        }
+      }
+    },
+    "hubUninstallKindHomeFolder" : {
+      "comment" : "Row title on the uninstall sheet for a hidden folder directly in the user's home folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner in deinem Benutzerordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder in your home folder"
+          }
+        }
+      }
+    },
     "launcherFile.findSimilarDetail" : {
       "comment" : "Subtitle of Find Similar in the Apps tab's file actions, for one dropped picture or file Lookout has read. It switches to the Files tab.",
       "extractionState" : "manual",

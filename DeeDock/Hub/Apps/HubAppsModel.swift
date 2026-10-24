@@ -23,6 +23,9 @@ final class HubAppsModel: HubTabModel {
     /// The launcher state this tab presents.
     let launcher: LauncherState
 
+    /// The uninstall sheet's owner.
+    let uninstaller: HubAppsUninstaller
+
     /// When the tab last appeared. Tiles created shortly after run the staggered entrance; tiles a
     /// lazy grid creates later while scrolling appear without it.
     @ObservationIgnored private(set) var appearedAt = Date.distantPast
@@ -42,11 +45,11 @@ final class HubAppsModel: HubTabModel {
 
     /// Independent reasons this tab keeps the Hub open, each mapped to one ``HubHoldReason``.
     private enum Hold: Hashable {
-        case fileChooser, dialog, menu
+        case fileChooser, dialog, menu, uninstall
 
         var reason: HubHoldReason {
             switch self {
-            case .fileChooser, .dialog: .modal
+            case .fileChooser, .dialog, .uninstall: .modal
             case .menu: .menu
             }
         }
@@ -63,7 +66,14 @@ final class HubAppsModel: HubTabModel {
     /// - Parameter launcher: The single launcher state for the Hub's lifetime.
     init(launcher: LauncherState) {
         self.launcher = launcher
+        uninstaller = HubAppsUninstaller(launcher: launcher)
         launcher.suggestionVisibility = { [weak self] in self?.display?.appVisibility ?? .showAll }
+        launcher.uninstall = { [weak self] application in
+            self?.clearKeyboardSelection()
+            self?.uninstaller.begin(application.reference)
+        }
+        // Removal can wait on Finder's password prompt, which takes focus; the Hub must stay open.
+        uninstaller.holdHub = { [weak self] active in self?.setHold(.uninstall, active) }
     }
 
     // MARK: - HubTabModel
@@ -90,9 +100,11 @@ final class HubAppsModel: HubTabModel {
             launcher.adoptFiles(pendingAdoption)
         }
         installMenuObservers()
+        uninstaller.tabDidAppear()
     }
 
     func hubTabDidDisappear() {
+        uninstaller.tabDidDisappear()
         removeMenuObservers()
         if let display { scrollByDisplay[display.displayID] = launcher.browseScroll }
         // Ending cancels an open file chooser, which reports `false` through `choosingChanged`.
@@ -108,6 +120,8 @@ final class HubAppsModel: HubTabModel {
         if fromSearchField, let editor = NSApp.keyWindow?.firstResponder as? NSTextView, editor.hasMarkedText() {
             return false
         }
+        // The uninstall sheet takes Escape, Return, and the arrows while it shows.
+        if uninstaller.session != nil { return uninstaller.handleKeyDown(event) }
         // The survey's answer field keeps its keys; Escape leaves it for the search field.
         if launcher.surveyTextFocused {
             guard event.keyCode == KeyCode.escape else { return false }
