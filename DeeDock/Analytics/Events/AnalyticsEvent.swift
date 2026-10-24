@@ -129,6 +129,10 @@ enum AnalyticsEvent {
     case lookoutAccessResult(AnalyticsLookoutAccessOutcome, context: AnalyticsLookoutAccessContext)
     /// A window was brought forward from the Windows tab.
     case hubWindowActivated(minimized: Bool)
+    /// An uninstall from the Apps tab ended. Counts and categories only: never the app, a name, or a path.
+    case hubAppUninstall(outcome: AnalyticsUninstallOutcome, source: AnalyticsUninstallSource, dataCount: Int,
+                         selectedCount: Int, movedCount: Int, protectedCount: Int, relatedSelected: Int,
+                         usedFinder: Bool, unpinned: Bool)
 
     // Dock Modes
     case modeSwitched(AnalyticsModeSource, modeCount: Int)

@@ -64,6 +64,7 @@ extension AnalyticsEvent {
         case .lookoutModelDownload: "lookout_model_download"
         case .lookoutAccessResult: "lookout_access_result"
         case .hubWindowActivated: "hub_window_activated"
+        case .hubAppUninstall: "hub_app_uninstall"
         case .modeSwitched: "mode_switched"
         case .modeEdited: "mode_edited"
         case .workspacePrepared: "workspace_prepared"
@@ -249,6 +250,12 @@ extension AnalyticsEvent {
             ["outcome": .init(outcome), "context": .init(context)]
         case let .hubWindowActivated(minimized):
             ["minimized": .init(minimized)]
+        case let .hubAppUninstall(outcome, source, dataCount, selectedCount, movedCount, protectedCount,
+                                 relatedSelected, usedFinder, unpinned):
+            ["outcome": .init(outcome), "source": .init(source), "data_count": .init(dataCount),
+             "selected_count": .init(selectedCount), "moved_count": .init(movedCount),
+             "protected_count": .init(protectedCount), "related_selected": .init(relatedSelected),
+             "used_finder": .init(usedFinder), "unpinned": .init(unpinned)]
         case let .modeSwitched(source, modeCount):
             ["source": .init(source), "mode_count": .init(modeCount)]
         case let .modeEdited(edit, modeCount, stepCount):

@@ -73,9 +73,53 @@ identifies directory enumeration failures. Synthetic metadata-ranking measuremen
 Discovery completeness and end-to-end native latency remain unmeasured.
 
 Each app has a context menu in both views: **Open**, **Show in Finder**, **Pin** or
-**Unpin**, **Add to Favorites** or **Remove from Favorites**, **Pin on Display**, and **Create capsule…**.
+**Unpin**, **Add to Favorites** or **Remove from Favorites**, **Pin on Display**, **Create capsule…**, and
+[**Uninstall…**](#uninstall).
 Pinning applies to the source display; the submenu lists other enabled docks. Creating a capsule opens an editable draft
 containing that app. Enter a summary and save to persist it.
+
+## Uninstall
+
+**Uninstall…** is the last item in an app's context menu. Apps macOS protects don't have it (anything
+under `/System`, and the Safari link in `/Applications`), and neither does DOKK. It opens a sheet over
+the Apps tab, built after `docs/mockups/hub-uninstall.html`, with three parts:
+
+- **App**: the bundle. App Store, TestFlight, and installer-package apps belong to root, so Finder
+  moves them with your password; DOKK never sees it. **Unpin from the dock** appears when the app is
+  pinned and removes the pin from every connected display's dock. Pins saved for a display that
+  isn't connected stay, like any pin of an app that's gone.
+- **App data**: items named after the app's bundle identifier, an embedded extension's or helper's,
+  or an app group the app declares. DOKK looks in `~/Library` (Containers, Group Containers,
+  Application Scripts, Application Support, Caches, Preferences, Saved Application State,
+  HTTPStorages, WebKit, Cookies, Logs, LaunchAgents) and in `/Library` (Application Support, Caches,
+  Preferences, LaunchAgents, LaunchDaemons, PrivilegedHelperTools). These are selected. Data another
+  installed app uses, through the same app group or another copy with the same identifier, is
+  listed but not selected.
+- **Possibly related**: folders named like the app, and looser identifier matches such as
+  `com.example.App.canary`. The section starts collapsed, nothing in it is selected, and its header
+  shows how much it holds.
+
+**Move to Trash** quits the app first (it may ask to save changes), then moves the app and the
+selection to the Trash. Items only root may move go to Finder in one request, so one password prompt
+covers them, and cancelling it leaves everything in place. Nothing is deleted outright and DOKK never
+empties the Trash, so Put Back works. If the app itself can't be removed, its data stays too. Sizes
+are space on disk.
+
+Without Full Disk Access, macOS hides other apps' containers and group containers from DOKK and
+doesn't ask. They show as **Not checked**, with a card that opens the Full Disk Access settings and
+then offers **Relaunch DOKK**: macOS applies the permission only when DOKK starts again. After the
+relaunch the Hub reopens the sheet for the same app, if that happens within 15 minutes.
+
+An app with a system or network extension gets a note that the Trash doesn't reliably remove the
+extension. The note opens the developer's uninstaller when DOKK finds one, or System Settings, and
+**Move to Trash Anyway** stays available. Background helpers and launch daemons keep running until
+the next restart.
+
+Without Full Disk Access, macOS shows "DOKK was prevented from modifying apps on your Mac" when
+Finder moves another developer's app for DOKK (App Management). The app still goes to the Trash.
+
+DOKK doesn't remove keychain items, privacy permissions the app was granted, folders nested in a
+vendor folder (such as `Application Support/Google/Chrome`), or anything in `~/Library/Developer`.
 
 ## Mixed search
 

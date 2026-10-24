@@ -256,6 +256,7 @@ final class DockCoordinator {
         configurePlugins()
         configureHarbor()
         configureHub()
+        restorePendingUninstall()
         // Lookout indexes in the background while the app runs; it does nothing until it's set up and on.
         hub.lookout.start()
         notificationFeedPopover.keyboardDismissed = { [weak self] displayID in
@@ -1050,6 +1051,23 @@ final class DockCoordinator {
         clipboardMuseum.show(returningTo: lastExternalApplication)
     }
 
+    /// Reopens the uninstall sheet that was waiting for DOKK to relaunch with Full Disk Access.
+    ///
+    /// Waits a moment so the docks exist and the Hub can anchor to one.
+    private func restorePendingUninstall() {
+        guard let url = AppUninstallRelaunch.takePending() else { return }
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(1))
+            guard let self else { return }
+            hub.open(tab: .apps, trigger: .uninstallRelaunch)
+            // The sheet checks data against the other installed apps, which the Apps tab loads on open.
+            for _ in 0..<30 where hub.apps.launcher.library.isLoading || hub.apps.launcher.library.applications.isEmpty {
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+            hub.apps.uninstaller.begin(appAt: url)
+        }
+    }
+
     /// Wires the Hub to the docks and the launcher behind its Apps tab.
     ///
     /// The launcher used to belong to each dock; the Hub has one for the whole app, so the hooks
@@ -1065,6 +1083,16 @@ final class DockCoordinator {
             guard let self, let panel = hubPanel() else { return }
             hub.dismissAfterAction()
             sessionCapsules.beginFromApplication(application, on: panel)
+        }
+        // Pins live per display; uninstalling counts and removes them on every dock.
+        hub.apps.uninstaller.pinnedDisplayCount = { [weak self] id in
+            self?.panels.values.filter { $0.store.pins.contains { $0.id == id } }.count ?? 0
+        }
+        hub.apps.uninstaller.unpinEverywhere = { [weak self] id in
+            guard let self else { return }
+            for panel in panels.values where panel.store.pins.contains(where: { $0.id == id }) {
+                _ = panel.store.removePin(id)
+            }
         }
         launcher.openTool = { [weak self] tool in
             guard let self else { return }

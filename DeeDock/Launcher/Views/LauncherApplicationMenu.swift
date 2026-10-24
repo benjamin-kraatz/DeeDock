@@ -61,5 +61,14 @@ struct LauncherApplicationMenu: View {
         } label: {
             Label { Text(.launcherMenuCreateCapsule) } icon: { Image(systemName: "capsule.portrait") }
         }
+        // Hidden for apps macOS protects (System Integrity Protection) and for DOKK itself.
+        if let uninstall = state.uninstall, AppUninstallPathPolicy.allowsApp(application.reference.url) {
+            Divider()
+            Button(role: .destructive) {
+                uninstall(application)
+            } label: {
+                Label { Text(.hubUninstallMenu) } icon: { Image(systemName: "trash") }
+            }
+        }
     }
 }

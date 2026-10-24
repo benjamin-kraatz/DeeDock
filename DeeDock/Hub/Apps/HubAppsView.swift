@@ -33,6 +33,8 @@ struct HubAppsView: View {
         .modifier(HubAppsFileDrop(model: model))
         // A click anywhere in the results ends arrow-key navigation, like the old launcher.
         .simultaneousGesture(TapGesture().onEnded { model.clearKeyboardSelection() })
+        // Uninstall… from an app's context menu; it slides down from under the Hub's header.
+        .overlay(alignment: .top) { HubUninstallOverlay(uninstaller: model.uninstaller) }
         .confirmationDialog(Text(.launcherClearHistory), isPresented: $confirmClear) {
             Button(role: .destructive) { launcher.history.clear() } label: { Text(.launcherClearHistory) }
         } message: { Text(.launcherClearHistoryDetail) }
