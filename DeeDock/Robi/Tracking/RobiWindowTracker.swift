@@ -244,6 +244,10 @@ final class RobiWindowTracker {
         case kAXMovedNotification, kAXResizedNotification:
             // Late and throttled during live drags; only the fallback when SkyLight is missing.
             if drag == nil, !serverEvents.isAvailable { windowMoved() }
+        case kAXUIElementDestroyedNotification, kAXWindowMiniaturizedNotification:
+            // Registered on the target window only: it closed or went to the Dock. A pinned
+            // interaction has nothing left to answer about, so it ends before following focus.
+            if isPinned { leftWhilePinned?() } else { scheduleRefresh() }
         default:
             scheduleRefresh()
         }
