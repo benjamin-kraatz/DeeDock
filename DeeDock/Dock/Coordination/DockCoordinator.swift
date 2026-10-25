@@ -486,7 +486,12 @@ final class DockCoordinator {
         systemDockTuck.start()
         accessibilityObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
-        ) { [weak self] _ in MainActor.assumeIsolated { self?.refreshPanels(resetVisibility: true) } }
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.hub.accessibilityOptionsDidChange()
+                self?.refreshPanels(resetVisibility: true)
+            }
+        }
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification,
                      NSWorkspace.sessionDidResignActiveNotification] {
             suspensionObservers.append(NSWorkspace.shared.notificationCenter.addObserver(

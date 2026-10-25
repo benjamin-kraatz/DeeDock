@@ -215,6 +215,13 @@ final class HubCoordinator {
         panel?.reanchor(HubGeometry.anchoredPlacement(anchor: context.anchor))
     }
 
+    /// The workspace's accessibility display options changed. An open Hub picks them up at once;
+    /// a closed one reads them again when it opens.
+    func accessibilityOptionsDidChange() {
+        guard isOpen else { return }
+        panel?.readAccessibilityOptions()
+    }
+
     /// Sleep or display reconfiguration: an anchored Hub closes at once, whatever holds it, because
     /// its tile may no longer be where it points.
     func suspend() {

@@ -44,6 +44,11 @@ struct HubGlassContainer<Content: View>: View {
 /// than `Glass.tint(_:)`, which Apple describes as tones mapped to the brightness of whatever is
 /// underneath: that follows the backdrop, and the tint has to even it out. Switching it in Settings
 /// fades it rather than cutting, because a detached Hub can stay open beside Settings.
+///
+/// Both cases keep one view structure: Reduce Transparency raises the fill to full opacity and
+/// sets the glass to `.identity`. Branching between two modifier chains instead would give the
+/// content a new identity when the option changes with the Hub open, and SwiftUI would rebuild it,
+/// dropping focus and scroll positions.
 private struct HubGlassMaterial: ViewModifier {
     let shape: HubGlassShape
     let opaque: Bool
@@ -53,19 +58,18 @@ private struct HubGlassMaterial: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
-        let fill = Color(nsColor: .windowBackgroundColor)
-        if opaque {
-            content.background(shape.fill(fill))
-        } else {
-            let opacity = tinted
-                ? HubStyle.glassTintOpacity(dark: colorScheme == .dark, increaseContrast: increaseContrast) : 0
-            content
-                .background {
-                    shape.fill(fill.opacity(opacity))
-                        .animation(.easeInOut(duration: 0.25), value: tinted)
-                }
-                .glassEffect(.regular, in: shape)
-        }
+        content
+            .background {
+                shape.fill(Color(nsColor: .windowBackgroundColor).opacity(fillOpacity))
+                    .animation(.easeInOut(duration: 0.25), value: tinted)
+            }
+            .glassEffect(opaque ? .identity : .regular, in: shape)
+    }
+
+    private var fillOpacity: Double {
+        if opaque { return 1 }
+        guard tinted else { return 0 }
+        return HubStyle.glassTintOpacity(dark: colorScheme == .dark, increaseContrast: increaseContrast)
     }
 }
 

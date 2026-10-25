@@ -3,7 +3,7 @@ import SwiftUI
 /// Settings → DOKK Hub: whether the Hub tints its glass so content stays readable.
 ///
 /// On by default. The value is app-wide (`DockSettings.hubGlassTint`) because only one Hub exists,
-/// and an open Hub follows the switch at once. `locked` freezes the switch while the stored
+/// and an open Hub fades to the new setting. `locked` freezes the switch while the stored
 /// preferences are unreadable, leaving the copy readable.
 struct HubGlassSettingsCard: View {
     @Binding var isOn: Bool

@@ -352,7 +352,8 @@ Hands-on acceptance still needed:
   detached. Primary and secondary text, the tab switcher, and the search placeholder read clearly,
   and the glass still shows the desktop.
 - [ ] Turn the switch off and on with a detached Hub open: the tint fades out and back.
-- [ ] Increase Contrast and Reduce Transparency, each reopening the Hub.
+- [ ] Increase Contrast and Reduce Transparency, switched on and off with a detached Hub open:
+  the glass follows, and focus and scroll positions stay put.
 - [ ] The detached window's shadow, which macOS draws from the window's alpha and now includes the
   tint.
 

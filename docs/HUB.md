@@ -12,7 +12,7 @@ dock. The Apps tab carries the whole launcher. Validation status is in the
 The glass carries a soft tint in the window background color, white in light mode and near black
 in dark mode, so text and icons stay readable over bright or busy wallpapers. Turn off
 **Settings → Dock Extras → DOKK Hub → Tint the glass** (on by default) for clear glass. An open
-Hub follows the switch at once.
+Hub fades to the new setting over a quarter of a second.
 
 ## Opening and closing
 
@@ -431,7 +431,8 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
 - Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass, with the tint on
   or off.
 - Increase Contrast: the glass tint is stronger. With **Tint the glass** off, the glass stays clear.
-  Both settings are read when the Hub opens.
+- An open Hub, anchored or detached, follows changes to Reduce Motion, Reduce Transparency, and
+  Increase Contrast without reopening.
 
 ## Known limitations
 

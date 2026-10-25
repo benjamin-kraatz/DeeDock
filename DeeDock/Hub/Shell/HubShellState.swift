@@ -58,11 +58,12 @@ final class HubShellState {
     private(set) var contentFocusRequest = 0
     /// Mirrors the search field's focus, so key routing can tell the tab where an event came from.
     var searchFieldFocused = false
-    /// Read from the workspace when the Hub opens; the open and close transitions depend on it.
+    /// Reduce Motion, read from the workspace on open and on change
+    /// (`HubPanelController.readAccessibilityOptions()`). The open and close transitions depend on it.
     var reduceMotion = false
-    /// Read from the workspace when the Hub opens; the glass falls back to an opaque fill.
+    /// Reduce Transparency, read like ``reduceMotion``. The glass falls back to an opaque fill.
     var reduceTransparency = false
-    /// Read from the workspace when the Hub opens; the glass takes a stronger tint.
+    /// Increase Contrast, read like ``reduceMotion``. The glass takes a stronger tint.
     var increaseContrast = false
     /// Whether the glass carries its readability tint (`DockSettings.hubGlassTint`). The dock
     /// coordinator sets it on launch and on every settings change, so an open Hub follows the switch.
