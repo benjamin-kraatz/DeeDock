@@ -95,7 +95,14 @@ final class RobiModel {
                              isFinished: phase == .answered || isStopped)
     }
 
-    /// The answer as Copy, Replace and Paste put it into the app: references are plain words.
+    /// The answer as the card draws it: Markdown syntax taken out and kept as blocks and styles,
+    /// references moved along with the text. Syntax that has not fully arrived is held back.
+    var formattedAnswer: RobiMarkdown {
+        RobiMarkdown(referencedAnswer, isFinished: phase == .answered || isStopped)
+    }
+
+    /// The answer as Copy, Replace and Paste put it into the app: references are plain words, and
+    /// Markdown stays as written, since a rewrite of Markdown text must keep its syntax.
     var answerText: String {
         RobiReferencedAnswer(answer, landmarks: [], isFinished: true).text
     }

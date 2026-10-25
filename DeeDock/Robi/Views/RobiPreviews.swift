@@ -54,13 +54,55 @@ enum RobiPreviewData {
     """
     static let region = RobiContext(kind: .region, text: "error: main actor-isolated property 'items' can not be referenced from a nonisolated context")
     static let longAnswer = """
-    LibraryStore.items is isolated to the main actor, but sync() is nonisolated, so line 42 reads \
-    main-actor state from an arbitrary thread.
+    `LibraryStore.items` is isolated to the main actor, but `sync()` is **nonisolated**, so line 42 \
+    reads main-actor state from an arbitrary thread.
 
     Two fixes:
-    • If sync() only updates UI state, mark it @MainActor.
-    • If it does slow work, read items on the main actor first, do the work, then hop back to \
+    - If `sync()` only updates UI state, mark it `@MainActor`.
+    - If it does slow work, read `items` on the main actor first, do the work, then hop back to \
     assign the result.
+    """
+    /// The answer from the bug report: bold, bullets and inline code, as Claude writes them.
+    static let markdownAnswer = """
+    Im Root von **benjamin-kraatz/DeeDock** (Branch `main`) liegen:
+
+    **Ordner**
+    - `.agents/skills`, `.githooks`, `.github/workflows`
+    - `Configuration`
+    - `DOKKPluginContract`, `DOKKPluginSample`
+    - `DeeDock.xcodeproj`, `DeeDock`, `DeeDockTests`
+
+    **Dateien**
+    - `.env.example`, `.gitignore`
+    - `README.md`, `AGENTS.md`
+    """
+    /// Every block the card lays out, for checking spacing and alignment together.
+    static let markdownShowcase = """
+    ## Fixing the race
+
+    The crash comes from *two* writers. See [the docs](https://developer.apple.com/documentation/swift) \
+    or ~~ignore it~~ fix it now.
+
+    1. Move the write onto the **main actor**:
+       - mark `sync()` as `@MainActor`
+       - or hop back with `await MainActor.run`
+    2. Remove the second writer.
+    10. Ship it.
+
+    > Isolation errors are warnings in Swift 5 mode.
+
+    ```swift
+    @MainActor func sync() async {
+        items = await store.load()
+    }
+    ```
+
+    ---
+
+    | Option | Effort | Risk |
+    |:--|:-:|--:|
+    | Main actor | Low | Low |
+    | Actor | Medium | Medium |
     """
 }
 
@@ -116,6 +158,10 @@ private struct RobiPreviewStage: View {
 #Preview("Answered by Opus, long, scrolls") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,
         answer: RobiPreviewData.longAnswer, model: .claude, claude: .opus))
+}
+#Preview("Answered in Markdown, dark") {
+    RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.window,
+        answer: RobiPreviewData.markdownAnswer, model: .claude))
 }
 #Preview("Answered with references to the window, dark") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.windowWithLandmarks,
