@@ -87,6 +87,14 @@ When the context has landmarks, the model reads them instead of the plain text, 
 
 Each question gets a fresh session with no history. The instructions quote the context as untrusted data. For **Do It**, typed questions, and suggested questions, the session also gets the app's enabled menu commands (up to 140, read off the main actor within 0.5 s) and `propose_menu_command`. That tool only accepts paths from the list and only proposes; the command runs when the person clicks **Run**, through `AXPress`.
 
+### Formatting
+
+Claude, and sometimes the on-device model, formats answers in Markdown. `RobiMarkdown` takes the syntax out of the answer after `RobiReferencedAnswer` and keeps the result as blocks (paragraphs, headings, nested bulleted and numbered lists, quotes, fenced code, rules, and pipe tables) and inline spans (bold, italic, strikethrough, inline code, and web links). `RobiMarkdownView` lays the blocks out natively with hanging indents. Code scrolls sideways instead of wrapping, and a table's cells wrap within the card. `RobiAnswerStyling` writes the spans and references over the pacer's text by character offset, so styling never changes what the pacer has revealed. A block's marker, bar, or panel fades in with its first word.
+
+The pacer is given the text without its syntax. While the answer streams, syntax that hasn't fully arrived is held back: an unclosed `**`, `_` or backtick, a last line that may still become a list item, heading, rule, quote, or code fence, and a `|` row until the line after it shows whether it starts a table. So the text only grows, the pacer never restarts, and no marker flashes on screen and then disappears. Once the answer is finished, unclosed syntax stays as typed. Emphasis doesn't span lines, and quotes hold text only, not nested blocks.
+
+Web and mail links open in their app. Copy, Replace, and Paste keep the Markdown as written: a rewrite of Markdown text has to keep its syntax, and many of the apps an answer goes into read Markdown.
+
 ### Pointing at the window
 
 `RobiReferencedAnswer` takes the links out of the answer: their words stay and become references, and the syntax goes. A link to a number the context doesn't have keeps its words and points nowhere, so a made-up number can't ring the wrong thing. While the answer streams, text from a `[` that may still become a link is held back until it closes as one or turns out not to be (a newline, a second `[`, or 200 characters ends it), so the card never shows half the syntax and the pacer's text only grows. The card gives each revealed reference a private `x-dokk-robi-landmark:` link with a dotted underline, and its `openURL` action calls the controller. Copy, Replace, and Paste use `RobiModel.answerText`, with every link reduced to its words.
@@ -154,6 +162,7 @@ The build compiles and the geometry and settings tests compile. DOKK was not lau
 - Stop during a long Claude answer: the Anthropic Console's usage for that request should show fewer output tokens than an unstopped answer to the same question.
 - VoiceOver on the face and the selection sheet, Reduce Motion, and Reduce Transparency.
 - The More menu from the non-activating panel, with the app staying in front. Suggested questions on a selection, a region, and a window, including how often the first one after launch misses the 4.5 s timeout.
+- Formatting: a Claude answer with headings, lists, bold, code, and a table, while it streams and after; nested lists wrapping with hanging indents; a wide code block scrolling sideways; a web link opening in the browser; Reduce Motion.
 - Pointing: references in answers from both models, the spotlight on windows on displays with different scales and on a display left of the primary one, following a moved window, Reduce Motion and Reduce Transparency, and the VoiceOver announcement.
 - Attach picture: on, off, and flipped after the window was read; without Screen Recording; and the fallback picture with the switch off.
 - LLM analytics: `robi_answer` and `robi_suggest_questions` arriving in PostHog with token counts for Claude, a failed request's `$ai_error`, and a stopped answer.
