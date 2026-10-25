@@ -149,6 +149,20 @@ struct RobiMarkdownTests {
         #expect(styled(markdown, .emphasis) == ["italic", "it bold"])
     }
 
+    @Test("A combined closer does not swallow a later bold phrase, and code hides asterisks")
+    func closerScope() {
+        let markdown = parse("Use **bold *italic*** and **more bold**, or **the `**kwargs` parameter**.")
+        #expect(markdown.text == "Use bold italic and more bold, or the **kwargs parameter.")
+        #expect(styled(markdown, .strong) == ["bold italic", "more bold", "the **kwargs parameter"])
+    }
+
+    @Test("A link keeps balanced parentheses in its URL and drops its title")
+    func linkParentheses() {
+        let markdown = parse("[docs](https://en.wikipedia.org/wiki/Swift_(programming_language) \"Swift\").")
+        #expect(markdown.text == "docs.")
+        #expect(markdown.spans.map(\.style) == [.link(URL(string: "https://en.wikipedia.org/wiki/Swift_(programming_language)")!)])
+    }
+
     @Test("Tables and code indented under a list item stay in the item")
     func indentedBlocks() {
         let markdown = parse("- Compare:\n\n  | A | B |\n  |---|---|\n  | x | y |\n- Code:\n  ```\n  x\n  ```")
@@ -185,6 +199,8 @@ struct RobiMarkdownTests {
               "Use **bold *italic*** and *it **bold*** text\nnext",
               "- Compare:\n\n  | A | B |\n  |---|---|\n  | x | y |\n",
               "- Item\n  ```swift\n  x\n  ```\nDone",
+              "Use **the `**kwargs` parameter** here and **bold *italic*** then **more** text.",
+              "See [docs](https://en.wikipedia.org/wiki/Swift_(programming_language) \"Swift\") now.",
           ])
     func growsAsPrefix(source: String) {
         let characters = Array(source)

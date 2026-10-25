@@ -479,24 +479,26 @@ nonisolated private extension RobiMarkdown {
 
         private enum Closer {
             case found(Int)
-            /// A closing run ends the line still arriving: it may still grow, as `**` does into the
-            /// `***` that closes bold and italic together, or, for underscores, a letter after it
-            /// may put it inside a word, where it closes nothing.
+            /// The closer depends on text still arriving: a closing run ends the open line and may
+            /// still grow, as `**` does into the `***` that closes bold and italic together, or a
+            /// letter after an underscore run may put it inside a word. Or a code span is still
+            /// open, and its contents may not close anything.
             case undecided
             case none
         }
 
         /// Where the delimiters that close emphasis opened before `start` begin, skipping code and
-        /// escapes. A closer follows a word and, for underscores, is not inside one.
+        /// escapes. A run closes when it follows a word and, for underscores, is not inside one.
         ///
-        /// A run of exactly `length` closes it; runs of other lengths belong to nested emphasis and
-        /// are passed over. Failing that, a longer run closes it with its last `length` characters,
-        /// the rest closing the nested emphasis, as in `**bold *italic***`. That fallback waits for
-        /// the line to be complete, since an exact closer could still arrive after it.
+        /// Emphasis opened inside is tracked, so its closers are not taken for this one's: in
+        /// `*it **bold** it*` the inner `**` pair is passed over. A run as long as an inner opener
+        /// and this one together closes both, as the `***` in `**bold *italic***` does, and this
+        /// emphasis ends at its last `length` characters.
         private func closingDelimiter(_ character: Character, length: Int, from start: Int, to end: Int,
                                       isOpen: Bool) -> Closer {
             var index = start
-            var longer: Int?
+            /// Lengths of runs that opened emphasis inside this one and are still unclosed.
+            var inner: [Int] = []
             while index < end {
                 let current = source[index]
                 if current == "\\" {
@@ -509,6 +511,9 @@ nonisolated private extension RobiMarkdown {
                         index = close + ticks
                         continue
                     }
+                    // Unclosed code is literal once the line is complete, but while it arrives its
+                    // contents may still turn into code.
+                    if isOpen { return .undecided }
                     index += ticks
                     continue
                 }
@@ -520,14 +525,19 @@ nonisolated private extension RobiMarkdown {
                 let followsWord = index > start && !source[index - 1].isWhitespace
                 let insideWord = character == "_" && index + found < end
                     && (source[index + found].isLetter || source[index + found].isNumber)
-                if found >= length, followsWord, !insideWord {
+                if followsWord, !insideWord {
                     if isOpen, index + found == end { return .undecided }
+                    if let open = inner.last, found == open {
+                        inner.removeLast()
+                        index += found
+                        continue
+                    }
+                    if let open = inner.last, found == open + length { return .found(index + open) }
                     if found == length { return .found(index) }
-                    if longer == nil { longer = index + found - length }
                 }
+                if canOpen(character, at: index, length: found, end: end) { inner.append(found) }
                 index += found
             }
-            if let longer, !isOpen { return .found(longer) }
             return .none
         }
 
@@ -577,10 +587,28 @@ nonisolated private extension RobiMarkdown {
             guard source[index] == "(" else { return .none }
             index += 1
             let urlStart = index
-            while index < end, source[index] != ")", !source[index].isWhitespace { index += 1 }
+            // Balanced parentheses belong to the URL, as in Wikipedia's `Swift_(programming_language)`.
+            var parentheses = 0
+            while index < end, !source[index].isWhitespace {
+                if source[index] == "(" { parentheses += 1 }
+                if source[index] == ")" {
+                    if parentheses == 0 { break }
+                    parentheses -= 1
+                }
+                index += 1
+            }
+            let urlEnd = index
+            // An optional title, `[label](url "title")`, is read past and not shown.
+            index = skippingSpaces(from: index, to: end)
+            if index < end, index > urlEnd, source[index] == "\"" {
+                index += 1
+                while index < end, source[index] != "\"" { index += 1 }
+                guard index < end else { return .incomplete }
+                index = skippingSpaces(from: index + 1, to: end)
+            }
             guard index < end else { return .incomplete }
             guard source[index] == ")", labelEnd > start + 1,
-                  let url = Self.webURL(String(source[urlStart..<index]))
+                  let url = Self.webURL(String(source[urlStart..<urlEnd]))
             else { return .none }
             return .link(label: (start + 1)..<labelEnd, url: url, next: index + 1)
         }
