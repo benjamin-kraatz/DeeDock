@@ -173,6 +173,7 @@ final class HubPanelController {
         isVisible = true
         state.reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         state.reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
+        state.increaseContrast = NSWorkspace.shared.accessibilityDisplayShouldIncreaseContrast
         // Start from the entering pose with no animation, then spring to rest on the next turn of
         // the run loop, once SwiftUI has rendered the starting pose in the newly sized window.
         var transaction = Transaction()

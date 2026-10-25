@@ -337,6 +337,25 @@ None of these scenarios has been exercised.
 - [ ] Sleep and wake, and a display change, with a transfer running and the Hub anchored and
   detached.
 
+### DEE-144 glass tint
+
+Implemented on `codex/dee-144-hub-glass-tint`. The Hub's Liquid Glass now carries a fill of the
+window background color between the glass and the content: 40 % in light mode, 45 % in dark mode,
+and 70 % with Increase Contrast. **Settings → Dock Extras → DOKK Hub → Tint the glass** turns it
+off. The switch is on by default, and settings saved before it existed decode as on. Reduce
+Transparency keeps the opaque background. The opacities were chosen from contrast estimates, not
+tuned on screen.
+
+Hands-on acceptance still needed:
+
+- [ ] Light and dark mode over a bright photo, a white window, and a busy wallpaper, anchored and
+  detached. Primary and secondary text, the tab switcher, and the search placeholder read clearly,
+  and the glass still shows the desktop.
+- [ ] Turn the switch off and on with a detached Hub open: the tint fades out and back.
+- [ ] Increase Contrast and Reduce Transparency, each reopening the Hub.
+- [ ] The detached window's shadow, which macOS draws from the window's alpha and now includes the
+  tint.
+
 ### Known gaps from code review
 
 - File search depends on the Spotlight index and does not say when a location is not indexed.

@@ -458,6 +458,7 @@ final class DockCoordinator {
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
+            self?.configureHubGlass()
             self?.configureVolumeReads()
             self?.scheduleShelfSemanticWarmup()
             self?.refreshPanels()
@@ -793,6 +794,12 @@ final class DockCoordinator {
         refreshPanels(resetVisibility: resetVisibility)
     }
 
+    /// The Hub's glass tint is app-wide, so the shared settings decide it. Applied again on every
+    /// settings change, so an open Hub follows the switch.
+    private func configureHubGlass() {
+        hub.state.glassTint = settings.value.hubGlassTint
+    }
+
     /// Reads network shares only while the share switch is on. Volume settings are app-wide, so
     /// the shared settings decide for every display. The Drives master switch is left out on
     /// purpose: Manage Drives still lists shares while it is off, and needs them to show as
@@ -1091,6 +1098,7 @@ final class DockCoordinator {
     /// The launcher used to belong to each dock; the Hub has one for the whole app, so the hooks
     /// that need a dock resolve the display the Hub opened on, falling back to the pointer's.
     private func configureHub() {
+        configureHubGlass()
         // The Lookout status chip opens Lookout's section; the view that calls this opens the window itself.
         hub.files.onOpenLookoutSettings = { [weak self] in self?.settingsLookoutRequest = true }
         let launcher = hub.apps.launcher

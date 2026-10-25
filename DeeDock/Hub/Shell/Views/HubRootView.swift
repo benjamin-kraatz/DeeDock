@@ -106,6 +106,9 @@ private struct HubPreviewTabStub: View {
 
 private struct HubRootPreview: View {
     let state: HubShellState
+    /// A bright, high-contrast backdrop instead of the calm gradient: where untinted glass loses its
+    /// text.
+    var busyBackdrop = false
     @State private var query = ""
 
     var body: some View {
@@ -115,7 +118,15 @@ private struct HubRootPreview: View {
         }
         .padding(state.isDetached ? 0 : 28)
         .frame(width: 1240, height: 700)
-        .background(LinearGradient(colors: [.indigo, .teal], startPoint: .topLeading, endPoint: .bottomTrailing))
+        .background(backdrop)
+    }
+
+    private var backdrop: AnyShapeStyle {
+        busyBackdrop
+            ? AnyShapeStyle(AngularGradient(colors: [.white, .yellow, .white, .cyan, .black, .orange, .white],
+                                            center: .center))
+            : AnyShapeStyle(LinearGradient(colors: [.indigo, .teal], startPoint: .topLeading,
+                                           endPoint: .bottomTrailing))
     }
 }
 
@@ -131,6 +142,21 @@ private struct HubRootPreview: View {
 
 #Preview("Detached") {
     HubRootPreview(state: .preview(tab: .windows, detached: true))
+}
+
+#Preview("Busy backdrop, dark") {
+    HubRootPreview(state: .preview(tab: .files), busyBackdrop: true)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Busy backdrop, dark, tint off") {
+    HubRootPreview(state: .preview(tab: .files, glassTint: false), busyBackdrop: true)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Busy backdrop, light, Increase Contrast") {
+    HubRootPreview(state: .preview(tab: .apps, increaseContrast: true), busyBackdrop: true)
+        .preferredColorScheme(.light)
 }
 
 #Preview("Reduce Transparency") {

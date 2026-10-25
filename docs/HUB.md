@@ -9,6 +9,11 @@ replaced both launcher styles: the Compact popover and the Full presentation tha
 dock. The Apps tab carries the whole launcher. Validation status is in the
 [acceptance notes](ACCEPTANCE.md#dee-121-dokk-hub).
 
+The glass carries a soft tint in the window background color, white in light mode and near black
+in dark mode, so text and icons stay readable over bright or busy wallpapers. Turn off
+**Settings → Dock Extras → DOKK Hub → Tint the glass** (on by default) for clear glass. An open
+Hub follows the switch at once.
+
 ## Opening and closing
 
 Click the DOKK tile, press Return on it in **Focus Dock**, or use its VoiceOver action. The Hub
@@ -423,7 +428,10 @@ folder still offers **Open in Finder**, because Finder can often open folders DO
   poof, and slots open without the spring.
 - The picture chip has a VoiceOver label with the picture's name and a Remove action. The results
   bar, Find Similar, and the closeness meter have labels, and Find Similar is a row action.
-- Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass.
+- Reduce Transparency: the Hub draws an opaque background instead of Liquid Glass, with the tint on
+  or off.
+- Increase Contrast: the glass tint is stronger. With **Tint the glass** off, the glass stays clear.
+  Both settings are read when the Hub opens.
 
 ## Known limitations
 

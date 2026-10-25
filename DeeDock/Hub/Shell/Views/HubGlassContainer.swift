@@ -4,8 +4,10 @@ import SwiftUI
 /// applies the open and close transitions.
 ///
 /// The glass is native Liquid Glass in the ``HubGlassShape`` outline, so the pointer is part of
-/// the same material rather than a separate fill. Reduce Transparency swaps it for an opaque window
-/// background. Content is clipped to the outline so scrolled rows never cross the rounded corners.
+/// the same material rather than a separate fill. A tint of the window background color keeps
+/// content readable over any backdrop unless Settings turns it off; Reduce Transparency swaps the
+/// glass for that color at full opacity. Content is clipped to the outline so scrolled rows never
+/// cross the rounded corners.
 struct HubGlassContainer<Content: View>: View {
     let state: HubShellState
     @ViewBuilder let content: Content
@@ -22,7 +24,8 @@ struct HubGlassContainer<Content: View>: View {
             .padding(.trailing, layout.edge == .right ? layout.pointerDepth : 0)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .clipShape(shape)
-            .modifier(HubGlassMaterial(shape: shape, opaque: state.reduceTransparency))
+            .modifier(HubGlassMaterial(shape: shape, opaque: state.reduceTransparency, tinted: state.glassTint,
+                                       increaseContrast: state.increaseContrast))
             .overlay {
                 shape.stroke(Color.primary.opacity(colorScheme == .dark ? 0.15 : 0.12), lineWidth: 0.5)
                     .allowsHitTesting(false)
@@ -33,16 +36,35 @@ struct HubGlassContainer<Content: View>: View {
     }
 }
 
-/// Liquid Glass, or an opaque fill under Reduce Transparency.
+/// Liquid Glass, tinted unless `tinted` is off, or an opaque fill under Reduce Transparency.
+///
+/// The tint is the opaque fill's color at ``HubStyle/glassTintOpacity(dark:increaseContrast:)``,
+/// so it moves the glass partway toward the Reduce Transparency look. It is drawn in the window's
+/// backing, between the glass the window server composites and the content. It is a fill rather
+/// than `Glass.tint(_:)`, which Apple describes as tones mapped to the brightness of whatever is
+/// underneath: that follows the backdrop, and the tint has to even it out. Switching it in Settings
+/// fades it rather than cutting, because a detached Hub can stay open beside Settings.
 private struct HubGlassMaterial: ViewModifier {
     let shape: HubGlassShape
     let opaque: Bool
+    let tinted: Bool
+    let increaseContrast: Bool
+
+    @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
+        let fill = Color(nsColor: .windowBackgroundColor)
         if opaque {
-            content.background(shape.fill(Color(nsColor: .windowBackgroundColor)))
+            content.background(shape.fill(fill))
         } else {
-            content.glassEffect(.regular, in: shape)
+            let opacity = tinted
+                ? HubStyle.glassTintOpacity(dark: colorScheme == .dark, increaseContrast: increaseContrast) : 0
+            content
+                .background {
+                    shape.fill(fill.opacity(opacity))
+                        .animation(.easeInOut(duration: 0.25), value: tinted)
+                }
+                .glassEffect(.regular, in: shape)
         }
     }
 }

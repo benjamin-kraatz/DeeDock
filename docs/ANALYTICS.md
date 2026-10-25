@@ -178,6 +178,7 @@ Registered with the SDK's `register`, so every event carries them.
 | `window_peek_enabled`, `window_peek_layout` | |
 | `show_shelf`, `show_trash`, `show_session_capsules`, `show_notification_feed`, `show_volumes`, `soap_bubble_effects` | |
 | `show_harbor_tile`, `harbor_shortcut_enabled`, `harbor_show_app_names` | |
+| `hub_glass_tint` | whether the Hub tints its glass (Settings → DOKK Hub → Tint the glass) |
 
 The marketing version, build number, and macOS version come from the SDK's default properties.
 

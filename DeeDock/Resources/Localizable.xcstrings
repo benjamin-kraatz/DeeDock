@@ -6506,13 +6506,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Orte in der Seitenleiste von Dateien"
+            "value" : "Glastönung und Orte in der Seitenleiste von Dateien"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Places in the Files sidebar"
+            "value" : "Glass tint and Files sidebar places"
           }
         }
       }
@@ -6524,13 +6524,85 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "hub dateien seitenleiste orte favoriten ordner wiederherstellen downloads schreibtisch dokumente"
+            "value" : "hub dateien seitenleiste orte favoriten ordner wiederherstellen downloads schreibtisch dokumente glas tönung kontrast transparenz lesbar"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "hub files sidebar places favorites folders restore downloads desktop documents"
+            "value" : "hub files sidebar places favorites folders restore downloads desktop documents glass tint contrast transparency readable"
+          }
+        }
+      }
+    },
+    "settingsHubGlassTitle" : {
+      "comment" : "Settings → DOKK Hub: card title for how the Hub's glass panel looks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glas"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glass"
+          }
+        }
+      }
+    },
+    "settingsHubGlassTint" : {
+      "comment" : "Settings → DOKK Hub: switch that lays a soft tint over the Hub's glass so its content is easier to read. On by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glas tönen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tint the glass"
+          }
+        }
+      }
+    },
+    "settingsHubGlassTintSubtitle" : {
+      "comment" : "Settings → DOKK Hub: subtitle under the “Tint the glass” switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hält Text und Symbole über hellen oder unruhigen Hintergründen lesbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps text and icons readable over bright or busy backgrounds."
+          }
+        }
+      }
+    },
+    "settingsHubGlassTintHelp" : {
+      "comment" : "Settings → DOKK Hub: footnote under the Glass card. “Increase Contrast” and “Reduce Transparency” are the macOS Accessibility → Display settings; use their names from System Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeschaltet bleibt das Glas klar. „Kontrast erhöhen“ verstärkt die Tönung. Mit „Transparenz reduzieren“ hat der Hub immer einen deckenden Hintergrund."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turned off, the glass stays clear. Increase Contrast makes the tint stronger. With Reduce Transparency, the Hub always has a solid background."
           }
         }
       }
