@@ -337,6 +337,10 @@ search, discovery, and file actions. Validation status is in the
 **Settings → Dock → Appearance → Line icons in the Hub's Apps tab** draws line glyphs in the Apps
 tab while the dock uses Line icons. Each display can override it.
 
+**Settings → Dock Extras → DOKK Hub → Tint the glass** (on by default) lays a soft tint over the
+Hub's glass, so its content stays readable over bright or busy backgrounds. Turn it off for clear
+glass. Increase Contrast makes the tint stronger.
+
 ### DOKK tile position
 
 The DOKK tile sits at the far left of a horizontal dock, or the top of a vertical one, by default.

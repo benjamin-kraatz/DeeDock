@@ -36,6 +36,7 @@ struct FeaturesPageContent: View {
                     .disabled(!source.value.showVolumes)
             }
         case .hub:
+            HubGlassSettingsCard(isOn: source.binding(\.hubGlassTint), locked: locked)
             if let files = context.coordinator?.hub.files {
                 HubFilesSidebarSettingsCard(sidebar: files.sidebar)
             }

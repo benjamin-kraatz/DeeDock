@@ -134,6 +134,7 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.showHarborTile = defaults.showHarborTile
         result.harborShortcutEnabled = defaults.harborShortcutEnabled
         result.harborShowsAppNames = defaults.harborShowsAppNames
+        result.hubGlassTint = defaults.hubGlassTint
         result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash

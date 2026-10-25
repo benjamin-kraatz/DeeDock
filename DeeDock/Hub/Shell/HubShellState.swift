@@ -58,10 +58,16 @@ final class HubShellState {
     private(set) var contentFocusRequest = 0
     /// Mirrors the search field's focus, so key routing can tell the tab where an event came from.
     var searchFieldFocused = false
-    /// Read from the workspace when the Hub opens; the open and close transitions depend on it.
+    /// Reduce Motion, read from the workspace on open and on change
+    /// (`HubPanelController.readAccessibilityOptions()`). The open and close transitions depend on it.
     var reduceMotion = false
-    /// Read from the workspace when the Hub opens; the glass falls back to an opaque fill.
+    /// Reduce Transparency, read like ``reduceMotion``. The glass falls back to an opaque fill.
     var reduceTransparency = false
+    /// Increase Contrast, read like ``reduceMotion``. The glass takes a stronger tint.
+    var increaseContrast = false
+    /// Whether the glass carries its readability tint (`DockSettings.hubGlassTint`). The dock
+    /// coordinator sets it on launch and on every settings change, so an open Hub follows the switch.
+    var glassTint = true
     /// Incremented by a click on the DOKK tile while the Hub is already open as a window.
     private(set) var tilePulse = 0
 
@@ -90,11 +96,14 @@ final class HubShellState {
 extension HubShellState {
     /// Deterministic state for previews: shown, with the given tab and mode.
     static func preview(tab: HubTab, detached: Bool = false, edge: DockEdge = .bottom,
-                        reduceTransparency: Bool = false) -> HubShellState {
+                        reduceTransparency: Bool = false, increaseContrast: Bool = false,
+                        glassTint: Bool = true) -> HubShellState {
         let state = HubShellState(tab: tab)
         state.isDetached = detached
         state.phase = .shown
         state.reduceTransparency = reduceTransparency
+        state.increaseContrast = increaseContrast
+        state.glassTint = glassTint
         state.layout = detached ? .detached : HubBodyLayout(
             insets: EdgeInsets(), edge: edge, pointerOffset: 180, pointerDepth: HubStyle.pointerSize.height,
             cornerRadius: HubStyle.anchoredCornerRadius)

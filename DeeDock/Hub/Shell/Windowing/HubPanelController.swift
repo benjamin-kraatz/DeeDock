@@ -168,11 +168,20 @@ final class HubPanelController {
         panel.orderOut(nil)
     }
 
+    /// Copies Reduce Motion, Reduce Transparency, and Increase Contrast from the workspace into the
+    /// shell state. Called on every open and again when the display options change, so an open
+    /// Hub, detached or anchored, follows them.
+    func readAccessibilityOptions() {
+        let workspace = NSWorkspace.shared
+        state.reduceMotion = workspace.accessibilityDisplayShouldReduceMotion
+        state.reduceTransparency = workspace.accessibilityDisplayShouldReduceTransparency
+        state.increaseContrast = workspace.accessibilityDisplayShouldIncreaseContrast
+    }
+
     private func present() {
         let token = generation
         isVisible = true
-        state.reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        state.reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
+        readAccessibilityOptions()
         // Start from the entering pose with no animation, then spring to rest on the next turn of
         // the run loop, once SwiftUI has rendered the starting pose in the newly sized window.
         var transaction = Transaction()

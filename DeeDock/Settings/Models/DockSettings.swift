@@ -74,6 +74,11 @@ struct DockSettings: Codable, Equatable {
     /// Whether Harbor's running-apps strip shows each app's name under its icon. Off by default;
     /// the strip is then shallower. Shared across displays.
     var harborShowsAppNames: Bool = false
+    /// Whether the DOKK Hub lays a tint over its glass so its content stays readable over bright or
+    /// busy backgrounds. Off leaves the glass clear. Documents saved before this key decode as on,
+    /// so existing users get the tint too. Reduce Transparency's opaque background ignores it.
+    /// Shared across displays.
+    var hubGlassTint: Bool = true
     /// Where the App Launcher tile sits. Documents saved before this key keep their
     /// `launcherAtStart` choice as `start` or `end`.
     var launcherPosition: LauncherDockPosition = .start
@@ -207,6 +212,7 @@ extension DockSettings {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
         case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
+        case hubGlassTint
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
@@ -241,6 +247,7 @@ extension DockSettings {
         showHarborTile = try values.decodeIfPresent(Bool.self, forKey: .showHarborTile) ?? false
         harborShortcutEnabled = try values.decodeIfPresent(Bool.self, forKey: .harborShortcutEnabled) ?? true
         harborShowsAppNames = try values.decodeIfPresent(Bool.self, forKey: .harborShowsAppNames) ?? false
+        hubGlassTint = try values.decodeIfPresent(Bool.self, forKey: .hubGlassTint) ?? true
         let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
         launcherPosition = try values.decodeIfPresent(LauncherDockPosition.self, forKey: .launcherPosition)
             ?? LauncherDockPosition(legacyAtStart: legacy.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true)

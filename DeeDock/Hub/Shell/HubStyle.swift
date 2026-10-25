@@ -14,6 +14,19 @@ enum HubStyle {
     /// The pointer under an anchored panel.
     static let pointerSize = CGSize(width: 24, height: 11)
 
+    /// Opacity of the tint between the glass and the content: the window background color, white in
+    /// light mode and near black in dark mode.
+    ///
+    /// Without it the glass lets a bright, dark, or busy backdrop through strongly enough that text
+    /// loses its contrast. Dark mode takes more, because light text washes out over a bright window
+    /// sooner than dark text sinks into a dark wallpaper. Increase Contrast takes about the approved
+    /// mockup's panel opacity (`--panel`, 0.66 dark and 0.70 light). `HubGlassMaterial` applies it,
+    /// unless `DockSettings.hubGlassTint` is off.
+    static func glassTintOpacity(dark: Bool, increaseContrast: Bool) -> Double {
+        if increaseContrast { return 0.7 }
+        return dark ? 0.45 : 0.4
+    }
+
     static let anchoredCornerRadius: CGFloat = 22
     static let detachedCornerRadius: CGFloat = 16
     static let headerHeight: CGFloat = 58

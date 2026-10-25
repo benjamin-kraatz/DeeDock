@@ -83,6 +83,20 @@ struct DockSettingsTests {
         #expect(DockSettingsOverrides().resolving(shown).harborShowsAppNames)
     }
 
+    @Test("Settings saved before the Hub glass tint switch get the tint")
+    func hubGlassTintBackwardDecode() throws {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "hubGlassTint")
+        let decoded = try JSONDecoder().decode(DockSettings.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        #expect(decoded.hubGlassTint)
+        var clear = DockSettings.defaults
+        clear.hubGlassTint = false
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(clear)) == clear)
+        #expect(!DockSettingsOverrides().resolving(clear).hubGlassTint)
+    }
+
     @Test("Invalid numeric values cannot reach geometry or persistence")
     func validation() {
         for invalid in [Double.nan, .infinity, -.infinity, 31, 97] {
