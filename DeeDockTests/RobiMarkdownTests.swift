@@ -201,6 +201,7 @@ struct RobiMarkdownTests {
               "- Item\n  ```swift\n  x\n  ```\nDone",
               "Use **the `**kwargs` parameter** here and **bold *italic*** then **more** text.",
               "See [docs](https://en.wikipedia.org/wiki/Swift_(programming_language) \"Swift\") now.",
+              "Use ` ``` ` to start a fence, and **`a`` b`** too.",
           ])
     func growsAsPrefix(source: String) {
         let characters = Array(source)

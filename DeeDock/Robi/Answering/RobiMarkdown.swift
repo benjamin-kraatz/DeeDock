@@ -385,6 +385,9 @@ nonisolated private extension RobiMarkdown {
                     let length = run(of: "`", from: index, to: end)
                     if index + length == end, isOpen { return false }
                     if let close = closingCode(length: length, from: index + length, to: end) {
+                        // A closing run that ends the line still arriving may grow into a longer
+                        // run, which would close nothing.
+                        if isOpen, close + length == end { return false }
                         var start = index + length
                         var stop = close
                         // One space inside each backtick is padding, so `` `x` `` can hold a backtick.
@@ -508,6 +511,7 @@ nonisolated private extension RobiMarkdown {
                 if current == "`" {
                     let ticks = run(of: "`", from: index, to: end)
                     if let close = closingCode(length: ticks, from: index + ticks, to: end) {
+                        if isOpen, close + ticks == end { return .undecided }
                         index = close + ticks
                         continue
                     }
