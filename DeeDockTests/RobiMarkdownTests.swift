@@ -141,6 +141,21 @@ struct RobiMarkdownTests {
         #expect(markdown.references == [.init(range: 6..<10, landmark: 2)])
     }
 
+    @Test("Emphasis nested at the end of other emphasis closes with it")
+    func nestedClosers() {
+        let markdown = parse("Use **bold *italic*** and *it **bold***.")
+        #expect(markdown.text == "Use bold italic and it bold.")
+        #expect(styled(markdown, .strong) == ["bold italic", "bold"])
+        #expect(styled(markdown, .emphasis) == ["italic", "it bold"])
+    }
+
+    @Test("Tables and code indented under a list item stay in the item")
+    func indentedBlocks() {
+        let markdown = parse("- Compare:\n\n  | A | B |\n  |---|---|\n  | x | y |\n- Code:\n  ```\n  x\n  ```")
+        #expect(markdown.blocks.map(\.kind) == [.listItem(.bullet), .table(columns: [.leading, .leading]), .listItem(.bullet), .code])
+        #expect(markdown.blocks.map(\.depth) == [0, 1, 0, 1])
+    }
+
     @Test("Unclosed syntax in a finished answer stays as typed")
     func unclosedWhenFinished() {
         #expect(parse("A **bold start").text == "A **bold start")
@@ -167,6 +182,9 @@ struct RobiMarkdownTests {
               RobiMarkdownTests.showcase,
               "Plain *x* and **y** with `z`\n\n1. one\n2. two\n\n> q\n> r\nend",
               "Mixed 2*3*4 and a_b_c and ~~s~~ ~x~ \\*e\\* <https://a.b/c>",
+              "Use **bold *italic*** and *it **bold*** text\nnext",
+              "- Compare:\n\n  | A | B |\n  |---|---|\n  | x | y |\n",
+              "- Item\n  ```swift\n  x\n  ```\nDone",
           ])
     func growsAsPrefix(source: String) {
         let characters = Array(source)

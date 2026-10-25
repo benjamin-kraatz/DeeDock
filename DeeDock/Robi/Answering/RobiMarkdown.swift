@@ -255,6 +255,8 @@ nonisolated private extension RobiMarkdown {
         private mutating func codeLine(_ line: Line, fence: Character, length: Int, indent: Int, isOpen: Bool) -> Bool {
             let (_, contentStart) = indentation(of: line)
             let end = trimmedEnd(line)
+            // Indentation alone may still become the closing fence, as in a list item's code.
+            if isOpen, contentStart >= end { return false }
             let run = run(of: fence, from: contentStart, to: end)
             if run > 0, contentStart + run == end {
                 if isOpen { return false }
@@ -299,7 +301,8 @@ nonisolated private extension RobiMarkdown {
             let end = trimmedEnd(next)
             let isDelimiterLike = start < end && source[start..<end].allSatisfy { "|-: \t".contains($0) }
             let nextIsOpen = !isFinished && index + 1 == lines.count - 1 && !next.hasBreak
-            if nextIsOpen { return isDelimiterLike ? .undecided : .notTable }
+            // Indentation alone may still become an indented delimiter row.
+            if nextIsOpen { return isDelimiterLike || start >= end ? .undecided : .notTable }
             guard isDelimiterLike, source[start..<end].contains("-") else { return .notTable }
             var alignments: [ColumnAlignment] = []
             for cell in cells(start..<end) {
@@ -476,18 +479,24 @@ nonisolated private extension RobiMarkdown {
 
         private enum Closer {
             case found(Int)
-            /// An underscore run ends the line still arriving; a letter after it would put it inside
-            /// a word, where it closes nothing.
+            /// A closing run ends the line still arriving: it may still grow, as `**` does into the
+            /// `***` that closes bold and italic together, or, for underscores, a letter after it
+            /// may put it inside a word, where it closes nothing.
             case undecided
             case none
         }
 
-        /// The start of the run of exactly `length` delimiters that closes emphasis opened before
-        /// `start`, skipping code and escapes. A closer follows a word and, for underscores, is not
-        /// inside one. Runs of other lengths belong to nested emphasis and are passed over.
+        /// Where the delimiters that close emphasis opened before `start` begin, skipping code and
+        /// escapes. A closer follows a word and, for underscores, is not inside one.
+        ///
+        /// A run of exactly `length` closes it; runs of other lengths belong to nested emphasis and
+        /// are passed over. Failing that, a longer run closes it with its last `length` characters,
+        /// the rest closing the nested emphasis, as in `**bold *italic***`. That fallback waits for
+        /// the line to be complete, since an exact closer could still arrive after it.
         private func closingDelimiter(_ character: Character, length: Int, from start: Int, to end: Int,
                                       isOpen: Bool) -> Closer {
             var index = start
+            var longer: Int?
             while index < end {
                 let current = source[index]
                 if current == "\\" {
@@ -511,11 +520,14 @@ nonisolated private extension RobiMarkdown {
                 let followsWord = index > start && !source[index - 1].isWhitespace
                 let insideWord = character == "_" && index + found < end
                     && (source[index + found].isLetter || source[index + found].isNumber)
-                if found == length, followsWord, !insideWord {
-                    return character == "_" && isOpen && index + found == end ? .undecided : .found(index)
+                if found >= length, followsWord, !insideWord {
+                    if isOpen, index + found == end { return .undecided }
+                    if found == length { return .found(index) }
+                    if longer == nil { longer = index + found - length }
                 }
                 index += found
             }
+            if let longer, !isOpen { return .found(longer) }
             return .none
         }
 
