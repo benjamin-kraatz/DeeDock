@@ -17,7 +17,7 @@ Population data may reveal patterns such as these:
 - Running state, recent use, and app category affect the likelihood of an app switch.
 - Some context signals transfer between users even when their installed apps differ.
 
-Personal data still matters more for exact choices. A population model cannot know that one person opens a private company app after Xcode or prefers one browser in a particular Dock Mode.
+Personal data still matters more for exact choices. A population model cannot know that one person opens a private company app after Xcode or prefers one browser in the morning.
 
 ## Score candidates instead of classifying fixed apps
 
@@ -60,7 +60,6 @@ The context encoder converts non-content metadata into a compact representation.
 - A bounded summary of eligible running apps.
 - Whether a candidate is running or pinned.
 - Time since the candidate was last used.
-- A local Dock Mode feature when a privacy review permits it.
 
 The encoder must not consume window titles, document names, paths, URLs, screenshots, keystrokes, or app content.
 

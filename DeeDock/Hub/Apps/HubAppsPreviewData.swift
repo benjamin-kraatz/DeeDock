@@ -46,7 +46,7 @@ enum HubAppsPreviewData {
             history.record(picks[1].reference)
             let date = Date()
             launcher.suggestions.installPreview(LauncherSuggestionSnapshot(
-                context: LauncherSuggestionContext(date: date, foregroundID: "preview.source", modeID: nil),
+                context: LauncherSuggestionContext(date: date, foregroundID: "preview.source"),
                 modelVersion: "preview", rankedIDs: picks.map(\.id), createdAt: date,
                 generation: store.revision))
         }

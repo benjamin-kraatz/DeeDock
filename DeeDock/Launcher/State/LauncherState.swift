@@ -11,7 +11,6 @@ import SwiftUI
 final class LauncherState {
     let catalog: ApplicationCatalog
     let suggestions = LauncherSuggestionPresentation()
-    @ObservationIgnored var suggestionModeID: (() -> String?)?
     @ObservationIgnored var suggestionVisibility: (() -> DockAppVisibility)?
     var library: LauncherLibrary { catalog.launcherLibrary }
     var favorites: LauncherFavorites { catalog.launcherFavorites }
@@ -124,7 +123,7 @@ final class LauncherState {
     private(set) var robiIDs: [String]?
     private(set) var robiBusy = false
     var robiMessage: LocalizedStringResource?
-    /// Dismisses the Hub after an action that hands focus elsewhere (a tool window, a Dock Mode).
+    /// Dismisses the Hub after an action that hands focus elsewhere (a tool window, a capsule).
     /// The Hub's Apps model wires this to ``HubShell/dismissAfterAction()`` while the tab is visible.
     @ObservationIgnored var close: (() -> Void)?
     /// Called after an app, window, file, or document opened successfully. Wired like ``close``.
@@ -264,7 +263,7 @@ final class LauncherState {
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
         initialPinnedIDs = Set(pins.map(\.id))
         error = nil; selectedID = nil; keyboardNavigationActive = false
-        suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID, modeID: suggestionModeID?())
+        suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID)
         library.acquire(owner, extraURLs: pins.map(\.url) + catalog.running.map(\.url) + history.visits.values.map { $0.reference.url })
     }
 

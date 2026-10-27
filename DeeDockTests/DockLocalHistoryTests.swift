@@ -205,8 +205,7 @@ struct DockLocalHistoryTests {
         let settings = DockSettingsStore(repository: nil)
         let profiles = DisplayProfilesStore(
             defaults: settings,
-            repository: DisplayProfilesRepository(defaults: defaults),
-            modesRepository: DockModesRepository(defaults: defaults)
+            repository: DisplayProfilesRepository(defaults: defaults)
         )
         profiles.synchronize([display]) { [] }
         let history = DockLocalHistoryStore(repository: DockLocalHistoryRepository(defaults: defaults))
@@ -355,8 +354,7 @@ struct DockLocalHistoryTests {
         let settings = DockSettingsStore(repository: nil)
         let profiles = DisplayProfilesStore(
             defaults: settings,
-            repository: DisplayProfilesRepository(defaults: defaults),
-            modesRepository: DockModesRepository(defaults: defaults)
+            repository: DisplayProfilesRepository(defaults: defaults)
         )
         profiles.synchronize([display]) { [] }
         let history = DockLocalHistoryStore(repository: DockLocalHistoryRepository(defaults: defaults))

@@ -92,7 +92,7 @@ struct LauncherSuggestionSyntheticTests {
         let repository = LauncherSuggestionsRepository(directory: directory)
         let date = Date()
         var realHistory = LauncherSuggestionDocument()
-        realHistory.examples = [.init(context: .init(date: date, foregroundID: "real.source", modeID: nil),
+        realHistory.examples = [.init(context: .init(date: date, foregroundID: "real.source"),
                                       targetID: "real.target", date: date)]
         try await repository.save(realHistory, sequence: 1)
         let store = LauncherSuggestionsStore(directory: directory, defaults: nil,
@@ -151,11 +151,11 @@ struct LauncherSuggestionSyntheticTests {
     @Test("Exact-distance ties cannot manufacture agreement through app-name ordering")
     func targetNeutralNeighbors() throws {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
-        let context = LauncherSuggestionContext(date: date, foregroundID: "source", modeID: "work", hour: 10, weekday: 2)
+        let context = LauncherSuggestionContext(date: date, foregroundID: "source", hour: 10, weekday: 2)
         var document = LauncherSuggestionDocument()
         document.examples = (0..<45).map { index in
             let preceding = LauncherSuggestionContext(date: date.addingTimeInterval(Double(index - 45)),
-                foregroundID: "source", modeID: "work", hour: 10, weekday: 2)
+                foregroundID: "source", hour: 10, weekday: 2)
             return .init(context: preceding, targetID: ["a", "b", "c"][index % 3], date: preceding.date)
         }
         let tuning = LauncherSuggestionTuning(minHistory: 0, minSupport: 0, minDays: 0,
@@ -281,7 +281,7 @@ struct LauncherSuggestionSyntheticTests {
 
     private func evaluation(_ target: String) -> LauncherSuggestionEvaluation {
         let date = Date(timeIntervalSince1970: 1_800_000_000)
-        let context = LauncherSuggestionContext(date: date, foregroundID: "source", modeID: nil)
+        let context = LauncherSuggestionContext(date: date, foregroundID: "source")
         var document = LauncherSuggestionDocument()
         document.examples = [.init(context: context, targetID: target, date: date)]
         return LauncherSuggestionEvidence.evaluate(engine: .baseline, raw: [target: 1], context: context,

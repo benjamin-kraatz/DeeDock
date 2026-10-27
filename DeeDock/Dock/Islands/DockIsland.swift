@@ -154,7 +154,7 @@ struct DockIslandPlan: Codable, Equatable, Sendable {
 
     /// Pinned islands whose counts cover exactly `pinCount` pins.
     ///
-    /// Counts never line up after a Dock Mode switch or an edit on another display, so every
+    /// Counts stop lining up after a pin edit made outside the island editor, so every
     /// read-side consumer goes through this. Surplus pins join the last island; missing pins shrink
     /// islands from the end. An island left with no pins is dropped, except that the first island
     /// survives at zero so its name and tint outlive an empty pin list.

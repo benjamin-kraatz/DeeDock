@@ -19,7 +19,7 @@ Hub fades to the new setting over a quarter of a second.
 Click the DOKK tile, press Return on it in **Focus Dock**, or use its VoiceOver action. The Hub
 opens on the tab it showed when it last closed. Files opens with keyboard focus in the listing.
 Apps and Windows open with focus in the search field. Opening the Hub closes folder stacks, the
-Shelf and other dock popovers, Window Peek, the Dock Mode picker, drive cards, and Focus Dock.
+Shelf and other dock popovers, Window Peek, drive cards, and Focus Dock.
 
 Drop files on the DOKK tile or on the open Apps tab, or choose **Use in Launcher** from a Shelf
 selection, to open the Apps tab in file-action mode. For one picture, or one file Lookout has read,

@@ -16,7 +16,6 @@ struct LauncherSuggestionInspectorContext: View {
             VStack(alignment: .leading, spacing: 6) {
                 LabeledContent { Text(context.date, format: .dateTime) } label: { Text(.launcherSuggestionsDebugCaptured) }
                 LabeledContent { Text(verbatim: appName(context.foregroundID)) } label: { Text(.launcherSuggestionsDebugForeground) }
-                LabeledContent { Text(verbatim: context.modeID ?? String(localized: .launcherSuggestionsDebugNone)) } label: { Text(.launcherSuggestionsDebugMode) }
                 LabeledContent { Text(context.hour, format: .number) } label: { Text(.launcherSuggestionsDebugHour) }
                 LabeledContent { Text(context.weekday, format: .number) } label: { Text(.launcherSuggestionsDebugWeekday) }
                 if let seconds = context.foregroundSeconds {

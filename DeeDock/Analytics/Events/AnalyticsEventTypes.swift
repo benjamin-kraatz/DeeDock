@@ -104,21 +104,6 @@ nonisolated enum AnalyticsFileOperationStatus: String, AnalyticsToken {
     case completed, failed, partial
 }
 
-/// What started a Dock Mode switch.
-nonisolated enum AnalyticsModeSource: String, AnalyticsToken {
-    case menuBar = "menu_bar", picker, settings, launcher, prepareWorkspace = "prepare_workspace"
-    case previousMode = "previous_mode"
-}
-
-nonisolated enum AnalyticsModeEdit: String, AnalyticsToken {
-    case created, duplicated, deleted, renamed, reordered, recipeUpdated = "recipe_updated"
-    case snapshotSaved = "snapshot_saved"
-}
-
-nonisolated enum AnalyticsRecipeOutcome: String, AnalyticsToken {
-    case succeeded, stoppedOnFailure = "stopped_on_failure", canceled, noSteps = "no_steps", blocked
-}
-
 nonisolated enum AnalyticsShelfSource: String, AnalyticsToken {
     case drop, stack, folderTile = "folder_tile", peek, fusion, clipboard
 }
@@ -161,7 +146,7 @@ nonisolated enum AnalyticsDiscoveryAction: String, AnalyticsToken {
 
 /// Keys the dock handles while it has keyboard focus.
 nonisolated enum AnalyticsFocusCommand: String, AnalyticsToken {
-    case windowSearch = "window_search", modePicker = "mode_picker", openFiles = "open_files"
+    case windowSearch = "window_search", openFiles = "open_files"
     case badgeMemory = "badge_memory", history, navigate, movePin = "move_pin", open, windowPeek = "window_peek", exit
 }
 

@@ -14,8 +14,6 @@ final class DockCoordinator {
     let timeline: DockTimelineController
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
-    let recipes: WorkspaceRecipeCoordinator
-    @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
     let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
@@ -29,8 +27,6 @@ final class DockCoordinator {
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
     var settingsFeaturesRequest = false
-    /// One-shot route opened from the menu-bar mode submenu.
-    var settingsModesRequest = false
     /// One-shot route opened from a drive tile's Manage Drives command.
     var settingsDrivesRequest = false
     /// One-shot route to the notification feed page, from its tile, popover, or Discovery.
@@ -53,10 +49,6 @@ final class DockCoordinator {
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     private(set) var enabledDisplays: [DisplaySnapshot] = []
     var canFocus: Bool { !enabledDisplays.isEmpty }
-    var canSwitchModes: Bool {
-        profiles.modes.canEdit && !dragging.isDragging && !filePicker.isActive
-            && !panels.values.contains(where: \.isMenuTracking)
-    }
     /// Shared with the updater so every dock can draw the waiting-update pip.
     var updateAwareness: UpdateAwarenessStore? {
         didSet { refreshPanels(); trackUpdateTile() }
@@ -121,7 +113,6 @@ final class DockCoordinator {
     var launcherSuggestions: LauncherSuggestionsStore { catalog.suggestions }
     var suggestionSurvey: LauncherSuggestionSurvey { catalog.suggestionSurvey }
     var launcherApplications: [LauncherApplication] { catalog.launcherLibrary.applications }
-    var recipeApplications: any ApplicationServicing { catalog.service }
     @ObservationIgnored private let trash = TrashController()
     @ObservationIgnored private let shelf = ShelfController()
     /// Mounted drives and their shared arrangement. Settings reads both to manage drive order.
@@ -136,7 +127,6 @@ final class DockCoordinator {
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     let peekHistory = PeekHistoryStore.live()
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
-    @ObservationIgnored private let modePicker = DockModePickerCoordinator()
     @ObservationIgnored private let displayService = DisplayService()
     @ObservationIgnored private let occupancy = DisplayApplicationOccupancy()
     @ObservationIgnored private var panels: [String: DockPanelController] = [:]
@@ -151,10 +141,11 @@ final class DockCoordinator {
     @ObservationIgnored private var occupancySuspended = false
 
     init(windowAccess: WindowAccessController, screenCapture: ScreenCaptureAccessController) {
+        // Must run before the stores below read the keys it writes.
+        DockModesMigration().run()
         let settings = DockSettingsStore(repository: DockSettingsRepository())
         self.settings = settings
-        profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
-                                         modesRepository: DockModesRepository())
+        profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository())
         let applicationService = ApplicationService()
         let backgroundApplications = BackgroundApplicationMonitor()
         // The feature is silent when macOS's background state cannot be read; only this count records it.
@@ -164,7 +155,6 @@ final class DockCoordinator {
         catalog = ApplicationCatalog(service: applicationService, launcherHistory: LauncherHistory(),
                                      suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites(),
                                      surveyDefaults: .standard, backgroundMonitor: backgroundApplications)
-        recipes = WorkspaceRecipeCoordinator(applications: catalog.service, actions: actionTiles)
         hub = HubCoordinator(launcher: LauncherState(catalog: catalog), openRadar: { [harbor] in harbor.toggle() })
         let menus = ApplicationMenuController(
             access: windowAccess,
@@ -225,11 +215,6 @@ final class DockCoordinator {
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
         fileDestinations.start()
-        recipes.didChange = { [weak self] in
-            guard let self, recipes.run != nil else { return }
-            recipeProgress.show()
-        }
-        recipeProgress.openSettings = { [weak self] in self?.settingsModesRequest = true }
         watchPresets.start()
         localHistory.start()
         clipboardMuseum.start()
@@ -254,7 +239,8 @@ final class DockCoordinator {
         }
         discovery.interactionBlocked = { [weak self] in
             guard let self else { return true }
-            return !canSwitchModes || popovers.isOpen || focusedID != nil
+            return dragging.isDragging || filePicker.isActive || panels.values.contains(where: \.isMenuTracking)
+                || popovers.isOpen || focusedID != nil
         }
         discovery.targetScreen = { [weak self] in
             guard let self else { return nil }
@@ -358,7 +344,6 @@ final class DockCoordinator {
                 self?.hub.dismissAnchored()
                 self?.windowPeeks.close(returnFocus: false)
                 self?.volumeDock.cards.dismiss()
-                self?.modePicker.close(returnFocus: false)
             }
             self?.panels.values.forEach { $0.holdPopover(open) }
         }
@@ -434,7 +419,6 @@ final class DockCoordinator {
             self?.occupancySuspended = false
             self?.reconcile($0)
         }
-        catalog.suggestions.modeProvider = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
         catalog.start()
         trash.start()
         shelf.start()
@@ -473,7 +457,6 @@ final class DockCoordinator {
                 self?.volumeDock.cards.close()
                 self?.windowPeeks.dismissFileHandoff()
                 self?.windowPeeks.close(returnFocus: false)
-                self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
                 self?.panels.values.forEach { $0.suspendIdleFading() }
             } })
@@ -505,7 +488,6 @@ final class DockCoordinator {
         occupancy.invalidate()
         if resetVisibility {
             dragging.cancel()
-            modePicker.close(returnFocus: false)
         }
         reconciling = true
         defer { reconciling = false }
@@ -548,8 +530,7 @@ final class DockCoordinator {
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !sessionCapsules.isOpen, !notificationFeedPopover.isOpen, !pluginPanels.isOpen,
-                   !modePicker.isKeyboardActive {
+                   !sessionCapsules.isOpen, !notificationFeedPopover.isOpen, !pluginPanels.isOpen {
                     endFocus(restore: false)
                 }
             }
@@ -562,20 +543,8 @@ final class DockCoordinator {
                 }
                 // A context menu or drag replaces the plain card; a question or refusal stays.
                 if volumeDock.cards.isOpen, volumeDock.cards.isShowingInfo { volumeDock.cards.close() }
-                modePicker.close(returnFocus: false)
             }
             panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
-            panel.modePickerRequested = { [weak self, weak panel] in
-                guard let self, let panel, canSwitchModes else { return }
-                modePicker.show(modes: profiles.modes.modes,
-                                activeModeID: profiles.modes.document.activeModeID,
-                                on: panel,
-                                choose: { [weak self] id in self?.activateMode(id, source: .picker) ?? false },
-                                prepare: { [weak self] id in
-                                    guard let self, let mode = profiles.modes.modes.first(where: { $0.id == id }) else { return }
-                                    prepareWorkspace(mode)
-                                })
-            }
             panel.timelineRequested = { [weak self] in self?.browseLocalHistory() }
             panel.escape = { [weak self] in
                 guard let self else { return }
@@ -901,7 +870,6 @@ final class DockCoordinator {
             hub.dismissAnchored()
             popovers.closeAll()
             windowPeeks.close(returnFocus: false)
-            modePicker.close(returnFocus: false)
             volumeDock.cards.close()
             timeline.end()
             endFocus(restore: false)
@@ -946,7 +914,6 @@ final class DockCoordinator {
         hub.dismissAnchored()
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
-        modePicker.close(returnFocus: false)
         endFocus(restore: false)
         previousApplication = lastExternalApplication
         focusedID = id
@@ -957,24 +924,10 @@ final class DockCoordinator {
         panels[id]?.focus()
     }
 
-    /// Prepare stays available so a blocked drag or menu can be reported before any side effect.
-    var canPrepareWorkspace: Bool { profiles.modes.canEdit }
-
-    func prepareWorkspace(_ mode: DockMode) {
-        guard let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
-        recipes.prepare(mode: current, canActivate: canSwitchModes) { [weak self] id in
-            guard let self else { return false }
-            if id == profiles.modes.document.activeModeID { return true }
-            return activateMode(id, source: .prepareWorkspace)
-        }
-        if recipes.run != nil { recipeProgress.show() }
-    }
-
     /// Called only from a badge click, menu/keyboard command or Settings.
     func showBadgeMemory(path: String? = nil) {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
-        modePicker.close(returnFocus: false)
         endFocus(restore: false)
         Analytics.track(.toolOpened(.badgeMemory, trigger: Analytics.trigger()))
         badgeMemoryWindow.show(path: path, returningTo: lastExternalApplication)
@@ -1003,7 +956,6 @@ final class DockCoordinator {
     func showClipboardMuseum() {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
-        modePicker.close(returnFocus: false)
         endFocus(restore: false)
         clipboardMuseum.show(returningTo: lastExternalApplication)
     }
@@ -1035,7 +987,6 @@ final class DockCoordinator {
         hub.files.onOpenLookoutSettings = { [weak self] in self?.settingsLookoutRequest = true }
         let launcher = hub.apps.launcher
         launcher.fileActions.configure(destinations: fileDestinations, actions: actionTiles, catalog: catalog)
-        launcher.suggestionModeID = { [weak self] in self?.profiles.modes.activeMode.id.uuidString }
         configureLauncherSearch(launcher)
         launcher.createCapsule = { [weak self] application in
             guard let self, let panel = hubPanel() else { return }
@@ -1070,7 +1021,6 @@ final class DockCoordinator {
             let previous = previousApplication ?? lastExternalApplication
             popovers.closeAll()
             windowPeeks.close(returnFocus: false)
-            modePicker.close(returnFocus: false)
             volumeDock.cards.close()
             timeline.end()
             endFocus(restore: false)
@@ -1091,7 +1041,7 @@ final class DockCoordinator {
         let id = displayID ?? DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation)
         guard let id, let panel = panels[id], let anchor = panel.hubAnchor() else { return nil }
         let foreground = (previousApplication ?? lastExternalApplication)?.bundleIdentifier
-        let apps = panel.hubAppsContext(appVisibility: profiles.modes.effectiveVisibility(for: id),
+        let apps = panel.hubAppsContext(appVisibility: profiles.effectiveSettings(for: id).appVisibility,
                                         foregroundBundleIdentifier: foreground)
         return HubOpenContext(displayID: id, anchor: anchor, apps: apps)
     }
@@ -1105,7 +1055,7 @@ final class DockCoordinator {
     /// Shared search borrows stored metadata; native actions stay with the same owners as the dock tiles.
     private func configureLauncherSearch(_ launcher: LauncherState) {
         let search = launcher.search
-        search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles; search.modes = profiles.modes
+        search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles
         search.explicitSearch = { [weak self] in
             self?.hub.dismissAfterAction()
             self?.searchWindows()
@@ -1138,54 +1088,12 @@ final class DockCoordinator {
                     search.actionError = String(localized: .unifiedShortcutUnavailable); return
                 }
                 // Keep completion or failure visible. The action owner enforces one run per UUID.
-            case .mode(let id):
-                guard profiles.modes.modes.contains(where: { $0.id == id }), activateMode(id, source: .launcher) else {
-                    search.actionError = String(localized: .unifiedModeUnavailable); return
-                }
-                launcher.close?()
             }
         }
     }
 
-    @discardableResult
-    func activateMode(_ id: UUID, source: AnalyticsModeSource) -> Bool {
-        guard canSwitchModes else { return false }
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        modePicker.close(returnFocus: false)
-        timeline.end()
-        applicationMenus.cancelAllDiscoveries()
-        let activated = profiles.modes.activate(id)
-        if activated {
-            Analytics.track(.dockModeActivated)
-            Analytics.track(.modeSwitched(source, modeCount: profiles.modes.modes.count))
-        }
-        return activated
-    }
-
-    @discardableResult
-    func activatePreviousMode() -> Bool {
-        guard let id = profiles.modes.previousMode?.id else { return false }
-        return activateMode(id, source: .previousMode)
-    }
-
-    @discardableResult
-    func deleteMode(_ id: UUID) -> Bool {
-        guard canSwitchModes else { return false }
-        if recipes.run?.modeID == id { recipes.cancel() }
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        modePicker.close(returnFocus: false)
-        timeline.end()
-        applicationMenus.cancelAllDiscoveries()
-        let deleted = profiles.modes.delete(id)
-        if deleted { Analytics.track(.modeEdited(.deleted, modeCount: profiles.modes.modes.count)) }
-        return deleted
-    }
-
     private func endFocus(restore: Bool) {
         guard let id = focusedID else { return }
-        modePicker.close(returnFocus: false)
         focusedID = nil // Clear before resignKey can call back into the coordinator.
         let previous = previousApplication
         previousApplication = nil
@@ -1217,7 +1125,6 @@ final class DockCoordinator {
         displayIndicator.stop()
         settingsDisplayRequest = nil
         settingsFeaturesRequest = false
-        settingsModesRequest = false
         settingsDrivesRequest = false
         settingsNotificationFeedRequest = false
         settingsHarborRequest = false
@@ -1231,8 +1138,6 @@ final class DockCoordinator {
         folderStacks.stop()
         shelves.stop()
         actionTiles.stop()
-        recipes.stop()
-        recipeProgress.stop()
         watchPresets.stop()
         appMelt.stop()
         fusion.stop()
@@ -1247,7 +1152,6 @@ final class DockCoordinator {
         windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()
-        modePicker.stop()
         applicationMenus.stop()
         if let accessibilityObserver { NSWorkspace.shared.notificationCenter.removeObserver(accessibilityObserver) }
         accessibilityObserver = nil

@@ -60,7 +60,7 @@ final class DockStore {
     var isPreviewingTimeline: Bool { previewPins != nil }
     var canEditPins: Bool {
         previewPins == nil
-            && !profiles.requiresReset && !profiles.modes.requiresReset && profiles.pinErrors[displayID] == nil
+            && !profiles.requiresReset && profiles.pinErrors[displayID] == nil
     }
 
     @ObservationIgnored private let profiles: DisplayProfilesStore

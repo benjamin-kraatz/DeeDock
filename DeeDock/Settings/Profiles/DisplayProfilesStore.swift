@@ -5,7 +5,6 @@ import Observation
 @MainActor @Observable
 final class DisplayProfilesStore {
     let defaults: DockSettingsStore
-    let modes: DockModesStore
     private(set) var document = DisplayProfilesDocument()
     private(set) var displays: [DisplaySnapshot] = []
     private(set) var pinLists: [String: [DockPin]] = [:]
@@ -15,19 +14,11 @@ final class DisplayProfilesStore {
     @ObservationIgnored private let repository: DisplayProfilesRepository?
     @ObservationIgnored var didChange: (() -> Void)?
 
-    init(defaults: DockSettingsStore, repository: DisplayProfilesRepository?,
-         modesRepository: (any DockModesPersisting)? = nil) {
+    init(defaults: DockSettingsStore, repository: DisplayProfilesRepository?) {
         self.defaults = defaults
-        let modes = DockModesStore(repository: modesRepository ?? repository?.dockModesRepository)
-        self.modes = modes
         self.repository = repository
         do { document = try repository?.load() ?? DisplayProfilesDocument() }
         catch { requiresReset = true; errorMessage = .displayProfilesError }
-        modes.didChange = { [weak self] in
-            guard let self else { return }
-            refreshModeProjection()
-            didChange?()
-        }
     }
 
     var remembered: [DisplayProfile] {
@@ -37,15 +28,7 @@ final class DisplayProfilesStore {
     }
 
     func effectiveSettings(for id: String) -> DockSettings {
-        var result = document.profiles[id]?.overrides.resolving(defaults.value) ?? defaults.value
-        result.appVisibility = modes.effectiveVisibility(for: id)
-        return result
-    }
-
-    var effectiveDefaultSettings: DockSettings {
-        var result = defaults.value
-        result.appVisibility = modes.effectiveVisibility(for: nil)
-        return result
+        document.profiles[id]?.overrides.resolving(defaults.value) ?? defaults.value
     }
 
     /// Primary-first seeding makes simultaneous discovery deterministic. Existing empty pins win.
@@ -94,24 +77,16 @@ final class DisplayProfilesStore {
                 pinErrors[display.id] = .errorLoadPins(details: error.localizedDescription)
             }
         }
-        let persistentIDs = Set(proposed.profiles.values.filter(\.isPersistent).map(\.id))
-        let visibilityOverrides = proposed.profiles.reduce(into: [String: DockAppVisibility]()) { values, pair in
-            if let visibility = pair.value.overrides.appVisibility { values[pair.key] = visibility }
+        // Settings shows a remembered display's pins while it is disconnected. Unreadable pins stay
+        // unloaded here and report their error once the display connects.
+        for profile in proposed.profiles.values where profile.isPersistent && pinLists[profile.id] == nil {
+            if let existing = try? repository?.existingPins(for: profile.id) { pinLists[profile.id] = existing }
         }
-        modes.synchronize(displays: displays, persistentDisplayIDs: persistentIDs,
-                          primaryDisplayID: proposed.initialPrimaryID ?? displays.first(where: \.isPrimary)?.id,
-                          legacyPins: pinLists, legacyDefaultVisibility: defaults.value.appVisibility,
-                          legacyVisibilityOverrides: visibilityOverrides)
-        refreshModeProjection()
     }
 
     /// Changes just one explicit override, even if its value equals today's shared default.
     func update<Value>(_ id: String, keyPath: WritableKeyPath<DockSettings, Value>, to value: Value) {
         guard let field = DockSettingField.allCases.first(where: { $0.keyPath == keyPath }) else { return }
-        if field == .appVisibility, let visibility = value as? DockAppVisibility {
-            modes.setVisibility(visibility, for: id)
-            return
-        }
         var effective = effectiveSettings(for: id)
         effective[keyPath: keyPath] = value
         guard let normalized = effective.normalized else { return }
@@ -136,22 +111,10 @@ final class DisplayProfilesStore {
         var effective = effectiveSettings(for: id)
         mutation(&effective)
         guard let normalized = effective.normalized else { return }
-        if fields.contains(.appVisibility) {
-            modes.setVisibility(normalized.appVisibility, for: id)
-        }
-        let profileFields = fields.filter { $0 != .appVisibility }
-        if !profileFields.isEmpty {
-            edit(id) { profile in profileFields.forEach { profile.overrides.set($0, from: normalized) } }
-        }
+        edit(id) { profile in fields.forEach { profile.overrides.set($0, from: normalized) } }
     }
-    func useDefault(_ field: DockSettingField, for id: String) {
-        if field == .appVisibility { modes.useDefaultVisibility(for: id) }
-        else { edit(id) { $0.overrides.set(field, from: nil) } }
-    }
-    func useDefaults(for id: String) {
-        edit(id) { $0.overrides = DockSettingsOverrides() }
-        modes.useDefaultVisibility(for: id)
-    }
+    func useDefault(_ field: DockSettingField, for id: String) { edit(id) { $0.overrides.set(field, from: nil) } }
+    func useDefaults(for id: String) { edit(id) { $0.overrides = DockSettingsOverrides() } }
     func setEnabled(_ enabled: Bool, for id: String) { edit(id) { $0.enabled = enabled } }
 
     private func edit(_ id: String, mutation: (inout DisplayProfile) -> Void) {
@@ -173,17 +136,10 @@ final class DisplayProfilesStore {
 
     /// Saves only this display's pins. Failed loads remain blocked instead of destroying saved bytes.
     func savePins(_ pins: [DockPin], for id: String) throws {
-        guard !requiresReset, !modes.requiresReset, pinErrors[id] == nil,
-              document.profiles[id] != nil else { throw CocoaError(.coderReadCorrupt) }
-        guard modes.setPins(pins, for: id) else { throw CocoaError(.fileWriteUnknown) }
-    }
-
-    func updateDefaultVisibility(_ visibility: DockAppVisibility) { modes.setDefaultVisibility(visibility) }
-    func restoreDefaultVisibility() { modes.restoreDefaultVisibility() }
-    func hasModeVisibilityOverride(for id: String) -> Bool { modes.hasVisibilityOverride(for: id) }
-
-    private func refreshModeProjection() {
-        let ids = Set(document.profiles.keys).union(displays.map(\.id))
-        pinLists = Dictionary(uniqueKeysWithValues: ids.map { ($0, modes.pins(for: $0)) })
+        guard !requiresReset, pinErrors[id] == nil, let profile = document.profiles[id] else { throw CocoaError(.coderReadCorrupt) }
+        let unique = DockPinEditing.unique(pins)
+        if profile.isPersistent { try repository?.savePins(unique, for: id) }
+        pinLists[id] = unique
+        didChange?()
     }
 }

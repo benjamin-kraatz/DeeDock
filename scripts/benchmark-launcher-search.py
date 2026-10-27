@@ -30,16 +30,15 @@ import Foundation
             ShelfItem(url: URL(fileURLWithPath: "/benchmark/invoice-\(index).pdf"), name: "invoice-\(index).pdf", bookmarkData: Data())
         }
         let shortcuts = (0..<30).map { ActionTile(id: UUID(), name: "Invoice Shortcut \($0)") }
-        let modes = (0..<100).map { LauncherSearchName(id: UUID(), name: "Invoice Mode \($0)") }
         let windows = (0..<200).map { index in
             WindowSearchSource(id: UUID(), applicationName: "Invoice App", processIdentifier: 0, launchDate: nil,
                 window: ApplicationWindowSummary(token: ApplicationWindowToken(sessionID: UUID(), id: UUID()),
                     processIdentifier: 0, title: "Invoice window \(index)", frame: .zero, isMinimized: false, isMain: false), candidate: nil)
         }
-        print("Dataset: 10000 apps, 200 windows, 30 capsules, 50 Shelf files, 30 Shortcuts, 100 modes. In-memory metadata only.")
+        print("Dataset: 10000 apps, 200 windows, 30 capsules, 50 Shelf files, 30 Shortcuts. In-memory metadata only.")
         for query in ["invoice", "Invoice Tool 9999", "invocie", "büro", "no-such-result"] {
             let input = LauncherSearchInput(query: query, kind: .all, applications: apps, capsules: capsules,
-                shelf: shelf, shortcuts: shortcuts, modes: modes, windowRevision: UUID())
+                shelf: shelf, shortcuts: shortcuts, windowRevision: UUID())
             _ = await LauncherSearchIndex.results(input, windows: windows)
             var milliseconds: [Double] = []
             var count = 0

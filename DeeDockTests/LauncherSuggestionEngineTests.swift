@@ -7,10 +7,10 @@ struct LauncherSuggestionEngineTests {
     @Test("Shared ranking preserves baseline transition, recency, and feedback scores")
     func baselinePolicyRegression() {
         let now = Date()
-        let context = LauncherSuggestionContext(date: now, foregroundID: "source", modeID: "work",
+        let context = LauncherSuggestionContext(date: now, foregroundID: "source",
             recentIDs: ["prior"], runningIDs: ["preferred"], hour: 10, weekday: 2,
             secondsSinceUse: ["preferred": 0])
-        let unrelated = LauncherSuggestionContext(date: now, foregroundID: "other", modeID: "other", hour: 20, weekday: 3)
+        let unrelated = LauncherSuggestionContext(date: now, foregroundID: "other", hour: 20, weekday: 3)
         let examples = [LauncherSuggestionExample(context: context, targetID: "preferred", date: now),
                         LauncherSuggestionExample(context: unrelated, targetID: "alternative", date: now),
                         LauncherSuggestionExample(context: context, targetID: "excluded", date: now)]
@@ -19,7 +19,7 @@ struct LauncherSuggestionEngineTests {
         let scores = LauncherSuggestionBaseline.scores(context: context, examples: examples,
             feedback: [feedback], excluded: ["excluded"], now: now)
         #expect(abs((scores["preferred"] ?? 0) - 1.475) < 0.000001)
-        #expect(abs((scores["alternative"] ?? 0) - 1 / 5.5) < 0.000001)
+        #expect(abs((scores["alternative"] ?? 0) - 1 / 5.0) < 0.000001)
         #expect(scores["excluded"] == nil)
     }
 
@@ -47,7 +47,7 @@ struct LauncherSuggestionEngineTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let seed = try LauncherSuggestionTestSeed.url()
         let now = Date()
-        let context = LauncherSuggestionContext(date: now, foregroundID: "source", modeID: "work")
+        let context = LauncherSuggestionContext(date: now, foregroundID: "source")
         var document = LauncherSuggestionDocument()
         document.examples = (0..<1_000).map { _ in
             LauncherSuggestionExample(context: context, targetID: "target", date: now)
@@ -114,7 +114,7 @@ struct LauncherSuggestionEngineTests {
         let store = LauncherSuggestionsStore(directory: nil, defaults: nil, coreMLSeedURL: absent)
         store.setEnabled(true)
         teach(store)
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         let baseline = try #require(await store.predict(context: context))
         #expect(baseline.rankedIDs.contains("target"))
         store.setEngine(.coreML)
@@ -135,7 +135,7 @@ struct LauncherSuggestionEngineTests {
         let absent = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mlmodel")
         let store = LauncherSuggestionsStore(directory: nil, defaults: nil, coreMLSeedURL: absent)
         store.setEngine(.coreML)
-        let context = LauncherSuggestionContext(date: Date(), foregroundID: "source", modeID: nil)
+        let context = LauncherSuggestionContext(date: Date(), foregroundID: "source")
         #expect(await store.predict(context: context) == nil)
         #expect(!store.engineBusy)
         store.setEnabled(true)

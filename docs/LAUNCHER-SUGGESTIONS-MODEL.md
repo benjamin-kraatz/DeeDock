@@ -10,7 +10,7 @@ Exact snapshot and neighbor-count matching reuses a completed model; simultaneou
 All model work uses CPU execution off MainActor. Preparing and unavailable states are explicit; failure never substitutes baseline results.
 
 The production encoder uses the fixture's 256 Float32 dimensions. It encodes cyclic hour, weekday, foreground identity, recent identities,
-a normalized running-app set, and Dock Mode with stable signed hashing in separate categorical regions. Hash collisions remain possible.
+and a normalized running-app set with stable signed hashing in separate categorical regions. The region that held the Dock Mode identifier until DEE-150 stays zero. Hash collisions remain possible.
 Foreground duration stays unset. The model defaults to 15 nearest neighbors, squared Euclidean distance, inverse-distance voting, and dynamic string app labels. Debug tuning can override the neighbor count from 1 through 100 at model loading and update time.
 
 After prediction, each label's Core ML vote is multiplied by the mean `exp(-ageDays / 21)` of its retained examples.

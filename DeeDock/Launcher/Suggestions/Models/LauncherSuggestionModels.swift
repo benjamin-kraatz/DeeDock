@@ -4,7 +4,6 @@ import Foundation
 nonisolated struct LauncherSuggestionContext: Codable, Equatable, Sendable {
     let date: Date
     let foregroundID: String?
-    let modeID: String?
     var recentIDs: [String] = []
     var runningIDs: [String] = []
     var hour: Int = 0
@@ -32,7 +31,8 @@ nonisolated struct LauncherSuggestionContext: Codable, Equatable, Sendable {
         }
         let runningWeight = 0.35 / Float(max(1, runningIDs.count)).squareRoot()
         for id in runningIDs { put(id, offset: 176, count: 48, weight: runningWeight) }
-        put(modeID, offset: 224, count: 32, weight: 0.4)
+        // Slots 224–255 held the retired Dock Mode identifier. They stay zero so the vector keeps
+        // the 256 inputs the bundled seed model expects.
         return values
     }
 }

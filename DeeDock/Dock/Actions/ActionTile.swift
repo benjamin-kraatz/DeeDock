@@ -21,7 +21,7 @@ nonisolated struct ActionTile: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-/// Persisted tiles are app-wide, ordered, and independent of display appearance or Dock Modes.
+/// Persisted tiles are app-wide, ordered, and independent of display appearance.
 nonisolated struct ActionTilesDocument: Codable {
     var version = 1
     var tiles: [ActionTile] = []

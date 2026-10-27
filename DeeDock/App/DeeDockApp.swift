@@ -47,7 +47,6 @@ struct DeeDockApp: App {
             Section {
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                     .disabled(!delegate.coordinator.canFocus)
-                DockModesMenu(coordinator: delegate.coordinator)
             } header: { Text(.menuSectionDock) }
             Section {
                 // The hint shows the shortcut that works from any app, when it could be registered.

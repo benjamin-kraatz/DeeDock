@@ -27,9 +27,8 @@ nonisolated enum LauncherSuggestionBaseline {
             let hourDistance = abs(previous.hour - context.hour)
             let time = min(hourDistance, 24 - hourDistance) <= 2 ? 0.5 : 0
             let weekday = previous.weekday == context.weekday ? 0.25 : 0
-            let mode = context.modeID != nil && previous.modeID == context.modeID ? 0.5 : 0
             let recent = Set(previous.recentIDs.prefix(3)).intersection(context.recentIDs.prefix(3)).isEmpty ? 0 : 0.25
-            scores[example.targetID, default: 0] += decay * (1 + transition + time + weekday + mode + recent)
+            scores[example.targetID, default: 0] += decay * (1 + transition + time + weekday + recent)
         }
         return scores
     }

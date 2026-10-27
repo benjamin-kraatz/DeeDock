@@ -113,7 +113,7 @@ nonisolated struct LauncherSuggestionSyntheticPlayback: Sendable {
     private static func context(_ template: LauncherSuggestionContext, at date: Date) -> LauncherSuggestionContext {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-        return .init(date: date, foregroundID: template.foregroundID, modeID: template.modeID,
+        return .init(date: date, foregroundID: template.foregroundID,
                      recentIDs: template.recentIDs, runningIDs: template.runningIDs,
                      hour: calendar.component(.hour, from: date), weekday: calendar.component(.weekday, from: date),
                      foregroundSeconds: template.foregroundSeconds, secondsSinceUse: template.secondsSinceUse,

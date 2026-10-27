@@ -47,7 +47,7 @@ when the filters, sort, grouping, layout, grid column count, and ordered app res
 Changing the query or entering file actions clears it. Mixed search has no scroll restoration. The
 position is approximate if the optional Suggested section changes height between openings.
 
-Typing searches apps, windows, saved work, Shelf filenames, pinned Shortcuts, and Dock Modes.
+Typing searches apps, windows, saved work, Shelf filenames, and pinned Shortcuts.
 Arrows select results, and Return performs the selected result's labeled action. If no result
 has been selected, Return performs the first result's action.
 
@@ -125,8 +125,7 @@ vendor folder (such as `Application Support/Google/Chrome`), or anything in `~/L
 
 A nonempty query keeps app matches in the selected grid or list layout. Other kinds use compact
 rows that identify their kind, source, and default action.
-**Result type** filters apps, windows, Capsules and Breadcrumbs, Shelf files, pinned Shortcuts,
-or named Dock Modes. Selecting a non-app type also browses that source without a query.
+**Result type** filters apps, windows, Capsules and Breadcrumbs, Shelf files, or pinned Shortcuts. Selecting a non-app type also browses that source without a query.
 Clear the query and choose **All types** or **Apps** to return to app grid/list browsing.
 App filters, location, sorting, and grouping apply with or without a query, including when **Apps** is
 selected as the result type. Running, pinned, recent, and favorites filters show only matching apps in
@@ -159,7 +158,7 @@ Capsule matches identify historical saved text. Matches found only in saved brea
 resume it automatically. Shelf rows identify stored references whose availability is checked on
 opening. Missing files produce an error and keep the Hub open. Shortcut availability is
 checked by the existing runner; running, success, and failure status remain visible in the row.
-The runner prevents duplicate concurrent runs. A deleted or guarded mode cannot be activated.
+The runner prevents duplicate concurrent runs.
 Unreadable stores show a notice without removing other providers' results or rewriting storage.
 
 Right-click a row for its actions, or use Tab to reach **Result actions** for the keyboard-selected
