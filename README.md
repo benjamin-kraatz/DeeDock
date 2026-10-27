@@ -24,7 +24,7 @@ The dock itself matches the system Dock: Liquid Glass, magnification, running in
 - Put a dock on any screen edge, then align and offset it to the point.
 - Turn on auto-hide with its own activation zone, reveal and hide delays, and ten animation styles. Docks can also fade when idle.
 - Open folder stacks in Grid, List, or Smart view. Downloads, Trash, and external drives sit at the end of the dock, and you eject a drive by dragging it off.
-- Rest on a running app to open Window Peek. From there you can pick a window, drop files into it, pin a live preview, watch a region for changes, or mark up a screenshot.
+- Rest on a running app to open Window Peek. From there you can pick a window, drop files into it, or mark up a screenshot.
 - Switch between Dock Modes, which are named sets of pins for every display. A mode can carry a recipe that opens apps, files, links, and Shortcuts.
 - Carry files across Spaces and displays on the Shelf.
 - Save what you were working on as a Session Capsule, and start a Focus Session timer from any mode.

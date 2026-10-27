@@ -55,7 +55,7 @@ nonisolated enum WindowThumbnailMatcher {
         return matches
     }
 
-    /// Match freshly discovered AX metadata to the portal's bound ScreenCaptureKit source.
+    /// Match freshly discovered AX metadata to a window summary recorded earlier, such as one Radar closed.
     /// Apply the same title normalization and two-point tolerance as thumbnail binding, refusing ambiguity.
     static func matchingWindow(_ source: ApplicationWindowSummary,
                                among windows: [ApplicationWindowSummary]) -> ApplicationWindowToken? {

@@ -1,7 +1,7 @@
 import CoreGraphics
 import ScreenCaptureKit
 
-/// Shared one-shot capture for Peek and portals. Call from a capture actor, never a rendering path.
+/// Shared one-shot capture for Peek, Radar, and atmosphere. Call from a capture actor, never a rendering path.
 nonisolated enum WindowScreenshot {
     /// Converts a logical point size into backing pixels.
     ///
@@ -14,8 +14,8 @@ nonisolated enum WindowScreenshot {
 
     /// Pixel size of a window frame fitted inside an exact pixel budget, preserving aspect ratio.
     ///
-    /// The result is at least 1×1. Callers that already hold pixels (portals, atmosphere, the enlarged
-    /// preview) pass that budget through; this function does not apply another display scale.
+    /// The result is at least 1×1. Callers that already hold pixels (atmosphere, the enlarged preview)
+    /// pass that budget through; this function does not apply another display scale.
     static func outputPixels(source: CGSize, fittingPixels budget: CGSize) -> CGSize {
         let fit = min(budget.width / max(1, source.width), budget.height / max(1, source.height))
         return CGSize(width: max(1, (source.width * fit).rounded()),

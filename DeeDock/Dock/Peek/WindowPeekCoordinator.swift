@@ -17,8 +17,6 @@ final class WindowPeekCoordinator {
     var fileDropAccepted: (() -> Void)?
     var fileDragEnded: (() -> Void)?
     private let history: PeekHistoryStore
-    private let watches: WindowWatchController
-    private let portals = WindowPortalCoordinator()
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
@@ -58,27 +56,23 @@ final class WindowPeekCoordinator {
     init(menus: ApplicationMenuController, screenCapture: ScreenCaptureAccessController,
          applications: any ApplicationServicing,
          thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService(),
-         watchPresets: WindowWatchPresetStore, actions: ActionTilesController, history: PeekHistoryStore) {
+         history: PeekHistoryStore) {
         self.history = history
         fileHandoff = WindowFileHandoffController(menus: menus, applications: applications)
         self.menus = menus
         self.screenCapture = screenCapture
         self.thumbnails = thumbnails
         markups = WindowMarkupController(thumbnails: thumbnails)
-        watches = WindowWatchController(presets: watchPresets, actions: actions)
     }
 
     func hover(_ item: DockItem?, on panel: DockPanelController, documents: DocumentResourceAccess? = nil) {
         guard let item else {
             if sourcePanel === panel {
                 leaveSource()
-                // A portal card press still has to record that the pointer left the tile.
-                // Blocking that exit kept Peek open after mouse-up off the icon and panel.
-                if controller?.state.portalDragging != true { scheduleClose() }
+                scheduleClose()
             }
             return
         }
-        guard controller?.state.portalDragging != true else { return }
         guard item.isRunning, item.isAvailable,
               let context = panel.windowPeekContext(for: item.id), context.settings.windowPeekEnabled else {
             close(returnFocus: false)
@@ -211,15 +205,11 @@ final class WindowPeekCoordinator {
         if returnFocus { panel?.focus() }
     }
 
-    func focusNextPortal() { portals.focusNext() }
-
     func stop() {
         history.stop()
         fileHandoff.stop()
-        portals.stop()
         markups.stop()
         close(returnFocus: false)
-        watches.stop()
         prepareSettings = nil
         enlargeBlocked = nil
         addToFusion = nil
@@ -276,13 +266,6 @@ final class WindowPeekCoordinator {
             self?.panelHovered = hovered
             if hovered { self?.cancelClose() } else { self?.scheduleClose() }
         }
-        next.state.watch = { [weak self, weak panel] token in
-            guard let self, let panel,
-                  let summary = allWindows.first(where: { $0.token == token }),
-                  let currentContext = panel.windowPeekContext(for: item.id) else { return }
-            close(returnFocus: false)
-            watches.show(summary, visibleFrame: currentContext.anchor.visibleFrame)
-        }
         next.state.markup = { [weak self] token in self?.openMarkup(token) }
         next.state.startMelt = { [weak self] window in
             guard let self else { return }
@@ -295,42 +278,6 @@ final class WindowPeekCoordinator {
             let action = addToFusion
             close(returnFocus: false)
             action?(window, panel, keyboard)
-        }
-        next.state.pinPortal = { [weak self, weak panel] window in
-            guard let self else { return }
-            guard portals.pin(window, appName: item.reference.name, keyboard: keyboard) else {
-                Analytics.track(.portalPinned(keyboard ? .keyboard : .button, outcome: .blocked))
-                panel?.store.errorMessage = .portalLimit
-                return
-            }
-            Analytics.track(.portalPinned(keyboard ? .keyboard : .button, outcome: .succeeded))
-            close(returnFocus: false)
-        }
-        next.state.portalTracking = { [weak self, weak next] tracking in
-            next?.state.portalDragging = tracking
-            if tracking { self?.enlarge?.dismiss() }
-            if tracking { self?.cancelClose() } else { self?.updatePointer() }
-        }
-        next.state.dropPortal = { [weak self, weak panel] window, point, frozen in
-            guard let self else { return }
-            guard portals.pin(window, appName: item.reference.name, keyboard: false,
-                              dropPoint: point, frozen: frozen) else {
-                Analytics.track(.portalPinned(.drag, outcome: .blocked))
-                panel?.store.errorMessage = .portalLimit
-                return
-            }
-            Analytics.track(.portalPinned(.drag, outcome: .succeeded))
-            close(returnFocus: false)
-        }
-        next.state.pinFrozen = { [weak self, weak panel] window in
-            guard let self else { return }
-            guard portals.pin(window, appName: item.reference.name, keyboard: keyboard, frozen: true) else {
-                Analytics.track(.portalPinned(.frozen, outcome: .blocked))
-                panel?.store.errorMessage = .portalLimit
-                return
-            }
-            Analytics.track(.portalPinned(.frozen, outcome: .succeeded))
-            close(returnFocus: false)
         }
         next.state.manage = { [weak self] token in self?.manage(token) }
         next.state.choose = { [weak self] token in self?.choose(token) }
@@ -363,12 +310,7 @@ final class WindowPeekCoordinator {
             next.state.cardHovered = { [weak enlarge] token, inside in enlarge?.hover(token, inside: inside) }
         }
         if fileDocuments != nil {
-            next.state.watch = nil
             next.state.markup = nil
-            next.state.pinPortal = nil
-            next.state.pinFrozen = nil
-            next.state.dropPortal = nil
-            next.state.portalTracking = nil
             next.state.addToFusion = nil
             next.state.startMelt = nil
         }
@@ -703,7 +645,7 @@ final class WindowPeekCoordinator {
     }
 
     private func scheduleClose() {
-        if controller?.state.actionBusy == true || controller?.state.portalDragging == true { return }
+        if controller?.state.actionBusy == true { return }
         if fileDocuments != nil, !fileDrag { return }
         let delay = fileDrag ? 650 : 180
         // Pointer updates call this on every move outside the peek. Keep the pending deadline so
