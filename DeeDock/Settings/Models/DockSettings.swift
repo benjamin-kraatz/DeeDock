@@ -86,11 +86,6 @@ struct DockSettings: Codable, Equatable {
     var showSessionCapsules: Bool = true
     /// Whether each display dock includes the trailing system Trash tile.
     var showTrash: Bool = true
-    /// Whether dragging a pin or folder stack snaps to screen edges and peer items.
-    ///
-    /// Deprecated. Launch coerces this off and persists the change. The Settings
-    /// page stays under Deprecated so the switch can be turned back on until 1.0.0.
-    var magneticEdges: Bool = true
     /// Whether Empty Trash requires DeeDock's destructive confirmation alert.
     var confirmBeforeEmptyingTrash: Bool = true
     /// Whether docks show tiles for mounted USB sticks, SD cards, and external disks.
@@ -211,7 +206,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
-        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, magneticEdges, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case hubGlassTint
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
@@ -253,7 +248,6 @@ extension DockSettings {
             ?? LauncherDockPosition(legacyAtStart: legacy.decodeIfPresent(Bool.self, forKey: .launcherAtStart) ?? true)
         showSessionCapsules = try values.decodeIfPresent(Bool.self, forKey: .showSessionCapsules) ?? true
         showTrash = values.contains(.showTrash) ? try values.decode(Bool.self, forKey: .showTrash) : true
-        magneticEdges = try values.decodeIfPresent(Bool.self, forKey: .magneticEdges) ?? true
         confirmBeforeEmptyingTrash = values.contains(.confirmBeforeEmptyingTrash)
             ? try values.decode(Bool.self, forKey: .confirmBeforeEmptyingTrash) : true
         showVolumes = try values.decodeIfPresent(Bool.self, forKey: .showVolumes) ?? true

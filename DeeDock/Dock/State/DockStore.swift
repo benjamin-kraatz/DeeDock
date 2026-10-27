@@ -26,7 +26,6 @@ final class DockStore {
         get { if case .app(let id) = selectedTarget { return id }; return nil }
         set { selectedTarget = newValue.map(DockEntryID.app) }
     }
-    @ObservationIgnored private var stampObserver: NSObjectProtocol?
     let sections = DockSectionState()
     private(set) var entries: [DockRenderSlot] = []
     @ObservationIgnored var presentationDidChange: (() -> Void)?
@@ -78,35 +77,17 @@ final class DockStore {
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
     @ObservationIgnored var applicationOpened: (() -> Void)?
-    /// Successful explicit app opens only, excluding hide, spring loading, and file drops.
-    @ObservationIgnored var patchBayAppOpened: ((String, UUID) -> Void)?
     /// Fired on app click and after a pin click or drop that changed this display's pins.
     @ObservationIgnored var soapBubblePlay: ((String) -> Void)?
 
-    /// Pin IDs parked on a magnetic edge. Those items stay favorites but leave the
-    /// linear dock until the user drops them back onto the glass.
-    var pinIDsHiddenFromDock: Set<String> = [] {
-        didSet {
-            guard pinIDsHiddenFromDock != oldValue else { return }
-            refreshEntries()
-            presentationDidChange?()
-        }
-    }
-
-    /// Called when favorites are inserted or removed so magnetic placements for
-    /// those IDs can be cleared.
-    @ObservationIgnored var willMutateFavoriteIDs: (([String]) -> Void)?
-
     @ObservationIgnored private let history: DockLocalHistoryStore?
-    @ObservationIgnored private let pinWeather: PinWeatherStore?
     /// Island plans shared with Settings and the other docks.
     @ObservationIgnored let islands: DockIslandPlanStore
 
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil, volumes: VolumeController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
-         history: DockLocalHistoryStore? = nil,
-         pinWeather: PinWeatherStore? = nil, islands: DockIslandPlanStore? = nil) {
+         history: DockLocalHistoryStore? = nil, islands: DockIslandPlanStore? = nil) {
         self.actions = actions
         self.displayID = displayID
         self.catalog = catalog
@@ -117,17 +98,9 @@ final class DockStore {
         self.volumes = volumes
         self.capsules = capsules
         self.history = history
-        self.pinWeather = pinWeather
         errorMessage = profiles.pinErrors[displayID]
         sections.didChange = { [weak self] in self?.refreshEntries(); self?.presentationDidChange?() }
         refresh()
-        stampObserver = NotificationCenter.default.addObserver(forName: QuarantineStampController.modeChanged,
-                                                              object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.refreshEntries()
-                self?.presentationDidChange?()
-            }
-        }
     }
 
     /// Shows `pins` on this dock without saving them or recording history.
@@ -232,14 +205,11 @@ final class DockStore {
     }
 
     private func refreshEntries() {
-        let hidden = pinIDsHiddenFromDock
-        let visiblePins = pins.filter { !hidden.contains($0.id) }
         let pairs = appMelt?.pairs ?? []
         let pairedIDs = Set(pairs.flatMap(\.applicationIDs))
         // Only the projection moves. Saved pins and running order remain the return destination.
-        let visibleItems = items.filter { !pairedIDs.contains($0.id) && (!$0.isFavorite || !hidden.contains($0.reference.id)) }
-        let visibleFolders = folders.filter { !hidden.contains($0.id) }
-        var content = DockSectionProjection.entries(items: visibleItems, folders: visibleFolders, pins: visiblePins,
+        let visibleItems = items.filter { !pairedIDs.contains($0.id) }
+        var content = DockSectionProjection.entries(items: visibleItems, folders: folders, pins: pins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
                                                   actions: actions?.dockItems ?? [],
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
@@ -265,12 +235,8 @@ final class DockStore {
             (order.firstIndex(of: $0.id) ?? order.count) < (order.firstIndex(of: $1.id) ?? order.count)
         }
         for (index, slot) in zip(positions, utilities) { content[index] = slot }
-        let ordinary = DockLauncherPlacement.entries(content, position: launcherPosition, pinOrder: pins.map(\.id))
         // Use the same projection for rendering, layout, keyboard selection, and native targets.
-        // Utility actions and running-only apps cannot be stamped and must not remain clickable.
-        let next = QuarantineStampController.shared.armed
-            ? ordinary.filter { $0.item?.isFavorite == true || $0.folder != nil }
-            : ordinary
+        let next = DockLauncherPlacement.entries(content, position: launcherPosition, pinOrder: pins.map(\.id))
         selectedTarget = DockSectionProjection.repairedSelection(selectedTarget, previous: entries, current: next)
         entries = next
     }
@@ -466,8 +432,6 @@ final class DockStore {
     func toggleFavorite(_ item: DockItem) {
         var pins = profiles.pinLists[displayID] ?? []
         if pins.contains(where: { $0.application?.id == item.id }) {
-            willMutateFavoriteIDs?([item.id])
-            pinIDsHiddenFromDock.remove(item.id)
             pins.removeAll { $0.application?.id == item.id }
         } else {
             pins.append(.application(item.reference))
@@ -517,8 +481,6 @@ final class DockStore {
 
     func insertPins(_ incoming: [DockPin], at index: Int) -> Bool {
         let previous = persistedPins
-        willMutateFavoriteIDs?(incoming.map(\.id))
-        pinIDsHiddenFromDock.subtract(incoming.map(\.id))
         let succeeded = savePins(DockPinEditing.inserting(incoming, into: pins, at: index), relocated: Set(incoming.map(\.id)))
         if let itemID = incoming.compactMap(\.application?.id).first {
             notePinInteraction(itemID, previous: previous, succeeded: succeeded)
@@ -535,24 +497,7 @@ final class DockStore {
         return pins.indices.contains(index + distance)
     }
 
-    func removePin(_ id: String) -> Bool {
-        willMutateFavoriteIDs?([id])
-        pinIDsHiddenFromDock.remove(id)
-        return savePins(pins.filter { $0.id != id })
-    }
-
-    /// Maps a drop index among visible pinned tiles onto the persisted pin list,
-    /// skipping IDs parked off the linear dock.
-    func persistedInsertionIndex(forVisibleIndex visual: Int) -> Int {
-        let hidden = pinIDsHiddenFromDock
-        var visible = 0
-        for (index, pin) in pins.enumerated() {
-            if hidden.contains(pin.id) { continue }
-            if visible == visual { return index }
-            visible += 1
-        }
-        return pins.count
-    }
+    func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
     // MARK: Islands
 
@@ -671,29 +616,17 @@ final class DockStore {
 
     /// Submits to shared launch suppression and refuses completions after this panel is stopped.
     func performPrimaryAction(_ item: DockItem) {
-        if QuarantineStampController.shared.armed {
-            if item.isFavorite {
-                QuarantineStampController.shared.stamp(id: item.id, url: item.resolvedURL ?? item.reference.url, name: item.reference.name)
-            }
-            return
-        }
-        if item.isFavorite { pinWeather?.recordUse(item.id) }
         soapBubblePlay?(item.id)
         Analytics.count(.appActivated(Analytics.trigger()))
         let token = session.token
-        let modeID = profiles.modes.activeMode.id
-        let isPatchBaySource = item.isFavorite && !isPreviewingTimeline
-        catalog.performPrimaryAction(item.reference) { [weak self] error, opened in
+        catalog.performPrimaryAction(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
             errorMessage = error
-            if error == nil {
-                applicationOpened?()
-                if opened, isPatchBaySource, !isPreviewingTimeline { patchBayAppOpened?(item.id, modeID) }
-            }
+            if error == nil { applicationOpened?() }
         }
     }
 
-    /// Artwork for a favorite that may be hidden from the linear dock.
+    /// Artwork for a saved pin, used for the drag image.
     func icon(for pin: DockPin) -> NSImage? {
         switch pin {
         case .application(let reference): items.first { $0.reference.id == reference.id }?.icon
@@ -703,27 +636,18 @@ final class DockStore {
 
     /// Opens or activates an app without applying the app-icon hide toggle.
     func open(_ item: DockItem) {
-        guard !QuarantineStampController.shared.armed else { return }
-        if item.isFavorite { pinWeather?.recordUse(item.id) }
         Analytics.count(.appActivated(Analytics.trigger()))
         let token = session.token
-        let modeID = profiles.modes.activeMode.id
-        let isPatchBaySource = item.isFavorite && !isPreviewingTimeline
         catalog.open(item.reference) { [weak self] error in
             guard let self, session.accepts(token) else { return }
             errorMessage = error
-            if error == nil {
-                applicationOpened?()
-                if isPatchBaySource, !isPreviewingTimeline { patchBayAppOpened?(item.id, modeID) }
-            }
+            if error == nil { applicationOpened?() }
         }
     }
 
     /// Captures this panel's session, not its mutable selection or display index.
     func openDocuments(_ documents: DocumentResourceAccess, with reference: ApplicationReference,
                        source: AnalyticsDocumentSource) {
-        guard !QuarantineStampController.shared.armed else { return }
-        if persistedPins.contains(where: { $0.id == reference.id }) { pinWeather?.recordUse(reference.id) }
         let token = session.token
         let fileCount = documents.urls.count
         let fileType = AnalyticsFileType.common(of: documents.urls)
@@ -738,8 +662,6 @@ final class DockStore {
 
     /// A spring activation may outlive hover, but late failures must not reveal an abandoned target.
     func springOpen(_ item: DockItem, isCurrent: @escaping () -> Bool) {
-        guard !QuarantineStampController.shared.armed else { return }
-        if item.isFavorite { pinWeather?.recordUse(item.id) }
         let token = session.token
         catalog.springOpen(item.reference, isCurrent: { [weak self] in
             self?.session.accepts(token) == true && isCurrent()
@@ -777,7 +699,5 @@ final class DockStore {
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
     func stop() {
-        if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
-        stampObserver = nil
-        previewPins = nil; openLauncher = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

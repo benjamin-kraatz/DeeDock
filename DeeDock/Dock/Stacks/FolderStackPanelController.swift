@@ -76,14 +76,6 @@ final class FolderStackPanelController {
     func close(returnFocus: Bool) { popover.close(returnFocus: returnFocus) }
 
     func open(_ entry: FolderStackEntryReference) {
-        if QuarantineStampController.shared.armed {
-            QuarantineStampController.shared.stamp(id: entry.url.standardizedFileURL.path, url: entry.url, name: entry.name)
-            return
-        }
-        guard !QuarantineStore.shared.blocks(entry.url) else {
-            state.report(String(localized: .quarantineBlocked)) { }
-            return
-        }
         let path = entry.url.path
         let trigger = Analytics.trigger()
         itemOpen?.cancel()

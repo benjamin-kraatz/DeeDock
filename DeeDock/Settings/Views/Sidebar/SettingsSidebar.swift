@@ -16,7 +16,6 @@ struct SettingsSidebar: View {
     }
     private var primary: [SettingsSection] { filtered(SettingsSection.primary) }
     private var features: [SettingsSection] { filtered(SettingsSection.featureSections) }
-    private var showsDeprecated: Bool { SettingsSection.deprecated.matches(searchText) }
 
     /// A display stays listed when its own name matches, or when the query matches a dock page,
     /// since every dock page can be set for that display.
@@ -32,7 +31,7 @@ struct SettingsSidebar: View {
     private var remembered: [DisplayProfile] { profiles.remembered.filter(matches) }
 
     private var isEmpty: Bool {
-        primary.isEmpty && features.isEmpty && !showsDeprecated && connected.isEmpty && remembered.isEmpty
+        primary.isEmpty && features.isEmpty && connected.isEmpty && remembered.isEmpty
     }
 
     var body: some View {
@@ -60,10 +59,6 @@ struct SettingsSidebar: View {
                             .tag(SettingsSection.display(profile.id))
                     }
                 } header: { Text(.displayRememberedGroup) }
-            }
-            // Deprecated sits last and alone so it never reads as one of the current features.
-            if showsDeprecated {
-                Section { rows([.deprecated]) }
             }
             if isEmpty {
                 Text(.settingsNoMatches)

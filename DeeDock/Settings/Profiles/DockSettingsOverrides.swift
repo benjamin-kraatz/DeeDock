@@ -138,7 +138,6 @@ struct DockSettingsOverrides: Codable, Equatable {
         result.secondaryDisplayAppsOnly = defaults.secondaryDisplayAppsOnly
         result.showSessionCapsules = defaults.showSessionCapsules
         result.showTrash = defaults.showTrash
-        result.magneticEdges = defaults.magneticEdges
         result.confirmBeforeEmptyingTrash = defaults.confirmBeforeEmptyingTrash
         result.showVolumes = defaults.showVolumes
         result.showDiskImages = defaults.showDiskImages

@@ -191,11 +191,11 @@ struct DockIslandTests {
         #expect(DockIslandAssignment.spans(slots: collapsed, plan: plan, pinOrder: order).map(\.island.kind) == [.pinned, .running])
     }
 
-    @Test("A pin parked off the dock or lifted into a drag leaves the others in their islands")
+    @Test("A pin missing from the slots or lifted into a drag leaves the others in their islands")
     func filteredPins() {
         let plan = DockIslandPlan(pinnedIslands: [DockIsland(kind: .pinned, pinCount: 2), DockIsland(kind: .custom, pinCount: 2)])
         let order = ["a", "b", "c", "d"]
-        // "a" parked on a magnetic edge: b stays red, c and d stay blue.
+        // "a" is not in the slots: b stays red, c and d stay blue.
         let hidden: [DockRenderSlot] = [app("b", pinned: true), app("c", pinned: true), app("d", pinned: true)]
         let spans = DockIslandAssignment.spans(slots: hidden, plan: plan, pinOrder: order)
         #expect(spans.map(\.range) == [0..<1, 1..<3])

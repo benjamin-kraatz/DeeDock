@@ -14,7 +14,6 @@ struct DockSettingsTests {
         #expect(settings.alongEdgeOffset == 0)
         #expect(settings.edgeDistance == 8)
         #expect(settings.windowPeekEnabled)
-        #expect(settings.magneticEdges)
         #expect(settings.windowPeekSize == .medium)
         #expect(settings.windowPeekLayout == .grid)
         #expect(settings.windowPeekStyle == .glass)
@@ -56,17 +55,15 @@ struct DockSettingsTests {
         #expect(WindowPeekPreset.matching(decoded) == .balanced)
     }
 
-    @Test("Settings saved before magnetic edges keep the snap-on default")
-    func magneticEdgesBackwardDecode() throws {
+    @Test("Settings saved with a removed feature's key still decode")
+    func removedFeatureKeyDecodes() throws {
         let encoded = try JSONEncoder().encode(DockSettings.defaults)
         var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
-        object.removeValue(forKey: "magneticEdges")
+        // Magnetic Edges was removed in DEE-149; older documents still carry its switch.
+        object["magneticEdges"] = true
         let decoded = try JSONDecoder().decode(DockSettings.self,
             from: JSONSerialization.data(withJSONObject: object))
-        #expect(decoded.magneticEdges)
-        var disabled = DockSettings.defaults
-        disabled.magneticEdges = false
-        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(disabled)) == disabled)
+        #expect(decoded == DockSettings.defaults)
     }
 
     @Test("Settings saved before Radar app names keep the names hidden")

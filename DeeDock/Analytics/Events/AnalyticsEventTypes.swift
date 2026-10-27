@@ -150,10 +150,6 @@ nonisolated enum AnalyticsAppMeltAction: String, AnalyticsToken {
     case setupOpened = "setup_opened", created, restored, minimized, closed, unpaired, layoutChanged = "layout_changed"
 }
 
-nonisolated enum AnalyticsPatchBayAction: String, AnalyticsToken {
-    case connected, disconnected, ranAutomatically = "ran_automatically", ranManually = "ran_manually"
-}
-
 nonisolated enum AnalyticsClipboardMuseumAction: String, AnalyticsToken {
     case opened, restored, removed, cleared, slideshowStarted = "slideshow_started", exported
 }

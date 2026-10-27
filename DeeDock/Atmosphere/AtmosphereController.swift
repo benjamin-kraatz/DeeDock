@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Owns Atmosphere independently of dock visibility, Dock Modes, bubbles, and Sims.
+/// Owns Atmosphere independently of dock visibility, Dock Modes, and bubbles.
 /// All geometry uses AppKit points; only window-list bounds cross from Quartz coordinates.
 @MainActor
 final class AtmosphereController {

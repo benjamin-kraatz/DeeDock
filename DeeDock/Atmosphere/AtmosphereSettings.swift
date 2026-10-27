@@ -58,7 +58,7 @@ struct AtmosphereSettings: Codable, Equatable {
     }
 }
 
-/// Slider bounds and the wash derived from them. Intensity never shares a cap with Sims or soap bubbles.
+/// Slider bounds and the wash derived from them. Intensity never shares a cap with soap bubbles.
 enum AtmosphereLimits {
     static let defaultIntensity = 0.5
     static let intensityRange = 0.0...1.0

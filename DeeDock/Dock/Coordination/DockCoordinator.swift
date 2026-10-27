@@ -6,17 +6,14 @@ import Observation
 @MainActor @Observable
 final class DockCoordinator {
     let localHistory = DockLocalHistoryStore()
-    let pinWeather = PinWeatherStore()
     let clipboardMuseum = ClipboardMuseumController()
     /// Collected notification banners, shared by every display's feed tile and Settings.
     let notificationFeed = NotificationFeedController()
     /// DOKK's plugins: discovery, pins, and one session per pinned plugin, shared by every dock and Settings.
     let plugins = DockPluginController()
-    let sims = DockSimsStore()
     let timeline: DockTimelineController
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
-    let patchBay: PatchBayController
     let recipes: WorkspaceRecipeCoordinator
     @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
     let watchPresets = WindowWatchPresetStore()
@@ -158,7 +155,6 @@ final class DockCoordinator {
         self.settings = settings
         profiles = DisplayProfilesStore(defaults: settings, repository: DisplayProfilesRepository(),
                                          modesRepository: DockModesRepository())
-        patchBay = PatchBayController(profiles: profiles)
         let applicationService = ApplicationService()
         let backgroundApplications = BackgroundApplicationMonitor()
         // The feature is silent when macOS's background state cannot be read; only this count records it.
@@ -236,7 +232,6 @@ final class DockCoordinator {
         recipeProgress.openSettings = { [weak self] in self?.settingsModesRequest = true }
         watchPresets.start()
         localHistory.start()
-        pinWeather.start()
         clipboardMuseum.start()
         clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
         if clipboardMuseum.store.captureEnabled || !clipboardMuseum.store.exhibits.isEmpty {
@@ -285,14 +280,6 @@ final class DockCoordinator {
             }
         }
         discovery.start()
-        sims.start()
-        DeprecatedFeaturesRetirement.disableEnabledFlags(
-            sims: sims,
-            pinWeather: pinWeather,
-            quarantine: .shared,
-            patchBay: patchBay,
-            dockSettings: settings
-        )
         badgeMemory.start()
         appMelt.compareWindows = { [weak self] pair, windows in
             guard let self else { return }
@@ -343,7 +330,6 @@ final class DockCoordinator {
             }
             windowPeeks.showKeyboard(item, on: panel, documents: documents)
         }
-        dragging.magnetismEnabled = { [weak self] in self?.settings.value.magneticEdges ?? true }
         dragging.springDragEnded = { [weak self] in
             self?.folderStacks.dragEnded()
             self?.windowPeeks.endFileDrag()
@@ -489,7 +475,6 @@ final class DockCoordinator {
                 self?.windowPeeks.close(returnFocus: false)
                 self?.modePicker.close(returnFocus: false)
                 self?.applicationMenus.cancelAllDiscoveries()
-                self?.patchBay.stop()
                 self?.panels.values.forEach { $0.suspendIdleFading() }
             } })
         }
@@ -527,7 +512,6 @@ final class DockCoordinator {
         let knownProfiles = Set(profiles.document.profiles.keys)
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
         reportDisplayChange(displays, knownProfiles: knownProfiles)
-        patchBay.reconcile()
         atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
@@ -546,8 +530,7 @@ final class DockCoordinator {
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, volumes: volumes, capsules: capsules, actions: actionTiles,
-                                  history: localHistory, pinWeather: pinWeather,
-                                  islands: islandPlans)
+                                  history: localHistory, islands: islandPlans)
             store.appMelt = appMelt
             store.refresh()
             appMelt.changed = { [weak self] in
@@ -562,8 +545,6 @@ final class DockCoordinator {
             panel.interaction.appMelt = appMelt
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
-            panel.interaction.pinWeather = pinWeather
-            panel.interaction.sims = sims
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
@@ -604,9 +585,6 @@ final class DockCoordinator {
             store.applicationOpened = { [weak self] in
                 self?.windowPeeks.close(returnFocus: false)
                 if self?.focusedID == display.id { self?.endFocus(restore: false) }
-            }
-            store.patchBayAppOpened = { [weak self] appID, modeID in
-                self?.patchBay.appOpened(appID, displayID: display.id, modeID: modeID)
             }
             store.soapBubblePlay = { [weak panel] itemID in
                 panel?.interaction.soapBubbles.play(
@@ -659,7 +637,6 @@ final class DockCoordinator {
             }
             panel.interaction.openFolder = { [weak self, weak panel] folder, keyboard in
                 guard let self, let panel, panels[display.id] === panel else { return }
-                if !folder.isDownloads { pinWeather.recordUse(folder.id) }
                 folderStacks.show(folder, on: panel, keyboard: keyboard)
             }
             panel.interaction.stageFolderOnShelf = { [weak panel] folder in
@@ -673,7 +650,6 @@ final class DockCoordinator {
             }
             panel.interaction.openFolderInHub = { [weak self, weak panel] folder in
                 guard let self, folder.isAvailable else { return }
-                if !folder.isDownloads { pinWeather.recordUse(folder.id) }
                 let access = FolderResourceAccess(folder.reference)
                 guard access.isAvailable else {
                     panel?.store.errorMessage = .folderStackUnavailable
@@ -761,9 +737,6 @@ final class DockCoordinator {
         dragging.setPanels(panels)
         for (id, panel) in panels {
             panel.store.pinDestinations = enabledDisplays.filter { $0.id != id }.map { DockPinDestination(id: $0.id, name: $0.name) }
-            panel.store.willMutateFavoriteIDs = { [weak self] ids in
-                self?.dragging.forgetPlacements(ids, on: id)
-            }
         }
         refreshPanels(resetVisibility: resetVisibility)
     }
@@ -797,13 +770,11 @@ final class DockCoordinator {
         notificationFeed.configure(enabled: settings.value.showNotificationFeed && !enabledDisplays.isEmpty)
         if !settings.value.showNotificationFeed { notificationFeedPopover.close() }
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
-        dragging.applyMagneticPinHiding()
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }
             panel.interaction.badges = badges
             panel.interaction.notificationFeed = notificationFeed
             panel.interaction.plugins = plugins
-            panel.interaction.sims = sims
             panel.interaction.updateAwareness = updateAwareness
             panel.store.configureUpdateTile(updateAwareness?.dockItem)
             panel.store.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
@@ -827,8 +798,6 @@ final class DockCoordinator {
         }
         catalog.pruneIcons(items: panels.values.flatMap { $0.store.items },
                            folders: panels.values.flatMap { $0.store.folders })
-        pinWeather.synchronize(pinIDs: Set(profiles.pinLists.values.flatMap { $0.map(\.id) }))
-        dragging.syncMagneticChrome()
     }
     private func updatePointers(eventType: NSEvent.EventType) {
         let wasOverDock = panels.values.contains { $0.interaction.pointer != nil }
@@ -1262,7 +1231,6 @@ final class DockCoordinator {
         folderStacks.stop()
         shelves.stop()
         actionTiles.stop()
-        patchBay.stop()
         recipes.stop()
         recipeProgress.stop()
         watchPresets.stop()

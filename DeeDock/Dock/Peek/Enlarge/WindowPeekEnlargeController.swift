@@ -369,7 +369,7 @@ final class WindowPeekEnlargeController {
     private var blocked: Bool {
         guard let state = peek?.state else { return true }
         return state.routingFiles || state.portalDragging || state.actionBusy || state.actionMenuTracking
-            || state.phase != .windows || QuarantineStampController.shared.armed || externallyBlocked()
+            || state.phase != .windows || externallyBlocked()
     }
 
     private func present(_ token: ApplicationWindowToken) {

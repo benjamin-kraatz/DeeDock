@@ -22,12 +22,7 @@ struct SettingsLinkRow: View {
                         }
                     }
                 VStack(alignment: .leading, spacing: 2) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(page.title)
-                        if page.isDeprecated {
-                            DeprecatedFeatureBadge()
-                        }
-                    }
+                    Text(page.title)
                     if let subtitle = page.subtitle {
                         Text(subtitle)
                             .font(.caption)
@@ -57,8 +52,7 @@ struct SettingsLinkRow: View {
     }
 
     private var accessibilityValue: Text {
-        if page.isDeprecated { return Text(.settingsDeprecated) }
-        return status.map { Text($0) } ?? Text(verbatim: "")
+        status.map { Text($0) } ?? Text(verbatim: "")
     }
 }
 
@@ -93,8 +87,8 @@ struct SettingsLinkCard: View {
     .frame(width: 640, height: 480)
 }
 
-#Preview("Deprecated rows — German, dark") {
-    SettingsLinkCard(pages: SettingsPage.deprecatedPages, open: { _ in })
+#Preview("Overview rows — German, dark") {
+    SettingsLinkCard(pages: SettingsSection.suggestionsHistory.pageGroups.flatMap(\.self), open: { _ in })
         .padding(24)
         .frame(width: SettingsMetrics.columnWidth)
         .environment(\.locale, Locale(identifier: "de"))

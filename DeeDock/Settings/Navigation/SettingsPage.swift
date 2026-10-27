@@ -5,8 +5,7 @@ import SwiftUI
 /// This mirrors how System Settings works: the sidebar picks a section, the section's overview
 /// lists its pages, and a page holds the controls. Adding a page means adding a case here, its
 /// copy to the string catalog, listing it in a section's `pageGroups`, and giving it content in
-/// `SettingsPageView`. Deprecated personality pages also belong in `deprecatedPages`, which the
-/// sidebar's Deprecated section lists.
+/// `SettingsPageView`.
 ///
 /// The `dock` cases are the display-scopable ones: every control they show writes through a
 /// `SettingsOverrideContext` when a display profile is being edited, so the same page serves both
@@ -38,29 +37,16 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case windowPeek
     case harbor
     case robi
-    case patchBay
     case actionTiles
     case multipleDisplays
     case permissions
     case appSuggestions
     case localHistory
-    case pinWeather
     case clipboardMuseum
-    case magneticEdges
-    case sims
     case discovery
     case soapBubbles
-    case quarantine
 
     var id: Self { self }
-
-    /// Personality features slated for removal in 1.0.0. Launch turns their enable flags off.
-    static let deprecatedPages: [SettingsPage] = [
-        .sims, .pinWeather, .quarantine, .patchBay, .magneticEdges
-    ]
-
-    /// True for the Deprecated sidebar section and the shared 1.0.0 removal notice.
-    var isDeprecated: Bool { Self.deprecatedPages.contains(self) }
 
     /// Which family of content a page belongs to, so the detail view can hand it to the one view
     /// that knows how to build it.
@@ -75,9 +61,8 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor, .robi,
-             .patchBay, .actionTiles, .multipleDisplays, .permissions,
-             .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
-             .discovery, .quarantine: .features
+             .actionTiles, .multipleDisplays, .permissions,
+             .appSuggestions, .localHistory, .clipboardMuseum, .soapBubbles, .discovery: .features
         }
     }
 
@@ -114,18 +99,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .windowPeekTitle
         case .harbor: .harborName
         case .robi: .robiSettingsTitle
-        case .patchBay: .patchBayTitle
         case .actionTiles: .actionsTitle
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
-        case .pinWeather: .pinWeatherTitle
         case .clipboardMuseum: .clipboardMuseumTitle
-        case .magneticEdges: .settingsMagneticEdges
-        case .sims: .simsTitle
         case .discovery: .discoveryTitle
         case .soapBubbles: .soapBubblesTitle
-        case .quarantine: .quarantineTitle
         case .permissions: .windowPeekPermissionsTitle
         }
     }
@@ -153,18 +133,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .settingsFeaturePeekSubtitle
         case .harbor: .harborSettingsSubtitle
         case .robi: .robiSettingsSubtitle
-        case .patchBay: .patchBaySubtitle
         case .actionTiles: .settingsFeatureActionsSubtitle
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
-        case .pinWeather: .settingsFeaturePinWeatherSubtitle
         case .clipboardMuseum: .settingsFeatureClipboardMuseumSubtitle
-        case .magneticEdges: .settingsFeatureMagneticSubtitle
-        case .sims: .settingsFeatureSimsSubtitle
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
-        case .quarantine: .settingsFeatureQuarantineSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
         default: nil
         }
@@ -194,18 +169,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .symbol("macwindow.on.rectangle")
         case .harbor: .symbol("rectangle.3.group.fill")
         case .robi: .symbol("face.smiling.inverse")
-        case .patchBay: .symbol("point.3.connected.trianglepath.dotted")
         case .actionTiles: .symbol("bolt.fill")
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
-        case .pinWeather: .symbol("leaf.fill")
         case .clipboardMuseum: .symbol("building.columns.fill")
-        case .magneticEdges: .symbol("arrow.up.and.down.and.arrow.left.and.right")
-        case .sims: .symbol("heart.fill")
         case .discovery: .symbol("lightbulb.fill")
         case .soapBubbles: .symbol("circle.dotted")
-        case .quarantine: .symbol("seal.fill")
         case .permissions: .symbol("lock.fill")
         }
     }
@@ -233,18 +203,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: Color(red: 0.24, green: 0.50, blue: 0.94)
         case .harbor: Color(red: 0.30, green: 0.36, blue: 0.62)
         case .robi: Color(red: 0.36, green: 0.30, blue: 0.62)
-        case .patchBay: .teal
         case .actionTiles: Color(red: 0.60, green: 0.34, blue: 0.90)
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
-        case .pinWeather: Color(red: 0.62, green: 0.40, blue: 0.24)
         case .clipboardMuseum: Color(red: 0.66, green: 0.52, blue: 0.30)
-        case .magneticEdges: Color(red: 0.18, green: 0.58, blue: 0.78)
-        case .sims: Color(red: 0.92, green: 0.42, blue: 0.58)
         case .discovery: .teal
         case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
-        case .quarantine: Color(red: 0.78, green: 0.27, blue: 0.16)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
         }
     }
@@ -272,18 +237,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: [Color(red: 0.44, green: 0.68, blue: 1.0), Color(red: 0.14, green: 0.36, blue: 0.88)]
         case .harbor: [Color(red: 0.42, green: 0.47, blue: 0.70), Color(red: 0.12, green: 0.14, blue: 0.24)]
         case .robi: [Color(red: 0.62, green: 0.54, blue: 0.92), Color(red: 0.20, green: 0.16, blue: 0.36)]
-        case .patchBay: [.mint, .teal]
         case .actionTiles: [Color(red: 0.78, green: 0.54, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.84)]
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
-        case .pinWeather: [Color(red: 0.86, green: 0.62, blue: 0.38), Color(red: 0.48, green: 0.28, blue: 0.16)]
         case .clipboardMuseum: [Color(red: 0.90, green: 0.78, blue: 0.52), Color(red: 0.56, green: 0.42, blue: 0.22)]
-        case .magneticEdges: [Color(red: 0.42, green: 0.84, blue: 0.96), Color(red: 0.10, green: 0.46, blue: 0.72)]
-        case .sims: [Color(red: 1.0, green: 0.62, blue: 0.72), Color(red: 0.86, green: 0.22, blue: 0.46)]
         case .discovery: [.mint, .teal]
         case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
-        case .quarantine: [Color(red: 0.92, green: 0.46, blue: 0.34), Color(red: 0.62, green: 0.18, blue: 0.12)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
         }
     }
@@ -292,20 +252,15 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     /// not only by its title.
     private var keywords: LocalizedStringResource {
         switch self {
-        case .patchBay: .patchBayHelp
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
-        case .pinWeather: .pinWeatherSettingsKeywords
         case .clipboardMuseum: .clipboardMuseumSettingsKeywords
-        case .magneticEdges: .settingsMagneticEdgesKeywords
-        case .sims: .simsSettingsKeywords
         case .discovery: .discoverySettingsHelp
         case .notificationFeed: .notificationFeedSettingsKeywords
         case .islands: .islandsSettingsKeywords
         case .harbor: .harborSettingsKeywords
         case .robi: .robiSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
-        case .quarantine: .quarantineSettingsHelp
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords
@@ -322,7 +277,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return true }
         let copy: [LocalizedStringResource] = [title, keywords]
-            + (isDeprecated ? [.settingsDeprecated, .settingsDeprecatedFeatureNotice] : [])
             + (self == .about || self == .softwareUpdate ? Self.aboutKeywords : [])
         return copy.contains { String(localized: $0).localizedStandardContains(query) }
     }

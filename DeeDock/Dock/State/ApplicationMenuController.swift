@@ -107,15 +107,9 @@ final class ApplicationMenuController {
                  for item: DockItem,
                  outcome completion: @escaping (ApplicationMenuOutcome) -> Void) -> UUID? {
         if action == .stopRunningInBackground {
-            // Ahead of the quarantine check, which would show a banner: this feature never
-            // shows one, and ending leftover processes does not run the app. A stop that cannot
-            // be requested is skipped silently, and the tile keeps its muted state.
+            // This feature never shows a banner. A stop that cannot be requested is skipped
+            // silently, and the tile keeps its muted state.
             completion(applications.stopRunningInBackground(item.reference) ? .succeeded : .skipped)
-            return nil
-        }
-        guard !QuarantineStore.shared.contains(item.id, url: item.resolvedURL ?? item.reference.url),
-              !QuarantineStore.shared.unreadable else {
-            completion(.failed(.quarantineBlocked))
             return nil
         }
         switch action {

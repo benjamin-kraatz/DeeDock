@@ -12,10 +12,6 @@ struct DockFolderButton: View {
     @AccessibilityFocusState private var accessibilityFocused: Bool
 
     private var primaryAction: () -> Void { { interaction.openFolder?(item, false) } }
-    private var pinWeatherSample: PinWeatherSample? {
-        guard !item.isDownloads, let weather = interaction.pinWeather else { return nil }
-        return weather.sample(for: item.id)
-    }
     private var artworkOpacity: Double {
         DockAppearanceOpacity(settings: interaction.idleFade.settings,
             idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons
@@ -28,7 +24,6 @@ struct DockFolderButton: View {
                                  keyboardSelected: selected, artworkOpacity: artworkOpacity,
                                  artworkAnimation: interaction.idleFade.animation,
                                  lineIcon: interaction.lineIcon(for: .folder))
-                .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay(alignment: .bottomTrailing) {
                     Image(systemName: "square.stack.3d.up.fill")
                         .font(.system(size: max(10, size * 0.22), weight: .semibold))
@@ -92,6 +87,5 @@ struct DockFolderButton: View {
                 }
             }
         }
-        .modifier(QuarantineItemModifier(id: item.id, url: item.reference.url, name: item.reference.name))
     }
 }

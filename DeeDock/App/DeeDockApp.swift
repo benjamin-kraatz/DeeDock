@@ -64,7 +64,6 @@ struct DeeDockApp: App {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
                 Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
-                QuarantineMenu()
                 OpenSystemSettingsCloneButton()
             } header: { Text(.menuSectionTools) }
             Divider()

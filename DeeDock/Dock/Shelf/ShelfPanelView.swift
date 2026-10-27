@@ -104,7 +104,6 @@ struct ShelfPanelView: View {
                 if state.sort != .smart { presentationControl }
             }
             if !state.showingCompost {
-                QuarantineToolbarButton()
                 Button(.shelfClear) { state.clearAll?() }
                     .controlSize(.small)
                     .disabled(state.isEmpty)
@@ -443,7 +442,6 @@ private struct ShelfItemBehavior: ViewModifier {
                 }
                 Button(.shelfRemove) { state.removeItems?([entry.id]) }
             }
-            .modifier(QuarantineItemModifier(id: entry.id.uuidString, url: entry.item.url, name: entry.item.name))
     }
 }
 

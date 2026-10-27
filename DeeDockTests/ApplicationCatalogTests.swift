@@ -37,10 +37,7 @@ struct ApplicationCatalogTests {
         let catalog = ApplicationCatalog(service: service)
         let reference = DisplayFixtures.app("app")
 
-        catalog.performPrimaryAction(reference) { error, opened in
-            #expect(error == nil)
-            #expect(opened)
-        }
+        catalog.performPrimaryAction(reference) { error in #expect(error == nil) }
         await service.waitForRequest()
         #expect(service.primaryRequests == 1)
         #expect(service.openRequests == 0)
@@ -103,9 +100,8 @@ struct ApplicationCatalogTests {
         let catalog = ApplicationCatalog(service: service)
         let reference = DisplayFixtures.app("app")
         await withCheckedContinuation { completed in
-            catalog.performPrimaryAction(reference) { error, opened in
+            catalog.performPrimaryAction(reference) { error in
                 #expect(error == nil)
-                #expect(!opened)
                 completed.resume()
             }
             Task {

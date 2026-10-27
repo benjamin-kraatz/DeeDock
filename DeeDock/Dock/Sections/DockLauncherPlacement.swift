@@ -55,8 +55,8 @@ enum LauncherDockPosition: Hashable, Codable, Sendable {
 enum DockLauncherPlacement {
     /// Inserts the launcher into `content`, which must not already contain it.
     ///
-    /// An anchor pin that is hidden here (parked on a magnetic edge, or not on this display's list
-    /// at all) falls back to the nearest earlier pin that is visible, then to `start`. A collapsed or
+    /// An anchor pin that is not shown here (for example, one that is not on this display's list)
+    /// falls back to the nearest earlier pin that is visible, then to `start`. A collapsed or
     /// hidden pinned section has no visible pins, so the launcher leads.
     /// - Parameter pinOrder: This display's full pin ID order, including pins not shown in `content`.
     static func entries(_ content: [DockRenderSlot], position: LauncherDockPosition, pinOrder: [String]) -> [DockRenderSlot] {
