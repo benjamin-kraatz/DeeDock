@@ -1,3 +1,4 @@
+import ApplicationServices
 import CoreGraphics
 import Foundation
 
@@ -21,6 +22,10 @@ nonisolated struct RobiContext: @unchecked Sendable {
     /// What Robi read, with where each piece sits in the window, so the answer can point at it.
     /// Empty for a selection.
     var landmarks: [RobiLandmark] = []
+    /// The Accessibility elements a proposed step may act on, by landmark number. Only landmarks
+    /// read from the accessibility tree have one; recognized text never does. Kept as long as
+    /// the context, including while its answer is set aside, and released with it.
+    var elements: [Int: AXUIElement] = [:]
     /// The window's size when the context was read, in points. Zero for a selection.
     var windowSize: CGSize = .zero
     /// The whole window's picture was taken because its accessibility text was too thin, not
@@ -28,11 +33,12 @@ nonisolated struct RobiContext: @unchecked Sendable {
     var pictureIsFallback = false
 
     init(kind: RobiContextKind, text: String, image: CGImage? = nil, landmarks: [RobiLandmark] = [],
-         windowSize: CGSize = .zero, pictureIsFallback: Bool = false) {
+         elements: [Int: AXUIElement] = [:], windowSize: CGSize = .zero, pictureIsFallback: Bool = false) {
         self.kind = kind
         self.text = text
         self.image = image
         self.landmarks = landmarks
+        self.elements = elements
         self.windowSize = windowSize
         self.pictureIsFallback = pictureIsFallback
     }
@@ -89,6 +95,6 @@ nonisolated enum RobiIntent: String, CaseIterable, Sendable {
         }
     }
 
-    /// The agent gets the app's menu commands and may propose one.
+    /// The agent gets the app's menu commands and the window's controls, and may propose steps.
     var canAct: Bool { self == .doIt || self == .suggested || self == .custom }
 }

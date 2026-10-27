@@ -51,8 +51,9 @@ private struct RobiPill: View {
     }
 }
 
-/// The accent-filled button for the one action a card leads with: running a proposed command,
-/// or using a pasted API key.
+/// The accent-filled button for the one action a notice leads with, such as using a pasted API
+/// key. The Run button has its own chip, `RobiRunChipStyle`, which stays lit while disabled for
+/// the run and recolours with the result.
 ///
 /// Not `.borderedProminent`: Robi's panel belongs to an app that is never active, and AppKit
 /// draws prominent buttons grey in windows that are not key in the active app.
@@ -102,9 +103,9 @@ private struct RobiProminentButton: View {
         HStack {
             Button {} label: { Label { Text(.robiSuggestSummarize) } icon: { Image(systemName: "text.alignleft") } }
                 .buttonStyle(RobiPillStyle(dark: true, reduceMotion: false))
-            Button {} label: { Label { Text(.robiRunCommand("Shell > New Tab")) } icon: { Image(systemName: "play.fill") } }
+            Button {} label: { Text(.robiKeyUse) }
                 .buttonStyle(RobiProminentButtonStyle(reduceMotion: false))
-            Button {} label: { Label { Text(.robiRunCommand("Shell > New Tab")) } icon: { Image(systemName: "play.fill") } }
+            Button {} label: { Text(.robiKeyUse) }
                 .buttonStyle(RobiProminentButtonStyle(reduceMotion: false))
                 .disabled(true)
         }

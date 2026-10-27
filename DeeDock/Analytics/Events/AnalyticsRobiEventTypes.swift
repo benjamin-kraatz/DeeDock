@@ -67,7 +67,7 @@ nonisolated enum AnalyticsRobiIntent: String, AnalyticsToken {
 nonisolated enum AnalyticsRobiOutcome: String, AnalyticsToken {
     /// A text answer arrived.
     case answered
-    /// The model proposed a menu command.
+    /// The model proposed one or more steps.
     case proposed
     /// The model or the network failed.
     case failed
@@ -82,7 +82,18 @@ nonisolated enum AnalyticsRobiOutcome: String, AnalyticsToken {
 /// What the person did with a Robi answer.
 nonisolated enum AnalyticsRobiAction: String, AnalyticsToken {
     case copy, replace, paste
+    /// Clicked Run on the proposed steps, whether or not all of them ran.
     case runCommand = "run_command"
     /// Clicked a reference in the answer, which spotlights it on the window.
     case point
+}
+
+/// How many steps of each kind a Robi run held.
+nonisolated struct AnalyticsRobiStepCounts: Equatable, Sendable {
+    var menu = 0
+    var press = 0
+    var toggle = 0
+    var type = 0
+
+    var total: Int { menu + press + toggle + type }
 }

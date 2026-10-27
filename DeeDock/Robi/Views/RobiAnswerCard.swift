@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The card that drops into the window under the prompt bar: the streaming answer, a proposed
-/// command, the actions that put the answer back into the app, and which model answered.
+/// The card that drops into the window under the prompt bar: the streaming answer, the steps the
+/// model proposed, the actions that put the answer back into the app, and which model answered.
 struct RobiAnswerCard: View {
     let model: RobiModel
     let actions: RobiActions
@@ -15,9 +15,9 @@ struct RobiAnswerCard: View {
                     .transition(.opacity)
             } else {
                 RobiAnswerText(model: model, pacer: pacer, point: actions.point)
-                if let proposal = model.proposal {
-                    RobiProposalButton(proposal: proposal, isReady: model.phase == .answered,
-                                       reduceMotion: model.reduceMotion, run: actions.runProposal)
+                if let proposal = model.proposal, !proposal.steps.isEmpty {
+                    RobiProposalView(proposal: proposal, runState: model.runState, isReady: model.phase == .answered,
+                                     reduceMotion: model.reduceMotion, run: actions.runProposal)
                         .transition(model.reduceMotion ? .opacity : .scale(scale: 0.9, anchor: .leading).combined(with: .opacity))
                 }
                 RobiAnswerActions(model: model, actions: actions)
@@ -73,7 +73,7 @@ private struct RobiAnswerText: View {
                 .frame(height: 20)
                 .transition(.opacity)
             } else {
-                RobiAnswerScroll(pacer: pacer, markdown: markdown, reduceMotion: model.reduceMotion, point: point)
+                RobiAnswerScroll(pacer: pacer, markdown: markdown, maxHeight: maxHeight, reduceMotion: model.reduceMotion, point: point)
                     .transition(.opacity)
                 if model.isStopped {
                     RobiStoppedLabel()
@@ -83,6 +83,18 @@ private struct RobiAnswerText: View {
         }
         .onChange(of: input, initial: true) { pacer.update(input) }
         .onDisappear { pacer.pause() }
+    }
+
+    /// The card's height is fixed (`RobiMetrics.cardHeight`, 320), so a proposal takes its room
+    /// from the answer, which is one short sentence then anyway.
+    ///
+    /// Of the 320, the padding (28), the three gaps (30), the actions row (about 20) and the footer
+    /// (about 14) are spoken for, leaving 228 for the answer and the proposal together; 218 keeps
+    /// ten in hand for the rows' font metrics. Without a proposal the mockup's 190 stands, and a
+    /// single step's button fits in the same budget.
+    private var maxHeight: CGFloat {
+        guard let count = model.proposal?.steps.count, count > 0 else { return 190 }
+        return 218 - RobiProposalView.height(stepCount: count)
     }
 }
 
@@ -110,12 +122,11 @@ private struct RobiAnswerScroll: View {
     let pacer: RobiTextPacer
     /// The formatted answer the pacer's text is a prefix of: its blocks, styles and references.
     let markdown: RobiMarkdown
+    let maxHeight: CGFloat
     let reduceMotion: Bool
     let point: (Int) -> Void
     /// Starts at zero for each answer: the view is rebuilt whenever the revealed text empties.
     @State private var textHeight: CGFloat = 0
-
-    private static let maxHeight: CGFloat = 190
 
     var body: some View {
         ScrollView {
@@ -132,9 +143,9 @@ private struct RobiAnswerScroll: View {
                 .help(markdown.references.isEmpty ? Text(verbatim: "") : Text(.robiReferenceHelp))
         }
         // `.never`, unlike `.hidden`, also holds when scroll bars are set to always show.
-        .scrollIndicators(textHeight > Self.maxHeight ? .automatic : .never)
+        .scrollIndicators(textHeight > maxHeight ? .automatic : .never)
         .scrollBounceBehavior(.basedOnSize)
-        .frame(height: min(textHeight, Self.maxHeight))
+        .frame(height: min(textHeight, maxHeight))
         // A reference's link spotlights its landmark on the window and never opens anything. Only
         // web and mail links, which the parser alone turns into links, open in their app.
         .environment(\.openURL, OpenURLAction { url in
@@ -144,24 +155,6 @@ private struct RobiAnswerScroll: View {
             }
             return ["http", "https", "mailto"].contains(url.scheme?.lowercased() ?? "") ? .systemAction : .discarded
         })
-    }
-}
-
-/// The menu command the model proposed. Nothing runs until it is clicked, and not before the
-/// answer is complete.
-private struct RobiProposalButton: View {
-    let proposal: RobiProposal
-    let isReady: Bool
-    let reduceMotion: Bool
-    let run: () -> Void
-
-    var body: some View {
-        Button(action: run) {
-            Label { Text(.robiRunCommand(proposal.path)) } icon: { Image(systemName: "play.fill") }
-                .lineLimit(1)
-        }
-        .buttonStyle(RobiProminentButtonStyle(reduceMotion: reduceMotion))
-        .disabled(!isReady)
     }
 }
 

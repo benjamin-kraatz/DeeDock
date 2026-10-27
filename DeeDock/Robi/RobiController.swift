@@ -54,7 +54,12 @@ final class RobiController {
     @ObservationIgnored private var presenceTask: Task<Void, Never>?
     @ObservationIgnored private var tintTask: Task<Void, Never>?
     @ObservationIgnored private var contextTask: Task<Void, Never>?
-    @ObservationIgnored private var menuTask: Task<[String], Never>?
+    /// Reads the app's menu bar once per interaction, as soon as Robi is summoned.
+    @ObservationIgnored private var menuTask: Task<RobiMenuCatalog, Never>?
+    /// Runs the proposed steps after the person clicked Run.
+    @ObservationIgnored private var runTask: Task<Void, Never>?
+    /// The pinned window lost focus while steps ran; Robi closes when the run ends.
+    @ObservationIgnored private var leftDuringRun = false
     @ObservationIgnored private var answerTask: Task<Void, Never>?
     /// Asks the on-device model for suggested questions while the prompt bar is open. Cancelled
     /// as soon as the prompt closes: a question is asked, Robi is dismissed, or the interaction ends.
@@ -691,7 +696,7 @@ final class RobiController {
         tracker.isPinned = true
         didUse()
         let pid = target.processIdentifier
-        menuTask = Task { await RobiMenuCommands.list(processIdentifier: pid) }
+        menuTask = Task { await RobiMenuCommands.read(processIdentifier: pid) }
         if let found = RobiSelectionReader.selection(processIdentifier: pid) { return useSelection(found) }
         if let application = NSRunningApplication(processIdentifier: pid) { webChange = RobiWebAccessibility.enable(for: application) }
         if wholeWindow { return takeWindow() }
@@ -773,7 +778,7 @@ final class RobiController {
         model.canAttachPicture = canCapture
         contextTask = Task { [weak self, capture] in
             let reading = await RobiWindowText.read(processIdentifier: target.processIdentifier)
-            var text = reading.text, landmarks = reading.landmarks
+            var text = reading.text, landmarks = reading.landmarks, elements = reading.elements
             let isThin = text.count < 200
             var image: CGImage?
             if isThin || attach, canCapture, let picture = await capture.image(windowID: target.windowID) {
@@ -784,11 +789,13 @@ final class RobiController {
                     if recognized.count > text.count {
                         text = recognized
                         landmarks = RobiLandmark.recognized(lines, in: CGRect(origin: .zero, size: target.frame.size))
+                        // Recognized lines are numbered afresh and have no elements behind them.
+                        elements = [:]
                     }
                 }
             }
             guard !Task.isCancelled, let self else { return }
-            self.model.context = RobiContext(kind: .window, text: text, image: image, landmarks: landmarks,
+            self.model.context = RobiContext(kind: .window, text: text, image: image, landmarks: landmarks, elements: elements,
                                              windowSize: target.frame.size, pictureIsFallback: isThin && image != nil)
             self.model.isReadingContext = false
             self.suggestQuestions()
@@ -923,15 +930,21 @@ final class RobiController {
         let trace = trace
         answerTask = Task { [weak self, agent, contextTask, menuTask] in
             await contextTask?.value
-            let commands = acts ? await menuTask?.value ?? [] : []
+            let catalog = acts ? await menuTask?.value ?? .empty : .empty
             // Read through the generation: the answer may have been set aside while it waited.
             guard !Task.isCancelled, let self, let exchange = self.exchange(generation) else { return }
             let request = RobiAgent.Request(intent: intent, text: text, context: exchange.context,
-                                            applicationName: target.applicationName, menuCommands: commands, trace: trace)
+                                            applicationName: target.applicationName, menu: catalog, canAct: acts, trace: trace)
             var failure: Error?
             do {
                 try await agent.answer(request, model: agentModel,
-                                       propose: { [weak self] path in self?.receive(generation) { $0.proposal = RobiProposal(path: path) } },
+                                       // Each proposal holds every step so far. They hop to the main actor
+                                       // separately, so a late, shorter one must not undo a newer one.
+                                       propose: { [weak self] proposal in
+                                           self?.receive(generation) { exchange in
+                                               if proposal.steps.count > exchange.proposal?.steps.count ?? 0 { exchange.proposal = proposal }
+                                           }
+                                       },
                                        update: { [weak self] snapshot in self?.receive(generation) { $0.answer = snapshot } })
             } catch is CancellationError {
                 return
@@ -1085,13 +1098,59 @@ final class RobiController {
         }
     }
 
+    /// Runs the proposed steps in order, pausing between them so the app can react. The first
+    /// step that cannot run stops the chain and the card says which; the rest are skipped. Robi
+    /// closes a moment after every step ran, so the chip's check can be seen.
+    ///
+    /// A step may move focus, such as a command that opens a window. The run keeps going in the
+    /// app it started in, and `leftWindow(_:)` waits for it before closing Robi.
     private func runProposal() {
-        guard let proposal = model.proposal, let target = tracker.target else { return }
-        let pressed = RobiMenuCommands.press(processIdentifier: target.processIdentifier, path: proposal.path)
-        flash(pressed ? .robiToastDone : .robiToastCommandMissing)
-        guard pressed else { return }
+        guard let proposal = model.proposal, model.phase == .answered, model.runState == nil,
+              let target = tracker.target else { return }
+        let pid = target.processIdentifier
+        let elements = model.context?.elements ?? [:]
+        let steps = proposal.steps
+        spotlight?.hide()
+        leftDuringRun = false
+        runTask = Task { [weak self] in
+            for (index, step) in steps.enumerated() {
+                guard !Task.isCancelled, let self else { return }
+                self.model.runState = .running(index: index)
+                if index > 0 { try? await Task.sleep(for: RobiStepRunner.pause) }
+                guard !Task.isCancelled else { return }
+                guard RobiStepRunner.run(step, processIdentifier: pid, elements: elements) else {
+                    self.model.runState = .failed(index: index)
+                    // The Run chip names the step a chain stopped at; one step only turns orange,
+                    // so the toast says why.
+                    if steps.count == 1 { self.flash(.robiToastStepMissing) }
+                    self.reportRun(steps, completed: index)
+                    if self.leftDuringRun { self.dismiss() }
+                    return
+                }
+            }
+            guard !Task.isCancelled, let self else { return }
+            // The Run chip turns green with a check; no toast repeats it.
+            self.model.runState = .done
+            self.reportRun(steps, completed: steps.count)
+            if !self.leftDuringRun { try? await Task.sleep(for: .milliseconds(700)) }
+            guard !Task.isCancelled else { return }
+            self.dismiss()
+        }
+    }
+
+    /// Counts what ran, never what it was: no paths, labels or typed text.
+    private func reportRun(_ steps: [RobiStep], completed: Int) {
         Analytics.track(.robiActionTaken(.runCommand))
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in self?.dismiss() }
+        var counts = AnalyticsRobiStepCounts()
+        for step in steps {
+            switch step {
+            case .menu: counts.menu += 1
+            case .press: counts.press += 1
+            case .toggle: counts.toggle += 1
+            case .type: counts.type += 1
+            }
+        }
+        Analytics.track(.robiStepsRun(counts, completed: completed))
     }
 
     /// Spotlights a landmark the answer referred to on the window it was read from, which is the
@@ -1143,10 +1202,11 @@ final class RobiController {
     }
 
     private func endInteraction() {
-        [contextTask, answerTask, toastTask].forEach { $0?.cancel() }
+        [contextTask, answerTask, toastTask, runTask].forEach { $0?.cancel() }
         cancelSuggestions()
         menuTask?.cancel()
-        contextTask = nil; answerTask = nil; menuTask = nil
+        contextTask = nil; answerTask = nil; menuTask = nil; runTask = nil
+        leftDuringRun = false
         answering = nil
         answerGeneration = nextGeneration()
         sheet?.close()
@@ -1171,14 +1231,23 @@ final class RobiController {
     // MARK: Setting an answer aside
 
     /// The pinned window lost focus or went away.
+    ///
+    /// A running step, such as a command that opens a window, may be what moved focus. The run
+    /// then finishes in the app it started in, and Robi closes when it ends.
     private func leftWindow(_ departure: RobiWindowTracker.Departure) {
+        if case .running = model.runState {
+            leftDuringRun = true
+            return
+        }
         if departure == .switchedAway, canPark { park() } else { dismiss() }
     }
 
     /// An answer is worth keeping once it has been asked for and its context is read. Picking,
     /// typing, and notices end as before: nothing has been asked yet, or there is nothing to keep.
+    /// Once its steps run, it is not kept either: a step that opens a window moves focus, and the
+    /// steps must not be offered again on return.
     private var canPark: Bool {
-        guard !model.isReadingContext, model.notice == nil else { return false }
+        guard !model.isReadingContext, model.notice == nil, model.runState == nil else { return false }
         switch model.phase {
         case .thinking: return answerTask != nil
         case .answered: return !model.answer.isEmpty || model.proposal != nil

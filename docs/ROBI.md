@@ -85,7 +85,16 @@ Both models stream in bursts: many characters at once, then nothing for a few hu
 
 When the context has landmarks, the model reads them instead of the plain text, one per line as `[#12 button @ 812,44] Send`, where the position is the element's centre in window points, and the instructions give the window's size. It is asked to link what it mentions as `[the Send button](#12)`, to use only listed numbers, and to add no links to a rewrite or translation. The listing is cut to the same character budget as plain text.
 
-Each question gets a fresh session with no history. The instructions quote the context as untrusted data. For **Do It**, typed questions, and suggested questions, the session also gets the app's enabled menu commands (up to 140, read off the main actor within 0.5 s) and `propose_menu_command`. That tool only accepts paths from the list and only proposes; the command runs when the person clicks **Run**, through `AXPress`.
+Each question gets a fresh session with no history. The instructions quote the context as untrusted data.
+
+### Proposing steps
+
+For **Do It**, typed questions, and suggested questions, the model may propose up to three steps, which the card lists and one click on **Run** (or Return, once the answer is complete) runs in order. No tool acts on the app itself; the steps run only on that click.
+
+- **Menu commands.** `RobiMenuCommands.read` walks the menu bar off the main actor as soon as Robi is summoned: enabled leaf items, the Apple menu skipped, up to 400 items within 1.5 s. Each top-level menu gets a fair share of what is left when its turn comes, so a long File menu cannot crowd out Window and Help. `RobiMenuCatalog` keeps the result in memory. The instructions list every menu with its count and its first commands (12 each for Claude, 4 for the on-device model). `list_menu_commands(menu, cursor)` returns further pages (60 or 20 commands) with how many are left and the next cursor. `propose_menu_command` accepts any path that was read, including ones not yet shown.
+- **Window elements.** `RobiWindowText` keeps the `AXUIElement` of each button, link, checkbox, option, and settable field or text area in `RobiContext.elements`, by landmark number, for as long as the context lives, including while its answer is set aside. `propose_press`, `propose_toggle(element, on)`, and `propose_type(element, text)` accept only numbers of the right kind. Selecting an option becomes a press. Pop-ups and menu buttons are left out, since pressing one only opens a menu the next step could not choose from. Landmarks from recognized text have no element and cannot be steps. An empty field is listed by its placeholder or description, so the model can find a search field to type into.
+- **Collecting.** `RobiStepCollector` keeps the steps in the order the tools are called, behind a lock, and publishes each new proposal to the card. A fourth step is refused.
+- **Running.** `RobiStepRunner` checks each target again first: a menu item must still exist and be enabled, and an element must still have its role and, for a control, its label. A toggle already in the wanted state counts as done. Typing focuses the field and sets `kAXValueAttribute`. Steps run 250 ms apart. The first step that cannot run stops the chain, its row shows the failure, the rest are marked skipped, and the Run chip names the step it stopped at; a single step that fails says why in a toast. When every step ran, the chip turns green with a check and Robi closes 0.7 s later. A step that moves focus, such as a command that opens a window, does not stop the run: `leftWindow` waits for it to end, and an answer whose steps ran is never set aside.
 
 ### Formatting
 
@@ -142,7 +151,9 @@ Robi reads a window only after a click or the shortcut. Text and pictures live i
 - Robi trails a window by about one frame when SkyLight is unavailable and the window is resized by its edges. AX notifications arrive at about 10 Hz.
 - During a Space switch animation the panel can be visible for a moment before it moves to the new focused window.
 - Apps that draw text without accessibility, such as games and canvases, give Robi only the region picture and recognized text.
-- Menu commands cover what an app puts in its menu bar. Actions that exist only as buttons inside a window are not proposed.
+- Steps act on what Robi read: the menu bar and the elements of the window it read. A dialog or sheet that a step opens cannot be filled by a later step, since the model does not see the window again.
+- Typing sets a field's value through Accessibility. A web app that listens only for key events may not notice the change.
+- Menu items are found again by title when Run is clicked. An item whose title changed since (Show Sidebar became Hide Sidebar) fails, and of two items with the same title the first wins.
 - Inside placement on a maximized window covers the middle of its title bar. Benn accepted this on 2026-10-24.
 - The tab moves along the top edge only. The side and bottom edges would need the prompt bar and card to open sideways or upwards.
 - The prompt bar and card stay centred on the tab, so with the tab near a corner they overhang the window's side, kept on the display. Shifting them back over the window would make the tab jump sideways as it widens into the bar.
@@ -157,6 +168,7 @@ The build compiles and the geometry and settings tests compile. DOKK was not lau
 - Real hover, clicks, drags, and resizes on Ghostty, Claude Desktop, a Chromium browser, Xcode, and Finder, on displays with different scales.
 - Spaces, full screen, Mission Control, Stage Manager, sleep and wake.
 - Selection-first flow in Electron and Chromium apps, Replace Selection, Paste into a terminal, and Run on a proposed command.
+- Proposed steps: a three-step chain (type into a search field, press a button, turn on a checkbox) in a native app and in a Chromium page; paging through a long menu with Claude and with the on-device model; a step that opens a new window; a step whose element changed before Run. The card's run motion in the real panel: the highlight sliding to the current row, numbers turning into spinners and checks, the Run chip going green or orange, Return running the steps, and the same with Reduce Motion on. The card must not clip at three steps with long German labels.
 - Claude with a real key on Haiku, Sonnet and Opus at both effort levels, the model named in the card's footer, and the key prompt in the card.
 - Switch windows while an answer streams, then come back: the card returns, still streaming or complete, and Replace and Paste still reach the first window. Close that window from another one and check that the dot goes away on the next focus change.
 - Stop during a long Claude answer: the Anthropic Console's usage for that request should show fewer output tokens than an unstopped answer to the same question.

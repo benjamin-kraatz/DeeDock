@@ -5707,6 +5707,24 @@
         }
       }
     },
+    "robiRanSteps" : {
+      "comment" : "The Run button in Robi’s answer card after every proposed step ran, shown green with a check for a moment before Robi closes. The placeholder is the number of steps, 2 or 3.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Schritte ausgeführt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ran %lld Steps"
+          }
+        }
+      }
+    },
     "robiReferenceHelp" : {
       "comment" : "Tooltip over Robi’s answer when it contains underlined phrases that point at parts of the window.",
       "extractionState" : "manual",
@@ -5725,20 +5743,38 @@
         }
       }
     },
-    "robiRunCommand" : {
-      "comment" : "Button in Robi’s answer card that runs a menu command the model proposed. The placeholder is the app’s menu path, such as “File > New Tab”.",
+    "robiRunSteps" : {
+      "comment" : "Button in Robi’s answer card that runs all the steps the model proposed, one after another. The placeholder is the number of steps, 2 or 3.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ausführen"
+            "value" : "%lld Schritte ausführen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Run %@"
+            "value" : "Run %lld Steps"
+          }
+        }
+      }
+    },
+    "robiRunStoppedAt" : {
+      "comment" : "The Run button in Robi’s answer card after one of several proposed steps could not run; the rest were skipped. The placeholder is that step’s number, starting at 1.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei Schritt %lld gestoppt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped at Step %lld"
           }
         }
       }
@@ -5919,6 +5955,204 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Works in any app without moving the pointer."
+          }
+        }
+      }
+    },
+    "robiStepMenu" : {
+      "comment" : "A step Robi proposes: choose a command from the app’s menu bar. The placeholder is the menu path as the app names it, such as “File > New Tab”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose %@"
+          }
+        }
+      }
+    },
+    "robiStepPress" : {
+      "comment" : "A step Robi proposes: click a button, link or option in the app’s window. The placeholder is the element’s label as the app names it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ klicken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click “%@”"
+          }
+        }
+      }
+    },
+    "robiStepsLabel" : {
+      "comment" : "Accessibility label for the list of steps Robi proposes to run in the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorgeschlagene Schritte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proposed steps"
+          }
+        }
+      }
+    },
+    "robiStepStatusDone" : {
+      "comment" : "Accessibility value of a step in Robi’s card after it ran, and of the Run button once every step ran.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erledigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "robiStepStatusFailed" : {
+      "comment" : "Accessibility value of a step in Robi’s card that could not run, and of the Run button once the run stopped.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht ausgeführt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t run"
+          }
+        }
+      }
+    },
+    "robiStepStatusRunning" : {
+      "comment" : "Accessibility value of a step in Robi’s card while it runs, and of the Run button while the steps run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "robiStepStatusSkipped" : {
+      "comment" : "Accessibility value of a step in Robi’s card that was skipped because an earlier step could not run.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersprungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
+          }
+        }
+      }
+    },
+    "robiStepToggleOff" : {
+      "comment" : "A step Robi proposes: turn off a checkbox or switch in the app’s window. The placeholder is the control’s label as the app names it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ausschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn off “%@”"
+          }
+        }
+      }
+    },
+    "robiStepToggleOn" : {
+      "comment" : "A step Robi proposes: turn on a checkbox or switch in the app’s window. The placeholder is the control’s label as the app names it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on “%@”"
+          }
+        }
+      }
+    },
+    "robiStepType" : {
+      "comment" : "A step Robi proposes: replace the text of a field in the app’s window. The placeholder is the text to type.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ eingeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type “%@”"
+          }
+        }
+      }
+    },
+    "robiStepTypeField" : {
+      "comment" : "Shown in small text beside a typing step in Robi’s card, naming the field it types into. The placeholder is the field’s label or current text as the app reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In das Feld „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Into the field “%@”"
           }
         }
       }
@@ -6337,24 +6571,6 @@
         }
       }
     },
-    "robiToastCommandMissing" : {
-      "comment" : "Brief message in Robi’s card when the proposed menu command no longer exists or is disabled.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Befehl ist gerade nicht verfügbar"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "That command isn’t available now"
-          }
-        }
-      }
-    },
     "robiToastCopied" : {
       "comment" : "Brief confirmation in Robi’s card after copying the answer.",
       "extractionState" : "manual",
@@ -6369,24 +6585,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copied"
-          }
-        }
-      }
-    },
-    "robiToastDone" : {
-      "comment" : "Brief confirmation in Robi’s card after running a menu command.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erledigt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
           }
         }
       }
@@ -6459,6 +6657,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selection changed, so nothing was replaced"
+          }
+        }
+      }
+    },
+    "robiToastStepMissing" : {
+      "comment" : "Brief message in Robi’s card when the proposed step’s menu command or window element no longer exists, changed, or is disabled.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist gerade nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That isn’t available now"
           }
         }
       }
