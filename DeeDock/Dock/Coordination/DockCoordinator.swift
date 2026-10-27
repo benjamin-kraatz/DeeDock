@@ -22,7 +22,6 @@ final class DockCoordinator {
     let patchBay: PatchBayController
     let recipes: WorkspaceRecipeCoordinator
     @ObservationIgnored private lazy var recipeProgress = WorkspaceRecipeProgressController(recipes: recipes)
-    let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let atmosphere = AtmosphereController()
@@ -181,7 +180,7 @@ final class DockCoordinator {
         )
         applicationMenus = menus
         windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service,
-                                            watchPresets: watchPresets, actions: actionTiles, history: peekHistory)
+                                            history: peekHistory)
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
@@ -239,7 +238,6 @@ final class DockCoordinator {
             recipeProgress.show()
         }
         recipeProgress.openSettings = { [weak self] in self?.settingsModesRequest = true }
-        watchPresets.start()
         badges.focusSession = { [weak self] in self?.focusSession.session }
         focusPopover.showDigest = { [weak self] in self?.showBadgeMemory(digest: true) }
         focusPopover.saveCapsule = { [weak self] panel in self?.sessionCapsules.beginFromFocus(on: panel) }
@@ -940,8 +938,6 @@ final class DockCoordinator {
         )
     }
 
-    func focusNextPortal() { windowPeeks.focusNextPortal() }
-
     /// The dock state for one display, or nil when that display hosts no dock.
     func dockStore(for displayID: String) -> DockStore? { panels[displayID]?.store }
 
@@ -1310,7 +1306,6 @@ final class DockCoordinator {
         patchBay.stop()
         recipes.stop()
         recipeProgress.stop()
-        watchPresets.stop()
         appMelt.stop()
         fusion.stop()
         sessionCapsules.stop()
