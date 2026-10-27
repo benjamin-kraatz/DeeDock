@@ -8810,48 +8810,6 @@
         }
       }
     },
-    "badgeMemoryChangesCount" : {
-      "comment" : "Number of observed badge changes recorded for one app in a focus digest.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Änderung"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Änderungen"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld change"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld changes"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "badgeMemoryClearAll" : {
       "comment" : "Badge memory: Clear all badge history Values and application names come from the source app when present.",
       "extractionState" : "manual",
@@ -8889,19 +8847,19 @@
       }
     },
     "badgeMemoryClearHelp" : {
-      "comment" : "Badge memory: Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are. Values and application names come from the source app when present.",
+      "comment" : "Badge memory: Delete all baselines and history. Current source-app badges stay as they are. Values and application names come from the source app when present.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Vergleichswerte, Verläufe und Rückblicke löschen und die Sammlung für Fokus-Sitzungen ausschalten. Die Badges der Apps bleiben unverändert."
+            "value" : "Alle Vergleichswerte und Verläufe löschen. Die Badges der Apps bleiben unverändert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete all baselines, history and digests, and turn off focus collection. Current source-app badges stay as they are."
+            "value" : "Delete all baselines and history. Current source-app badges stay as they are."
           }
         }
       }
@@ -8920,42 +8878,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Close"
-          }
-        }
-      }
-    },
-    "badgeMemoryCollect" : {
-      "comment" : "Badge memory: Collect badge changes in future Focus Sessions Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Badge-Änderungen in künftigen Fokus-Sitzungen sammeln"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collect badge changes in future Focus Sessions"
-          }
-        }
-      }
-    },
-    "badgeMemoryCollecting" : {
-      "comment" : "Badge memory: Collecting Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sammlung läuft"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collecting"
           }
         }
       }
@@ -9015,55 +8937,19 @@
       }
     },
     "badgeMemoryDeleteAppHelp" : {
-      "comment" : "Badge memory: Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again. Values and application names come from the source app when present.",
+      "comment" : "Badge memory: Delete this app’s baseline and changes. Later observed changes can be recorded again. Values and application names come from the source app when present.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Den Vergleichswert, die Änderungen und alle Einträge dieser App in Fokus-Rückblicken löschen. Spätere beobachtete Änderungen können wieder erfasst werden."
+            "value" : "Den Vergleichswert und die Änderungen dieser App löschen. Spätere beobachtete Änderungen können wieder erfasst werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete this app’s baseline, changes and rows in every focus digest. Later observed changes can be recorded again."
-          }
-        }
-      }
-    },
-    "badgeMemoryDeleteDigest" : {
-      "comment" : "Badge memory: Delete digest Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rückblick löschen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete digest"
-          }
-        }
-      }
-    },
-    "badgeMemoryDeleteDigestHelp" : {
-      "comment" : "Badge memory: Delete this digest. An active session will stop collecting until the next session. Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diesen Rückblick löschen. Für eine laufende Sitzung endet die Sammlung bis zur nächsten Sitzung."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete this digest. An active session will stop collecting until the next session."
+            "value" : "Delete this app’s baseline and changes. Later observed changes can be recorded again."
           }
         }
       }
@@ -9122,60 +9008,6 @@
         }
       }
     },
-    "badgeMemoryDigest" : {
-      "comment" : "Badge memory: Focus badge digest Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Badge-Rückblick zur Fokus-Sitzung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus badge digest"
-          }
-        }
-      }
-    },
-    "badgeMemoryDigestEmpty" : {
-      "comment" : "Badge memory: No focus digest yet. Enable collection before starting a Focus Session. Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch kein Fokus-Rückblick. Aktiviere die Sammlung vor dem Start einer Fokus-Sitzung."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No focus digest yet. Enable collection before starting a Focus Session."
-          }
-        }
-      }
-    },
-    "badgeMemoryDigestHelp" : {
-      "comment" : "Badge memory: Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled. Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Differenz vergleicht den ersten mit dem letzten beobachteten Wert. Pausen, Ausfallzeiten und fehlende Beobachtungen hinterlassen Lücken. App-Badges müssen aktiviert sein."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Net change compares the first and last observed values. Pauses, downtime and unavailable observations leave gaps. App badges must be enabled."
-          }
-        }
-      }
-    },
     "badgeMemoryEmpty" : {
       "comment" : "Badge memory: No badge history yet. Enable app badges, then open an app’s badge details. Values and application names come from the source app when present.",
       "extractionState" : "manual",
@@ -9190,78 +9022,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No badge history yet. Enable app badges, then open an app’s badge details."
-          }
-        }
-      }
-    },
-    "badgeMemoryEnded" : {
-      "comment" : "Label for the time a focus digest stopped collecting.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestoppt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ended"
-          }
-        }
-      }
-    },
-    "badgeMemoryFinished" : {
-      "comment" : "Badge memory: Finished Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beendet"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finished"
-          }
-        }
-      }
-    },
-    "badgeMemoryFirst" : {
-      "comment" : "Badge memory: First observed value Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erster beobachteter Wert"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First observed value"
-          }
-        }
-      }
-    },
-    "badgeMemoryGap" : {
-      "comment" : "Badge memory: Incomplete observation coverage. Changes may have been missed. Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Beobachtung ist lückenhaft. Änderungen können fehlen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incomplete observation coverage. Changes may have been missed."
           }
         }
       }
@@ -9392,24 +9152,6 @@
         }
       }
     },
-    "badgeMemoryNoChanges" : {
-      "comment" : "Badge memory: No changes observed in the retained apps. Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Änderungen bei den gespeicherten Apps beobachtet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No changes observed in the retained apps."
-          }
-        }
-      }
-    },
     "badgeMemoryNoDelta" : {
       "comment" : "Badge memory: No numeric comparison available. Values and application names come from the source app when present.",
       "extractionState" : "manual",
@@ -9442,24 +9184,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open app"
-          }
-        }
-      }
-    },
-    "badgeMemoryOpenNamedApp" : {
-      "comment" : "Badge memory: Open %1$@ Values and application names come from the source app when present.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ öffnen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open %1$@"
           }
         }
       }
@@ -9501,19 +9225,19 @@
       }
     },
     "badgeMemoryRetention" : {
-      "comment" : "Badge memory: Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days. Values and application names come from the source app when present.",
+      "comment" : "Badge memory: Up to 100 apps and 20 changes per app. History expires after 7 days; checked baselines after 30 days. Values and application names come from the source app when present.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bis zu 100 Apps, 20 Änderungen je App und 10 Rückblicke. Der Verlauf verfällt nach 7 Tagen, Vergleichswerte nach 30 Tagen."
+            "value" : "Bis zu 100 Apps und 20 Änderungen je App. Der Verlauf verfällt nach 7 Tagen, Vergleichswerte nach 30 Tagen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Up to 100 apps, 20 changes per app and 10 digests. History expires after 7 days; checked baselines after 30 days."
+            "value" : "Up to 100 apps and 20 changes per app. History expires after 7 days; checked baselines after 30 days."
           }
         }
       }
@@ -9555,37 +9279,19 @@
       }
     },
     "badgeMemorySettingsHelp" : {
-      "comment" : "Badge memory: Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock. Values and application names come from the source app when present.",
+      "comment" : "Badge memory: Click a badge, use Badge details in an app’s menu, or press B in Focus Dock. Values and application names come from the source app when present.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sammlung ist zunächst aus. Einschalten gilt ab der nächsten Sitzung, Ausschalten beendet die Sammlung sofort. Klicke auf ein Badge, wähle Badge-Details im App-Menü oder drücke B in „Dock fokussieren“."
+            "value" : "Klicke auf ein Badge, wähle Badge-Details im App-Menü oder drücke B in „Dock fokussieren“."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collection is off by default. Enabling applies to the next session; disabling stops collection now. Click a badge, use Badge details in an app’s menu, or press B in Focus Dock."
-          }
-        }
-      }
-    },
-    "badgeMemoryStarted" : {
-      "comment" : "Label for the time a focus digest began collecting.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestartet"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Started"
+            "value" : "Click a badge, use Badge details in an app’s menu, or press B in Focus Dock."
           }
         }
       }
@@ -10144,276 +9850,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Along-edge offset"
-          }
-        }
-      }
-    },
-    "bossFightCancelSession" : {
-      "comment" : "Cancels the focus timer without completion or celebration.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session abbrechen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel session"
-          }
-        }
-      }
-    },
-    "bossFightChooseApps" : {
-      "comment" : "Opens the native app-bundle picker; does not launch the selected apps.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arbeits-Apps auswählen …"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose work apps…"
-          }
-        }
-      }
-    },
-    "bossFightDisable" : {
-      "comment" : "Immediately returns to normal Focus Session appearance without changing the timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss Fight deaktivieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disable Boss Fight"
-          }
-        }
-      }
-    },
-    "bossFightDismissCelebration" : {
-      "comment" : "Stops the short ornament while retaining the completed timer and Capsule action.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feier ausblenden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dismiss celebration"
-          }
-        }
-      }
-    },
-    "bossFightEnable" : {
-      "comment" : "Explicit opt-in toggle for the optional Focus Session Easter egg; off by default.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss Fight aktivieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable Boss Fight"
-          }
-        }
-      }
-    },
-    "bossFightHealth" : {
-      "comment" : "Progress label stating that health is only remaining time.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss-Lebensleiste · verbleibende Zeit"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss health · time remaining"
-          }
-        }
-      }
-    },
-    "bossFightHelp" : {
-      "comment" : "Explain the timer-only meaning and silent completion effect.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein optionales Design für den Timer. Die Boss-Lebensleiste zeigt die verbleibende Zeit, nicht deine Produktivität. Zum Abschluss gibt es eine kurze, lautlose Feier."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An optional timer skin. Boss health shows time remaining, not productivity. Completion brings a brief, silent celebration."
-          }
-        }
-      }
-    },
-    "bossFightParty" : {
-      "comment" : "Chosen work apps shown as the party in the optional timer skin.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Gruppe"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your party"
-          }
-        }
-      }
-    },
-    "bossFightPartyEmpty" : {
-      "comment" : "Empty party prompt in Boss Fight settings.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle Arbeits-Apps für deine Gruppe aus."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose work apps to join your party."
-          }
-        }
-      }
-    },
-    "bossFightPartyLimit" : {
-      "comment" : "Party selection limit and its decorative-only behavior.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bis zu 8 Apps. Die Auswahl betrifft nur die Anzeige im Timer; alle Apps bleiben frei nutzbar."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Up to 8 apps. This only changes their appearance in the timer; apps remain unrestricted."
-          }
-        }
-      }
-    },
-    "bossFightPickerFailed" : {
-      "comment" : "Native app picker failure; no app was added.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die App-Auswahl konnte nicht geöffnet werden. Bitte versuche es erneut."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The app selection could not be opened. Please try again."
-          }
-        }
-      }
-    },
-    "bossFightRemoveApp" : {
-      "comment" : "Accessible remove button; argument is the app name supplied by macOS.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ aus der Gruppe entfernen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove %@ from party"
-          }
-        }
-      }
-    },
-    "bossFightTimeRemaining" : {
-      "comment" : "Accessible timer value; argument is the remaining time spoken in words.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ verbleibend"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ remaining"
-          }
-        }
-      }
-    },
-    "bossFightTitle" : {
-      "comment" : "Name of the optional Focus Session Easter egg. Keep the product name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss Fight"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss Fight"
-          }
-        }
-      }
-    },
-    "bossFightVictory" : {
-      "comment" : "Brief, silent completion message. Never describes productivity.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss besiegt. Session abgeschlossen!"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Boss defeated. Session complete!"
           }
         }
       }
@@ -17279,762 +16715,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selected window"
-          }
-        }
-      }
-    },
-    "focusBreathingEnable" : {
-      "comment" : "Master opt-in toggle and Focus filter parameter, both off by default.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dock-Hintergrund atmen lassen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breathe dock background"
-          }
-        }
-      }
-    },
-    "focusBreathingFilterDescription" : {
-      "comment" : "Description shown when adding the public system Focus filter.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Den Hintergrund von DOKK während dieses Fokus sanft animieren. Aktiviere zuerst Fokus-Atmen in den DOKK-Einstellungen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gently animate DOKK’s background during this Focus. Enable Focus breathing in DOKK Settings first."
-          }
-        }
-      }
-    },
-    "focusBreathingFilterOff" : {
-      "comment" : "DOKK Focus filter is inactive, unavailable, or not configured.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inaktiv"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inactive"
-          }
-        }
-      }
-    },
-    "focusBreathingFilterOn" : {
-      "comment" : "DOKK Focus filter requests breathing.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktiv"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Active"
-          }
-        }
-      }
-    },
-    "focusBreathingHelp" : {
-      "comment" : "Explains opt-in, triggers, public Focus filter setup, and accessibility limits.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standardmäßig ausgeschaltet. Ein langsamer Lichtakzent atmet im Hintergrund von DOKK. Bewegung reduzieren schaltet den Effekt aus. Füge für macOS-Fokus DOKK unter Systemeinstellungen → Fokus → dein Fokus → Fokusfilter hinzu und aktiviere Dock-Hintergrund atmen lassen. Nur eingerichtete Fokusfilter, laufende Fokus-Sitzungen oder ausgewählte Dock-Modi lösen den Effekt aus. Bei ausgeblendetem Hintergrund erscheint kein Effekt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Off by default. A slow highlight breathes inside DOKK’s background. Reduce Motion turns it off. For macOS Focus, add DOKK under System Settings → Focus → your Focus → Focus Filters and turn on Breathe dock background. Only configured Focus filters, running Focus Sessions, or selected Dock Modes trigger the effect. A hidden background shows no effect."
-          }
-        }
-      }
-    },
-    "focusBreathingIntensity" : {
-      "comment" : "Amplitude slider for dock background highlight.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atemintensität"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breathing intensity"
-          }
-        }
-      }
-    },
-    "focusBreathingModes" : {
-      "comment" : "Explicit selection of Dock Modes that trigger breathing.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auch in diesen Dock-Modi atmen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Also breathe in these Dock Modes"
-          }
-        }
-      }
-    },
-    "focusBreathingSessions" : {
-      "comment" : "Trigger breathing during running sessions, excluding paused or completed sessions.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Während laufender Fokus-Sitzungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "During running Focus Sessions"
-          }
-        }
-      }
-    },
-    "focusBreathingSystemStatus" : {
-      "comment" : "Status of the app-specific public system Focus filter, not global Focus status.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DOKK-Fokusfilter"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DOKK Focus filter"
-          }
-        }
-      }
-    },
-    "focusBreathingTitle" : {
-      "comment" : "Settings card and public Focus filter title.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Atmen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus breathing"
-          }
-        }
-      }
-    },
-    "focusCelebrate" : {
-      "comment" : "Optional short checkmark animation, disabled by Reduce Motion.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sitzungsabschluss animieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Animate session completion"
-          }
-        }
-      }
-    },
-    "focusCompleted" : {
-      "comment" : "Status of a completed focus timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sitzung abgeschlossen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session finished"
-          }
-        }
-      }
-    },
-    "focusCurrentMode" : {
-      "comment" : "Name of the mode that started the timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktuelle Sitzung: %1$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Current session: %1$@"
-          }
-        }
-      }
-    },
-    "focusDebtCount" : {
-      "comment" : "Numeric focus debt meter. Argument is the number of promised sessions ended early since enabling.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorzeitig beendete Sitzungen: %lld"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sessions ended early: %lld"
-          }
-        }
-      }
-    },
-    "focusDebtDisable" : {
-      "comment" : "Immediate kill switch for focus debt. Clears the count and active promise without affecting the timer. No confirmation.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausschalten und zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn off and clear"
-          }
-        }
-      }
-    },
-    "focusDebtEmpty" : {
-      "comment" : "Gentle feedback when the meter is enabled and zero.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein neuer Anfang. Nimm dir die Zeit, die du brauchst."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A fresh start. Take the time you need."
-          }
-        }
-      }
-    },
-    "focusDebtEnable" : {
-      "comment" : "Opt-in toggle. Off by default; disabling also clears the count.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Zähler aktivieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable focus debt"
-          }
-        }
-      }
-    },
-    "focusDebtFeedback" : {
-      "comment" : "Non-punitive feedback when one or more promised sessions ended early. No escalation or shame.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pläne ändern sich. Probiere eine kürzere Sitzung oder setze den Zähler zurück, wann du möchtest."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plans change. You can try a shorter session, or clear this whenever you like."
-          }
-        }
-      }
-    },
-    "focusDebtHelp" : {
-      "comment" : "Explains opt-in timing, which actions count, exclusions, clearing, and local-only storage.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standardmäßig aus. Wenn aktiviert, gilt jede neue Fokus-Sitzung als Versprechen, den Timer zu Ende laufen zu lassen. Vorzeitiges Beenden oder Abbrechen erhöht diesen lokalen Zähler um eins. Pausen sowie App- oder Moduswechsel zählen nicht. Ausschalten löscht den Zählerstand. Es wird nichts an Linear oder andere Dienste gesendet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Off by default. When enabled, each new Focus Session is a promise to let its timer finish. Finishing or cancelling early adds one to this local count. Pauses and app or mode changes do not count. Turning this off clears the count. Nothing is sent to Linear or other services."
-          }
-        }
-      }
-    },
-    "focusDebtTitle" : {
-      "comment" : "Title of the optional, gentle count of sessions ended early.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Zähler"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus debt"
-          }
-        }
-      }
-    },
-    "focusDismiss" : {
-      "comment" : "Remove the completed timer tile.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sitzung schließen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dismiss Session"
-          }
-        }
-      }
-    },
-    "focusDuration" : {
-      "comment" : "Default focus duration in minutes, from 1 to 180.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dauer: %1$lld Min."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duration: %1$lld min"
-          }
-        }
-      }
-    },
-    "focusDurationTitle" : {
-      "comment" : "Label of the focus-session length row in Settings; the value and a stepper follow it.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dauer"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duration"
-          }
-        }
-      }
-    },
-    "focusDurationValue" : {
-      "comment" : "Focus-session length shown beside its stepper. The argument is a number of minutes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Min."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld min"
-          }
-        }
-      }
-    },
-    "focusExtend" : {
-      "comment" : "Extend the current focus session by five minutes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "5 Minuten hinzufügen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add 5 Minutes"
-          }
-        }
-      }
-    },
-    "focusFinish" : {
-      "comment" : "Finish a focus session early and offer a Session Capsule.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abschließen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finish"
-          }
-        }
-      }
-    },
-    "focusFinishedHelp" : {
-      "comment" : "Optional next step after finishing a focus session.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch etwas offen? Halte es in einer Kapsel fest."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anything left to pick up later? Save it in a Session Capsule."
-          }
-        }
-      }
-    },
-    "focusPause" : {
-      "comment" : "Pause a focus timer without losing time remaining.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pausieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pause"
-          }
-        }
-      }
-    },
-    "focusPaused" : {
-      "comment" : "Status of a paused focus timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pausiert"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paused"
-          }
-        }
-      }
-    },
-    "focusReset" : {
-      "comment" : "Recovery action for unreadable focus settings and session state.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzungen zurücksetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset Focus Sessions"
-          }
-        }
-      }
-    },
-    "focusResetHelp" : {
-      "comment" : "Confirmation before resetting focus data.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Den gespeicherten Timer löschen und die Fokus-Vorgaben wiederherstellen? Modi und Kapseln bleiben erhalten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear the saved timer and restore focus defaults? Dock Modes and Session Capsules will remain."
-          }
-        }
-      }
-    },
-    "focusResume" : {
-      "comment" : "Resume a paused focus timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortsetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resume"
-          }
-        }
-      }
-    },
-    "focusRunning" : {
-      "comment" : "Status of a running focus timer.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus läuft"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focusing"
-          }
-        }
-      }
-    },
-    "focusSaveCapsule" : {
-      "comment" : "Open the existing capsule creation flow; does not capture or save automatically.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kapsel speichern"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save Session Capsule"
-          }
-        }
-      }
-    },
-    "focusSettingsHelp" : {
-      "comment" : "Explains timer entry points, shared ownership, and clock behavior.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starte eine Sitzung unter „Modi“ in den Einstellungen oder über die Menüleiste. Alle Bildschirme teilen sich einen Timer. Die Zeit läuft im Ruhezustand und bei geschlossener App weiter, während einer Pause nicht. Änderungen an diesen Vorgaben gelten für die nächste Sitzung."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start from Dock Modes in Settings or the menu bar. One timer is shared by every display. Running time includes sleep and app downtime; paused time does not. Changing these defaults affects your next session."
-          }
-        }
-      }
-    },
-    "focusStart" : {
-      "comment" : "Start a timer and activate the selected Dock Mode.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung starten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Focus Session"
-          }
-        }
-      }
-    },
-    "focusStartBlocked" : {
-      "comment" : "Explains why another timer cannot start.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schließe die aktuelle Fokus-Sitzung ab, bevor du eine neue startest."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finish the current focus session before starting another."
-          }
-        }
-      }
-    },
-    "focusStartHelp" : {
-      "comment" : "Help text for the Start Focus Session button on a mode row.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diesen Modus aktivieren und einen Fokus-Timer starten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activate this mode and start a focus timer."
-          }
-        }
-      }
-    },
-    "focusStorageFailed" : {
-      "comment" : "Recovery message for corrupt or unsupported focus data.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gespeicherte Fokus-Sitzungen konnten nicht gelesen oder gespeichert werden. Setze sie zurück, um Änderungen zu ermöglichen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved Focus Sessions could not be read or saved. Reset them to allow changes."
-          }
-        }
-      }
-    },
-    "focusTileHint" : {
-      "comment" : "Accessibility hint for the focus timer tile.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Timer-Steuerung öffnen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open timer controls."
-          }
-        }
-      }
-    },
-    "focusTileName" : {
-      "comment" : "Accessibility label followed by the saved Dock Mode name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus: %1$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus: %1$@"
-          }
-        }
-      }
-    },
-    "focusTitle" : {
-      "comment" : "Feature name for a shared focus timer started from a Dock Mode.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus Sessions"
           }
         }
       }
@@ -39948,13 +38628,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Rezept ist optional. Das Umschalten dieses Modus ändert nur Anheftungen und die App-Sichtbarkeit. Arbeitsbereich vorbereiten ist eine eigene Aktion und startet keine Fokus-Sitzung."
+            "value" : "Ein Rezept ist optional. Das Umschalten dieses Modus ändert nur Anheftungen und die App-Sichtbarkeit. Arbeitsbereich vorbereiten ist eine eigene Aktion."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A recipe is optional. Switching this mode only updates pins and app visibility. Prepare workspace is a separate action and does not start a Focus Session."
+            "value" : "A recipe is optional. Switching this mode only updates pins and app visibility. Prepare workspace is a separate action."
           }
         }
       }
@@ -40254,13 +38934,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiviert diesen Modus und öffnet die konfigurierten Apps, Dateien, Links und Kurzbefehle. Startet keine Fokus-Sitzung."
+            "value" : "Aktiviert diesen Modus und öffnet die konfigurierten Apps, Dateien, Links und Kurzbefehle."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activate this mode and open its configured apps, files, links, and Shortcuts. Does not start a Focus Session."
+            "value" : "Activate this mode and open its configured apps, files, links, and Shortcuts."
           }
         }
       }
@@ -42947,60 +41627,6 @@
         }
       }
     },
-    "settingsFeatureFocusBreathingSubtitle" : {
-      "comment" : "Description of Focus breathing on the Features settings overview.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein langsamer Lichtakzent im Dock-Hintergrund während Fokus."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A slow highlight in the dock background during Focus."
-          }
-        }
-      }
-    },
-    "settingsFeatureFocusDebtSubtitle" : {
-      "comment" : "Description of the Focus debt meter on the Features settings overview.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zählt lokal, wie oft eine Fokus-Sitzung vor dem Ende abgebrochen wurde."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Counts locally how often a Focus session ended early."
-          }
-        }
-      }
-    },
-    "settingsFeatureFocusSubtitle" : {
-      "comment" : "Description of this feature on the Features settings overview.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeitlich begrenzte Fokus-Sitzungen einrichten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set up timed focus sessions."
-          }
-        }
-      }
-    },
     "settingsFeatureMagneticSubtitle" : {
       "comment" : "Description of this feature on the Features settings overview.",
       "extractionState" : "manual",
@@ -43170,13 +41796,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen veraltet abgekündigt Quarantäne Stempel Patchbay Atem Fokus-Zähler"
+            "value" : "Funktionen Kapseln Zwischenstand fortsetzen Apple Intelligence Vision OCR Ablage Dateien Ablegen Stapel Papierkorb leeren bestätigen Window Peek Vorschau Vorschaubilder Berechtigungen Bedienungshilfen Bildschirmaufnahme Chronik Verlauf Zeitleiste lokal Sitzung anheften Rost Patina unbenutzt Anheftung Wetter magnet magnetisch einrasten ausrichten Hilfslinie Kante Sims Haustier Stimmung Seifenblasen Effekt klicken anheften ablegen veraltet abgekündigt Quarantäne Stempel Patchbay"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop deprecated quarantine stamp patch bay breathing focus debt"
+            "value" : "features session capsules checkpoint continue resume apple intelligence vision ocr shelf staging tray drop stack trash bin empty confirm window peek preview thumbnails permissions accessibility screen recording capture timeline history scrub local pin session privacy rust weather unused patina magnet magnetic snap align guide edge sims pet mood soap bubble pin drop click pop deprecated quarantine stamp patch bay"
           }
         }
       }
@@ -44964,7 +43590,7 @@
       }
     },
     "settingsWindowsFocus" : {
-      "comment" : "Sidebar title for Window Peek, focus sessions, and their permissions.",
+      "comment" : "Sidebar title for Window Peek, Radar, Robi, and their permissions.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -44988,13 +43614,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Peek, Fokussitzungen und die dafür nötigen Berechtigungen."
+            "value" : "Window Peek, Radar, Robi und die dafür nötigen Berechtigungen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window Peek, focus sessions, and the permissions they need."
+            "value" : "Window Peek, Radar, Robi, and the permissions they need."
           }
         }
       }
@@ -46590,13 +45216,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence erfindet auf diesem Mac kurze Gespräche aus sichtbaren App-Namen und Sims-Stimmungen. App-Inhalte werden nicht gelesen. Zum Überspringen den Zeiger ins Dock bewegen. Pausiert während Fokus-Sitzungen und bei reduzierter Bewegung."
+            "value" : "Apple Intelligence erfindet auf diesem Mac kurze Gespräche aus sichtbaren App-Namen und Sims-Stimmungen. App-Inhalte werden nicht gelesen. Zum Überspringen den Zeiger ins Dock bewegen. Pausiert bei reduzierter Bewegung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Intelligence invents short conversations using visible app names and Sims moods, on this Mac. No app content is read. Move the pointer into the dock to skip. Paused during Focus Sessions and Reduce Motion."
+            "value" : "Apple Intelligence invents short conversations using visible app names and Sims moods, on this Mac. No app content is read. Move the pointer into the dock to skip. Paused during Reduce Motion."
           }
         }
       }
@@ -50400,19 +49026,19 @@
       }
     },
     "timelineEmptyMessage" : {
-      "comment" : "Privacy-first empty state when DOKK has not recorded local pin or session events yet.",
+      "comment" : "Privacy-first empty state when DOKK has not recorded local pin events yet.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DOKK speichert nur eigene Anhefte- und Fokus-Sitzungsaktionen. Es gibt keine Bildschirmzeit und keine Daten anderer Apps."
+            "value" : "DOKK speichert nur eigene Anhefteaktionen. Es gibt keine Bildschirmzeit und keine Daten anderer Apps."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DOKK stores only its own pin and Focus Session actions. There is no Screen Time and no data from other apps."
+            "value" : "DOKK stores only its own pin actions. There is no Screen Time and no data from other apps."
           }
         }
       }
@@ -50424,13 +49050,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die lokale Aufzeichnung ist aus. Anheften und Fokus-Sitzungen erscheinen erst wieder, wenn du sie einschaltest."
+            "value" : "Die lokale Aufzeichnung ist aus. Anheftungen erscheinen erst wieder, wenn du sie einschaltest."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local recording is off. Pin and Focus Session actions appear here again after you turn it on."
+            "value" : "Local recording is off. Pin actions appear here again after you turn it on."
           }
         }
       }
@@ -50525,96 +49151,6 @@
         }
       }
     },
-    "timelineEventSessionDismissed" : {
-      "comment" : "Glance title when a Focus Session ends without finishing.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung beendet"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ended Focus Session"
-          }
-        }
-      }
-    },
-    "timelineEventSessionFinished" : {
-      "comment" : "Glance title when a Focus Session completes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung abgeschlossen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finished Focus Session"
-          }
-        }
-      }
-    },
-    "timelineEventSessionPaused" : {
-      "comment" : "Glance title when a Focus Session is paused.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung pausiert"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paused Focus Session"
-          }
-        }
-      }
-    },
-    "timelineEventSessionResumed" : {
-      "comment" : "Glance title when a Focus Session continues after a pause.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung fortgesetzt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resumed Focus Session"
-          }
-        }
-      }
-    },
-    "timelineEventSessionStarted" : {
-      "comment" : "Glance title when a Focus Session begins. subject is the Dock Mode name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fokus-Sitzung gestartet: %1$(subject)@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Started Focus Session: %1$(subject)@"
-          }
-        }
-      }
-    },
     "timelineEventUnrecognized" : {
       "comment" : "Fallback glance title for a stored local event whose kind this build does not know.",
       "extractionState" : "manual",
@@ -50688,19 +49224,19 @@
       }
     },
     "timelineRecordHelp" : {
-      "comment" : "Explains that recording covers only DOKK pin and Focus Session actions.",
+      "comment" : "Explains that recording covers only DOKK pin actions.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nur Anhefte- und Fokus-Sitzungsaktionen in DOKK. Nichts aus der Bildschirmzeit oder anderen Apps."
+            "value" : "Nur Anhefteaktionen in DOKK. Nichts aus der Bildschirmzeit oder anderen Apps."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only pin and Focus Session actions in DOKK. Nothing from Screen Time or other apps."
+            "value" : "Only pin actions in DOKK. Nothing from Screen Time or other apps."
           }
         }
       }
@@ -53203,13 +51739,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wird übersprungen, während du Pins ziehst, das Fokus-Panel offen ist oder dieses Fenster geöffnet bleibt."
+            "value" : "Wird übersprungen, während du Pins ziehst oder dieses Fenster geöffnet bleibt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skipped while you drag pins, keep Focus open, or leave this window up."
+            "value" : "Skipped while you drag pins or leave this window up."
           }
         }
       }

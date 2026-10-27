@@ -1,6 +1,6 @@
 # Session Capsule breadcrumbs
 
-DEE-13 adds a deliberate leave-and-return workflow to Session Capsules. It uses the existing `dock.session-capsules.v1` collection, including its limit of 30 records and existing oldest-record eviction. Optional fields let older saved capsules load without migration or a second store. Existing capsule creation, launcher checkpoints, and focus-session handoff remain available.
+DEE-13 adds a deliberate leave-and-return workflow to Session Capsules. It uses the existing `dock.session-capsules.v1` collection, including its limit of 30 records and existing oldest-record eviction. Optional fields let older saved capsules load without migration or a second store. Existing capsule creation and launcher checkpoints remain available.
 
 ## Leave and return
 
@@ -61,7 +61,7 @@ All items below remain untested. Use a signed installed build for TCC and sandbo
 - [ ] Check all four dock edges, negative display origins, different scaling, narrow displays, auto-hide, and display unplug/replug. Verify panel positioning and scrolling.
 - [ ] Check full-screen apps, Spaces, sleep/wake, and app relaunch. Availability labels must stay honest; no layout restoration is implied.
 - [ ] Use keyboard-only navigation, Command-B, Command-M, Command-E, Return, Tab, and Escape. Exercise the file picker, VoiceOver names, German and English copy, Reduce Motion, and Reduce Transparency. Hover must not steal focus.
-- [ ] Confirm original capsule creation and focus-session completion still work. Verify no capture happens on idle, app switch, or return from a break.
+- [ ] Confirm original capsule creation still works. Verify no capture happens on idle, app switch, or return from a break.
 
 ## Review follow-up
 

@@ -10,14 +10,12 @@ final class BadgeMemoryStore {
     private(set) var requiresReset = false
     private(set) var storageFailed = false
     @ObservationIgnored private let defaults: UserDefaults
-    @ObservationIgnored private var session: FocusSession?
-    @ObservationIgnored private var collectionNotBefore = Date.distantPast
     private static let key = "dock.badge-memory.v1"
     private static let retention: TimeInterval = 7 * 86400
 
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
 
-    func start(session: FocusSession?, at date: Date = .now) {
+    func start() {
         if let stored = defaults.object(forKey: Self.key) {
             do {
                 guard let data = stored as? Data, data.count <= 4_000_000 else { throw CocoaError(.coderReadCorrupt) }
@@ -26,30 +24,26 @@ final class BadgeMemoryStore {
                 document = decoded
             } catch { requiresReset = true; storageFailed = true }
         }
-        if document.active != nil { document.active?.incomplete = true }
         rekeyInstallations()
-        synchronize(session: session, at: date, allowStart: false)
     }
 
     /// Replaces the live snapshot without appending a transition.
     ///
     /// Suspension passes an empty snapshot to stop presenting. A retained failure passes the
-    /// hidden snapshot back. History and digest rows stay as they were.
+    /// hidden snapshot back. History stays as it was.
     func present(_ observations: [String: BadgeObservation]) {
         if current != observations { current = observations }
     }
 
     /// Called for actual snapshots, including unavailable scans. Identical samples do not persist.
-    func observe(_ observations: [String: BadgeObservation], session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
-        synchronize(session: session, at: date)
+    func observe(_ observations: [String: BadgeObservation], at date: Date = .now) {
         // Join a resolved scan onto the saved spelling before a missing key is stored as unknown.
         let observations = matchedObservations(observations)
         let previous = current
         if current != observations { current = observations }
         guard !requiresReset else { return }
         let before = document
-        if observations.isEmpty, document.active != nil { document.active?.incomplete = true }
-        let paths = Set(document.apps.keys).union(observations.keys).union(previous.keys).union(document.active?.rows.keys.map { $0 } ?? [])
+        let paths = Set(document.apps.keys).union(observations.keys).union(previous.keys)
         for path in paths.sorted() {
             let value = observations[path] ?? .unknown
             if previous[path] != value {
@@ -66,82 +60,9 @@ final class BadgeMemoryStore {
                     document.apps[path] = BadgeAppMemory(changes: [BadgeChange(value: value, date: date)], touched: date)
                 }
             }
-            // AX scans can outlive a start or resume action. They update current presentation,
-            // but must not import pre-boundary observations into the session digest.
-            if (scanStarted ?? date) >= collectionNotBefore,
-               document.active?.rows[path] != nil || previous[path] != value {
-                collect(path: path, value: value)
-            }
         }
         prune(at: date)
         if document != before { persist() }
-    }
-
-    /// Records a failed scan whose last snapshot is still being presented.
-    ///
-    /// Current values and history stay unchanged, so a transient failure does not add an
-    /// unknown transition and a second one back. The active digest is marked incomplete because
-    /// changes during the failure may have been missed. A scan begun before a start or resume
-    /// boundary does not mark the new interval.
-    func markGap(session: FocusSession?, at date: Date = .now, scanStarted: Date? = nil) {
-        synchronize(session: session, at: date)
-        guard !requiresReset, (scanStarted ?? date) >= collectionNotBefore,
-              document.active?.incomplete == false else { return }
-        document.active?.incomplete = true
-        persist()
-    }
-
-    /// A session's deadline is checked before accepting a sample, even if its timer task is delayed.
-    func synchronize(session: FocusSession?, at date: Date = .now, allowStart: Bool = true) {
-        if session?.id != self.session?.id || session?.phase != self.session?.phase {
-            collectionNotBefore = date
-        }
-        self.session = session
-        guard !requiresReset else { return }
-        let before = document
-        if let session, session.id == document.active?.id, session.phase != .completed {
-            document.active?.deadline = session.deadline
-        }
-        if let active = document.active,
-           session?.id != active.id || session?.phase == .completed ||
-            (session?.phase == .running && session!.remaining(at: date) <= 0) {
-            var ended = active
-            ended.ended = min(date, active.deadline ?? date)
-            ended.excludedPaths = []
-            document.digests.insert(ended, at: 0)
-            document.active = nil
-        }
-        if let session, document.lastSessionID != session.id {
-            document.lastSessionID = session.id
-            if allowStart, document.collectFocus, session.phase == .running, session.remaining(at: date) > 0 {
-                var digest = BadgeFocusDigest(id: session.id, modeName: String(session.modeName.prefix(1024)), started: date, deadline: session.deadline, incomplete: current.isEmpty)
-                for path in current.keys.sorted().prefix(100) {
-                    let value = current[path] ?? .unknown
-                    digest.rows[path] = BadgeDigestRow(first: value, last: value, hasGap: value == .unknown)
-                }
-                document.active = digest
-            }
-        }
-        if session?.phase == .paused, document.active != nil { document.active?.incomplete = true }
-        prune(at: date)
-        if before != document { persist() }
-    }
-
-    private func collect(path: String, value: BadgeObservation) {
-        guard session?.phase == .running, var active = document.active, !active.excludedPaths.contains(path) else { return }
-        if var row = active.rows[path] {
-            if row.changes == 0, row.first == .unknown, value != .unknown {
-                // The first reliable value is an endpoint, not an observed count change.
-                row.first = value; row.last = value
-            } else if row.last != value {
-                row.last = value; row.changes = min(1_000_000, row.changes + 1)
-            }
-            if value == .unknown { row.hasGap = true }
-            active.rows[path] = row
-        } else if value != .unknown, active.rows.count + active.excludedPaths.count < 100 {
-            active.rows[path] = BadgeDigestRow(first: value, last: value)
-        }
-        document.active = active
     }
 
     /// App activation does not call this. Only the explicit Mark checked control resets a baseline.
@@ -160,40 +81,15 @@ final class BadgeMemoryStore {
         persist()
     }
 
-    /// Disabling stops collection immediately. Enabling applies to the next newly started session.
-    func setCollectFocus(_ enabled: Bool) {
-        guard !requiresReset else { return }
-        Analytics.shared.featureSettingChanged(.badgeMemoryCollectFocus, from: AnalyticsValue(document.collectFocus), to: AnalyticsValue(enabled))
-        document.collectFocus = enabled
-        if !enabled, var active = document.active {
-            active.ended = .now; active.incomplete = true; active.excludedPaths = []
-            document.digests.insert(active, at: 0); document.active = nil
-        }
-        prune(at: .now); persist()
-    }
-
-    func deleteDigest(_ id: UUID) {
-        guard !requiresReset else { return }
-        document.digests.removeAll { $0.id == id }
-        if document.active?.id == id { document.active = nil }
-        persist()
-    }
-
     func clearApp(_ path: String) {
         guard !requiresReset else { return }
         document.apps[path] = nil
-        if var active = document.active {
-            active.rows[path] = nil
-            if active.rows.count + active.excludedPaths.count < 100 { active.excludedPaths.insert(path) }
-            document.active = active
-        }
-        for index in document.digests.indices { document.digests[index].rows[path] = nil }
         persist()
     }
 
-    /// Deletes all retained data, stops this session's collection and disables future collection.
+    /// Deletes all retained data.
     func clearAll() {
-        document = BadgeMemoryDocument(lastSessionID: session?.id)
+        document = BadgeMemoryDocument()
         requiresReset = false; storageFailed = false
         defaults.removeObject(forKey: Self.key)
     }
@@ -207,15 +103,6 @@ final class BadgeMemoryStore {
         guard !requiresReset else { return }
         let before = document
         document.apps = rekeyed(document.apps, merge: { mergeApps($0, $1) })
-        if var active = document.active {
-            active.rows = rekeyed(active.rows, merge: { mergeRows($0, $1) })
-            active.excludedPaths = rekeyed(active.excludedPaths)
-            document.active = active
-        }
-        for index in document.digests.indices {
-            document.digests[index].rows = rekeyed(document.digests[index].rows, merge: { mergeRows($0, $1) })
-            document.digests[index].excludedPaths = rekeyed(document.digests[index].excludedPaths)
-        }
         if document != before { persist() }
         let remapped = matchedObservations(current)
         if remapped != current { current = remapped }
@@ -236,14 +123,6 @@ final class BadgeMemoryStore {
         return result
     }
 
-    private func rekeyed(_ paths: Set<String>) -> Set<String> {
-        var groups: [String: [String]] = [:]
-        for path in paths {
-            groups[DockBadgePath.key(for: URL(fileURLWithPath: path)), default: []].append(path)
-        }
-        return Set(groups.map { DockBadgePath.preferredStorageKey(identity: $0.key, stored: $0.value) })
-    }
-
     /// Keeps a checked baseline when two saved spellings collapse. Does not invent `.unknown`.
     private func mergeApps(_ first: BadgeAppMemory, _ second: BadgeAppMemory) -> BadgeAppMemory {
         let (primary, secondary) = first.checked == nil && second.checked != nil ? (second, first) : (first, second)
@@ -254,13 +133,9 @@ final class BadgeMemoryStore {
         return result
     }
 
-    private func mergeRows(_ first: BadgeDigestRow, _ second: BadgeDigestRow) -> BadgeDigestRow {
-        second.changes > first.changes ? second : first
-    }
-
     /// Uses the stored spelling when a scan names the same installation.
     private func matchedObservations(_ observations: [String: BadgeObservation]) -> [String: BadgeObservation] {
-        let stored = storedPaths()
+        let stored = Array(document.apps.keys)
         var matched: [String: BadgeObservation] = [:]
         var conflicted: Set<String> = []
         for (path, value) in observations {
@@ -272,19 +147,6 @@ final class BadgeMemoryStore {
         return matched
     }
 
-    private func storedPaths() -> [String] {
-        var paths = Set(document.apps.keys)
-        if let active = document.active {
-            paths.formUnion(active.rows.keys)
-            paths.formUnion(active.excludedPaths)
-        }
-        for digest in document.digests {
-            paths.formUnion(digest.rows.keys)
-            paths.formUnion(digest.excludedPaths)
-        }
-        return Array(paths)
-    }
-
     private func prune(at date: Date) {
         let cutoff = date.addingTimeInterval(-Self.retention)
         for path in document.apps.keys {
@@ -294,8 +156,6 @@ final class BadgeMemoryStore {
             }
             if document.apps[path]?.changes.isEmpty == true, document.apps[path]?.checked == nil { document.apps[path] = nil }
         }
-        document.digests = Array(document.digests.filter { ($0.ended ?? $0.started) >= cutoff }.prefix(10))
-        if let active = document.active, active.started < cutoff { document.active = nil }
     }
 
     private func persist() {
@@ -319,15 +179,7 @@ final class BadgeMemoryStore {
         }
         func dateValid(_ date: Date) -> Bool { date.timeIntervalSince1970.isFinite }
         func pathValid(_ path: String) -> Bool { path.hasPrefix("/") && path.count <= 4096 && path.hasSuffix(".app") }
-        func digestValid(_ digest: BadgeFocusDigest) -> Bool {
-            digest.rows.count + digest.excludedPaths.count <= 100 && digest.excludedPaths.allSatisfy(pathValid)
-                && digest.modeName.count <= 1024 && dateValid(digest.started)
-                && (digest.ended.map(dateValid) ?? true) && (digest.deadline.map(dateValid) ?? true) && digest.rows.allSatisfy { path, row in
-                    pathValid(path) && valueValid(row.first) && valueValid(row.last) && (0...1_000_000).contains(row.changes)
-                }
-        }
-        return doc.apps.count <= 100 && doc.digests.count <= 10 && (doc.active.map(digestValid) ?? true)
-            && doc.digests.allSatisfy(digestValid) && doc.apps.allSatisfy { path, app in
+        return doc.apps.count <= 100 && doc.apps.allSatisfy { path, app in
                 pathValid(path) && dateValid(app.touched) && app.changes.count <= 20
                     && app.changes.allSatisfy { valueValid($0.value) && dateValid($0.date) }
                     && (app.checked.map { valueValid($0.value) && dateValid($0.date) } ?? true)

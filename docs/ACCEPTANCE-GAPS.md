@@ -82,7 +82,7 @@ Read-only reconciliation against Linear descriptions and comments on 2026-09-29:
 | [DEE-40](https://linear.app/d-zwei/issue/DEE-40) App Divorce Court | September 13 owner comment keeps it for local experiments, outside production toward 1.0. | Excluded from this acceptance pass. |
 | [DEE-53](https://linear.app/d-zwei/issue/DEE-53) calendar cues | In Progress; no EventKit implementation found in current app sources. | Planned feature, not verified as shipped. |
 | [DEE-60](https://linear.app/d-zwei/issue/DEE-60) flag badges | In Progress; no matching flag-status implementation found in current app sources. | Planned feature, not verified as shipped. |
-| [DEE-61](https://linear.app/d-zwei/issue/DEE-61) configurable digest | Existing badge digest does not establish the requested frequency, verbosity, and section controls. | Feature scope remains open. |
+| [DEE-61](https://linear.app/d-zwei/issue/DEE-61) configurable digest | The Focus Session badge digest this would have configured was removed with Focus Sessions in DEE-148. | Nothing left to configure; scope needs a new decision. |
 
 No Linear status or GitHub issue was changed. Deprecated personality features and withdrawn Metal
 indicators do not need acceptance as enabled production features; their disabled-on-launch and

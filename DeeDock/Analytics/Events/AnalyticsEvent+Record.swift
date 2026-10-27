@@ -107,7 +107,6 @@ extension AnalyticsEvent {
         case .toolOpened: "tool_opened"
         case .focusDockEntered: "focus_dock_entered"
         case .focusDockCommand: "focus_dock_command"
-        case .focusSession: "focus_session"
         case let .update(event, _): event.name
         case .applicationUpdated: "Application updated"
         }
@@ -356,8 +355,6 @@ extension AnalyticsEvent {
             ["trigger": .init(trigger)]
         case let .focusDockCommand(command):
             ["command": .init(command)]
-        case let .focusSession(action):
-            ["action": .init(action)]
         case let .update(event, facts):
             facts.properties.merging(event.properties)
         case let .applicationUpdated(change):

@@ -98,7 +98,7 @@ Git does not enable that path on its own. The hook needs `xcodebuild`. Skip it f
 - `DeeDock/Dock/Popover` owns the transient panel shell shared by folder stacks and the Shelf: its window, dismissal monitors, animation, inward placement geometry, and pointer shape, plus the presenter that keeps only one open.
 - `DeeDock/Dock/Shelf` holds the staged-item model, its repository, the shared controller, security-scoped access, the panel state and view, the native drag sources, and the coordinator.
 - `DeeDock/Dock/SemanticStacks` owns metadata-only grouping, streamed result repair, process-lifetime caching, and the Foundation Models adapter shared by folder stacks and the Shelf. Identical live requests share one generation. When Smart is selected, Shelf edits silently prepare the next grouping after a short debounce unless Low Power Mode is active.
-- `DeeDock/Dock/History` owns the shared DOKK-local pin and Focus Session event model, persistence, and dock-axis scrub mapping. DEE-45 can reuse the same events for session playback.
+- `DeeDock/Dock/History` owns the shared DOKK-local pin event model, persistence, and dock-axis scrub mapping.
 - `DeeDock/Dock/Views` separates live-store wiring, scrolling, surface composition, app buttons, material, and errors.
 - `DeeDock/Dock/Islands` owns DOKK Islands: the per-display plan (`DockIslandPlan`, counts of consecutive pins per island, reconciled against every pin edit), the dock-wide `DockIslandSettings` nested in `DockSettings`, slot grouping (`DockIslandAssignment`), the palette and icon sampler, and the plan store. The island glass itself is `DockIslandBackgroundView` under `Dock/Views`.
 - `DeeDock/Dock/PreviewSupport` provides deterministic fixtures with inert actions, compiled only in Debug.

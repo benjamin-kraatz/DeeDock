@@ -5,8 +5,6 @@ struct DockModesSettingsPane: View {
     let store: DockModesStore
     var activateMode: ((UUID) -> Bool)?
     var deleteMode: ((UUID) -> Bool)?
-    var startFocus: ((DockMode) -> Void)?
-    var canStartFocus = false
     var applications: (any ApplicationServicing)?
     var actions: ActionTilesController?
     var prepareWorkspace: ((DockMode) -> Void)?
@@ -95,11 +93,6 @@ struct DockModesSettingsPane: View {
                 Button(.recipeTitle, systemImage: "briefcase") { prepareWorkspace(mode) }
                     .labelStyle(.iconOnly).buttonStyle(.borderless).disabled(!canPrepareWorkspace)
                     .help(Text(.recipePrepareHelp))
-            }
-            if let startFocus {
-                Button(.focusStart, systemImage: "timer") { startFocus(mode) }
-                    .labelStyle(.iconOnly).buttonStyle(.borderless).disabled(!canStartFocus)
-                    .help(Text(.focusStartHelp))
             }
             if mode.id == store.document.activeModeID {
                 Text(.dockModesCurrent)

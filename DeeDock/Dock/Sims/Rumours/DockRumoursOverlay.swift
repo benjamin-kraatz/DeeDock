@@ -47,7 +47,7 @@ struct DockRumoursOverlay: View {
             && interaction.sims?.requiresReset == false && interaction.pointer == nil
             && !interaction.dragActive && !interaction.suppressTooltips && !store.keyboardFocus
             && store.errorMessage == nil && interaction.dragMessage == nil
-            && store.focusSession?.isActive != true && store.launching.isEmpty
+            && store.launching.isEmpty
             && interaction.timeline?.isActive(on: store.displayID) != true
         let participants = allowed ? store.items.filter {
             $0.isFavorite && frame(for: $0.id).map { viewport.contains($0) } == true

@@ -7,7 +7,6 @@ final class DockBadgeController {
     let memory: BadgeMemoryStore
     /// Which of the presented badges are news. Line icon docks draw those as a red ring.
     let attention: BadgeAttentionStore
-    @ObservationIgnored var focusSession: (() -> FocusSession?)?
     private(set) var labels: [String: String] = [:]
     @ObservationIgnored private var worker: Task<Void, Never>?
     @ObservationIgnored private var continuation: AsyncStream<Void>.Continuation?
@@ -95,11 +94,10 @@ final class DockBadgeController {
                 self?.timer?.invalidate()
                 self?.timer = nil
                 let pid = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first?.processIdentifier
-                let scanStarted = Date()
                 let next = await reader.read(pid: pid)
                 guard !Task.isCancelled, let self, generation == session else { break }
                 // One AX timeout must not blank every dot or write unknown values into history.
-                self.applyScan(next, at: .now, scanStarted: scanStarted)
+                self.applyScan(next, at: .now)
                 scheduleFallback()
             }
             await reader.stop()
@@ -142,22 +140,20 @@ final class DockBadgeController {
         continuation = nil
         worker?.cancel()
         retention.suspend(keeping: memory.current)
-        memory.markGap(session: focusSession?())
         if !labels.isEmpty { labels = [:] }
         memory.present([:])
     }
 
     /// Applies one reader result. `snapshot` is nil when the scan threw.
-    func applyScan(_ snapshot: [String: BadgeObservation]?, at now: ContinuousClock.Instant, scanStarted: Date) {
+    func applyScan(_ snapshot: [String: BadgeObservation]?, at now: ContinuousClock.Instant) {
         switch retention.resolve(snapshot, at: now) {
         case .retain(let hidden):
-            memory.markGap(session: focusSession?(), scanStarted: scanStarted)
             if let hidden {
                 memory.present(hidden)
                 publish(hidden)
             }
         case .update(let snapshot):
-            memory.observe(snapshot, session: focusSession?(), scanStarted: scanStarted)
+            memory.observe(snapshot)
             // Only a real scan may forget acknowledgements; a retained snapshot is not an observation.
             attention.reconcile(snapshot, frontmost: Self.frontmostKey())
             publish(snapshot)

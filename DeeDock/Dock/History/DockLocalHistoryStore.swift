@@ -1,9 +1,9 @@
 import Foundation
 import Observation
 
-/// App-wide DDock-local pin and Focus Session history.
+/// App-wide DOKK-local pin history.
 ///
-/// Records only actions the user already took inside DDock. Nothing is imported from
+/// Records only actions the user already took inside DOKK. Nothing is imported from
 /// macOS Screen Time, workspace telemetry, or other applications. Pin writes that only
 /// change folder presentation or bookmarks are ignored. Mode activation does not pass
 /// through this store.
@@ -13,7 +13,6 @@ final class DockLocalHistoryStore {
     private(set) var requiresReset = false
     private(set) var storageFailed = false
     @ObservationIgnored private let repository: DockLocalHistoryRepository
-    @ObservationIgnored private var lastSession: FocusSession?
 
     var events: [DockLocalHistoryEvent] { document.events }
     var recordingEnabled: Bool { document.recordingEnabled }
@@ -23,18 +22,13 @@ final class DockLocalHistoryStore {
     var isEmpty: Bool { document.events.isEmpty }
     /// Notified after the pin-preview preference is persisted so an open timeline can react.
     @ObservationIgnored var replayEnabledDidChange: (() -> Void)?
-    /// The Focus Session currently being grouped for future DEE-45 playback, if any.
-    var activeSessionID: UUID? {
-        guard let session = lastSession, session.phase != .completed else { return nil }
-        return session.id
-    }
 
     init(repository: DockLocalHistoryRepository = DockLocalHistoryRepository()) {
         self.repository = repository
     }
 
-    /// Loads stored events. An already-running session is remembered without inventing a start event.
-    func start(session: FocusSession? = nil) {
+    /// Loads stored events.
+    func start() {
         do {
             if let stored = try repository.load() {
                 document = stored
@@ -43,7 +37,6 @@ final class DockLocalHistoryStore {
             requiresReset = true
             storageFailed = true
         }
-        lastSession = session
         guard !requiresReset else { return }
         let before = document.events.count
         prune(at: .now)
@@ -72,45 +65,27 @@ final class DockLocalHistoryStore {
         let mutations = DockLocalHistoryPinDiff.mutations(previous: previous, next: next)
         guard !mutations.isEmpty else { return }
         archive(previous + next)
-        let sessionID = activeSessionID
         let pinIDs = snapshotIDs(next)
         for mutation in mutations {
             let event: DockLocalHistoryEvent
             switch mutation {
             case .added(let id, let name):
-                event = makeEvent(kind: .pinAdded, at: date, displayID: displayID, sessionID: sessionID,
+                event = makeEvent(kind: .pinAdded, at: date, displayID: displayID,
                                   subjectID: id, subjectName: name, pinIDs: pinIDs)
             case .removed(let id, let name):
-                event = makeEvent(kind: .pinRemoved, at: date, displayID: displayID, sessionID: sessionID,
+                event = makeEvent(kind: .pinRemoved, at: date, displayID: displayID,
                                   subjectID: id, subjectName: name, pinIDs: pinIDs)
             case .moved(let id, let name):
-                event = makeEvent(kind: .pinMoved, at: date, displayID: displayID, sessionID: sessionID,
+                event = makeEvent(kind: .pinMoved, at: date, displayID: displayID,
                                   subjectID: id, subjectName: name, pinIDs: pinIDs)
             case .reordered:
-                event = makeEvent(kind: .pinsReordered, at: date, displayID: displayID, sessionID: sessionID,
+                event = makeEvent(kind: .pinsReordered, at: date, displayID: displayID,
                                   pinIDs: pinIDs)
             }
             append(event)
         }
         prune(at: date)
         persist()
-    }
-
-    /// Observes Focus Session transitions. The first sample after launch does not invent history.
-    func noteSession(_ session: FocusSession?, at date: Date = .now) {
-        let previous = lastSession
-        lastSession = session
-        guard !requiresReset, document.recordingEnabled else { return }
-        let events = sessionTransitions(from: previous, to: session, at: date)
-        guard !events.isEmpty else { return }
-        for event in events { append(event) }
-        prune(at: date)
-        persist()
-    }
-
-    /// Events that belong to one Focus Session, in time order, for later DEE-45 playback.
-    func events(forSession id: UUID) -> [DockLocalHistoryEvent] {
-        document.events.filter { $0.sessionID == id }
     }
 
     func clear() {
@@ -129,50 +104,13 @@ final class DockLocalHistoryStore {
         repository.remove()
     }
 
-    private func sessionTransitions(from previous: FocusSession?, to session: FocusSession?,
-                                    at date: Date) -> [DockLocalHistoryEvent] {
-        var events: [DockLocalHistoryEvent] = []
-        if let previous, session?.id != previous.id, previous.phase != .completed {
-            events.append(makeEvent(kind: .sessionDismissed, at: date, sessionID: previous.id,
-                                    subjectID: previous.modeID.uuidString, subjectName: previous.modeName))
-        }
-        if let session, session.id != previous?.id, session.phase == .running {
-            events.append(makeEvent(kind: .sessionStarted, at: date, sessionID: session.id,
-                                    subjectID: session.modeID.uuidString, subjectName: session.modeName))
-            return events
-        }
-        guard let session, let previous, session.id == previous.id else { return events }
-        if previous.phase == .running, session.phase == .paused {
-            events.append(makeEvent(kind: .sessionPaused, at: date, sessionID: session.id,
-                                    subjectID: session.modeID.uuidString, subjectName: session.modeName))
-        } else if previous.phase == .paused, session.phase == .running {
-            events.append(makeEvent(kind: .sessionResumed, at: date, sessionID: session.id,
-                                    subjectID: session.modeID.uuidString, subjectName: session.modeName))
-        } else         if session.phase == .completed, previous.phase != .completed {
-            closeSessionSpan(id: session.id, at: date)
-            events.append(makeEvent(kind: .sessionFinished, at: date, sessionID: session.id,
-                                    subjectID: session.modeID.uuidString, subjectName: session.modeName))
-        }
-        return events
-    }
-
-    /// Marks the matching start event so a future podcast can read one closed clip.
-    private func closeSessionSpan(id: UUID, at date: Date) {
-        guard let index = document.events.lastIndex(where: {
-            $0.sessionID == id && $0.kind == .sessionStarted
-        }) else { return }
-        document.events[index].endedAt = date
-    }
-
     private func makeEvent(kind: DockLocalHistoryEvent.Kind, at date: Date, displayID: String? = nil,
-                           sessionID: UUID? = nil, subjectID: String? = nil,
-                           subjectName: String? = nil, pinIDs: [String]? = nil) -> DockLocalHistoryEvent {
+                           subjectID: String? = nil, subjectName: String? = nil,
+                           pinIDs: [String]? = nil) -> DockLocalHistoryEvent {
         DockLocalHistoryEvent(
             id: UUID(),
             occurredAt: date,
-            endedAt: nil,
             kind: kind,
-            sessionID: sessionID,
             displayID: displayID.map { String($0.prefix(256)) },
             subjectID: subjectID.map { String($0.prefix(4096)) },
             subjectName: subjectName.map { String($0.prefix(512)) },

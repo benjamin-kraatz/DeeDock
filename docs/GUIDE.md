@@ -16,7 +16,6 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [External drives](#external-drives)
 - [Windows](#windows)
 - [Dock Modes](#dock-modes)
-- [Focus Sessions](#focus-sessions)
 - [Local History](#local-history)
 - [Session Capsules](#session-capsules)
 - [Action Tiles](#action-tiles)
@@ -265,32 +264,15 @@ Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or 
 
 Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
 
-The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. Ordinary switching updates pins and app visibility only. **Prepare Workspace** is a separate command: it activates the chosen mode, then runs that mode's optional recipe in order. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return to switch. P prepares the selected mode's workspace. Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks. Prepare reports that blocked state and does not open apps, files, links, or Shortcuts. A recipe does not start a Focus Session, replay after launch, or arrange windows.
+The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. Ordinary switching updates pins and app visibility only. **Prepare Workspace** is a separate command: it activates the chosen mode, then runs that mode's optional recipe in order. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return to switch. P prepares the selected mode's workspace. Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks. Prepare reports that blocked state and does not open apps, files, links, or Shortcuts. A recipe does not replay after launch or arrange windows.
 
 Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DOKK continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
 
 Choose a named configuration from **Dock Mode** in the menu-bar item, or press M in Focus Dock to open the keyboard mode picker. A mode changes every display's pins and App Visibility together; it does not launch, quit, hide, or reorder running-only apps. **Prepare Workspace** is a separate command that runs that mode's optional recipe.
 
-## Focus Sessions
-
-Choose **Dock Mode → Start Focus Session → [mode]** from the menu bar, or use the timer button beside a mode in **Settings → Modes**. DOKK activates that mode and starts a shared timer. You can also start from the already-active mode. Only one session can run or pause at a time; switching modes later does not replace its timer.
-
-The timer tile appears on every display. Its ring shows time remaining. Click it for **Pause**, **Resume**, **Add 5 Minutes**, and **Finish**. A finished session keeps a checkmark tile until dismissed or replaced by a new session. **Save Session Capsule** opens the usual window-selection and draft-review flow; finishing never captures or saves anything automatically.
-
-Set the next session's duration, from 1 to 180 minutes, in **Settings → Features → Focus Sessions**. The default is 25 minutes. Completion animation is optional and off by default, and Reduce Motion suppresses it. There are no streaks.
-
-Running timers use a saved wall-clock deadline, so sleep and app downtime count. Paused timers retain their remaining duration. Reopening DOKK after the deadline marks the session finished without replaying a celebration. Changing focus defaults does not restart the current session. Renaming or deleting a Dock Mode does not erase a timer already started from it.
-
-### Boss Fight
-
-**Boss Fight** is an optional Easter egg in Settings → Features → Focus Sessions. Choose
-up to eight work apps for your party, then start a normal session. A boss health bar shows
-remaining time, and completion adds a brief, silent trophy. Disable the skin at any time
-without changing the timer. See [Boss Fight behavior and acceptance](BOSS-FIGHT.md).
-
 ## Local History
 
-Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DOKK-local pin and Focus Session events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Session events share an identifier so a later session-scrub feature can replay one Focus Session from the same log.
+Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DOKK-local pin events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Focus Session events recorded by older versions are dropped when history loads.
 
 **Show pins while browsing** is off until you turn it on in that same settings card. With it on, the dock waits until you pause on a moment, then shows that pin order using the usual insert, remove, and move animations. Saved pins do not change. Leaving the timeline restores the current layout.
 
@@ -447,7 +429,7 @@ AX reads run outside the main actor and do not depend on pointer movement or ani
 
 ### Badge memory
 
-Click an app badge, choose **Badge details** from its context menu, or press **B** in Focus Dock to review observed changes. **Mark checked** explicitly sets the comparison baseline; opening an app leaves it unchanged. Optional Focus Session collection provides a digest of net badge changes. History, baseline and digest deletion controls are available in **Settings → Features → App badges → Review badge history**. See [Badge memory](BADGE_MEMORY.md) for retention limits and observation gaps.
+Click an app badge, choose **Badge details** from its context menu, or press **B** in Focus Dock to review observed changes. **Mark checked** explicitly sets the comparison baseline; opening an app leaves it unchanged. History and baseline deletion controls are available in **Settings → Features → App badges → Review badge history**. See [Badge memory](BADGE_MEMORY.md) for retention limits and observation gaps.
 
 ## Notification Feed
 
@@ -796,7 +778,7 @@ DOKK uses Sparkle’s update engine with a DOKK-owned native update window. Cons
 
 ## Deprecated features
 
-These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Focus breathing, Focus debt, Pin weather (icon rust), Quarantine stamp, Patch bay, and Magnetic Edges. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
+These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Pin weather (icon rust), Quarantine stamp, Patch bay, and Magnetic Edges. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
 
 **Patch bay** is deprecated. Launch turns cable actions off. The editor stays under **Settings → Features → Deprecated**. See [supported ports and limits](PATCH-BAY.md).
 
@@ -804,10 +786,3 @@ These personality extras are deprecated and turn off on launch: Dock Sims and AI
 
 **AI icon rumours** and Dock Sims are deprecated. Launch turns Sims moods off, which also stops rumours. Settings stay under **Settings → Features → Deprecated → Dock Sims**. See [Icon rumours](ICON-RUMOURS.md) for the old consent and data boundaries.
 
-**Focus breathing** is deprecated and will be removed in version 1.0.0. Launch turns it off.
-The controls live under **Settings → Features → Deprecated**, not on Modes.
-See [Focus breathing](FOCUS-BREATHING.md) for the old setup and native acceptance limits.
-
-**Focus debt** is deprecated and will be removed in version 1.0.0. Launch turns the meter off.
-Its page is under **Settings → Features → Deprecated**. When it was enabled, each new session
-was a promise to let its timer finish. Finishing or cancelling early added one to a local count.

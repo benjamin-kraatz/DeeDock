@@ -50,7 +50,7 @@ struct FeaturesPageContent: View {
                                   showCounts: source.binding(\.showAppBadgeCounts),
                                   windowAccess: context.windowAccess, locked: locked)
             if let coordinator = context.coordinator {
-                BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
+                BadgeMemorySettingsCard(open: { coordinator.showBadgeMemory() })
             }
         case .notificationFeed:
             NotificationFeedSettingsCard(isOn: source.binding(\.showNotificationFeed),
@@ -73,23 +73,6 @@ struct FeaturesPageContent: View {
             WindowPeekSettingsPane(source: source, persistentSettingsDisabled: locked)
             if let coordinator = context.coordinator {
                 PeekHistorySettingsCard(history: coordinator.peekHistory)
-            }
-        case .focusSessions:
-            if let coordinator = context.coordinator {
-                FocusSessionSettingsCard(controller: coordinator.focusSession)
-                BadgeMemorySettingsCard(memory: coordinator.badgeMemory, open: { coordinator.showBadgeMemory(digest: true) })
-            }
-        case .focusBreathing:
-            if let coordinator = context.coordinator {
-                FocusBreathingSettingsCard(store: coordinator.focusBreathing, modes: coordinator.profiles.modes)
-            }
-        case .focusDebt:
-            if let coordinator = context.coordinator {
-                SettingsCard(title: .focusDebtTitle) {
-                    SettingsStackedRow {
-                        FocusDebtSettingsView(controller: coordinator.focusSession)
-                    }
-                }
             }
         case .quarantine:
             QuarantineSettingsCard()

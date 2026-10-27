@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The badge history window: what an app's badge is doing now, and what it did during a session.
+/// The badge history window: what an app's badge is doing now, and how it changed.
 ///
 /// Native tabs, list selection and buttons provide keyboard and VoiceOver navigation. Nothing here
 /// samples badges or changes an app; the store is read, and every write is an explicit control.
@@ -21,24 +21,17 @@ struct BadgeMemoryView: View {
 
     /// The selected app's own color carries the window. Nothing selected keeps the system accent.
     private var tint: Color {
-        guard presentation.tab == 0, let path = presentation.path else { return .accentColor }
+        guard let path = presentation.path else { return .accentColor }
         return BadgeAppArtwork.tint(path, dark: colorScheme == .dark) ?? .accentColor
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            TabView(selection: $presentation.tab) {
-                Tab(String(localized: .badgeMemoryDetails), systemImage: "app.badge", value: 0) {
-                    details
-                }
-                Tab(String(localized: .badgeMemoryDigest), systemImage: "timer", value: 1) {
-                    BadgeDigestView(memory: memory, activate: activate)
-                }
-            }
-            .overlay(alignment: .top) { wash }
-            .overlay(alignment: .top) { banners }
+            details
+                .overlay(alignment: .top) { wash }
+                .overlay(alignment: .top) { banners }
             Divider()
-            BadgeMemoryFooter(memory: memory, clearAll: { confirmsClear = true }, close: close)
+            BadgeMemoryFooter(clearAll: { confirmsClear = true }, close: close)
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .confirmationDialog(.badgeMemoryClearAll, isPresented: $confirmsClear) {
@@ -74,8 +67,8 @@ struct BadgeMemoryView: View {
         }
     }
 
-    /// Storage and activation problems belong above whichever tab is open: both outlive a tab
-    /// switch, and neither is caused by the tab the user is looking at.
+    /// Storage and activation problems sit above the content: neither is caused by the app the user
+    /// has selected.
     @ViewBuilder private var banners: some View {
         VStack(spacing: 8) {
             if memory.storageFailed {
@@ -121,25 +114,17 @@ private struct BadgeMemoryBanner: View {
     }
 }
 
-/// Collection is a preference, not an action, so it stays visible next to the limits it obeys.
+/// Clear All and Close, with the retention limits stated next to the destructive control.
 private struct BadgeMemoryFooter: View {
-    let memory: BadgeMemoryStore
     let clearAll: () -> Void
     let close: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Toggle(isOn: Binding(get: { memory.document.collectFocus }, set: memory.setCollectFocus)) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(.badgeMemoryCollect)
-                    Text(.badgeMemoryRetention)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .toggleStyle(.switch)
-            .disabled(memory.requiresReset)
+            Text(.badgeMemoryRetention)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             HStack {
                 Button(.badgeMemoryClearAll, role: .destructive, action: clearAll)
                 Spacer(minLength: 12)
@@ -155,24 +140,23 @@ private struct BadgeMemoryFooter: View {
 }
 
 #if DEBUG
-@MainActor private func badgeMemoryPreview(tab: Int, path: String?) -> some View {
+@MainActor private func badgeMemoryPreview(path: String?) -> some View {
     let presentation = BadgeMemoryPresentation()
-    presentation.tab = tab
     presentation.path = path
     return BadgeMemoryView(memory: BadgeMemoryStore(defaults: UserDefaults(suiteName: "BadgeWindowPreview")!),
                            presentation: presentation, activate: { _ in }, close: {})
 }
 
 #Preview("Details, nothing tracked") {
-    badgeMemoryPreview(tab: 0, path: nil).frame(width: 780, height: 620)
+    badgeMemoryPreview(path: nil).frame(width: 780, height: 620)
 }
 
 #Preview("Details, one app selected") {
-    badgeMemoryPreview(tab: 0, path: "/Applications/Mail.app").frame(width: 780, height: 620)
+    badgeMemoryPreview(path: "/Applications/Mail.app").frame(width: 780, height: 620)
 }
 
-#Preview("Focus digest, German") {
-    badgeMemoryPreview(tab: 1, path: nil)
+#Preview("Details, German") {
+    badgeMemoryPreview(path: "/Applications/Mail.app")
         .environment(\.locale, Locale(identifier: "de"))
         .frame(width: 780, height: 620)
 }

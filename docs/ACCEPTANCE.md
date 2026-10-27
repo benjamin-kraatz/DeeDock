@@ -374,14 +374,43 @@ Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock
 
 ## Deprecated personality features
 
-Dock Sims (including AI icon rumours), Focus breathing, Focus debt, Pin weather / icon rust,
+Dock Sims (including AI icon rumours), Pin weather / icon rust,
 Quarantine stamp, Patch bay, and Magnetic Edges are deprecated. They will be removed in
 version 1.0.0. Launch coerces each enable flag to off and persists that. Settings keeps a
 **Deprecated** section under Features so the removal notice stays reachable. Atmosphere and
 soap bubbles stay first-class.
 
 The slices below remain the record of how those features were built. Hands-on checks that
-assume they stay on after launch no longer apply.
+assume they stay on after launch no longer apply. Focus breathing and Focus debt were
+deprecated here too; DEE-148 removed them with Focus Sessions.
+
+## DEE-148 Focus Sessions removed
+
+Focus Sessions, the Boss Fight skin, Focus breathing (including its macOS Focus filter App
+Intent), and Focus debt are gone, with no replacement. Their settings pages, the timer
+button in Settings → Modes, **Dock Mode → Start Focus Session** in the menu bar, the timer
+tile and panel, the `focus_session` analytics event, the `focus_session` mode-switch source,
+and the `badge_memory_collect_focus` setting are removed. Dock Modes stay.
+
+Dependent features keep working without them:
+
+- Badge memory keeps history, baselines and Mark checked. The digest tab, the collection
+  toggle and digest storage are removed. Older `dock.badge-memory.v1` documents still
+  decode; their digest fields are ignored and dropped on the next save.
+- Local History records pin events only. Stored session events (`sessionStarted`,
+  `sessionPaused`, `sessionResumed`, `sessionFinished`, `sessionDismissed`) are dropped
+  while decoding, so they neither fail the load nor appear as unrecognized markers. The
+  next save writes the document without them. Other unknown kinds still decode as before.
+- Session Capsules lose the handoff from a finished session. Capsule creation,
+  breadcrumbs and Launcher checkpoints are unchanged.
+- The update idle gate no longer checks for an open Focus Session panel.
+
+`dock.focus-sessions.v1` and the `dock.focus-breathing.*` keys stay in UserDefaults
+unread. DOKK has no legacy-key cleanup to add them to.
+
+On 2026-10-27, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-derivedDataPath /tmp/dee-148-dd build-for-testing CODE_SIGNING_ALLOWED=NO` succeeded,
+compiling the app and test targets. No tests were run, and the app was not launched.
 
 ## DEE-86 product name
 
@@ -591,22 +620,6 @@ placement, or relaunch.
 - Confirm Reduce Motion keeps the update tile static and only fades the callout. Confirm German and English. Confirm
   onboarding does not show the idle switch.
 
-## DEE-37 Focus breathing
-
-Implemented as an app-wide opt-in, now under **Settings → Features → Deprecated**, off by default. Launch turns it off. It is no longer hosted on Modes or Focus Sessions.
-The intensity slider ranges from 0 to 100 percent and resets to 30 percent. Running Focus
-Sessions, explicitly selected Dock Modes, and a configured public macOS Focus filter can
-trigger a six-second highlight inside DDock's background. Reduce Motion removes it.
-Hidden docks and backgrounds stop the timeline. Icons and dock geometry are unaffected.
-
-On 2026-09-12, the unsigned Debug `DeeDock` scheme build succeeded with Xcode 27 and the
-macOS 27 SDK. App Intent metadata exported successfully. English and German strings are
-included in the app. Static diff review passed. Tests, preview rendering, app launch,
-and native visual or interaction acceptance were not run.
-
-System Settings filter discovery and on/off delivery remain unverified on this macOS build.
-See [Focus breathing](FOCUS-BREATHING.md) for configuration and the pending native checks.
-
 ## DEE-58 patch-bay automations
 
 Implemented on `feature/dee-58`. **Settings → Features → Deprecated → Patch bay** still offers app-open output ports and pinned-folder input ports, visual cable dragging, button-based keyboard routing, saved-cable controls, and English/German copy. Launch turns cable actions off. Successful app-pin opens can request the wired folder in Finder with activation disabled. Hiding an app never fires the cable. See [supported ports and limits](PATCH-BAY.md).
@@ -654,7 +667,7 @@ Length-tolerance follow-up: removed the 65-character rejection and length-only m
 - Load preferences saved before DEE-43 or with only the earlier canned-rumour flag enabled. Confirm AI rumours start off and Sims moods and care history remain intact. Enable rumours, restart, and confirm the switch persists.
 - With Sims and AI rumours on and at least two visible pinned apps, leave the pointer outside a visible dock for 30 seconds plus generation time. Confirm a model-selected opening and reply appear beside their respective icons for five seconds each. Wait 90 more seconds plus generation time for a fresh exchange. Assess coherence, brevity, variation, English and German fluency, and response latency.
 - Enter the dock during either line. Confirm it disappears and the first click still activates the app. Exercise keyboard Focus Dock, dragging, menus, popovers, errors, Launcher, and timeline browsing during playback.
-- Disable AI rumours or Sims, enable Reduce Motion, or start or pause a Focus Session. Confirm playback stops. End the session or restore eligibility and confirm the quiet interval starts fresh.
+- Disable AI rumours or Sims, or enable Reduce Motion. Confirm playback stops. Restore eligibility and confirm the quiet interval starts fresh.
 - Disable and re-enable AI rumours while generation is in flight. Confirm the older response never appears. Check that two display docks never generate concurrently.
 - Exercise model unavailable, Apple Intelligence disabled, unsupported locale, refusal, invalid response, and generation-error states. Confirm an invalid draft gets at most one revision, final failures leave selectable Error details, and Console shows IconRumours events without app names or dialogue. The dock stays quiet without a canned fallback.
 - Exercise auto-hide, all four edges, horizontal and vertical overflow, long app names, German text, Reduce Transparency, and VoiceOver. Confirm callouts fit without changing icon positions or taking focus.
@@ -702,16 +715,16 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 
 ## DEE-36 dock as timeline
 
-Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits and Focus Session transitions into `dock.local-history.v1`. **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history. An already-running session after launch does not invent a start event.
+Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits into `dock.local-history.v1`. (It also recorded Focus Session transitions until DEE-148 removed them.) **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history.
 
-The event model keeps `sessionID`, optional `endedAt` on the matching start event, and `Kind.unrecognized` so DEE-45 can add playback markers without a second store. New pin events also store post-change `pinIDs` and an archive of resolvable pins. Recording is on by default and limited to 500 events or 90 days. **Show pins while browsing** is off by default, including on older documents. When it is on, the glance follows the playhead immediately. Arrow keys apply that pin order at once. Pointer scrub waits 200 ms on one event. The glance card sits in a taller inward reserve so it is not clipped. Resting on the card does not move the playhead. Leaving the timeline, or turning the toggle off, restores saved pins. Preview never writes `savePins` or records new history. **Settings → Features → Local History** can pause recording and clear the log. Corrupt bytes are reported and never overwritten.
+The event model keeps `Kind.unrecognized` so DEE-45 can add playback markers without a second store. New pin events also store post-change `pinIDs` and an archive of resolvable pins. Recording is on by default and limited to 500 events or 90 days. **Show pins while browsing** is off by default, including on older documents. When it is on, the glance follows the playhead immediately. Arrow keys apply that pin order at once. Pointer scrub waits 200 ms on one event. The glance card sits in a taller inward reserve so it is not clipped. Resting on the card does not move the playhead. Leaving the timeline, or turning the toggle off, restores saved pins. Preview never writes `savePins` or records new history. **Settings → Features → Local History** can pause recording and clear the log. Corrupt bytes are reported and never overwritten.
 
 This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
 
 ### Required hands-on acceptance
 
 - Pin, unpin, and reorder on one display. Confirm those events scrub on that dock and that a folder Grid/List change does not add an event.
-- Start, pause, resume, and finish a Focus Session. Confirm the events share one session id and remain readable at a glance while scrubbing.
+- Load history saved by a build with Focus Sessions. Confirm its session events no longer appear and pin events remain.
 - Open Browse Local History with no stored events. Confirm the privacy empty state. Pause recording, pin an app, and confirm nothing new appears. Clear history and confirm the empty state returns.
 - With **Show pins while browsing** off, scrub and confirm pins stay as they are. Turn it on, pause on an older pin event, and confirm the dock icons change after a short pause, then return when you leave the timeline. Confirm saved pins did not change.
 - Confirm the system Dock is unchanged and that no Screen Time or other-app activity appears.
@@ -741,7 +754,7 @@ Model cases worth later tests: app identity deduplication and pin bookmark prece
 
 Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
 
-`WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files. Focus Session startup is unchanged.
+`WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files.
 
 Window arrangement, Launcher Prepare actions, startup replay, shell commands, forced quit, and unsaved-document restoration are out of scope.
 
@@ -757,7 +770,6 @@ No Xcode build or tests were run. This environment has no Xcode. Compilation and
 - Restart after a partial run. Confirm it does not replay.
 - Rename a Shortcut, remove an app, move a file, duplicate and delete a mode. Repair the broken step without losing the rest of the recipe. Deleting a mode must leave source files on disk.
 - Invoke Prepare during a drag, menu, or file picker. Confirm the blocked state is reported and nothing opens.
-- Confirm Prepare does not start a Focus Session timer.
 - Exercise keyboard-only operation, VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and rapid repeated Prepare of the same recipe.
 
 ## DEE-32 Metal running indicators withdrawn
@@ -1963,100 +1975,9 @@ Xcode MCP `BuildProject`, with `buildForTesting: false`, built the app successfu
 
 Remaining hands-on acceptance: pin and reorder shortcuts, restart, rename or remove a shortcut externally, exercise one and multiple dropped files from Finder and the Shelf, concurrent runs of different tiles, duplicate activation of a busy tile, helper errors, interactive shortcut prompts, cancellation, shutdown, keyboard navigation, VoiceOver, four dock edges, auto-hide, and reduced accessibility effects. Cancellation stops the CLI but cannot undo shortcut side effects. Sandbox support remains limited by the project's existing configuration.
 
-## Focus Sessions
-
-### DEE-48: opt-in focus debt
-
-Focus debt is deprecated. It is off by default under Settings → Features → Deprecated. Launch turns it off. A session started
-while enabled is a promise. Finish or Cancel before its remaining time reaches zero adds
-one to the shared local count. Pausing, resuming, extending, switching apps or modes,
-quitting DDock, and natural completion do not add debt. Running deadlines still include
-sleep and app downtime. Enabling during a session applies from the next session.
-
-Settings and the timer panel display a numeric count and soft English or German feedback.
-Turn off and clear immediately disables the meter and forgets its count and active promise,
-without changing the timer. Re-enabling during that timer does not restore the promise.
-Cancellation closes the timer panel as before; its updated count remains available in Settings.
-No alerts, sounds, escalating language, app monitoring, system Dock changes, or external
-writebacks are added. The static text uses system styles and native keyboard-accessible controls.
-
-The optional `focusDebt` field in `dock.focus-sessions.v1` stores only the enabled flag,
-count, and current promised session ID. Older documents decode with the meter off.
-Ending a session consumes its promise in the same saved document as the timer change,
-preventing a second increment when the completed session is dismissed.
-
-Regression cases were added for migration, early and natural endings, duplicate endings,
-mid-session opt-in, promise persistence, and immediate clearing without timer changes.
-On 2026-09-12, the Debug app target built successfully with Xcode 27 and signing disabled:
-
-```sh
-xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
-  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-DEE48-build \
-  CODE_SIGNING_ALLOWED=NO build
-```
-
-All seven new strings match the packaged English and German values in `DDock.app`.
-The build reports existing warnings in Badges, Quarantine, Clipboard Museum, and App Intents extraction.
-Tests, previews, app launch, automated visual checks, and native acceptance were not run.
-
-Pending hands-on acceptance: opt in, finish and cancel running and paused sessions, let a
-timer expire, restart before and after expiry, and disable from Settings and the panel.
-Check both languages, VoiceOver, keyboard access, Reduce Motion and Reduce Transparency,
-Boss Fight enabled and disabled, all dock edges, small displays, and multiple displays.
-Confirm clearing updates every open view and that no count returns after re-enabling or restart.
-
-### DEE-18: optional Boss Fight skin
-
-Implemented disabled-by-default Boss Fight preferences, a bounded work-app party picker,
-a boss/timer dock tile, party and health in the timer panel, immediate disable controls,
-explicit session cancellation, and a dismissible three-second silent trophy. Existing
-deadlines, pause/resume, extension, restart/wake reconciliation, and Capsule handoff remain
-the timer authority. Distraction cues and sound are optional parts not included in this
-slice. See [behavior, model cases, and manual checklist](BOSS-FIGHT.md).
-
-On 2026-09-07, the focused Debug app build passed with Xcode 27.0 (27A5252f), macOS 27 SDK,
-Swift 5 mode, MainActor default isolation, and approachable concurrency enabled:
-
-```sh
-xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
-  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-DEE18-build build
-```
-
-Log: `/tmp/DeeDock-DEE18-build.log`. Existing warnings concern an unused launcher token,
-an unused badge `assumeIsolated` result, and skipped App Intents metadata extraction.
-The catalog parses, and all 15 new keys match the built English and German resources.
-No tests, previews, app launches, automated visual checks, or hands-on acceptance were run.
-Compilation is not native acceptance; DEE-18 must remain open for the documented checks.
-
-A GPT 5.6 Luna review at Extra High prompted follow-up fixes for picker cancellation,
-normal-timer accessibility copy, and party/zero-health visibility during victory. The
-focused app build passed again on 2026-09-08 after those changes. The latest main branch
-was merged on this feature branch; the catalog conflict preserves Boss Fight, badge
-memory, file-handoff, and launch-animation entries. The Focus Session panel still offers
-the digest action from DEE-17. No native acceptance was performed as part of the review.
-
-### Original timer implementation
-
-Implemented one shared, persisted focus timer started from an existing Dock Mode through Settings or the menu bar. Starting the already-active mode works without requiring a redundant mode activation. Switching to another mode must save successfully before its timer starts. Running or paused sessions prevent a second start. Timers retain the starting mode's identity and name independently of later mode edits.
-
-A dock tile shows a remaining-time ring and opens controls for pause, resume, five-minute extension, and early completion. Running visible tiles and an open timer panel update once per second; hidden, paused, and completed tiles schedule no view ticks. The controller owns one deadline task plus a wake observer, cancels old tasks on every transition, and releases both at shutdown. Running wall-clock deadlines include sleep and app downtime; paused durations do not. The versioned document under `dock.focus-sessions.v1` includes the default duration and optional completion animation. Invalid data blocks edits pending an explicit reset.
-
-Completion leaves a checkmark and offers the existing Session Capsule creation flow. Capture remains user-initiated, with normal window selection, permission handling, draft review, and explicit Save. The optional checkmark bounce respects Reduce Motion. No notifications, streaks, or system Focus settings are changed.
-
-Xcode MCP `BuildProject`, with `buildForTesting: false`, built the feature successfully with no errors. No tests were run. Paused and completed SwiftUI previews use inert sample documents; previews were not rendered.
-
-Remaining hands-on acceptance: start from the active and an inactive mode, pause/resume, extend, finish early, wait for expiry, reopen during a running or paused session, reopen after expiry, sleep/wake, mode rename/delete, display disconnect, four dock edges and auto-hide, keyboard focus return, optional completion animation, VoiceOver, Reduce Motion/Transparency, and Session Capsule permission denial and approval. System clock changes affect the saved wall-clock deadline; this is not a monotonic elapsed-time recorder.
-
-
-### Action Tiles and Focus Sessions localization correction
-
-The initial feature strings had English values only. In the user's German interface this exposed catalog keys such as `focusTitle`, `focusDuration`, and `actionsRun`. All 39 Action Tiles and Focus Sessions keys now have German translations, including errors, confirmations, and accessibility text. The duration label uses a minutes abbreviation so one minute does not produce an incorrect plural.
-
-Inspection of the built app's English and German `Localizable.strings` confirmed that all 39 values match the source catalog, with matching interpolation placeholders. This checks the packaged strings; the app was not launched for another visual check. A follow-up Xcode MCP app build passed after replacing unsupported preview accessibility-environment writes with the existing explicit opaque-background preview pattern.
-
 ## Individual numeric setting resets, DEE-5
 
-All 17 Settings sliders, their direct numeric fields, and the Focus Session duration stepper offer factory reset when their value differs from the model default. Display factory reset preserves an explicit override; Use Shared Setting removes it. See the [numeric settings inventory](NUMERIC-SETTINGS.md) for coverage, deliberate exclusions, persistence paths, and pending hands-on acceptance. No tests or native UI checks were run for this issue.
+All 17 Settings sliders and their direct numeric fields offer factory reset when their value differs from the model default. Display factory reset preserves an explicit override; Use Shared Setting removes it. See the [numeric settings inventory](NUMERIC-SETTINGS.md) for coverage, deliberate exclusions, persistence paths, and pending hands-on acceptance. No tests or native UI checks were run for this issue.
 
 ## Sparkle updater, DEE-4
 
@@ -2506,7 +2427,7 @@ All 28 new handoff keys matched their compiled `en.lproj` and `de.lproj` resourc
 
 ## DEE-17: badge memory and Focus digest
 
-Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection follows Focus Session boundaries and retains bounded digests with source activation and deletion controls.
+Implemented on `feature/dee-17`. Badge details show explicit checked baselines and numeric net changes, keeping clear, text and unavailable observations separate. The existing DEE-10 reader supplies all observations. Opt-in collection followed Focus Session boundaries and retained bounded digests with source activation and deletion controls. DEE-148 removed that digest with Focus Sessions.
 
 See [Badge memory](BADGE_MEMORY.md) for observation reliability, identity, retention, model/state cases and the manual checklist. A focused unsigned Debug app build passed after correcting an Int64-to-Int argument for a generated localized string. Tests, previews, automated visual checks and native acceptance were not executed. Keyboard/VoiceOver, badge hit regions, permission loss, all dock edges, multiple displays, Spaces, sleep/restart and actual source badge behavior remain unverified. Compilation alone does not make DEE-17 Done.
 

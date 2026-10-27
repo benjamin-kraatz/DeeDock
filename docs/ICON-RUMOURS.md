@@ -20,7 +20,7 @@ Group rounds have a shared five-minute cooldown across displays, measured from s
 
 The callout sits beside the speaking icon in DDock's existing tooltip space. It stays still, makes no sound, takes no focus, and passes clicks through. Move the pointer into the dock to skip an exchange. Keyboard focus, dragging, menus, popovers, errors, app launches, and timeline browsing also interrupt playback. An interrupted exchange is discarded.
 
-Rumours pause while a DDock Focus Session is active, including a paused session, and while Reduce Motion is enabled. Reduce Transparency uses an opaque background. Hidden docks do not reveal themselves for rumours. Sleep, screen sleep, session changes, application switches, and Space changes cancel the current exchange and restart the quiet interval when eligible. Removing a display cancels its view-owned playback task and notification subscriptions.
+Rumours pause while Reduce Motion is enabled. Reduce Transparency uses an opaque background. Hidden docks do not reveal themselves for rumours. Sleep, screen sleep, session changes, application switches, and Space changes cancel the current exchange and restart the quiet interval when eligible. Removing a display cancels its view-owned playback task and notification subscriptions.
 
 Turning **AI icon rumours** off is the persistent quiet control. This feature does not inspect macOS Focus or Do Not Disturb settings.
 
@@ -34,7 +34,7 @@ The composer uses `SystemLanguageModel.default` on this Mac. Input consists of v
 
 ## Debug trigger
 
-Debug builds add **Gerüchterunden → Nächste Gerüchterunde starten** in Deprecated Dock Sims settings. The button skips the initial wait or the current cooldown for one round on the first eligible visible dock. It can replace an exchange already on screen. Hidden or busy docks wait until eligible; the button does not reveal them or override consent, Focus Sessions, or Reduce Motion. It is disabled while generation is in flight. Repeated clicks coalesce into one pending round. Turning Sims or AI rumours off clears that request.
+Debug builds add **Gerüchterunden → Nächste Gerüchterunde starten** in Deprecated Dock Sims settings. The button skips the initial wait or the current cooldown for one round on the first eligible visible dock. It can replace an exchange already on screen. Hidden or busy docks wait until eligible; the button does not reveal them or override consent or Reduce Motion. It is disabled while generation is in flight. Repeated clicks coalesce into one pending round. Turning Sims or AI rumours off clears that request.
 
 The button, pending request, claim mechanism, and timing override compile only under `DEBUG`. Nothing is persisted.
 

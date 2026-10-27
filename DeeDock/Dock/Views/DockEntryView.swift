@@ -32,16 +32,6 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.launcher.hitID, $0)
                 }
             )
-        case .focus(let item):
-            DockFocusButton(
-                item: item,
-                size: size,
-                selected: selected,
-                interaction: interaction,
-                accessibilityFocus: {
-                    accessibilityFocus(DockEntryID.focus.hitID, $0)
-                }
-            )
         case .action(let item):
             DockActionButton(
                 item: item,

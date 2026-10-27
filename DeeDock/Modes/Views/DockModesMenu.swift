@@ -20,11 +20,6 @@ struct DockModesMenu: View {
                 .disabled(!coordinator.canSwitchModes || mode.id == coordinator.profiles.modes.document.activeModeID)
             }
             Divider()
-            Menu(.focusStart) {
-                ForEach(coordinator.profiles.modes.modes) { mode in
-                    Button(mode.name) { coordinator.startFocus(mode) }
-                }
-            }.disabled(!coordinator.canStartFocus)
             Menu(.recipeMenuTitle) {
                 ForEach(coordinator.profiles.modes.modes) { mode in
                     Button(mode.name) { coordinator.prepareWorkspace(mode) }

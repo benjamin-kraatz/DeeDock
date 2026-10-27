@@ -209,9 +209,6 @@ struct UpdateIdleGateTests {
         #expect(gate.isBusy)
         #expect(!gate.isIdle)
         gate.isDragging = false
-        gate.isFocusSessionPanelOpen = true
-        #expect(!gate.isIdle)
-        gate.isFocusSessionPanelOpen = false
         gate.isUpdateWindowOpen = true
         #expect(!gate.isIdle)
     }
