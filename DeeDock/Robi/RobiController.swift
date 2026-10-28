@@ -1118,7 +1118,7 @@ final class RobiController {
                 self.model.runState = .running(index: index)
                 if index > 0 { try? await Task.sleep(for: RobiStepRunner.pause) }
                 guard !Task.isCancelled else { return }
-                guard RobiStepRunner.run(step, processIdentifier: pid, elements: elements) else {
+                guard await RobiStepRunner.run(step, processIdentifier: pid, elements: elements) else {
                     self.model.runState = .failed(index: index)
                     // The Run chip names the step a chain stopped at; one step only turns orange,
                     // so the toast says why.

@@ -13,9 +13,12 @@ enum RobiStepRunner {
     /// updating a button's state after typing.
     static let pause: Duration = .milliseconds(250)
 
+    /// How long a toggle may take to report its new state after the press.
+    private static let settleTime: Duration = .milliseconds(600)
+
     /// Runs `step` in the app with `processIdentifier`. Returns false when its target is gone,
-    /// changed, or refused the action.
-    static func run(_ step: RobiStep, processIdentifier: pid_t, elements: [Int: AXUIElement]) -> Bool {
+    /// changed, or refused the action. Suspends only while a toggle settles.
+    static func run(_ step: RobiStep, processIdentifier: pid_t, elements: [Int: AXUIElement]) async -> Bool {
         switch step {
         case let .menu(path):
             return RobiMenuCommands.press(processIdentifier: processIdentifier, path: path)
@@ -26,10 +29,7 @@ enum RobiStepRunner {
             guard let element = check(elements[id], label: label) else { return false }
             if isOn(element) == on { return true }
             guard AXUIElementPerformAction(element, kAXPressAction as CFString) == .success else { return false }
-            // A state that reads wrong fails the step. One that cannot be read at all, such as a
-            // checkbox whose press rebuilt the view around it, falls back on the press, which
-            // the app accepted: stopping there would report a toggle that worked as failed.
-            return isOn(element).map { $0 == on } ?? true
+            return await settles(element, on: on)
         case let .type(id, label, text):
             guard let element = check(elements[id], label: label) else { return false }
             // Focus first: web fields and search fields often act on text only while focused.
@@ -47,6 +47,22 @@ enum RobiStepRunner {
         if kind.isEditable { return element }
         if (RobiAX.value(element, kAXEnabledAttribute) as? Bool) == false { return nil }
         return RobiWindowText.label(of: element, kind: kind) == label ? element : nil
+    }
+
+    /// Whether a pressed toggle reaches `on`. Many apps, SwiftUI among them, update the value a
+    /// moment after the press, so the old state reads back at first; it is read again until it
+    /// changes or `settleTime` runs out, and only a state still wrong then fails the step. A state
+    /// that cannot be read at all, such as a checkbox whose press rebuilt the view around it,
+    /// falls back on the press, which the app accepted.
+    private static func settles(_ element: AXUIElement, on: Bool) async -> Bool {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: settleTime)
+        while true {
+            guard let state = isOn(element) else { return true }
+            if state == on { return true }
+            guard clock.now < deadline else { return false }
+            try? await Task.sleep(for: .milliseconds(50))
+        }
     }
 
     /// A checkbox, switch or option's state: its value is 1 when on or selected.
