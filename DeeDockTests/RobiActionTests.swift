@@ -70,6 +70,15 @@ struct RobiActionTests {
         ])
     }
 
+    @Test("The same step twice is kept twice, such as zooming in two levels")
+    func keepsRepeatedSteps() {
+        let published = Mutex<[RobiProposal]>([])
+        let collector = RobiStepCollector { proposal in published.withLock { $0.append(proposal) } }
+        _ = collector.add(.menu(path: "View > Zoom In"))
+        #expect(collector.add(.menu(path: "View > Zoom In")).hasPrefix("Added as step 2."))
+        #expect(published.withLock { $0.last?.steps.count } == 2)
+    }
+
     @Test("A menu path that was not read is refused and proposes nothing")
     func refusesUnknownPath() async throws {
         let published = Mutex(0)

@@ -51,7 +51,6 @@ nonisolated final class RobiStepCollector: Sendable {
     func add(_ step: RobiStep) -> String {
         let added: [RobiStep]? = steps.withLock { steps in
             guard steps.count < RobiProposal.maximumSteps else { return nil }
-            if steps.last == step { return steps }
             steps.append(step)
             return steps
         }
