@@ -14,7 +14,6 @@ final class DockCoordinator {
     let timeline: DockTimelineController
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
-    let watchPresets = WindowWatchPresetStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
     let atmosphere = AtmosphereController()
@@ -163,7 +162,7 @@ final class DockCoordinator {
         )
         applicationMenus = menus
         windowPeeks = WindowPeekCoordinator(menus: menus, screenCapture: screenCapture, applications: catalog.service,
-                                            watchPresets: watchPresets, actions: actionTiles, history: peekHistory)
+                                            history: peekHistory)
         let semanticStacks = CoalescingSemanticStackOrganizer(
             base: FoundationModelsSemanticStackOrganizer()
         )
@@ -215,7 +214,6 @@ final class DockCoordinator {
         actionTiles.changed = { [weak self] in self?.refreshPanels() }
         actionTiles.start()
         fileDestinations.start()
-        watchPresets.start()
         localHistory.start()
         clipboardMuseum.start()
         clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
@@ -846,8 +844,6 @@ final class DockCoordinator {
         )
     }
 
-    func focusNextPortal() { windowPeeks.focusNextPortal() }
-
     /// The dock state for one display, or nil when that display hosts no dock.
     func dockStore(for displayID: String) -> DockStore? { panels[displayID]?.store }
 
@@ -1138,7 +1134,6 @@ final class DockCoordinator {
         folderStacks.stop()
         shelves.stop()
         actionTiles.stop()
-        watchPresets.stop()
         appMelt.stop()
         fusion.stop()
         sessionCapsules.stop()

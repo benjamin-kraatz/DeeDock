@@ -1,7 +1,7 @@
 import Foundation
 
-// Closed vocabularies for tool events: Shortcut tiles, Window Search, Fusion, portals, the file
-// handoff panel, and Launcher suggestions. Every value is a compile-time constant.
+// Closed vocabularies for tool events: Shortcut tiles, Window Search, Fusion, the file handoff
+// panel, and Launcher suggestions. Every value is a compile-time constant.
 
 /// Where a pinned Shortcut was run from.
 nonisolated enum AnalyticsShortcutSource: String, AnalyticsToken {
@@ -60,11 +60,6 @@ nonisolated enum AnalyticsFusionFailure: String, AnalyticsToken {
         case .saveFailed: self = .saveFailed
         }
     }
-}
-
-/// What a person did with a pinned portal after pinning it.
-nonisolated enum AnalyticsPortalAction: String, AnalyticsToken {
-    case paused, resumed, frozen, frameSaved = "frame_saved", cropOpened = "crop_opened", jumped
 }
 
 /// A step in the panel that routes dropped files to a window or app.

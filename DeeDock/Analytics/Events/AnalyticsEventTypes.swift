@@ -76,30 +76,6 @@ nonisolated enum AnalyticsMarkupAction: String, AnalyticsToken {
     case searchedWeb = "searched_web", recaptured
 }
 
-nonisolated enum AnalyticsPortalSource: String, AnalyticsToken {
-    case button, keyboard, drag, frozen
-}
-
-nonisolated enum AnalyticsWatchCompletion: String, AnalyticsToken {
-    case none, openFolder = "open_folder", runShortcut = "run_shortcut"
-
-    init(_ action: WindowWatchCompletionAction) {
-        switch action {
-        case .none: self = .none
-        case .openFolder: self = .openFolder
-        case .runShortcut: self = .runShortcut
-        }
-    }
-}
-
-nonisolated enum AnalyticsWatchDetection: String, AnalyticsToken {
-    case change, phrase
-}
-
-nonisolated enum AnalyticsWatchEnd: String, AnalyticsToken {
-    case stopped, permission, unavailable, closed, offscreen
-}
-
 nonisolated enum AnalyticsFileOperationStatus: String, AnalyticsToken {
     case completed, failed, partial
 }

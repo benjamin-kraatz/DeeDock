@@ -54,20 +54,12 @@ enum AnalyticsEvent {
     case smartGrouping(AnalyticsSmartGroupingSource, result: AnalyticsSmartGroupingResult, duration: Double,
                        candidateCount: Int, failure: AnalyticsSmartGroupingFailure?)
 
-    // Window Peek, portals, and Watch
+    // Window Peek
     case peekOpened(AnalyticsPeekTrigger, cardCount: Int, totalWindowCount: Int, layout: WindowPeekLayout,
                     style: WindowPeekStyle, size: WindowPeekSize)
     case peekWindowChosen(trigger: AnalyticsTrigger)
     case peekWindowAction(AnalyticsWindowAction, outcome: AnalyticsOutcome, trigger: AnalyticsTrigger)
     case markup(AnalyticsMarkupAction, hasMarks: Bool?)
-    case portalPinned(AnalyticsPortalSource, outcome: AnalyticsOutcome)
-    case watchSetupOpened(trigger: AnalyticsTrigger)
-    case watchStarted(usesPhrase: Bool, playsSound: Bool, completion: AnalyticsWatchCompletion, usesPreset: Bool,
-                      hasRegion: Bool)
-    case watchDetected(AnalyticsWatchDetection, duration: Double, checkCount: Int)
-    case watchEnded(AnalyticsWatchEnd, duration: Double, checkCount: Int)
-    case portal(AnalyticsPortalAction, outcome: AnalyticsOutcome?)
-    case portalClosed(duration: Double, frameCount: Int, frozen: Bool, cropped: Bool)
     case fileHandoff(AnalyticsFileHandoffAction, fileCount: Int, exactWindow: Bool, outcome: AnalyticsOutcome)
 
     // Window Search and Fusion

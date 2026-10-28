@@ -15,7 +15,7 @@ the 0.11.0 release preparation and merge; they were incorporated before committi
 | Check | Result | Scope and limits |
 | --- | --- | --- |
 | `WindowPeekEnlargeTests` and `WindowMarkupTests` | 29 tests passed after correcting two expectations | Settings migration, geometry, hold regions, stow paths, destination choice, document operations, and filenames. Does not prove native pointer handling or file delivery. |
-| `DockVisibilityTests`, `WindowPeekTests`, `WindowPeekSplitTests`, and `WindowPortalExportTests` | 25 tests passed | Model and geometry coverage. Does not prove animation quality, OS window behavior, or capture permissions. |
+| `DockVisibilityTests`, `WindowPeekTests`, `WindowPeekSplitTests`, and `WindowPortalExportTests` (removed with portals in DEE-147) | 25 tests passed | Model and geometry coverage. Does not prove animation quality, OS window behavior, or capture permissions. |
 | `DockLocalHistoryTests/replayDwellAndGate()` | Resolved ([DEE-113](https://linear.app/d-zwei/issue/DEE-113)) | The test keeps a 25 ms dwell and suspends until `applyPreview` runs. It no longer treats a 2 s main-actor poll as success. |
 | `FolderStackTests/mediaHeaders()` | Failed | WAV duration is still unavailable on this OS build. CoreMedia reports underlying error `-17770`. |
 | Installed app and Settings | Opened and inspected | German Settings lists the built-in display and two external displays. This does not prove unplug, replug, scaling, or rearrangement behavior. |
@@ -55,7 +55,7 @@ These groups remain open. Passing model tests closes only the matching automated
 | Enlarged Peek, markup, and Save to Shelf | Corridor boundaries, drawing, save/share dialogs, Finder export, failure cleanup, all dock edges, and secondary-display placement. Save-to-Shelf delivery, retention through landing, and pointer-exit dismissal passed in the user's exercised configuration; its auto-hide setting was not recorded. See [markup scenarios](WINDOW-MARKUP.md#pending-native-acceptance). |
 | Core dock, settings, and displays | Hover focus and click passthrough, keyboard focus restoration, overflow, drag and drop, independent display overrides, unplug/replug, mirroring, negative origins, mixed scale, Spaces, full screen, Mission Control, and sleep/wake. Updating an install that has several Dock Modes, with the non-default one active, must keep every dock unchanged (DEE-150). |
 | Launcher | Other browse layouts and groupings, favorites, Escape and outside-click dismissal, keyboard selection after reopening, independent offsets on two displays, suggestions, and file-action delivery. |
-| Window integrations | Exact-window actions, permission loss, stale captures, file handoff, live portals, watch completion and cancellation, window search, OCR history, and App Fusion. |
+| Window integrations | Exact-window actions, permission loss, stale captures, file handoff, window search, OCR history, and App Fusion. |
 | Files and local history | Shelf and Compost restoration, folder details and cloud placeholders, Clipboard Museum, Capsules, timeline replay, badge history, and Shortcut actions. |
 | Appearance and accessibility | VoiceOver operation, Reduce Motion and Reduce Transparency in native windows, light/dark contrast, magnification, launch animations, indicators, and Atmosphere. |
 | Onboarding and updates | First-launch paths, login-item behavior, update discovery, idle-install gates, and relaunch. Release publishing remains Esi's responsibility. |

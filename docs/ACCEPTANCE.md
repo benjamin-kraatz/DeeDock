@@ -1657,7 +1657,7 @@ The supported v0 case is two captured windows belonging to the app whose icon op
 The selected window appears beside its next neighbor in discovery order, with the main window
 first initially. The final window appears beside its previous neighbor. Previous/Next window
 and keyboard arrows browse without activating windows. Clicking a pane or pressing Return uses
-the existing selection action. Both panes keep window actions, Watch, portals, and Fusion.
+the existing selection action. Both panes keep window actions, Markup, and Fusion.
 Split panes always show window titles, including with the Minimal style.
 
 Both thumbnails must be available. A single window, missing capture, constrained display, or
@@ -1724,7 +1724,7 @@ it, and late results are discarded unless they belong to the staged card. Minimi
 cards without a thumbnail do not enlarge.
 
 The stage is a click-through panel one level above Peek. It never takes focus and is hidden from
-VoiceOver, which keeps using the labeled cards. It is suspended during file handoff, portal drags,
+VoiceOver, which keeps using the labeled cards. It is suspended during file handoff,
 window actions and their menu, dock drags, and App Fusion drags or
 busy pairs. Closing Peek stops its tasks, removes its event monitor, and fades the panel out.
 
@@ -1738,7 +1738,7 @@ Pending hands-on acceptance: with the option off, confirm Peek is unchanged. Wit
 a card and check the flight, dim, and placard. Confirm the hi-res swap on a Retina display and on
 a 1× display. Scrub quickly across grid, list, filmstrip, and Split-peek cards. Leave the card and
 the panel, click a staged card and watch it land on its window (including a window on another
-display or Space), click an unstaged card, and open the context menu. Start a portal drag, use a window action, and
+display or Space), click an unstaged card, and open the context menu. Use a window action, and
 exercise file handoff. Check all dock edges, negative origins, a secondary display, Spaces,
 full-screen apps, Reduce Motion, Reduce Transparency, and GPU and memory use during scrubbing.
 
@@ -2148,164 +2148,17 @@ accessibility/display combinations. Remaining hands-on acceptance includes:
 
 Changes are uncommitted. The issue has not been closed or marked accepted.
 
-## DEE-11: Watch this
+## DEE-11, DEE-14, DEE-23, DEE-25: removed
 
-Implementation and limits are described in [Watch a window](WINDOW-WATCH.md). The focused Debug
-DeeDock app build passed with Xcode 27, macOS deployment target 27, Swift 5 language mode, MainActor
-default isolation, and approachable concurrency. Tests, automated visual checks, app launch,
-permission changes, and resource profiling were not run. This is compilation evidence only.
-
-Window Watch activity and optional AI explanation update, 2026-09-08:
-
-- Settled-change thresholds and phrase confirmations remain unchanged. A bounded activity view
-  exposes intermediate visual observations, including in phrase mode.
-- Optional on-device image comparison runs after detection, in the app language, with matching
-  baseline/final region crops and cancellation on dismissal. English and German copy is included.
-- Manual acceptance remains pending: expand/collapse activity during motion and return to baseline;
-  check history coalescing; enable AI before Start; inspect explanation language and accuracy;
-  resize or interrupt capture before detection; dismiss during generation; try unavailable AI.
-- The DeeDock Debug build passed with Xcode 27 for macOS, including the new source files and
-  generated localization symbols. Log: `/tmp/DeeDock-watch-enhancements-build-final.log`.
-  Tests, automated visual checks, and native app launch were not run for this update.
-
-Model/state cases worth testing when authorized:
-
-- Initial baseline, transient image changes, steady changed image, persistent animation, small noise,
-  and a return to baseline before the third confirmation.
-- Phrase present initially, absent-to-present transition, three consecutive matches, interrupted
-  matches, case/diacritic normalization, and unrelated lines containing the phrase as a substring.
-- Region boundary clamping, reverse drag, letterboxing, resize, backing-scale changes, and negative
-  global origins. Pixel coordinate correctness needs asymmetric real source content.
-- Closed window, process restart, initial ambiguous match, permission revocation, capture error,
-  slow request, cancellation during OCR, and late results after Stop or Dismiss.
-- Overlapping sleep/display/session suspension reasons, no overlapping requests across wake,
-  stopped/completed observer cleanup, and duplicate suppression.
-
-Manual acceptance, all pending:
-
-- Watch a changing timer. It must never claim completion. Compare a timer-only region with a larger
-  noisy window, then watch an export whose exact completion line appears after Start.
-- Close the selected window mid-watch. Open another window with the same title; do not switch sources.
-- Resize and move between Retina and non-Retina displays. Inspect selected region boundaries and
-  ensure geometry changes do not produce a false detection.
-- Check minimized, hidden, occluded, protected, other-Space, full-screen, display removal, reconnect,
-  screen sleep, system sleep, lock/session return, and interrupted setup behavior.
-- Check all four dock edges and multiple display arrangements. Hover must not steal focus. Explicit
-  Watch opens its controls. Stop, Dismiss, and completion do not activate the source.
-- Use W from keyboard Peek, sliders, Return to Start, Command-period to Stop, Escape, and VoiceOver
-  card actions. Check English/German layout, a small screen, Reduce Motion, and Reduce Transparency.
-- Check exact-window jump and its Window Access/ambiguous-match failure. Confirm app fallback is
-  labeled separately. Check silent delivery and opt-in sound, including duplicate suppression.
-- Measure idle resources before selection, during watch, after Stop/Dismiss/completion, and across
-  wake. Confirm that a delayed OS capture never causes overlapping periodic requests.
-
-Build logs: `/tmp/DeeDock-dee11-build.log` and `/tmp/DeeDock-dee11-build-2.log`. The initial build
-reported existing Launcher and Dock Badges warnings; the second reported only the App Intents
-metadata-extraction notice. No native acceptance result is claimed. Keep DEE-11 out of Done until
-its required manual acceptance is reviewed.
-
-The final focused Debug build also passed after adding display repositioning and deterministic
-previews; log: `/tmp/DeeDock-dee11-build-3.log`. All 38 watch keys matched their compiled English
-and German `.lproj/Localizable.strings` values. `git diff --check` passed. These inspections did
-not render the previews or exercise native interaction.
-
-```sh
-xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
-  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee11-build build
-```
-
-
-### DEE-11 review follow-up
-
-Merged current `main` into `feature/dee-11` without checking out `main`. Peek now preserves both
-Watch and App Compare actions and their W/F shortcuts. The merged String Catalog preserves both
-features' entries.
-
-Review fixes cover offscreen setup retry, process identity around capture, clamped region controls,
-source-display panel placement, a fixed Stop/Dismiss footer, and serialization between dismissed and
-replacement sessions. Closed-window detection also continues while the source app is hidden.
-The focused Debug build passed at `/tmp/DeeDock-dee11-review-build.log`. Tests and automated visual
-checks were not run. Native acceptance remains pending, especially rapid dismiss/reopen during a
-slow capture, hidden-window closure, setup restore, display placement, and keyboard region editing.
-
-The final focused build passed after resolving the Peek anchor at click time, rather than retaining
-an earlier display frame. Log: `/tmp/DeeDock-dee11-review-final-build.log`. All 38 compiled English
-and German watch strings matched the catalog after merging App Compare. `git diff --check` passed.
-
-GPT-5.6 Luna reviewed the implementation at Extra High reasoning. Its reported setup, identity,
-region, control-visibility, placement, and cancellation findings were addressed. Follow-up fixes
-also reject a cancelled stale-status timeout and clear old exact-window errors before retrying.
-The focused Debug build passed again at `/tmp/DeeDock-dee11-review-status-build.log`; it reported
-only the App Intents metadata-extraction notice. Review was static; native acceptance is still pending.
-
-## DEE-14 window portals
-
-The implementation adds up to four session-only floating window portals, detached through Window Peek's
-menu, VoiceOver action, or P shortcut. Portals own capture independently of Peek, preserve image aspect
-ratio, and expose pause, source navigation, close, and keyboard movement. See the
-[window portal reference and acceptance checklist](WINDOW-PORTALS.md) for capture bounds, lifecycle
-states, display/Spaces behavior, SDK limitations, and model cases worth testing.
-
-Focused app compilation passed after repairing intermediate compiler errors. Tests, automated visual
-checks, native acceptance, and energy measurements were not run. DEE-14 remains awaiting native
-acceptance and must not be marked Done based on this build.
+Window Watch (DEE-11, DEE-25) and window portals (DEE-14, DEE-23) were removed in DEE-147. Nobody
+used either feature, so the code, settings, strings, analytics events, and acceptance notes went
+with them.
 
 ## DEE-15: window search
 
 Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
 
 See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
-
-A second main update brought in DEE-15 during review delivery. Its String Catalog and acceptance
-notes were preserved alongside DEE-11. The focused Debug app build passed after resolving those
-conflicts, with log `/tmp/DeeDock-dee11-latest-main-build.log`. Native acceptance remains pending.
-
-DEE-11 integration with DEE-14: resolved the latest main conflicts while preserving Watch, App
-Fusion, and Portal actions, keyboard shortcuts, localization, and acceptance notes. The focused
-Debug app build passed at `/tmp/DeeDock-dee11-portals-merge-build.log`. Tests and native acceptance
-were not run.
-
-## DEE-25: reusable window watches
-
-Implementation and limits are described in [Watch a window](WINDOW-WATCH.md). Saved presets store a
-name, optional app hint, normalized region, condition, phrase, sound preference, and an optional
-folder or Shortcut action. Screenshots, OCR, capture buffers, and window IDs are not persisted. Each
-run still starts from Window Peek, applies a preset to a current window, and waits for Start.
-Completion actions require an explicit click. Stop, cancel, source loss, and wake never run them.
-
-Model/state cases worth testing when authorized:
-
-- Save, reload after restart, duplicate, delete, capacity of 30, and explicit reset of unreadable
-  storage without overwriting corrupt bytes.
-- App-hint suggestions versus a silent window match. Duplicate titles stay a Peek choice.
-- Start copies a snapshot; later preset edits or deletes leave the running configuration unchanged.
-- Detector completion offers the configured action. Cancel, stop, timeout, and source loss do not.
-- Run identity rejects a second click, a stale detector callback, and a late Shortcut completion.
-- A missing folder or Shortcut fails beside the watch evidence and can be repaired or skipped.
-- Launch or wake after completion does not start a watch or run its action.
-
-Manual acceptance, all pending:
-
-- Save a phrase watch, quit DDock, bind it to a new current window, review the region, and start.
-  Confirm no periodic capture before Watch this and no watching before Start.
-- Apply a preset to a resized or retitled window and reselect the region when the outline is wrong.
-- Complete, cancel, stop, and close the source; only the completed run shows its action button.
-- Double-click the Shortcut action. Delete or move the output folder. Rename or remove the Shortcut.
-- Edit or delete the saved preset while a watch runs and confirm the snapshot copy in the panel.
-- Restart or wake after completion and confirm the action does not run.
-
-The focused Debug app build passed with Xcode 27, macOS deployment target 27, Swift 5 language
-mode, MainActor default isolation, and approachable concurrency. Command:
-
-```sh
-xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug \
-  -destination 'platform=macOS' -derivedDataPath /tmp/DeeDock-dee25-build \
-  CODE_SIGNING_ALLOWED=NO build
-```
-
-Log: `/tmp/DeeDock-dee25-build`. All 51 new watch-preset keys matched their compiled English and
-German `.lproj/Localizable.strings` values. Tests, automated visual checks, and native app launch
-were not run. Compilation is not native acceptance. Do not mark DEE-25 Done on compilation alone.
 
 ## DEE-12: files through Window Peek
 
@@ -2418,23 +2271,6 @@ exact AX object before native access, including close buttons. The fullscreen co
 as an explicit capability limitation: only app-advertised `AXFullScreen` metadata is read through
 public AX queries, and missing state remains unavailable. The final staged-tree build passed
 after these changes. No additional native acceptance is claimed.
-
-## DEE-23 cropped and frozen portals
-
-Implemented crop selection with shared normalized geometry, keyboard/VoiceOver percentage steppers,
-aspect-preserving fit, bounded zoom/pan, and an explicit timestamped frozen state. Source dimension
-changes require reselection; privacy suspension clears retained pixels, including frozen frames.
-See [window portals](WINDOW-PORTALS.md#dee-23-cropped-and-frozen-portals) for coordinate conversions,
-API/resource limits, lifecycle policy, and model/native acceptance cases.
-
-The focused unsigned Debug app build passed with Xcode 27. Log: `/tmp/DeeDock-dee23-build.log`.
-Tests, automated visual checks, native acceptance, and memory/capture measurements were not run.
-Compilation alone does not make DEE-23 Done.
-
-GPT 5.6 Sol at Low reasoning reviewed PR #41 statically and reported no actionable correctness,
-accessibility, or lifecycle findings. Its trailing-blank-line finding was removed. The final app
-build passed at `/tmp/DeeDock-dee23-final-build.log`; all 14 new keys match the compiled English
-and German resources. This review did not execute native acceptance or tests.
 
 ## DEE-20: unified Launcher
 
@@ -2687,7 +2523,7 @@ Declared app support comes from `NSWorkspace.urlsForApplications(toOpen:)`. Mixe
 list unsupported names instead of dropping them. App-level open copy says the files are not
 attached to a window or project. Shortcuts use the honest “Pass selected files” wording;
 the existing one-run-per-Shortcut rule is unchanged. Discovery uses `ensureLoaded()` when
-file-action UI appears, matching Settings and Watch. Folder copy never overwrites; conflicts
+file-action UI appears, matching Settings. Folder copy never overwrites; conflicts
 get a numbered name and a partial result. Saved destinations are versioned local bookmarks
 (`launcher.file-destinations.v1`) with rename, remove, and repair. Remove deletes the
 bookmark only.

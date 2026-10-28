@@ -258,7 +258,7 @@ silently.
 
 Pinned Shortcuts appear as **Pass selected files to this Shortcut**. DOKK does not claim to
 know what a Shortcut accepts. Mark **Pass selected files** in Settings to sort a Shortcut
-with the file-input actions. The installed Shortcut list loads when Settings, Watch, or this
+with the file-input actions. The installed Shortcut list loads when Settings or this
 file-action UI appears. **Reload Shortcuts** remains a manual refresh. The existing
 one-run-per-Shortcut rule still applies.
 

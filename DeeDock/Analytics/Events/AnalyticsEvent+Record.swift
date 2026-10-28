@@ -28,13 +28,6 @@ extension AnalyticsEvent {
         case .peekWindowChosen: "peek_window_chosen"
         case .peekWindowAction: "peek_window_action"
         case .markup: "markup"
-        case .portalPinned: "portal_pinned"
-        case .watchSetupOpened: "watch_setup_opened"
-        case .watchStarted: "watch_started"
-        case .watchDetected: "watch_detected"
-        case .watchEnded: "watch_ended"
-        case .portal: "portal"
-        case .portalClosed: "portal_closed"
         case .fileHandoff: "file_handoff"
         case .windowSearchActivated: "window_search_activated"
         case .windowSearchClosed: "window_search_closed"
@@ -160,22 +153,6 @@ extension AnalyticsEvent {
             ["action": .init(action), "outcome": .init(outcome), "trigger": .init(trigger)]
         case let .markup(action, hasMarks):
             ["action": .init(action), "has_marks": hasMarks.map(AnalyticsValue.init)]
-        case let .portalPinned(source, outcome):
-            ["source": .init(source), "outcome": .init(outcome)]
-        case let .watchSetupOpened(trigger):
-            ["trigger": .init(trigger)]
-        case let .watchStarted(usesPhrase, playsSound, completion, usesPreset, hasRegion):
-            ["uses_phrase": .init(usesPhrase), "plays_sound": .init(playsSound), "completion": .init(completion),
-             "uses_preset": .init(usesPreset), "has_region": .init(hasRegion)]
-        case let .watchDetected(detection, duration, checkCount):
-            ["detection": .init(detection), "duration": .init(duration), "check_count": .init(checkCount)]
-        case let .watchEnded(end, duration, checkCount):
-            ["reason": .init(end), "duration": .init(duration), "check_count": .init(checkCount)]
-        case let .portal(action, outcome):
-            ["action": .init(action), "outcome": outcome.map(AnalyticsValue.init)]
-        case let .portalClosed(duration, frameCount, frozen, cropped):
-            ["duration": .init(duration), "frame_count": .init(frameCount), "frozen": .init(frozen),
-             "cropped": .init(cropped)]
         case let .fileHandoff(action, fileCount, exactWindow, outcome):
             ["action": .init(action), "file_count": .init(fileCount), "exact_window": .init(exactWindow),
              "outcome": .init(outcome)]

@@ -77,14 +77,8 @@ final class WindowPeekState {
     @ObservationIgnored var fileDrop: ((NSDraggingInfo, ApplicationWindowToken?) -> Bool)?
     @ObservationIgnored var fileDragExited: (() -> Void)?
     @ObservationIgnored var fileDragEnded: (() -> Void)?
-    @ObservationIgnored var watch: ((ApplicationWindowToken) -> Void)?
     /// Opens the markup editor for a card's window. Closes Peek.
     @ObservationIgnored var markup: ((ApplicationWindowToken) -> Void)?
-    var portalDragging = false
-    @ObservationIgnored var portalTracking: ((Bool) -> Void)?
-    @ObservationIgnored var dropPortal: ((ApplicationWindowSummary, CGPoint, Bool) -> Void)?
-    @ObservationIgnored var pinFrozen: ((ApplicationWindowSummary) -> Void)?
-    @ObservationIgnored var pinPortal: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var startMelt: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var addToFusion: ((ApplicationWindowSummary) -> Void)?
     @ObservationIgnored var choose: ((ApplicationWindowToken) -> Void)?

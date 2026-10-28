@@ -62,7 +62,6 @@ struct DeeDockApp: App {
             Section {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
-                Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
                 OpenSystemSettingsCloneButton()
             } header: { Text(.menuSectionTools) }
             Divider()
@@ -92,7 +91,6 @@ struct DeeDockApp: App {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 CheckForUpdatesButton(updater: delegate.updater, source: .appMenu)
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
-                Button(.portalFocusNext) { delegate.coordinator.focusNextPortal() }
 
                 Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
                     .keyboardShortcut("f", modifiers: [.command, .shift])
