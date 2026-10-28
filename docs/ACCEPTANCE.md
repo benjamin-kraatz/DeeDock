@@ -3664,9 +3664,9 @@ Validation: `build` and `build-for-testing` of the `DeeDock` scheme into a scrat
 
 Built on `codex/dee-146-robi-actions`. How it works is in [ROBI.md](ROBI.md#proposing-steps).
 
-- **Steps.** The model may propose up to three steps, run in order by one click on **Run**: menu commands, presses on buttons, links and options, toggles, and typing into fields. Nothing runs without the click.
+- **Steps.** The model may propose up to three steps, run in order by one click on **Run** or by Return: menu commands, presses on buttons, links and options, toggles, and typing into fields. Nothing runs until the person clicks **Run** or presses Return.
 - **Menu.** Read once per interaction, up to 400 items within 1.5 s, with a fair share for each top-level menu. The instructions show an overview, and `list_menu_commands` pages through the rest. The on-device model gets the same tools with smaller pages.
-- **Elements.** The window's actionable `AXUIElement`s are kept with the context by landmark number. Each step checks its target's role and label again before acting.
+- **Elements.** The window's actionable `AXUIElement`s are kept with the context by landmark number. Each step checks its target's role again before acting, and a control its label too. A field is checked by role alone, since its label is usually its text, which may have changed.
 - **Card.** One step is its own button; two or three are listed with their progress above **Run N Steps**. The answer gives up height to the list, since the card's height is fixed.
 - **Analytics.** `robi_steps_run` with counts per kind and how many ran.
 

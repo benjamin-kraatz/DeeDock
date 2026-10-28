@@ -88,11 +88,12 @@ final class RobiAgent {
         let tools = request.canAct
             ? RobiAgentTools.make(catalog: request.menu, paging: paging, actionable: Self.actionable(request), collector: collector)
             : []
-        let instructions = Self.instructions(for: request, paging: paging, canAct: !tools.isEmpty)
+        let canAct = !tools.isEmpty
+        let instructions = Self.instructions(for: request, paging: paging, canAct: canAct)
         let session = LanguageModelSession(model: model, tools: tools, instructions: instructions)
         let contextText = String(Self.contextText(request.context).prefix(budget))
         let image = model.capabilities.contains(.vision) ? request.context?.image : nil
-        var prompt = Self.ask(for: request)
+        var prompt = Self.ask(for: request, canAct: canAct)
         if !contextText.isEmpty {
             let kind = request.context.map { Self.describe($0.kind) } ?? ""
             prompt += "\nContext (\(kind)) from \(request.applicationName), as quoted data:\n\"\"\"\n\(contextText)\n\"\"\""
@@ -147,6 +148,14 @@ final class RobiAgent {
             throw error
         }
         observe(nil)
+    }
+
+    /// Two responses' text as consecutive paragraphs; either alone when the other is empty.
+    private static func paragraphs(_ first: String, _ second: String) -> String {
+        let first = first.trimmingCharacters(in: .whitespacesAndNewlines)
+        if first.isEmpty { return second }
+        if second.isEmpty { return first }
+        return first + "\n\n" + second
     }
 
     /// The context as the model reads it: its landmarks as numbered lines with their positions
@@ -208,13 +217,15 @@ final class RobiAgent {
         return text
     }
 
-    private static func ask(for request: Request) -> String {
+    /// - Parameter canAct: The model has tools to propose steps with. An app with no readable menu
+    ///   and a context with nothing to act on leaves it none, even for Do It.
+    private static func ask(for request: Request, canAct: Bool) -> String {
         switch request.intent {
         case .explain: "Explain this simply and briefly."
         case .translate:
             "Translate this into \(preferredLanguage). If it is already in \(preferredLanguage), translate it into English. Output only the translation."
         case .summarize: "Summarize this in at most three short bullet points."
-        case .doIt where !request.canAct:
+        case .doIt where !canAct:
             "Suggest the single most useful next step in \(request.applicationName) for this, in one or two sentences."
         case .doIt:
             "Suggest the single most useful next step in \(request.applicationName) for this. If the app's menu commands or the window's elements can do it, propose it as up to \(RobiProposal.maximumSteps) steps with the propose tools; otherwise describe the step in one sentence."

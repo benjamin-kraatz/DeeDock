@@ -26,7 +26,9 @@ enum RobiStepRunner {
             guard let element = check(elements[id], label: label) else { return false }
             if isOn(element) == on { return true }
             guard AXUIElementPerformAction(element, kAXPressAction as CFString) == .success else { return false }
-            // Some controls report their new state a moment late; trust the press then.
+            // A state that reads wrong fails the step. One that cannot be read at all, such as a
+            // checkbox whose press rebuilt the view around it, falls back on the press, which
+            // the app accepted: stopping there would report a toggle that worked as failed.
             return isOn(element).map { $0 == on } ?? true
         case let .type(id, label, text):
             guard let element = check(elements[id], label: label) else { return false }
