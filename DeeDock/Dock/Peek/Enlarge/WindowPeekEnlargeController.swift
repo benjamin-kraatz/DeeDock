@@ -368,7 +368,7 @@ final class WindowPeekEnlargeController {
 
     private var blocked: Bool {
         guard let state = peek?.state else { return true }
-        return state.routingFiles || state.portalDragging || state.actionBusy || state.actionMenuTracking
+        return state.routingFiles || state.actionBusy || state.actionMenuTracking
             || state.phase != .windows || externallyBlocked()
     }
 

@@ -12,14 +12,9 @@ struct WindowPeekCardSlot: View {
     let size: CGSize
     let manage: () -> Void
     let choose: () -> Void
-    let watch: () -> Void
     let markup: () -> Void
     let addToFusion: () -> Void
     let startMelt: () -> Void
-    let pinPortal: () -> Void
-    let pinFrozen: () -> Void
-    let portalTracking: (Bool) -> Void
-    let dropPortal: (CGPoint, Bool) -> Void
     /// Enlarged-preview hooks; `nil` while that option is off, so disabled Peek does no extra work.
     var lifted = false
     var enlargeHover: ((Bool) -> Void)? = nil
@@ -33,30 +28,18 @@ struct WindowPeekCardSlot: View {
             .contextMenu {
                 Button(.peekActionTitle, systemImage: "ellipsis", action: manage)
                 Divider()
-                Button(.watchTitle, systemImage: "eye", action: watch)
                 Button(.markupOpen, systemImage: "pencil.tip.crop.circle", action: markup)
-                Button(.portalPin, systemImage: "pin", action: pinPortal)
-                Button(.portalPinFrozen, systemImage: "snowflake", action: pinFrozen)
                 Button(.fusionAdd, systemImage: "plus.square.on.square", action: addToFusion)
                 Button(.meltStartWithApp, systemImage: "rectangle.split.2x1", action: startMelt)
             }
             .accessibilityAction(named: Text(.peekActionTitle), manage)
-            .accessibilityAction(named: Text(.watchTitle), watch)
             .accessibilityAction(named: Text(.markupOpen), markup)
             .accessibilityAction(named: Text(.fusionAdd), addToFusion)
             .accessibilityAction(named: Text(.meltStartWithApp), startMelt)
-            .accessibilityAction(named: Text(.portalPin), pinPortal)
-            .accessibilityAction(named: Text(.portalPinFrozen), pinFrozen)
-            .help(Text(.portalDragHelp))
-            .overlay {
-                WindowPeekPortalDragSource(card: card, click: choose, tracking: portalTracking, drop: dropPortal)
-            }
             .overlay(alignment: .topTrailing) {
                 HStack(spacing: 4) {
                     WindowPeekActionButton(revealed: hovering || selected, label: .peekActionTitle,
                                            symbol: "ellipsis", action: manage)
-                    WindowPeekActionButton(revealed: hovering || selected, label: .watchTitle,
-                                           symbol: "eye", action: watch)
                     WindowPeekActionButton(revealed: hovering || selected, label: .markupOpen,
                                            symbol: "pencil.tip", action: markup)
                     WindowPeekActionButton(revealed: hovering || selected, label: .fusionAdd,
