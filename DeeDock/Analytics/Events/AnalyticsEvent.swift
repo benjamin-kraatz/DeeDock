@@ -188,6 +188,9 @@ enum AnalyticsEvent {
                       duration: Double, picture: Bool)
     /// The person put a Robi answer to use.
     case robiActionTaken(AnalyticsRobiAction)
+    /// The person ran the steps Robi proposed: how many of each kind, and how many ran before one
+    /// could not. Never a menu path, an element's label, or typed text.
+    case robiStepsRun(AnalyticsRobiStepCounts, completed: Int)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     /// How many installed and pinned apps have a Line glyph, with the bundle IDs of public apps
     /// that have none. Sent shortly after launch, at most every six hours.

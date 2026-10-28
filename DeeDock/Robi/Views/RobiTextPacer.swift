@@ -13,9 +13,14 @@ import SwiftUI
 /// holds the full text. With Reduce Motion the pacer shows the target as it arrives, without fading.
 ///
 /// One pacer belongs to one answer card. It owns a single tick task, which runs while text is
-/// waiting or still fading and ends when it catches up; `pause()` cancels it when the answer
+/// waiting or still fading and ends when it catches up; `stop()` cancels it when the answer
 /// leaves the screen. Only the properties views draw are observed, so a tick redraws the answer
 /// text and nothing else.
+///
+/// The pacer follows the answer itself (`follow(_:)`) rather than being fed from a view's
+/// `onChange`. After a tool call the model's text arrives as a burst of snapshots a few
+/// milliseconds apart, and SwiftUI drops an `onChange` that fires more than once a frame, for
+/// good: the card stopped at the words it had when the burst began.
 @MainActor @Observable
 final class RobiTextPacer {
     /// What the pacer is given each time the answer, its completion or Reduce Motion changes.
@@ -89,10 +94,40 @@ final class RobiTextPacer {
     @ObservationIgnored private var isSynced = false
     @ObservationIgnored private var lastStep: TimeInterval = 0
     @ObservationIgnored private var task: Task<Void, Never>?
+    /// Counts `follow(_:)` and `stop()` calls, so a change noticed for an older follow is ignored.
+    @ObservationIgnored private var following = 0
+    /// The input last passed to `update(_:)`, so a change that leaves it the same does nothing.
+    @ObservationIgnored private var lastInput: Input?
+
+    /// Follows the answer `input` reads until `stop()`: takes it now, and again after anything
+    /// it read changes. Changes in one burst are read once, after the burst, so none is lost.
+    func follow(_ input: @escaping @MainActor () -> Input) {
+        following += 1
+        lastInput = nil
+        track(input, generation: following)
+    }
+
+    /// Stops following and cancels the tick task, for when the answer leaves the screen.
+    func stop() {
+        following += 1
+        pause()
+    }
+
+    private func track(_ input: @escaping @MainActor () -> Input, generation: Int) {
+        guard generation == following else { return }
+        let value = withObservationTracking(input) { [weak self] in
+            guard let self else { return }
+            // Called before the change is made; read it once the main actor gets to it.
+            Task { @MainActor in self.track(input, generation: generation) }
+        }
+        guard value != lastInput else { return }
+        lastInput = value
+        update(value)
+    }
 
     /// Takes the latest answer. Growth is paced; an empty target clears the text; any other change,
     /// such as a different answer, is shown at once.
-    func update(_ input: Input) {
+    private func update(_ input: Input) {
         let now = Self.now()
         let wasFinished = isFinished
         isFinished = input.isFinished
@@ -114,8 +149,8 @@ final class RobiTextPacer {
         start()
     }
 
-    /// Stops the tick task, for when the answer leaves the screen. The next `update(_:)` resumes.
-    func pause() {
+    /// Stops the tick task. The next `update(_:)` resumes it.
+    private func pause() {
         task?.cancel()
         task = nil
     }

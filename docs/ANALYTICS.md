@@ -395,7 +395,8 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `focus_dock_command` | `command` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
 | `robi_answered` | `model` (`on_device`, `claude`), `claude_model` (`haiku`, `sonnet`, `opus`; only when Claude answered), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
-| `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`, `point` for clicking a reference in the answer, which spotlights it on the window) |
+| `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command` for clicking Run on proposed steps, `point` for clicking a reference in the answer, which spotlights it on the window) |
+| `robi_steps_run` | `step_count`, `completed_count` (steps that ran before one could not, or all of them), `menu_count`, `press_count`, `toggle_count`, `type_count` |
 
 Atmosphere has no events of its own. Its settings are reported through `setting_changed` with
 `area = atmosphere`.
@@ -409,7 +410,7 @@ ID) is not reported at all, not even as a count. Whether an Anthropic API key is
 the key itself never leaves the Keychain except in requests to Anthropic.
 
 Robi's product events never include the app, the window, the selection, recognized text, the
-question, the answer, or the proposed command. Its model calls go to LLM analytics in full, like
+question, the answer, or the proposed steps (no menu paths, element labels, or typed text). Its model calls go to LLM analytics in full, like
 DOKK's other model calls; see [AI observability](#ai-observability).
 
 Plugin events carry counts, durations, surfaces, and yes/no flags only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
@@ -557,7 +558,7 @@ prompt or answer contains:
 | `semantic_stack_organize` | file and folder names, the generated group titles |
 | `window_search_image_match` | the search phrase and the model's description of the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
-| `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu commands for Do It, and the answer, on this Mac or from Claude |
+| `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu overview and any menu pages the model asked for, and the answer, on this Mac or from Claude |
 | `robi_suggest_questions` | Robi's instructions, what the person picked, and the suggested questions |
 
 One Robi interaction, from the click to the card closing, is one trace: its suggested questions

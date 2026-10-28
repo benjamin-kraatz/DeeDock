@@ -35,12 +35,6 @@ enum RobiNotice: Equatable {
     case failed(String)
 }
 
-/// A menu command the model proposed. Nothing runs until the person clicks it.
-struct RobiProposal: Equatable {
-    /// The menu path as the app names it, such as "File > New Tab".
-    let path: String
-}
-
 /// Everything Robi's views draw. Owned by `RobiController`, which is the only writer.
 @MainActor @Observable
 final class RobiModel {
@@ -59,7 +53,10 @@ final class RobiModel {
     /// Shown in the bar while answering, such as a suggestion's name.
     var request = ""
     var answer = ""
+    /// Steps the model proposed for this answer, run together by one click.
     var proposal: RobiProposal?
+    /// Set from the click on Run until the card closes.
+    var runState: RobiRunState?
     var notice: RobiNotice?
     var toast: LocalizedStringResource?
     /// The person stopped the answer; what arrived before that stays in the card.
@@ -180,6 +177,7 @@ final class RobiModel {
         request = ""
         answer = ""
         proposal = nil
+        runState = nil
         notice = nil
         toast = nil
         isStopped = false

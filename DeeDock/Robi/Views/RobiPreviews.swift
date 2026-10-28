@@ -48,6 +48,12 @@ enum RobiPreviewData {
             RobiLandmark(id: 2, kind: .button, label: "Send", frame: CGRect(x: 640, y: 12, width: 56, height: 24)),
             RobiLandmark(id: 3, kind: .text, label: "Meeting moved to 3 pm on Thursday", frame: CGRect(x: 16, y: 96, width: 260, height: 18)),
         ], windowSize: CGSize(width: 720, height: 480))
+    /// A three-step chain on the mail window: type, press, toggle.
+    static let steps = RobiProposal(steps: [
+        .type(element: 4, label: "Search", text: "meeting Thursday"),
+        .press(element: 6, label: "Find"),
+        .toggle(element: 5, label: "Unread only", on: true),
+    ])
     static let referencedAnswer = """
     The thread says the [meeting moved to 3 pm on Thursday](#3). To confirm, reply and press \
     [Send](#2) at the top right.
@@ -175,7 +181,54 @@ private struct RobiPreviewStage: View {
 #Preview("Proposed command, dark") {
     RobiPreviewStage(model: RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,
         answer: "Claude Code is waiting for input. I can open a new tab for the fix.",
-        proposal: RobiProposal(path: "Shell > New Tab")))
+        proposal: RobiProposal(steps: [.menu(path: "Shell > New Tab")])))
+}
+#Preview("Proposed steps, light") {
+    RobiPreviewStage(model: RobiPreviewData.model(.answered, context: RobiPreviewData.windowWithLandmarks,
+        answer: "This searches the inbox for the meeting and turns on unread only.", proposal: RobiPreviewData.steps))
+}
+#Preview("Proposed steps, running, dark") {
+    let model = RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.windowWithLandmarks,
+        answer: "This searches the inbox for the meeting and turns on unread only.", proposal: RobiPreviewData.steps)
+    let _ = model.runState = .running(index: 1)
+    RobiPreviewStage(model: model)
+}
+#Preview("Proposed steps, all done, dark") {
+    let model = RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.windowWithLandmarks,
+        answer: "This searches the inbox for the meeting and turns on unread only.", proposal: RobiPreviewData.steps,
+        model: .claude)
+    let _ = model.runState = .done
+    RobiPreviewStage(model: model)
+}
+#Preview("Proposed steps, running, Reduce Motion") {
+    let model = RobiPreviewData.model(.answered, context: RobiPreviewData.windowWithLandmarks,
+        answer: "This searches the inbox for the meeting and turns on unread only.", proposal: RobiPreviewData.steps,
+        reduceMotion: true)
+    let _ = model.runState = .running(index: 2)
+    RobiPreviewStage(model: model)
+}
+#Preview("Proposed command, running, dark") {
+    let model = RobiPreviewData.model(.answered, dark: true, context: RobiPreviewData.region,
+        answer: "Claude Code is waiting for input. I can open a new tab for the fix.",
+        proposal: RobiProposal(steps: [.menu(path: "Shell > New Tab")]))
+    let _ = model.runState = .running(index: 0)
+    RobiPreviewStage(model: model)
+}
+#Preview("Proposed typing step, light") {
+    RobiPreviewStage(model: RobiPreviewData.model(.answered, context: RobiPreviewData.windowWithLandmarks,
+        answer: "I can put the search term in for you.",
+        proposal: RobiProposal(steps: [.type(element: 4, label: "Search", text: "meeting Thursday")])))
+}
+#Preview("Proposed steps, second failed") {
+    let model = RobiPreviewData.model(.answered, context: RobiPreviewData.windowWithLandmarks,
+        answer: "This searches the inbox for the meeting and turns on unread only.", proposal: RobiPreviewData.steps)
+    let _ = model.runState = .failed(index: 1)
+    RobiPreviewStage(model: model)
+}
+#Preview("Proposed steps, German") {
+    RobiPreviewStage(model: RobiPreviewData.model(.answered, context: RobiPreviewData.windowWithLandmarks,
+        answer: "Damit suchst du im Posteingang nach dem Termin und zeigst nur Ungelesenes.", proposal: RobiPreviewData.steps))
+        .environment(\.locale, Locale(identifier: "de"))
 }
 #Preview("Claude key missing") {
     RobiPreviewStage(model: RobiPreviewData.model(.thinking, context: RobiPreviewData.selection,

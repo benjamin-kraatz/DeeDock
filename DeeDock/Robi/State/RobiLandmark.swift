@@ -40,6 +40,9 @@ nonisolated struct RobiLandmark: Equatable, Sendable, Identifiable {
             }
         }
 
+        /// Fields and text areas, whose text a step may replace.
+        var isEditable: Bool { self == .field || self == .textArea }
+
         /// Controls are labelled by their title or description and read as a whole; their
         /// children usually repeat the label.
         var isControl: Bool {

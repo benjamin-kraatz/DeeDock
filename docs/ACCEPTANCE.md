@@ -3239,7 +3239,7 @@ Built on `benn/window-agent-companion` after the mockup `docs/mockups/robi.html`
 - **Tracking.** `RobiWindowTracker` follows the frontmost app's focused standard window through `NSWorkspace` and an AX observer. Title-bar drags are predicted from global mouse monitors and checked against real bounds after four events. Other moves come from SkyLight events 806 and 807, gated to macOS 27, with AX notifications as the fallback. Secure text fields, system UI, DOKK, and excluded apps get no Robi.
 - **Panel.** `RobiPanel` is borderless and non-activating, joins all Spaces and full-screen apps, and Mission Control hides it. The tab sits above the window, or inside its top edge when nothing fits above. It retracts into the old window and emerges from the new one when focus moves, and its colour is sampled under the tab.
 - **Context.** The AX selection comes first, with text markers for web content and Electron/Chromium accessibility switched on for the request. The selection sheet takes region drags. Whole windows use their AX text or a picture with recognized text. OCR is prewarmed when Robi starts.
-- **Answers.** `RobiAgent` runs the on-device model or Claude Haiku, Sonnet or Opus 5.5 (`ClaudeForFoundationModels` 0.2.3, the person's API key in the Keychain, Medium or High effort; Sonnet by default) through one `LanguageModelSession`. The menu-command tool only proposes; commands run on a click.
+- **Answers.** `RobiAgent` runs the on-device model or Claude Haiku, Sonnet or Opus 5.5 (`ClaudeForFoundationModels` 0.2.3, the person's API key in the Keychain, Medium or High effort; Sonnet by default) through one `LanguageModelSession`. The menu-command tool only proposes; commands run on a click. (DEE-146 later widened this to up to three steps; see below.)
 - **Actions.** Copy, Replace Selection through AX, Paste into the app with the clipboard restored, and Run for a proposed command.
 - **Settings.** A Robi page under Windows & Focus with the switch, the ⌥⇧⌘R shortcut (Carbon hot key ID 17), the answer model, the API key, effort, hidden apps, and the permissions card.
 - **Discovery and analytics.** A `robi` Discovery callout. Count-only `robi_opened`, `robi_answered`, and `robi_action` events, plus `setting_changed` with `area = robi`. Model calls go to PostHog LLM analytics through `AIObservability` (added in the pointing follow-up below).
@@ -3255,6 +3255,18 @@ Built on `codex/robi-pointing`.
 - **LLM analytics.** `robi_answer` (both models, with token usage and errors) and `robi_suggest_questions` spans, one trace per interaction. Privacy copy in Robi's settings, the answer card footers, and the Privacy card's exception note now says this.
 
 Validation: `build` and `build-for-testing` of the `DeeDock` scheme into a scratch `-derivedDataPath` with `CODE_SIGNING_ALLOWED=NO` both succeeded, with no warnings in `DeeDock/Robi/`. `DeeDockTests/RobiPointingTests.swift` (reference parsing while streaming, window-local and Vision coordinates, the landmark listing, the new setting) was compiled but not run. DOKK was not launched: clicking references, the spotlight on real windows and displays with different scales, the picture switch, and events arriving in PostHog are untested by hand.
+
+### Acting in the app (DEE-146)
+
+Built on `codex/dee-146-robi-actions`. How it works is in [ROBI.md](ROBI.md#proposing-steps).
+
+- **Steps.** The model may propose up to three steps, run in order by one click on **Run** or by Return: menu commands, presses on buttons, links and options, toggles, and typing into fields. Nothing runs until the person clicks **Run** or presses Return.
+- **Menu.** Read once per interaction, up to 400 items within 1.5 s, with a fair share for each top-level menu. The instructions show an overview, and `list_menu_commands` pages through the rest. The on-device model gets the same tools with smaller pages.
+- **Elements.** The window's actionable `AXUIElement`s are kept with the context by landmark number. Each step checks its target's role again before acting, and a control its label too. A field is checked by role alone, since its label is usually its text, which may have changed.
+- **Card.** One step is its own button; two or three are listed with their progress above **Run N Steps**. The answer gives up height to the list, since the card's height is fixed.
+- **Analytics.** `robi_steps_run` with counts per kind and how many ran.
+
+Validation: `build` and `build-for-testing` of the `DeeDock` scheme into a scratch `-derivedDataPath` with `CODE_SIGNING_ALLOWED=NO` both succeeded, with no warnings in `DeeDock/Robi/`. `DeeDockTests/RobiActionTests.swift` (menu overview and pages, the three-step limit, refusing unknown paths and wrong element kinds) was compiled but not run. DOKK was not launched: proposing and running steps in real apps, with either model, is untested by hand.
 
 ### Validation status
 

@@ -87,6 +87,7 @@ extension AnalyticsEvent {
         case .robiOpened: "robi_opened"
         case .robiAnswered: "robi_answered"
         case .robiActionTaken: "robi_action"
+        case .robiStepsRun: "robi_steps_run"
         case .discoveryCallout: "discovery_callout"
         case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
@@ -293,6 +294,10 @@ extension AnalyticsEvent {
              "duration": .init(duration), "picture": .init(picture)]
         case let .robiActionTaken(action):
             ["action": .init(action)]
+        case let .robiStepsRun(counts, completed):
+            ["step_count": .init(counts.total), "completed_count": .init(completed),
+             "menu_count": .init(counts.menu), "press_count": .init(counts.press),
+             "toggle_count": .init(counts.toggle), "type_count": .init(counts.type)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
         case let .lineIconCoverage(coverage):
