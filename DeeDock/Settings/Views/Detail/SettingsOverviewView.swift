@@ -54,8 +54,4 @@ extension SettingsOverviewView where Header == EmptyView {
         .preferredColorScheme(.dark)
         .frame(width: 720, height: 640)
 }
-#Preview("Deprecated overview") {
-    SettingsOverviewView(section: .deprecated, open: { _ in })
-        .frame(width: 720, height: 640)
-}
 #endif

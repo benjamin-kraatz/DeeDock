@@ -74,12 +74,6 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 PeekHistorySettingsCard(history: coordinator.peekHistory)
             }
-        case .quarantine:
-            QuarantineSettingsCard()
-        case .patchBay:
-            if let coordinator = context.coordinator {
-                PatchBaySettingsView(controller: coordinator.patchBay, profiles: coordinator.profiles)
-            }
         case .actionTiles:
             if let actions = context.coordinator?.actionTiles { ActionTilesSettingsCard(controller: actions) }
             if let destinations = context.coordinator?.fileDestinations {
@@ -101,24 +95,14 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
-        case .pinWeather:
-            if let coordinator = context.coordinator {
-                PinWeatherSettingsCard(weather: coordinator.pinWeather)
-            }
         case .clipboardMuseum:
             if let coordinator = context.coordinator {
                 ClipboardMuseumSettingsCard(museum: coordinator.clipboardMuseum,
                                             open: { coordinator.showClipboardMuseum() })
             }
-        case .magneticEdges:
-            MagneticEdgesSettingsCard(source: source, locked: locked)
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)
-        case .sims:
-            if let coordinator = context.coordinator {
-                DockSimsSettingsCard(sims: coordinator.sims)
-            }
         case .discovery:
             if let coordinator = context.coordinator {
                 DiscoverySettingsCard(discovery: coordinator.discovery)

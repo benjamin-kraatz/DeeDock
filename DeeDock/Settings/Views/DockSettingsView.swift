@@ -138,7 +138,7 @@ struct DockSettingsView: View {
             SettingsOverviewView(section: .general, open: open)
         case .dock:
             SettingsOverviewView(section: .dock, open: open)
-        case .extras, .windowsFocus, .suggestionsHistory, .deprecated:
+        case .extras, .windowsFocus, .suggestionsHistory:
             if let selection {
                 SettingsOverviewView(section: selection, isAvailable: isAvailable, status: status, open: open)
                     .id(selection)
@@ -201,7 +201,6 @@ struct DockSettingsView: View {
     private func isAvailable(_ page: SettingsPage) -> Bool {
         switch page {
         case .actionTiles: coordinator?.actionTiles != nil
-        case .pinWeather, .sims, .patchBay: coordinator != nil
         default: true
         }
     }
@@ -219,7 +218,6 @@ struct DockSettingsView: View {
         case .notificationFeed: isOn = value.showNotificationFeed
         case .harbor: isOn = value.harborShortcutEnabled || value.showHarborTile
         case .windowPeek: isOn = value.windowPeekEnabled
-        case .magneticEdges: isOn = value.magneticEdges
         case .soapBubbles: isOn = value.soapBubbleEffects
         case .multipleDisplays: isOn = value.secondaryDisplayAppsOnly
         default: return nil

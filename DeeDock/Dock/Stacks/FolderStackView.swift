@@ -95,7 +95,6 @@ struct FolderStackView: View {
             .fixedSize()
             .help(Text(.folderSortTitle))
             .accessibilityValue(Text(state.sort.title))
-            QuarantineToolbarButton()
             HStack(spacing: 2) {
                 modeButton(.grid, symbol: "square.grid.2x2")
                 modeButton(.list, symbol: "list.bullet")
@@ -283,8 +282,6 @@ struct FolderStackView: View {
             Button(.folderItemAddToShelf) { state.stageOnShelf?(entry.reference) }
                 .disabled(state.stageOnShelf == nil)
         }
-        .modifier(QuarantineItemModifier(id: entry.reference.url.standardizedFileURL.path,
-                                         url: entry.reference.url, name: entry.reference.name))
     }
 }
 

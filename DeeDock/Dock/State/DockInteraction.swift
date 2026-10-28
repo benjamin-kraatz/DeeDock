@@ -10,8 +10,6 @@ final class DockInteraction {
     @ObservationIgnored var openLauncher: (() -> Void)?
     /// Shared local-history scrub. Nil in previews that do not browse history.
     var timeline: DockTimelineController?
-    /// Unused-pin weather. Nil in previews that do not persist last-used times.
-    var pinWeather: PinWeatherStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     /// Shared notification feed. The tile reads its unread count here. Nil in previews.
@@ -21,8 +19,6 @@ final class DockInteraction {
     /// When true, notification badges draw their count. Off draws a red dot.
     /// VoiceOver still reads the count from the badge label.
     var showAppBadgeCounts = false
-    /// Shared opt-in Sims moods. Nil in previews that do not play the care loop.
-    var sims: DockSimsStore?
     /// Waiting-update pip on this dock's glass. Nil in previews.
     var updateAwareness: UpdateAwarenessStore?
     /// Optional soap-bubble bursts for pin click and drop. Owned per panel.

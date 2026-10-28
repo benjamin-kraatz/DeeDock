@@ -173,13 +173,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 menu.addItem(parent)
             }
 
-            if item.isFavorite, interaction?.sims?.isEnabled == true {
-                menu.addItem(.separator())
-                addItem(.simsFeed, symbol: DockSimsCareAction.feed.symbolName, action: #selector(feedSims), to: menu)
-                addItem(.simsCheer, symbol: DockSimsCareAction.cheer.symbolName, action: #selector(cheerSims), to: menu)
-                addItem(.simsSettle, symbol: DockSimsCareAction.settle.symbolName, action: #selector(settleSims), to: menu)
-            }
-
             menu.addItem(.separator())
             addItem(.actionSettings, symbol: "gear", action: #selector(showSettings), to: menu)
         }
@@ -326,16 +319,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
             Analytics.performing(.menu) { interaction?.setIslandTint?(item.id, tint) }
         }
         @objc private func resetIslands() { Analytics.performing(.menu) { interaction?.resetIslands?() } }
-
-        @objc private func feedSims() { careSims(.feed) }
-        @objc private func cheerSims() { careSims(.cheer) }
-        @objc private func settleSims() { careSims(.settle) }
-
-        private func careSims(_ action: DockSimsCareAction) {
-            guard let item else { return }
-            let sims = interaction?.sims
-            DispatchQueue.main.async { sims?.care(action, pinID: item.id) }
-        }
 
         private func finishTracking() {
             if selectedWindowToken == nil, let discoveryID {

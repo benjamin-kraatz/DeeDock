@@ -372,17 +372,33 @@ Implemented on `feat/notification-panel`. An opt-in Notification Feed reads Noti
 
 Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
 
-## Deprecated personality features
+## DEE-149 deprecated extras removed
 
-Dock Sims (including AI icon rumours), Pin weather / icon rust,
-Quarantine stamp, Patch bay, and Magnetic Edges are deprecated. They will be removed in
-version 1.0.0. Launch coerces each enable flag to off and persists that. Settings keeps a
-**Deprecated** section under Features so the removal notice stays reachable. Atmosphere and
-soap bubbles stay first-class.
+Dock Sims with AI icon rumours, Pin weather (icon rust), Quarantine stamp, Patch bay, and
+Magnetic Edges are gone, with no replacement. Every launch already turned them off, so no
+install was using them. Their settings pages, the **Settings → Features → Deprecated**
+section and its `deprecated` analytics section value, the Quarantine menu-bar item and
+toolbar buttons, the Sims context-menu care actions, the `patch_bay` analytics event, the
+`dock_rumour_compose` and `dock_rumour_revise` AI traces, and the launch-time retirement
+code are removed. Atmosphere, soap bubbles, and Dock Modes stay.
 
-The slices below remain the record of how those features were built. Hands-on checks that
-assume they stay on after launch no longer apply. Focus breathing and Focus debt were
-deprecated here too; DEE-148 removed them with Focus Sessions.
+Dependent behavior changes:
+
+- Opening apps, documents, folder stacks, Shelf items, and Window Peek no longer checks
+  quarantine records.
+- Dragging a pin no longer snaps to screen edges or other pins, and no pin is parked off
+  the dock. A drag released outside every dock unpins as before.
+- Opening an app from the dock no longer reports it to Patch bay with the active Dock Mode.
+  Dock Modes themselves are unchanged.
+
+`DockSettings` no longer has `magneticEdges`; older documents that carry the key still
+decode, and the key is dropped on the next save. The Sims, Pin weather, Quarantine, Patch
+bay, and magnetic-placement UserDefaults keys stay unread. DOKK has no legacy-key cleanup
+to add them to.
+
+On 2026-10-27, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-derivedDataPath /tmp/dee-149-dd build-for-testing CODE_SIGNING_ALLOWED=NO` succeeded,
+compiling the app and test targets. No tests were run, and the app was not launched.
 
 ## DEE-148 Focus Sessions removed
 
@@ -620,98 +636,11 @@ placement, or relaunch.
 - Confirm Reduce Motion keeps the update tile static and only fades the callout. Confirm German and English. Confirm
   onboarding does not show the idle switch.
 
-## DEE-58 patch-bay automations
-
-Implemented on `feature/dee-58`. **Settings → Features → Deprecated → Patch bay** still offers app-open output ports and pinned-folder input ports, visual cable dragging, button-based keyboard routing, saved-cable controls, and English/German copy. Launch turns cable actions off. Successful app-pin opens can request the wired folder in Finder with activation disabled. Hiding an app never fires the cable. See [supported ports and limits](PATCH-BAY.md).
-
-Cable actions are off by default. Connections are scoped by display, Dock Mode, and pin identity. There are eight cables maximum, one folder per app output, and one running action with no queue. Editing, disabling, sleep, session suspension, shutdown, or an unavailable scope cancels pending work. Strict bookmark resolution rejects stale access. Corrupt preferences freeze execution and edits until confirmed reset. No system Dock settings are changed.
-
-Validation on 2026-09-12: the Debug app build succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Command: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-58-build CODE_SIGNING_ALLOWED=NO build`. New files use the existing synchronized app target. English and German string resources and generated symbols compiled. `git diff --check` passed.
-
-Existing `ApplicationCatalogTests` assertions were updated to distinguish successful open from hide. Tests, previews, automated visual checks, and native app interaction were not run. Compilation does not prove an end-to-end Finder window or native routing acceptance.
-
-### Required hands-on acceptance
-
-- Pin an app and a folder to an enabled display. Create a cable by dragging and by selecting its ports. Confirm cable endpoints stay attached while scrolling, resizing, and using long names. Escape cancels an unfinished cable.
-- Confirm wiring while disabled opens nothing. Enable cable actions and open the source pin by mouse and keyboard. Confirm Finder opens the target folder in the background and the source app retains focus. Confirm clicking to hide that app opens no folder. Exercise Window Peek's Show App path separately.
-- Run the saved folder action directly. Confirm the source app does not launch. Disconnect and reconnect the cable, then relaunch DDock and confirm persistence without startup execution.
-- Change modes, unplug or disable the display, and remove either pin. Confirm an unavailable cable does not execute and remains removable. Confirm returning to its valid scope restores eligibility without running automatically.
-- Exercise missing and stale folder bookmarks, the eight-cable limit, overlapping triggers, corrupt stored data and confirmed reset, cancellation, sleep, and screen lock. Confirm no delayed action replays on wake.
-- Check VoiceOver, keyboard-only operation, English and German, Light and Dark Mode, Reduce Motion, Reduce Transparency, Spaces, and multiple displays. Cables are static apart from direct pointer dragging.
-
-## DEE-43 icon rumours
-
-Implemented on `feature/dee-43` after DEE-33 was Done and its merged implementation was present. The user subsequently authorized replacing the canned slice with Apple Foundation Models. The on-device model chooses visible pinned apps and generates their exchange after separate opt-in under **Settings → Features → Deprecated → Dock Sims → AI icon rumours**. Launch turns Sims moods off. See [Icon rumours](ICON-RUMOURS.md) for instructions, timing, cancellation, consent, and data boundaries.
-
-AI revision validation on 2026-09-12: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-43-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. This compiled the Foundation Models composer, guided-generation schema, generated localization symbols, and consent integration. The first sandboxed attempt could not access Xcode package caches; the permitted retry passed. Warnings were in existing Quarantine and Clipboard Museum code, plus App Intents metadata extraction. Automated tests, previews, native interaction, and live model generation were not run. Compilation does not establish model quality or native acceptance.
-
-Follow-up diagnosis on 2026-09-12: an isolated live Foundation Models call with synthetic Safari, Notizen, and Finder candidates in `de_DE` reproduced the generic failure. Generation returned 79- and 72-character lines; the app rejected them against its 65-character limit. Added one model revision for invalid drafts, distinct validation diagnostics, selectable Settings error details, and unified logging under `IconRumours`. A subsequent live call returned a valid German exchange. A focused follow-up exercised the revision path: an initial 70/70-character draft became a valid 53/43-character exchange after one revision. The corrected Debug app build passed with the same existing warnings. No unit suite, automated visual checks, or native dock acceptance was run. The diagnostic probe did not launch DDock or modify its preferences.
-
-
-Debug-trigger follow-up on 2026-09-12: added a Debug-only next-round button and stronger fictional-gossip instructions. Debug and Release app builds passed using the same Xcode command above with their respective configurations. The button, request state, claim method, and idle-wait override are conditionally compiled under `DEBUG`. This follow-up did not run tests, previews, live generation, or native button acceptance.
-
-Gossip-intensity follow-up on 2026-09-12: added a production three-position slider with a persisted Light chatter default. Loud whispering requires three alternating turns between two apps. Egregious echoing uses up to five visible pinned apps, two turns each, with an app-wide five-minute session cooldown and a one-attempt Debug bypass. Changing style cancels an older round. Generation validates exact turn counts and participant coverage before playback. Debug and Release app builds passed with the Xcode command above and their respective configurations. Warnings remained in existing Badge, Clipboard Museum, Quarantine, and App Intents metadata code. Live generation, native interaction, tests, and previews were not run for this follow-up.
-
-Length-tolerance follow-up: removed the 65-character rejection and length-only model revisions. The bubble allows four lines and gives longer turns up to 15 seconds of reading time. Empty dialogue and invalid conversation structure still receive validation. Native layout and live generation remain unverified.
-
-### Required hands-on acceptance
-
-- In Debug and Release, select each gossip style, restart, and confirm persistence. Existing preferences should start at Light chatter. Check keyboard and VoiceOver operation of the slider.
-- Confirm two turns for Light chatter, three alternating turns for Loud whispering, and two turns per selected app for Egregious echoing. Exercise 2, 3, 5, and more than 5 eligible pins; all participate up to the five-app cap. Assess whether the tone grows sharper while remaining coherent and fictional.
-- With multiple displays, confirm group rounds stay at least five minutes apart, including after style or consent changes and sleep/wake. Use the Debug button within that interval; confirm it permits one round and subsequent automatic rounds respect the renewed limit. Change intensity during generation and playback; no previous-style line should return.
-
-- In Debug, enable Sims and AI rumours, then use **Nächste Gerüchterunde starten**. Confirm one eligible dock begins generation without the idle wait. Repeat during a displayed exchange and during cooldown. Confirm the button is disabled during generation and absent in Release.
-- Request a round while all docks are hidden or blocked. Confirm one pending round waits for eligibility, repeated clicks do not queue extra rounds, and disabling Sims or AI rumours clears it.
-- Assess whether new dialogue contains a specific fictional secret and a gossip reaction rather than generic small talk.
-
-- Load preferences saved before DEE-43 or with only the earlier canned-rumour flag enabled. Confirm AI rumours start off and Sims moods and care history remain intact. Enable rumours, restart, and confirm the switch persists.
-- With Sims and AI rumours on and at least two visible pinned apps, leave the pointer outside a visible dock for 30 seconds plus generation time. Confirm a model-selected opening and reply appear beside their respective icons for five seconds each. Wait 90 more seconds plus generation time for a fresh exchange. Assess coherence, brevity, variation, English and German fluency, and response latency.
-- Enter the dock during either line. Confirm it disappears and the first click still activates the app. Exercise keyboard Focus Dock, dragging, menus, popovers, errors, Launcher, and timeline browsing during playback.
-- Disable AI rumours or Sims, or enable Reduce Motion. Confirm playback stops. Restore eligibility and confirm the quiet interval starts fresh.
-- Disable and re-enable AI rumours while generation is in flight. Confirm the older response never appears. Check that two display docks never generate concurrently.
-- Exercise model unavailable, Apple Intelligence disabled, unsupported locale, refusal, invalid response, and generation-error states. Confirm an invalid draft gets at most one revision, final failures leave selectable Error details, and Console shows IconRumours events without app names or dialogue. The dock stays quiet without a canned fallback.
-- Exercise auto-hide, all four edges, horizontal and vertical overflow, long app names, German text, Reduce Transparency, and VoiceOver. Confirm callouts fit without changing icon positions or taking focus.
-- Remove a participating pin or display, change Dock Mode, switch Spaces, sleep and wake, and switch user sessions. Confirm no stale line or queued exchange returns. Verify that hidden docks stay hidden.
-
 ## DEE-74 DDock Discovery
 
 Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
 
 Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-74-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Generated string symbols and new source target membership compiled. The final build reported only the App Intents metadata warning. Automated tests, previews, and native interaction checks were not run. Compilation does not establish native acceptance.
-
-## DEE-44 rust on unused pins
-
-Implemented on `feature/dee-44`. Pins take a gentle rust after N unused days. Last-used times are written only when a pin is used from DDock (open, hide, spring-open, open files, open or reveal a folder). Hover, magnification, Downloads, Shelf, Trash, and apps launched outside DDock do not write timestamps. Missing times evaluate as now, so existing pins do not rust on upgrade. Using a pin writes now and the rust clears.
-
-Settings live in **Settings → Features → Deprecated → Pin Weather**, not in `DockSettings`, so the threshold is app-wide and parallel slices do not share that document. Weather now starts off. Launch turns it off on existing installs. The unused-day range remains 1...90, default 30. Rust starts at a 0.32 blush on day N and reaches 1 after another N days. The look is SwiftUI Canvas oxide (no Metal). Timestamps stay in `dock.pin-weather.v1`. Corrupt bytes freeze edits and are not overwritten.
-
-This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
-
-### Required hands-on acceptance
-
-- Leave a pin unused past the threshold (or set Unused days to 1 and wait). Confirm a quiet rust, not an error badge. Using the pin restores it.
-- Confirm running-only apps, Downloads, Shelf, and Trash do not rust. Confirm an app opened from Spotlight does not clear rust on its pin.
-- Change Unused days and the enable toggle. Confirm rust appears or disappears without a restart.
-- Reset last-used times. Confirm rust stays off until pins sit unused again.
-- Confirm timestamps are not uploaded and that Screen Time is unused.
-- Exercise VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide on a weathered pin.
-
-## DEE-33 Dock Sims / pet mini-game
-
-Implemented on `cursor/dee-33-dock-sims-af28`. Settings → Features → Deprecated → Dock Sims is off by default. Launch turns it off. When it is on, each favorite application pin shows a mood mark and a small idle motion (playful bounce, content breathe, hungry or lonely sway). Intensity is a 15–100% slider. Feed, Cheer, and Settle live on the pin’s context menu and VoiceOver actions. Settle and **Reset moods** undo care without unpinning. Turning Sims off hides overlays and keeps pets. Storage is `dock.sims.v1` in UserDefaults. Debug builds add a **Simulate time** card that advances a session-only care clock (+1 / +2 / +6 / +8 hours) so moods can be checked without waiting; the offset is not persisted. Corrupt bytes freeze edits until an explicit reset. There is no network path. AI rumours are a separate opt-in added by [DEE-43](ICON-RUMOURS.md).
-
-Folder pins, running-only unpinned tiles, and AI rumours are out of scope.
-
-This environment has no Xcode. Compilation, generated string symbols, and native interaction were not run.
-
-### Required hands-on acceptance
-
-- Leave Sims off. Confirm pins look unchanged and the context menu has no Feed, Cheer, or Settle.
-- Turn Sims on. Confirm every pinned app shows a playful mood and idle motion. Confirm a running-only unpinned app does not.
-- Drag the intensity slider. Confirm the idle motion gets stronger or quieter. Confirm Reduce Motion shows a still mood mark.
-- In a Debug build, enable Sims and use Simulate time: +2 hours should look content, +6 hours hungry. Feed, then +8 hours, and confirm lonely. Reset clock and confirm the offset returns to now. Release builds must not show that card.
-- Feed, Cheer, then Settle on one pin and confirm the mood mark changes. Reset moods and confirm pins return to playful. Turn Sims off and on and confirm a fed pin still remembers care.
-- Confirm nothing is sent over the network and the system Dock is unchanged.
 
 ## DEE-36 dock as timeline
 
@@ -1799,7 +1728,7 @@ cards without a thumbnail do not enlarge.
 
 The stage is a click-through panel one level above Peek. It never takes focus and is hidden from
 VoiceOver, which keeps using the labeled cards. It is suspended during file handoff,
-window actions and their menu, an armed Quarantine stamp, dock drags, and App Fusion drags or
+window actions and their menu, dock drags, and App Fusion drags or
 busy pairs. Closing Peek stops its tasks, removes its event monitor, and fades the panel out.
 
 Validation: the Debug app target and the test bundle built with Xcode 27 and
@@ -2658,7 +2587,7 @@ dimming, layout, and exclusive color sources. Intensity is a 0…1 slider. The m
 the original 0.07 Minimal and 0.18 other-preset wash. The low end stays a faint rim, and
 the high end stays short of a full-screen overlay. Documents saved before intensity decode
 the midpoint default without dropping other Atmosphere fields. Atmosphere does not share
-intensity or activation state with Dock Modes, Sims, or soap bubbles.
+intensity or activation state with Dock Modes or soap bubbles.
 
 Each drawable non-mirrored display owns a full-frame click-through ambient panel. Only two
 84-point corner panels accept input for 69 and Party. These panels cannot become key or
@@ -2713,7 +2642,7 @@ Pending native acceptance:
 - Idle dimming, fullscreen on one display, Space changes, sleep/wake, lock/unlock, and
   unavailable window metadata. Confirm unaffected displays continue independently.
 - Click versus long press, app focus, pointer passage outside corner panels, VoiceOver
-  actions, and simultaneous Sims and soap bubbles. Check CPU/GPU cost and readability.
+  actions, and simultaneous soap bubbles. Check CPU/GPU cost and readability.
 - Wallpaper replacement and unreadable URLs, app activation, palette interpolation,
   Mood availability and cancellation, and Image Playground completion/cancellation.
 - Reduce Motion and Reduce Transparency during live use. Confirm disabling leaves no
@@ -2836,66 +2765,6 @@ a Mac with Apple Intelligence enabled and absence without it; save panels; slide
 displays, in Spaces, with Reduce Motion, and when exiting with the green button; and rename by
 every entry point with VoiceOver.
 
-## DEE-46: Quarantine stamp
-
-The feature is off by default and deprecated. **Settings → Features → Deprecated → Quarantine stamp**
-contains the opt-in, instructions, independent arm/stamp/release sound switches, and saved marks for
-release. Shelf & Trash stays an ordinary Features page. Launch turns stamp mode off. Enabling it exposes a direct **Arm stamp** action at the root of the DDock
-menu bar, plus controls in Shelf and folder-stack headers. Menus contain no instructions.
-While armed, the dock projects only app pins and folder icons. Running-only apps and
-nonstampable utility controls are absent from layout, keyboard selection, and hit testing.
-Disarming restores the ordinary dock without changing pins or visibility preferences.
-Marked items stay at their original positions.
-Clicking a marked item outside stamp mode shows a nonactivating glass notice for 2.2 seconds.
-It leaves the mark intact. Release requires stamp mode, including release from Settings. Saved flags apply across displays and Dock Modes to matching
-item identities or file URLs. A saved file URL also matches a symlink to that file and any
-descendant. Matching resolves symlinks and follows the volume's case-sensitive names rule.
-A removed pin's flag remains releasable from Settings.
-
-The stamp follows the pointer across panel headers, menus, and other apps while armed.
-A red forbidden badge and reduced stamp opacity indicate that the pointer is not over a
-visible, unobscured eligible DDock item. The badge disappears over stampable items.
-A 64-point click-through overlay augments the system cursor without changing its hide count.
-Only eligible DDock items handle stamping. Right-click anywhere disarms the stamp. DDock
-consumes that click in its own windows; other apps retain their normal right-click behavior.
-Escape while DDock receives keyboard input,
-**Put stamp away**, disabling the feature, session resignation, sleep, and termination
-end stamp mode and remove its overlay and event monitors. Arming is never persisted.
-The overlay uses the same pad-center anchor for idle and press; there is no lift/highlight frame.
-Folder and Shelf headers use a separate 20-point stamp glyph in a compact button.
-
-`QuarantineStore` saves flags, item IDs, names, URLs, and timestamps in
-`quarantine.records.v1`. Pin, Shelf, and filesystem placement stays in its existing owner.
-Application opening and document handoff, app-menu commands, stack opening and preview,
-and Shelf resource resolution reject marked items. Shelf batch opening rejects the batch
-if it includes a marked item. This is a set-aside convenience, not a security boundary.
-It does not stop an existing process, scan files, modify Gatekeeper, or set xattrs.
-A renamed stack entry can acquire a different URL identity; its old mark remains in the
-Settings release list. Unreadable flag data is preserved and blocks these opening routes.
-
-The locked PNGs are downscaled from `one`, `too`, `vor`, and `wife` into asset
-catalog images. The three locked Kenney WAVs and CC0 notice are bundled resources. Playback
-uses NSSound and system output volume. DDock has no existing Focus-specific sound gate.
-Reduce Motion disables notice fades. The cursor uses only idle and press frames, without
-bounce or lift motion, and Reduce Motion does not mute audio.
-
-Validation: the Debug app target built with `CODE_SIGNING_ALLOWED=NO` using Xcode 27.
-No tests, previews, app launch, or automated visual checks were run.
-
-Pending hands-on acceptance:
-
-- Arm from each control; stamp and release an app pin, folder pin, Shelf item, and stack
-  entry. Confirm placement survives release and restart, and all four images read at size.
-- Check idle and press pad alignment on Retina and non-Retina displays, each dock
-  edge, mixed display origins, and unplugging a display while armed.
-- Try keyboard opening, app context commands, file drops, Shelf bulk opening and dragging,
-  and Window Peek while an item is marked. Confirm no marked item opens.
-- Exit with right-click inside DDock and over another app, Escape, the menu, sleep, logout,
-  and quitting during the press.
-  Confirm the stamp remains visible outside DDock while armed and disappears after exit or a forced crash.
-- Listen to arm, stamp, and release; check system mute, Reduce Motion, English and German,
-  VoiceOver, focus retention, Spaces, and fullscreen behavior.
-
 ## Hosted test target
 
 `DeeDockTests` stopped compiling on 2026-09-03 (`d947cc6`). It compiled a hand-kept list of app
@@ -2907,8 +2776,7 @@ The target is now hosted in the app. It depends on the app target, sets `TEST_HO
 ad hoc bundle from a different team), and every suite uses `@testable import DeeDock`. The copied
 source list, the **Test Model Sources** and **Recovered References** groups, and the test-only
 strings and Core ML resources are gone; the Core ML tests read the seed from the app bundle.
-`HostEnvironment.isTestHost` starts an empty Settings-only scene instead of the menu-bar app, and
-`QuarantineStore.shared` keeps flags in memory there, as in previews. The host shares DDock's
+`HostEnvironment.isTestHost` starts an empty Settings-only scene instead of the menu-bar app. The host shares DDock's
 preferences domain, so tests must keep injecting their own suites and directories.
 
 Tests that had never run needed fixes: two `#expect` forms that did not compile
@@ -2940,8 +2808,7 @@ new document version instead of silently saving away the archive.
 
 Compost retains each item's identity, bookmark, path, and name. Restore starts a fresh age and
 works for unavailable file references too. Re-adding the same file restores its archived identity.
-Archived entries are excluded from active Shelf actions, bulk drags, and Launcher search. Quarantine
-checks apply again through the existing Shelf resource resolver after restoration.
+Archived entries are excluded from active Shelf actions, bulk drags, and Launcher search.
 
 The Shelf still holds 50 active entries. Compost holds 500 references, then pauses aging and leaves
 remaining items on the Shelf. Neither limit evicts existing data. Clear Shelf preserves Compost.
@@ -2963,7 +2830,7 @@ Tests, previews, automated visual checks, and native interaction acceptance were
 Remaining hands-on acceptance:
 
 - Enable and change each rule with old and recent references. Restart and sleep across a deadline.
-- Restore available, moved, missing, and quarantined references. Verify normal open and drag behavior
+- Restore available, moved, and missing references. Verify normal open and drag behavior
   after restoration, a fresh age, and the same archive on every display.
 - Fill both collections and confirm that no entries disappear. Cancel and confirm Forget reference,
   then check that the original file and clipboard-created artifacts remain intact.

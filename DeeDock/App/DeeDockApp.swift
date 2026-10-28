@@ -63,7 +63,6 @@ struct DeeDockApp: App {
             Section {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
-                QuarantineMenu()
                 OpenSystemSettingsCloneButton()
             } header: { Text(.menuSectionTools) }
             Divider()

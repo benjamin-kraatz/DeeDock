@@ -58,18 +58,16 @@ struct DockPresentationSettingsTests {
         defaults.showShelf = false; defaults.showTrash = false
         defaults.confirmBeforeEmptyingTrash = false; defaults.windowPeekEnabled = false
         defaults.soapBubbleEffects = true
-        defaults.magneticEdges = false
         defaults.showAppBadgeCounts = true
         // A display's overrides never carry these, so every dock resolves the shared value.
         let resolved = DockSettingsOverrides().resolving(defaults)
         #expect(!resolved.showShelf && !resolved.showTrash)
         #expect(!resolved.confirmBeforeEmptyingTrash && !resolved.windowPeekEnabled)
         #expect(resolved.soapBubbleEffects)
-        #expect(!resolved.magneticEdges)
         #expect(resolved.showAppBadgeCounts)
         #expect(!DockSettingField.allCases.contains { field in
             [\DockSettings.showShelf, \.showTrash, \.confirmBeforeEmptyingTrash, \.windowPeekEnabled,
-             \.soapBubbleEffects, \.magneticEdges, \.showAppBadgeCounts]
+             \.soapBubbleEffects, \.showAppBadgeCounts]
 
                 .contains { $0 == field.keyPath }
         })

@@ -36,9 +36,6 @@ struct DockView: View {
                 togglePin: store.toggleFavorite,
                 dismissError: { store.errorMessage = nil }
             )
-            DockRumoursOverlay(store: store, interaction: interaction,
-                enabled: visibility.progress == 0 && !reduceMotion,
-                reduceTransparency: reduceTransparency)
             if let timeline, timeline.isActive(on: store.displayID) {
                 DockTimelineOverlay(
                     presentation: timeline.presentation,

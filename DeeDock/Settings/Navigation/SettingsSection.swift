@@ -17,8 +17,6 @@ enum SettingsSection: Hashable, Identifiable {
     case lookout
     /// DOKK Plugins: installed plugins, their pins, and the system approval window. The section is the page.
     case plugins
-    /// Personality features slated for removal in 1.0.0, kept reachable but out of the way.
-    case deprecated
     case display(String)
 
     /// What the app and the dock are; the sidebar's untitled first group.
@@ -26,7 +24,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// Opt-in capabilities, listed under the sidebar's Features heading.
     static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout, .plugins]
     /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
-    static let fixed: [SettingsSection] = primary + featureSections + [.deprecated]
+    static let fixed: [SettingsSection] = primary + featureSections
 
     var id: String {
         switch self {
@@ -39,7 +37,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: "suggestionsHistory"
         case .lookout: "lookout"
         case .plugins: "plugins"
-        case .deprecated: "deprecated"
         case .display(let id): "display.\(id)"
         }
     }
@@ -56,7 +53,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .settingsSuggestionsHistory
         case .lookout: .lookoutSettingsTitle
         case .plugins: .pluginsSettingsTitle
-        case .deprecated: .settingsDeprecated
         case .display: nil
         }
     }
@@ -72,7 +68,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .settingsSuggestionsHistorySummary
         case .lookout: .lookoutSettingsSummary
         case .plugins: .pluginsSettingsSummary
-        case .deprecated: .settingsDeprecatedSummary
         case .display: .settingsDisplaySummary
         }
     }
@@ -89,7 +84,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .symbol("clock.arrow.circlepath")
         case .lookout: .lookout
         case .plugins: .symbol("puzzlepiece.extension.fill")
-        case .deprecated: .symbol("archivebox.fill")
         case .display: .symbol("display")
         }
     }
@@ -108,7 +102,6 @@ enum SettingsSection: Hashable, Identifiable {
                         Color(red: 94 / 255, green: 92 / 255, blue: 230 / 255)]
         // The DEE-140 mockup's Plugins tile, #4CD9A3 to #16946B.
         case .plugins: [Color(red: 76 / 255, green: 217 / 255, blue: 163 / 255), Color(red: 22 / 255, green: 148 / 255, blue: 107 / 255)]
-        case .deprecated: [Color(red: 0.74, green: 0.72, blue: 0.68), Color(red: 0.50, green: 0.47, blue: 0.42)]
         }
     }
 
@@ -128,8 +121,6 @@ enum SettingsSection: Hashable, Identifiable {
             [[.windowPeek, .harbor, .robi], [.permissions]]
         case .suggestionsHistory:
             [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
-        case .deprecated:
-            [SettingsPage.deprecatedPages]
         case .modes, .atmosphere, .lookout, .plugins:
             []
         }
@@ -139,7 +130,7 @@ enum SettingsSection: Hashable, Identifiable {
     var offersRestoreDefaults: Bool {
         switch self {
         case .general, .atmosphere, .modes, .lookout, .plugins: false
-        case .dock, .display, .extras, .windowsFocus, .suggestionsHistory, .deprecated: true
+        case .dock, .display, .extras, .windowsFocus, .suggestionsHistory: true
         }
     }
 
@@ -150,7 +141,6 @@ enum SettingsSection: Hashable, Identifiable {
             [.settingsGeneralKeywords, .updatesAutomatic, .updatesAutomaticInstallation, .updatesIdleInstall, .updatesCheck]
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
         case .extras, .windowsFocus, .suggestionsHistory: [.settingsFeatures, .settingsFeaturesKeywords]
-        case .deprecated: [.settingsDeprecatedFeatureNotice]
         case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
         case .lookout: [.lookoutSettingsKeywords]

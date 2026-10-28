@@ -41,11 +41,6 @@ struct DockAppButton: View {
     /// every `body` pass, and a live process snapshot there would scan running apps on each pointer move.
     @State private var accessibilityAllHidden = false
 
-    private var pinWeatherSample: PinWeatherSample? {
-        guard item.isFavorite, let weather = interaction?.pinWeather else { return nil }
-        return weather.sample(for: item.id)
-    }
-
     private var badgeKey: String { DockBadgePath.key(for: item.resolvedURL ?? item.reference.url) }
 
     var body: some View {
@@ -74,18 +69,10 @@ struct DockAppButton: View {
                                  launchRequest: interaction?.applicationCatalog?.launchAnimationRequests[item.id],
                                  launchMotionEnabled: interaction.map { $0.exposesContent && $0.idleFade.fraction == 0 } ?? true,
                                  lineIcon: lineIcon)
-                .environment(\.pinWeatherSample, pinWeatherSample)
                 .overlay {
                     if interaction?.documentTargetID == item.id {
                         DockDocumentHighlight(emphasized: interaction?.springEmphasized == true)
                             .allowsHitTesting(false)
-                    }
-                    if let interaction, let sims = interaction.sims,
-                       let state = sims.pinState(for: item.id, isFavorite: item.isFavorite) {
-                        DockSimsOverlay(state: state, size: size, edge: interaction.layout.edge,
-                                        artworkOpacity: artworkOpacity, animated: indicatorAnimated)
-                            .allowsHitTesting(false)
-                            .accessibilityHidden(true)
                     }
                     if AppDockPresence.representsCurrentApplication(item.reference),
                        let awareness = interaction?.updateAwareness, awareness.showsDockPip {
@@ -187,11 +174,6 @@ struct DockAppButton: View {
                     menuAction(.selectWindow(window.token))
                 }
             }
-            if item.isFavorite, interaction?.sims?.isEnabled == true {
-                Button(.simsFeed) { interaction?.sims?.care(.feed, pinID: item.id) }
-                Button(.simsCheer) { interaction?.sims?.care(.cheer, pinID: item.id) }
-                Button(.simsSettle) { interaction?.sims?.care(.settle, pinID: item.id) }
-            }
             if item.isFavorite {
                 Button {
                     Analytics.performing(.voiceOver) { interaction?.movePin?(item.id, -1) }
@@ -214,8 +196,6 @@ struct DockAppButton: View {
                 }
             }
         }
-        .modifier(QuarantineItemModifier(id: item.id, url: item.resolvedURL ?? item.reference.url,
-                                         name: item.reference.name, eligible: item.isFavorite))
     }
 
     /// A context-menu action reached through VoiceOver's actions rotor.
@@ -231,20 +211,10 @@ struct DockAppButton: View {
         case .notRunning: .appStatusNotRunning
         }
         let status = String(localized: item.isAvailable ? running : .appStatusUnavailable)
-        let mood = interaction?.sims?.pinState(for: item.id, isFavorite: item.isFavorite).map {
-            String(localized: $0.mood(at: .now).title)
-        }
         if let badgeLabel {
-            let badge = String(localized: newBadge
+            return Text(verbatim: String(localized: newBadge
                 ? .appBadgeNewAccessibility(status: status, badge: badgeLabel)
-                : .appBadgeAccessibility(status: status, badge: badgeLabel))
-            if let mood {
-                return Text(verbatim: "\(badge), \(String(localized: .simsMoodAccessibility(mood: mood)))")
-            }
-            return Text(verbatim: badge)
-        }
-        if let mood {
-            return Text(verbatim: "\(status), \(String(localized: .simsMoodAccessibility(mood: mood)))")
+                : .appBadgeAccessibility(status: status, badge: badgeLabel)))
         }
         return Text(verbatim: status)
     }

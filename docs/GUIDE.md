@@ -29,7 +29,6 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [DOKK Discovery](#dokk-discovery)
 - [Settings](#settings)
 - [App updates](#app-updates)
-- [Deprecated features](#deprecated-features)
 
 ## Get started
 
@@ -330,7 +329,7 @@ running apps and utilities to the far end. Click it to open the Hub as usual. Vo
 
 A DOKK tile placed after a pin stays beside that pin when other pins are added or removed. If you
 move or unpin that pin, the tile stays put and follows the pin that was before it. Where a display
-doesn't have that pin, or it is parked on a magnetic edge, the tile follows the nearest
+doesn't have that pin, the tile follows the nearest
 earlier pin, or the far left if none. A tile between pins shares the pinned section and adds no divider.
 
 The position is a dock setting, saved with the other settings and kept across restarts. A drag
@@ -773,14 +772,3 @@ The implementation uses `SMAppService.mainApp`; it stores no duplicate preferenc
 ## App updates
 
 DOKK uses Sparkle’s update engine with a DOKK-owned native update window. Consent, release notes, download progress, errors, and installation choices use DOKK’s UI. Choose **Check for Updates…** from the DOKK menu, or configure automatic checks in **Settings → General**. Scheduled updates appear as **Update Available…** in the menu without taking focus. You can hide a download and reopen it from **Show App Update…**, or cancel it explicitly. The ready screen offers a restart now or installation when DOKK quits. macOS may still show an administrator authorization dialog. The release process is described in [release instructions](UPDATES.md).
-
-## Deprecated features
-
-These personality extras are deprecated and turn off on launch: Dock Sims and AI icon rumours, Pin weather (icon rust), Quarantine stamp, Patch bay, and Magnetic Edges. Their settings stay under **Settings → Features → Deprecated**, with a notice that they will be removed in version 1.0.0. Atmosphere and soap bubbles stay in the ordinary Features list.
-
-**Patch bay** is deprecated. Launch turns cable actions off. The editor stays under **Settings → Features → Deprecated**. See [supported ports and limits](PATCH-BAY.md).
-
-**Magnetic Edges** is deprecated and will be removed in version 1.0.0. Launch turns snapping off. The toggle stays under **Settings → Features → Deprecated**.
-
-**AI icon rumours** and Dock Sims are deprecated. Launch turns Sims moods off, which also stops rumours. Settings stay under **Settings → Features → Deprecated → Dock Sims**. See [Icon rumours](ICON-RUMOURS.md) for the old consent and data boundaries.
-

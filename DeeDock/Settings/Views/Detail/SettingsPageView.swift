@@ -25,9 +25,6 @@ struct SettingsPageView: View {
     }
 
     @ViewBuilder private var content: some View {
-        if page.isDeprecated {
-            DeprecatedFeatureNotice()
-        }
         switch page.group {
         case .dock:
             DockPageContent(page: page, context: context, override: override, showZone: showZone)

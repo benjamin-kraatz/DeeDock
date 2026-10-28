@@ -15,7 +15,6 @@ struct DockIconPresentation<Artwork: View>: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.dockTileHovered) private var hovered
-    @Environment(\.pinWeatherSample) private var pinWeatherSample
     let artwork: Artwork
     let size: CGFloat
     let edge: DockEdge
@@ -94,7 +93,6 @@ struct DockIconPresentation<Artwork: View>: View {
             styledArtwork
                 .frame(width: size, height: size)
                 .opacity(available ? 1 : 0.4)
-                .modifier(PinWeatherChrome(sample: pinWeatherSample))
                 .modifier(DockIconIndicator(style: runningIndicatorStyle, state: running, size: size,
                                             variant: indicatorVariant, animated: indicatorAnimated))
                 .overlay {

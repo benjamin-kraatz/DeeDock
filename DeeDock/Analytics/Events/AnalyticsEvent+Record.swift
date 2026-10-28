@@ -78,7 +78,6 @@ extension AnalyticsEvent {
         case .shortcutRun: "shortcut_run"
         case .shortcutTile: "shortcut_tile"
         case .appMelt: "app_melt"
-        case .patchBay: "patch_bay"
         case .clipboardMuseum: "clipboard_museum"
         case .clipboardCaptureEnabled: "clipboard_capture_enabled"
         case .notificationFeedOpened: "notification_feed_opened"
@@ -274,8 +273,6 @@ extension AnalyticsEvent {
             ["action": .init(action), "tile_count": .init(tileCount)]
         case let .appMelt(action, pairCount, outcome):
             ["action": .init(action), "pair_count": .init(pairCount), "outcome": .init(outcome)]
-        case let .patchBay(action, cableCount, outcome):
-            ["action": .init(action), "cable_count": .init(cableCount), "outcome": outcome.map(AnalyticsValue.init)]
         case let .clipboardMuseum(action, kind, itemCount):
             ["action": .init(action), "kind": kind.map(AnalyticsValue.init), "item_count": itemCount.map(AnalyticsValue.init)]
         case let .notificationFeedOpened(entryCount, unreadCount, trigger):
