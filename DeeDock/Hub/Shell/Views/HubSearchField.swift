@@ -37,11 +37,13 @@ struct HubSearchField: View {
             ZStack(alignment: .leading) {
                 HStack(spacing: 6) {
                     if let token, let extras {
-                        HubSearchTokenView(token: token, reduceMotion: state.reduceMotion) {
+                        HubSearchTokenView(token: token, reduceMotion: state.reduceMotion, compact: !query.isEmpty) {
                             extras.removeSearchToken()
                             state.requestSearchFocus()
                         }
                         .id(token.id)
+                        .animation(state.reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.85),
+                                   value: query.isEmpty)
                     }
                     textField(token: token)
                     if !query.isEmpty || token != nil {
@@ -99,7 +101,7 @@ struct HubSearchField: View {
     }
 
     /// The text field. Beside a token it has no placeholder (there's no room for one), and its VoiceOver label says
-    /// that typing searches by words instead.
+    /// that words typed there search together with the token's picture.
     private func textField(token: HubSearchToken?) -> some View {
         let label = token != nil ? extras?.searchTokenPrompt ?? prompt : prompt
         return TextField(text: $query, prompt: token == nil ? Text(prompt) : Text(verbatim: "")) {

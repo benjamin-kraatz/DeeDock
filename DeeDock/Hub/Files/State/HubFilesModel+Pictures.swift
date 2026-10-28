@@ -5,8 +5,9 @@ import UniformTypeIdentifiers
 /// Searching with a picture in the Files tab (`docs/mockups/lookout-image-search.html`): the search field's chip and
 /// drop well, pasting a picture, Find Similar, the picture results' selection and folds, and opening their hits.
 ///
-/// A picture replaces the words in the field (`LookoutPictureSession`); while it's there `isSearching` is true, the
-/// names section is gone, and `lookoutSelection` walks the picture results' groups instead of the text results.
+/// A picture replaces the words in the field (`LookoutPictureSession`), and words typed after its chip search together
+/// with it (DEE-126). While it's there `isSearching` is true, the names section is gone, and `lookoutSelection` walks
+/// the picture results' groups instead of the text results.
 extension HubFilesModel {
     // MARK: State
 
@@ -75,20 +76,48 @@ extension HubFilesModel {
         searchDidChange(wasSearching: wasSearching)
     }
 
-    /// Typing replaced the picture: forget it and its search (called while `query` changes).
-    func endPictureSearch() {
-        pictureSession.typed()
-        lookout.pictureSearch.clear()
-        searchedPictureID = nil
-        pictureWeakExpanded = []
+    /// The words typed after the picture's chip changed (called while `query` changes): the picture stays, and its
+    /// search runs again with them after the typing debounce. The selection and Quick Look start over, as for new
+    /// words; the folds stay as they are.
+    func pictureWordsDidChange() {
+        searchSelection.clear()
+        lookoutSelection = nil
+        quickLook.selectionDidChange()
+        guard previewOverrides.pictureResults == nil else { return }
+        lookout.pictureSearch.updateWords(trimmedQuery)
     }
 
-    /// Runs the picture search, or reuses its vector for a scope change or when the tab appears again.
+    /// The words typed beside the picture, as its results were ranked with them; empty for none.
+    var pictureWords: String { pictureResults.words }
+
+    /// Whether the results bar says that typing adds words: the picture's results are in, and nothing is typed.
+    var showsPictureWordsHint: Bool {
+        picturePhase == .done && trimmedQuery.isEmpty && pictureWords.isEmpty
+    }
+
+    /// The picture–words slider's place: how much the typed words count against the picture.
+    var pictureWordsWeight: Double {
+        previewOverrides.pictureWordsWeight ?? lookout.pictureSearch.wordsWeight
+    }
+
+    /// Moves the picture–words slider.
+    func setPictureWordsWeight(_ weight: Double) {
+        lookout.pictureSearch.setWordsWeight(weight)
+    }
+
+    /// The slider was let go after a move, for `lookout_picture_weight_changed`.
+    func pictureWordsWeightCommitted() {
+        Analytics.count(.lookoutPictureWeightChanged)
+    }
+
+    /// Runs the picture search, or reuses its vector for a scope change or when the tab appears again. The words
+    /// typed beside the picture go with it.
     func runPictureSearch(_ picture: LookoutPictureQuery) {
-        if searchedPictureID == picture.id, lookout.pictureSearch.rescope(resolvedSearchScope) { return }
+        if searchedPictureID == picture.id,
+           lookout.pictureSearch.rescope(resolvedSearchScope, words: trimmedQuery) { return }
         searchedPictureID = picture.id
         lookout.pictureSearch.search(picture.input, source: picture.analyticsSource, scope: resolvedSearchScope,
-                                     id: picture.id)
+                                     id: picture.id, words: trimmedQuery)
     }
 
     private func setQueryForPicture(_ text: String) {
@@ -247,17 +276,17 @@ extension HubFilesModel {
 
     // MARK: Open
 
-    /// `lookout_result_opened` for a hit of a search with a picture: strong or weak, and its rank within its group.
+    /// `lookout_result_opened` for a hit of a search with a picture: strong or weak, its rank within its group, and,
+    /// when words were typed beside the picture, the slider's place.
     func trackPictureResultOpened(_ hit: LookoutHit) {
-        for group in pictureResults.groups {
-            if let index = group.strong.firstIndex(where: { $0.path == hit.path }) {
-                Analytics.track(LookoutAnalytics.opened(hit, section: .strong, rank: index + 1,
-                                                        scope: analyticsSearchScope, isLookup: false, query: .image))
-                return
-            }
-            if let index = group.weak.firstIndex(where: { $0.path == hit.path }) {
-                Analytics.track(LookoutAnalytics.opened(hit, section: .weak, rank: index + 1,
-                                                        scope: analyticsSearchScope, isLookup: false, query: .image))
+        let results = pictureResults
+        let query: AnalyticsLookoutQuery = results.hasWords ? .imageWords : .image
+        for group in results.groups {
+            for (section, hits) in [(AnalyticsLookoutSection.strong, group.strong), (.weak, group.weak)] {
+                guard let index = hits.firstIndex(where: { $0.path == hit.path }) else { continue }
+                Analytics.track(LookoutAnalytics.opened(hit, section: section, rank: index + 1,
+                                                        scope: analyticsSearchScope, isLookup: results.isLookup,
+                                                        query: query, wordsWeight: pictureWordsWeight))
                 return
             }
         }

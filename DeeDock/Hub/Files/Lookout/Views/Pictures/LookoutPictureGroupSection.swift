@@ -3,11 +3,14 @@ import SwiftUI
 /// One group of a search with a picture: its header ("Looks like it · 5", "About what it shows · 2"), its strong
 /// hits, and its own "Weaker matches" fold, or "Nothing stands out here." when nothing in it clearly fits.
 ///
-/// The rows are Lookout's own (`LookoutResultRow`), with the match chip saying "Looks alike" or "Same subject".
+/// The rows are Lookout's own (`LookoutResultRow`), with the match chip saying "Looks alike" or "Same subject", or
+/// Lookout's words chip for a file only the typed words found. Words typed beside the picture are highlighted.
 struct LookoutPictureGroupSection: View {
     let model: HubFilesModel
     let group: LookoutSimilarResults.Group
     let queryIsPicture: Bool
+    /// The keyword terms of words typed beside the picture, for highlighting; empty for none.
+    var terms: [String] = []
     let reduceMotion: Bool
 
     var body: some View {
@@ -36,7 +39,7 @@ struct LookoutPictureGroupSection: View {
 
     private func rows(_ hits: [LookoutHit]) -> some View {
         ForEach(Array(hits.enumerated()), id: \.element.id) { index, hit in
-            LookoutResultRow(model: model, hit: hit, terms: [],
+            LookoutResultRow(model: model, hit: hit, terms: terms,
                              matchTitle: LookoutPictureWhy.matchTitle(hit: hit, group: group.kind,
                                                                       queryIsPicture: queryIsPicture))
                 .lookoutArrival(index: index, reduceMotion: reduceMotion)

@@ -194,6 +194,128 @@ import Testing
         #expect(search.phase == .idle)
     }
 
+    // MARK: Words beside the picture
+
+    @Test func typedWordsSearchAgainWithoutReadingThePicture() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .done })
+        search.updateWords("  at night ")
+        #expect(search.words == "at night")
+        #expect(await eventually { await reader.requests.count == 2 })
+        let request = try #require(await reader.requests.last)
+        #expect(request.words == LookoutSimilarWords(text: "at night", vector: encoder.wordsVector,
+                                                     weight: LookoutRanking.pictureWordsWeight))
+        #expect(request.vector == encoder.vector && request.queryIsPicture)
+        #expect(encoder.pictures.count == 1 && encoder.queries == ["at night"])
+        // Back to no words: the picture alone again, nothing embedded.
+        search.updateWords("")
+        #expect(await eventually { await reader.requests.count == 3 })
+        #expect(await reader.requests.last?.words == nil && encoder.queries.count == 1)
+    }
+
+    @Test func typingWaitsForTheDebounce() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .done })
+        for prefix in ["a", "at", "at n", "at ni", "at night"] { search.updateWords(prefix) }
+        #expect(await eventually { await reader.requests.count == 2 })
+        try await Task.sleep(for: LookoutSearch.debounce * 3)
+        // One search for the last words, one embedding.
+        #expect(await reader.requests.count == 2 && encoder.queries == ["at night"])
+    }
+
+    @Test func wordsTypedWhileThePictureIsReadWaitForIt() async throws {
+        await reader.setResults(someResults())
+        encoder.delay = .milliseconds(150)
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        search.updateWords("at night")
+        #expect(search.phase == .waking)
+        #expect(await eventually { search.phase == .done })
+        // The read went on: one picture, one search, with the words.
+        #expect(encoder.pictures.count == 1)
+        let requests = await reader.requests
+        #expect(requests.count == 1 && requests.first?.words?.text == "at night")
+    }
+
+    @Test func theSliderRanksAgainWithTheVectorsItHas() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .done })
+        // Without words the slider has nothing to weigh.
+        search.setWordsWeight(0.7)
+        try await Task.sleep(for: LookoutPictureSearch.weightPause * 3)
+        #expect(await reader.requests.count == 1)
+        search.updateWords("at night")
+        #expect(await eventually { await reader.requests.count == 2 })
+        search.setWordsWeight(0.75)
+        search.setWordsWeight(2)                         // past the end: held at the end
+        #expect(search.wordsWeight == LookoutRanking.pictureWordsWeights.upperBound)
+        #expect(await eventually { await reader.requests.count == 3 })
+        #expect(await reader.requests.last?.words?.weight == LookoutRanking.pictureWordsWeights.upperBound)
+        // A new scope keeps the words and the weight, and embeds nothing again.
+        search.rescope(.folder(URL(filePath: "/Users/tester/Desktop")), words: "at night")
+        #expect(await eventually { await reader.requests.count == 4 })
+        #expect(await reader.requests.last?.words?.weight == LookoutRanking.pictureWordsWeights.upperBound)
+        #expect(encoder.queries == ["at night"] && encoder.pictures.count == 1)
+        // A new filter refreshes with the words it has.
+        search.filter = LookoutSearchFilter(folders: ["/Users/tester/Desktop"])
+        search.refresh()
+        #expect(await eventually { await reader.requests.count == 5 })
+        #expect(await reader.requests.last?.words?.text == "at night" && search.words == "at night")
+    }
+
+    @Test func aNewPictureStartsAtTheDefaultWeight() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        let first = UUID()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac, id: first)
+        #expect(await eventually { search.phase == .done })
+        search.updateWords("at night")
+        search.setWordsWeight(0.8)
+        // The same picture searched again (a restart) keeps the slider; a new one doesn't.
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac, id: first, words: "at night")
+        #expect(search.wordsWeight == 0.8)
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac, id: UUID())
+        #expect(search.wordsWeight == LookoutRanking.pictureWordsWeight && search.words.isEmpty)
+        search.clear()
+        #expect(search.wordsWeight == LookoutRanking.pictureWordsWeight && search.words.isEmpty)
+    }
+
+    @Test func wordsTheEncoderCantReadCountAsKeywords() async throws {
+        await reader.setResults(someResults())
+        encoder.failsWords = true
+        let search = search()
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac)
+        #expect(await eventually { search.phase == .done })
+        search.updateWords("sunset")
+        #expect(await eventually { await reader.requests.count == 2 })
+        let words = try #require(await reader.requests.last?.words)
+        #expect(words.text == "sunset" && words.vector == nil)
+        #expect(search.phase == .done)
+    }
+
+    @Test func theFirstWordsArePerPictureInAnalytics() async throws {
+        await reader.setResults(someResults())
+        let search = search()
+        var counted: [AnalyticsCounter] = []
+        search.countAnalytics = { counted.append($0) }
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac, id: UUID())
+        #expect(await eventually { search.phase == .done })
+        search.updateWords("at")
+        search.updateWords("at night")
+        search.updateWords("")
+        search.updateWords("at dusk")
+        #expect(counted == [.lookoutPictureWordsAdded])
+        search.search(.data(LookoutTestPictures.png()), source: .paste, scope: .thisMac, id: UUID())
+        search.updateWords("red")
+        #expect(counted == [.lookoutPictureWordsAdded, .lookoutPictureWordsAdded])
+    }
+
     // MARK: Reading a dropped file
 
     @Test func aDroppedFileIsReadFromOneCheckedDescriptor() throws {

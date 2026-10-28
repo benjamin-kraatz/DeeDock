@@ -1,19 +1,31 @@
 import Foundation
 
-/// Searching with a vector alone: a picture someone dropped or pasted, or a file already in the index (Find Similar).
+/// Searching with a vector: a picture someone dropped or pasted, or a file already in the index (Find Similar), alone
+/// or with words typed beside it.
 ///
-/// There are no words, so a file qualifies by meaning alone: its best segment must stand out on this query's own
-/// scale (`Searcher.meaning`, `LookoutRanking.zGate`), and it scores that z. Pictures and documents sit on separate
-/// scales even after `meaning` centers each modality (a picture query's cosines to other pictures run far above its
-/// cosines to text), so they're ranked, grouped into folders, and split into strong and weak each on their own
+/// Without words, a file qualifies by meaning alone: its best segment must stand out on this query's own scale
+/// (`Searcher.meaning`, `LookoutRanking.zGate`), and it scores that z. Pictures and documents sit on separate scales
+/// even after `meaning` centers each modality (a picture query's cosines to other pictures run far above its cosines to
+/// text), so they're ranked, grouped into folders, and split into strong and weak each on their own
 /// (`LookoutSimilarResults`). The file searched with never appears in its own results.
+///
+/// Words typed beside the picture ("this, but at night") change both parts (DEE-126). Meaning becomes the blend of
+/// the picture's and the words' scores (`Searcher.blend`), and the words count as keywords as they do in a search by
+/// words: a file qualifies by the blend or by having half the words, and scores
+/// `max(z, 0) + 2 × coverage^1.5`, with lookups and kind words weighed as `search` weighs them.
 nonisolated extension Searcher {
-    /// Searches the index with `vector`.
+    /// Words connecting a picture to what's typed beside it ("but at night", "like this, in red"). The vector still
+    /// reads them; keyword coverage doesn't count them, so "but black" covers a file with "black" fully.
+    static let pictureConnectors: Set<String> = ["but", "like", "same", "similar", "instead", "version", "just", "only"]
+
+    /// Searches the index with `vector`, and with `words` when someone typed them beside it.
     ///
     /// - Parameters:
     ///   - vector: 768 L2-normalized floats: a picture's image vector, or a stored vector. Loads the vectors first when
     ///     they're released.
     ///   - queryIsPicture: The vector is a picture's (it puts the pictures group first).
+    ///   - words: Words typed beside it, with their vector and weight; nil or empty text for the vector alone. Without
+    ///     a vector (the encoder failed) they count as keywords only.
     ///   - excluding: Paths, as the index stores them, never to return: the file searched with.
     ///   - scope: A folder to search inside, as an absolute real path; nil for the whole index.
     ///   - kinds: Only files of these kinds; nil for all.
@@ -21,19 +33,29 @@ nonisolated extension Searcher {
     ///   - limit: The most hits in each group, files and folders together.
     /// - Returns: Both groups in display order, each split into strong and weak.
     /// - Throws: SQLite errors.
-    func similar(to vector: [Float], queryIsPicture: Bool, excluding: Set<String> = [], scope: String? = nil,
-                 kinds: Set<FileKind>? = nil, filter: LookoutSearchFilter? = nil, limit: Int = 40) throws
-        -> LookoutSimilarResults {
-        guard vector.count == Vectors.dimension else { return LookoutSimilarResults(queryIsPicture: queryIsPicture) }
+    func similar(to vector: [Float], queryIsPicture: Bool, words: LookoutSimilarWords? = nil,
+                 excluding: Set<String> = [], scope: String? = nil, kinds: Set<FileKind>? = nil,
+                 filter: LookoutSearchFilter? = nil, limit: Int = 40) throws -> LookoutSimilarResults {
+        let words = words.flatMap { $0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+        guard vector.count == Vectors.dimension else {
+            return LookoutSimilarResults(queryIsPicture: queryIsPicture, words: words?.text ?? "")
+        }
         if !vectorsLoaded { try reload() }
-        let scoped = try scope.map(Self.prefixRange).map(files(in:))
+        let zGate = LookoutRanking.zGate
+        let range = scope.map(Self.prefixRange)
+        let scoped = try range.map(files(in:))
         let excludedIDs = try fileIDs(forPaths: excluding)
 
-        // Each file's best segment on this query's scale, as text search scores meaning.
+        // Each file's best segment on this query's scale, as text search scores meaning. With words, the picture's
+        // and the words' scales blended.
         var best: [Int64: (z: Double, cosine: Double, row: Int)] = [:]
         if !rowFile.isEmpty {
             let scores = score(vector)
-            let meaning = Self.meaning(scores, rowModality, setsScale: rowSetsScale)
+            var meaning = Self.meaning(scores, rowModality, setsScale: rowSetsScale)
+            if let words, let wordsVector = words.vector, wordsVector.count == Vectors.dimension {
+                let wordsMeaning = Self.meaning(score(wordsVector), rowModality, setsScale: rowSetsScale)
+                meaning = Self.blend(meaning, wordsMeaning, weight: words.weight, setsScale: rowSetsScale)
+            }
             for row in scores.indices {
                 let file = rowFile[row]
                 guard !excludedIDs.contains(file), kinds?.contains(rowKind[row]) ?? true,
@@ -42,17 +64,43 @@ nonisolated extension Searcher {
             }
         }
 
-        let candidates = Set(best.filter { $0.value.z >= LookoutRanking.zGate }.keys)
+        // The typed words as keywords, as in a search by words, without the words that only tie them to the picture.
+        let text = words?.text ?? ""
+        let terms = Self.terms(text).filter { !Self.pictureConnectors.contains($0) }
+        var found = try wordMatches(Self.patterns(terms, prefixLast: false), terms: terms, range: range, kinds: kinds,
+                                    filter: filter)
+        found.matches.removeAll { excludedIDs.contains($0.file) }
+        let lookup = Self.isLookup(terms)
+        let (meaningWeight, wordsWeight) = lookup
+            ? (LookoutRanking.lookupMeaningWeight, LookoutRanking.wordWeight * LookoutRanking.lookupWordFactor)
+            : (1, LookoutRanking.wordWeight)
+        let hinted = Self.kindHints(text)
+
+        var candidates = Set(best.filter { $0.value.z >= zGate }.keys)
+        for (file, share) in found.coverage where share >= LookoutRanking.wordGate && !excludedIDs.contains(file) {
+            candidates.insert(file)
+        }
         let fileRows = try files(withIDs: candidates)
         typealias GroupKind = LookoutSimilarResults.GroupKind
+        var scored: [Int64: Double] = [:]
         var filesByGroup: [GroupKind: [Int64]] = [:]
         var members: [GroupKind: [LookoutFolderGrouping.Member]] = [:]
         for file in candidates {
-            guard let row = fileRows[file], let match = best[file], filter?.allows(row.path) ?? true else { continue }
+            guard let row = fileRows[file], found.allowed[file] ?? filter?.allows(row.path) ?? true else { continue }
+            let z = best[file]?.z, share = found.coverage[file] ?? 0
+            var score: Double
+            if words == nil {
+                score = z ?? 0
+            } else {
+                score = meaningWeight * max(z ?? 0, 0) + wordsWeight * pow(share, LookoutRanking.coverageExponent)
+                if hinted.contains(row.kind) { score += LookoutRanking.kindHintBonus }
+            }
+            scored[file] = score
             let group = GroupKind(row.kind)
             filesByGroup[group, default: []].append(file)
-            members[group, default: []].append(.init(path: row.path, score: match.z, z: match.z, coverage: 0,
-                                                     match: .meaning))
+            members[group, default: []].append(.init(
+                path: row.path, score: score, z: z, coverage: share,
+                match: .init(meaning: (z ?? -.infinity) >= zGate, words: share >= LookoutRanking.wordGate)))
         }
 
         // Folders form within a group. One that forms in both stays where it scores higher, so a path is listed once.
@@ -65,20 +113,32 @@ nonisolated extension Searcher {
         folders[.pictures] = folders[.pictures]?.filter { $0.score >= documentFolders[$0.path] ?? -.infinity }
         folders[.documents] = folders[.documents]?.filter { $0.score > pictureFolders[$0.path] ?? -.infinity }
 
+        // Point at the best meaning segment if it stands out; else at the segment the words matched.
+        let wordRank = Dictionary(found.matches.enumerated().map { ($0.element.file, (rank: $0.offset + 1,
+                                                                                      match: $0.element)) },
+                                  uniquingKeysWith: { first, _ in first })
         enum Entry { case file(Int64), folder(LookoutHit) }
         var pages: [GroupKind: [Entry]] = [:]
-        var pointed: Set<Int64> = []
+        var pointed: [Int64: Int64] = [:]
         for group in GroupKind.allCases {
             var entries: [(score: Double, path: String, entry: Entry)] = (filesByGroup[group] ?? []).map { file in
-                (best[file]!.z, fileRows[file]!.path, .file(file))
+                (scored[file]!, fileRows[file]!.path, .file(file))
             }
             entries += (folders[group] ?? []).map { ($0.score, $0.path, .folder($0)) }
             entries.sort { $0.score > $1.score || ($0.score == $1.score && $0.path < $1.path) }
             let page = entries.prefix(limit).map(\.entry)
-            for case .file(let file) in page { pointed.insert(rowSegment[best[file]!.row]) }
+            for case .file(let file) in page {
+                let semantic = best[file], keyword = wordRank[file]
+                let useMeaning = semantic.map { $0.z >= zGate || keyword == nil } ?? false
+                if let id = useMeaning ? semantic.map({ rowSegment[$0.row] }) : keyword?.match.segment {
+                    pointed[file] = id
+                }
+            }
             pages[group] = page
         }
-        let segmentRows = try segments(withIDs: pointed)
+        let segmentRows = try segments(withIDs: Set(pointed.values).union(pointed.keys.compactMap {
+            wordRank[$0]?.match.segment
+        }))
 
         let groups = LookoutSimilarResults.order(queryIsPicture: queryIsPicture).map { group in
             let hits: [LookoutHit] = (pages[group] ?? []).compactMap { entry in
@@ -86,19 +146,24 @@ nonisolated extension Searcher {
                 case .folder(let folder):
                     return folder
                 case .file(let file):
-                    guard let row = fileRows[file], let match = best[file] else { return nil }
-                    let segmentID = rowSegment[match.row]
-                    guard let segment = segmentRows[segmentID] else { return nil }
+                    guard let row = fileRows[file], let segmentID = pointed[file], let segment = segmentRows[segmentID],
+                          let score = scored[file] else { return nil }
+                    let semantic = best[file], keyword = wordRank[file], share = found.coverage[file] ?? 0
                     return LookoutHit(
-                        path: row.path, kind: row.kind, folder: nil, score: match.z, z: match.z, cosine: match.cosine,
-                        coverage: 0, keywordRank: nil, match: .meaning, segment: segment.kind, segmentID: segmentID,
-                        loc: segment.loc, locEnd: segment.locEnd, snippet: nil, excerpt: segment.excerpt,
-                        modified: row.modified, size: row.size, info: row.info)
+                        path: row.path, kind: row.kind, folder: nil, score: score, z: semantic?.z,
+                        cosine: semantic?.cosine, coverage: share, keywordRank: keyword?.rank,
+                        match: .init(meaning: (semantic?.z ?? -.infinity) >= zGate,
+                                     words: share >= LookoutRanking.wordGate),
+                        segment: segment.kind, segmentID: segmentID, loc: segment.loc, locEnd: segment.locEnd,
+                        snippet: Self.snippet(pointedAt: segmentID, segment: segment, keyword: keyword?.match,
+                                              matchedKind: keyword.flatMap { segmentRows[$0.match.segment]?.kind }),
+                        excerpt: segment.excerpt, modified: row.modified, size: row.size, info: row.info)
                 }
             }
             return LookoutSimilarResults.Group(kind: group, ranked: hits)
         }
-        return LookoutSimilarResults(queryIsPicture: queryIsPicture, groups: groups)
+        return LookoutSimilarResults(queryIsPicture: queryIsPicture, groups: groups, words: words?.text ?? "",
+                                     terms: terms, isLookup: lookup)
     }
 
     /// The stored vector a file already in the index searches with (Find Similar): the segment `preferredSegment`

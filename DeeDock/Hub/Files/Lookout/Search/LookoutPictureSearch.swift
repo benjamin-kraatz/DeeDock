@@ -2,7 +2,8 @@ import Foundation
 import Observation
 import os
 
-/// Lookout's search with a picture: a dropped or pasted picture, or Find Similar on a file in the index.
+/// Lookout's search with a picture: a dropped or pasted picture, or Find Similar on a file in the index, alone or with
+/// words typed beside it.
 ///
 /// A new picture is read in the app (`LookoutPictureReading`), sent to the query service as pixels, and its vector
 /// searched with (`Searcher.similar`). The service loads its picture reader only for the first picture; the phases say
@@ -12,6 +13,11 @@ import os
 /// Each `search` cancels the previous one's work, and a generation token drops anything that arrives late. The last
 /// vector is kept in memory while its search is current, so a scope change searches again without reading the
 /// picture again; `clear()` drops it. Nothing is written anywhere.
+///
+/// Words typed beside the picture (`updateWords`) are embedded by the query service as a search by words is, after the
+/// same short debounce, and searched with together with the picture's vector, which is reused: typing never reads the
+/// picture again. Words typed while the picture is still being read wait for it. Their vector is kept for the text it
+/// was made from, so moving the picture–words slider (`setWordsWeight`) only ranks again.
 ///
 /// The current request is kept until `clear()`, so a search that couldn't run, or ran under old settings, runs
 /// again by itself: when Lookout becomes available (set up, or turned on again), and through `refresh()` when the
@@ -44,6 +50,11 @@ final class LookoutPictureSearch {
     private(set) var readSeconds: Double?
     /// The stored vector searched with, when Find Similar reused one (its page, for "Page 7").
     private(set) var storedSource: LookoutSimilarSource?
+    /// The words typed beside the picture, trimmed; empty for none.
+    private(set) var words = ""
+    /// How much the words count against the picture, within `LookoutRanking.pictureWordsWeights`. Back to
+    /// `LookoutRanking.pictureWordsWeight` for every new picture.
+    private(set) var wordsWeight = LookoutRanking.pictureWordsWeight
 
     /// Whether Lookout is set up and on. Turning it off cancels the search and clears the results; turning it on
     /// runs the current request, which couldn't run meanwhile, again.
@@ -68,8 +79,14 @@ final class LookoutPictureSearch {
     @ObservationIgnored private var pending: Task<Void, Never>?
     @ObservationIgnored private var warmTask: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
-    /// The current search's vector and what it excludes, for `rescope`.
+    /// The current search's vector and what it excludes, for `rescope` and for searching again with new words.
     @ObservationIgnored private var current: (vector: [Float], isPicture: Bool, excluding: Set<String>)?
+    /// The last words embedded and their vector, so the slider and a scope change don't embed them again.
+    @ObservationIgnored private var wordsVector: (text: String, vector: [Float])?
+    /// `lookout_picture_words_added` was counted for `request`'s picture.
+    @ObservationIgnored private var wordsCounted = false
+    /// Counts an analytics counter; `Analytics.count` unless a test listens.
+    @ObservationIgnored var countAnalytics: (AnalyticsCounter) -> Void = { Analytics.count($0) }
     /// What was last searched with, until `clear()`, so `refresh()` can run it again.
     @ObservationIgnored private var request: (input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
                                               scope: HubFileSearch.Scope)?
@@ -95,14 +112,20 @@ final class LookoutPictureSearch {
     ///   - source: Where the picture came from, for `lookout_image_search`.
     ///   - id: The picture searched with (`LookoutPictureQuery.id`). The same picture searched again, as a scope
     ///     change does while it's still being read, is the same request for analytics: `lookout_image_search` is
-    ///     sent once. Nil is always a new request.
+    ///     sent once, and the slider keeps its place. Nil is always a new request.
+    ///   - words: Words typed beside the picture; empty for none.
     /// - Returns: Whether the search waits for the picture reader to load (it was cold).
     @discardableResult
     func search(_ input: LookoutPictureInput, source: AnalyticsLookoutImageSource,
-                scope: HubFileSearch.Scope, id: UUID? = nil) -> Bool {
-        if id == nil || id != requestID { requestTracked = false }
+                scope: HubFileSearch.Scope, id: UUID? = nil, words: String = "") -> Bool {
+        if id == nil || id != requestID {
+            requestTracked = false
+            wordsCounted = false
+            wordsWeight = LookoutRanking.pictureWordsWeight
+        }
         request = (input, source, scope)
         requestID = id
+        setWords(words)
         return start()
     }
 
@@ -159,17 +182,66 @@ final class LookoutPictureSearch {
 
     /// Searches the current picture again within a new scope, with the vector it already has.
     ///
+    /// - Parameter words: The words typed beside the picture now; nil keeps the current ones (a refresh).
     /// - Returns: False when there's no vector yet (the picture was still being read): search again instead.
     @discardableResult
-    func rescope(_ scope: HubFileSearch.Scope) -> Bool {
-        guard let current, isAvailable else { return false }
+    func rescope(_ scope: HubFileSearch.Scope, words: String? = nil) -> Bool {
+        guard current != nil, isAvailable else { return false }
+        if let words { setWords(words) }
         request?.scope = scope
+        searchAgain(after: .zero)
+        return true
+    }
+
+    /// The words typed beside the picture changed: searches again with them and the picture's vector after the
+    /// typing debounce (`LookoutSearch.debounce`). While the picture is still being read, they wait for it.
+    func updateWords(_ words: String) {
+        guard setWords(words), current != nil, isAvailable else { return }
+        searchAgain(after: LookoutSearch.debounce)
+    }
+
+    /// Moves the picture–words slider: ranks again with both vectors as they are, after a moment's pause so a drag
+    /// doesn't queue a search for every step.
+    func setWordsWeight(_ weight: Double) {
+        let range = LookoutRanking.pictureWordsWeights
+        let weight = min(max(weight, range.lowerBound), range.upperBound)
+        guard weight != wordsWeight else { return }
+        wordsWeight = weight
+        guard !words.isEmpty, current != nil, isAvailable else { return }
+        searchAgain(after: Self.weightPause)
+    }
+
+    /// How long the slider waits for the next step before ranking again.
+    nonisolated static let weightPause: Duration = .milliseconds(40)
+
+    /// Takes `words` as the current words; counts the first words a picture gets.
+    ///
+    /// - Returns: Whether they changed.
+    @discardableResult
+    private func setWords(_ words: String) -> Bool {
+        let words = words.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard words != self.words else { return false }
+        self.words = words
+        if !words.isEmpty, !wordsCounted, request != nil {
+            wordsCounted = true
+            countAnalytics(.lookoutPictureWordsAdded)
+        }
+        return true
+    }
+
+    /// Searches again with the vector the current search has, the current words, scope and filter, after `delay`.
+    private func searchAgain(after delay: Duration) {
+        guard let current, let request else { return }
         cancelRunning()
         let token = generation
-        let request = LookoutSimilarRequest(vector: current.vector, queryIsPicture: current.isPicture,
-                                            excluding: current.excluding, scope: scope.lookoutFolder, filter: filter)
-        pending = Task { [weak self] in await self?.finish(request, token: token) }
-        return true
+        let similar = LookoutSimilarRequest(vector: current.vector, queryIsPicture: current.isPicture,
+                                            excluding: current.excluding, scope: request.scope.lookoutFolder,
+                                            filter: filter)
+        pending = Task { [weak self] in
+            if delay > .zero { try? await Task.sleep(for: delay) }
+            guard let self, self.isCurrent(token) else { return }
+            await self.finish(similar, token: token)
+        }
     }
 
     /// Ends the search: cancels its work and forgets its vector and results.
@@ -178,6 +250,10 @@ final class LookoutPictureSearch {
         request = nil
         requestID = nil
         requestTracked = false
+        wordsCounted = false
+        words = ""
+        wordsWeight = LookoutRanking.pictureWordsWeight
+        wordsVector = nil
         current = nil
         readSeconds = nil
         storedSource = nil
@@ -258,7 +334,11 @@ final class LookoutPictureSearch {
         }
     }
 
+    /// Searches with `request` and the current words, then publishes the results unless the search moved on.
     private func finish(_ request: LookoutSimilarRequest, token: UUID) async {
+        var request = request
+        request.words = await currentWords()
+        guard isCurrent(token) else { return }
         let found: LookoutSimilarResults?
         do {
             found = try await reader.similar(request)
@@ -269,6 +349,25 @@ final class LookoutPictureSearch {
         guard isCurrent(token) else { return }
         results = found ?? LookoutSimilarResults(queryIsPicture: request.queryIsPicture)
         phase = found == nil ? .unavailable : .done
+    }
+
+    /// The current words with their vector and weight, embedding them when they're new; nil for no words. When the
+    /// encoder fails they still count as keywords.
+    private func currentWords() async -> LookoutSimilarWords? {
+        let text = words
+        guard !text.isEmpty else { return nil }
+        if wordsVector?.text != text {
+            do {
+                let vector = try await encoder.embed(query: text)
+                wordsVector = (text, vector)
+            } catch {
+                if !(error is CancellationError) {
+                    LookoutLog.logger.error("Lookout can't read the words beside a picture: \(String(describing: error), privacy: .public)")
+                }
+            }
+        }
+        return LookoutSimilarWords(text: text, vector: wordsVector?.text == text ? wordsVector?.vector : nil,
+                                   weight: wordsWeight)
     }
 
     private func fail(_ token: UUID) {

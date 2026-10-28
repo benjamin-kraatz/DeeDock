@@ -3,8 +3,8 @@ import Testing
 @testable import DeeDock
 
 /// The search field's picture chip (`LookoutPictureSession`) and the Files model around it: a picture replaces the
-/// words, ⌫ / ✕ / "Back to" bring them back, clear and Escape don't, typing replaces the picture, and a second
-/// picture (Find Similar on a result) keeps the words from before the first.
+/// words, ⌫ / ✕ / "Back to" bring them back, clear and Escape don't, words typed after the chip search together with
+/// the picture, and a second picture (Find Similar on a result) keeps the words from before the first.
 @MainActor struct LookoutPictureSessionTests {
     private let beach = LookoutPictureQuery.dropped(URL(filePath: "/Users/tester/Desktop/IMG_5012.HEIC"))
     private let page = LookoutPictureQuery.similar(URL(filePath: "/Users/tester/Documents/lease.pdf"), segmentID: 7,
@@ -31,13 +31,6 @@ import Testing
         session.begin(page, replacingWords: "")
         #expect(session.picture == page && session.wordsBefore == "dog")
         #expect(session.remove(restoringWords: true) == "dog")
-    }
-
-    @Test func typingReplacesThePicture() {
-        var session = LookoutPictureSession()
-        session.begin(beach, replacingWords: "dog")
-        session.typed()
-        #expect(!session.isActive && session.wordsBefore.isEmpty)
     }
 
     // MARK: Model
@@ -69,12 +62,42 @@ import Testing
         #expect(model.query.isEmpty && !model.isSearching && model.searchToken == nil)
     }
 
-    @Test func typingAfterAPictureSearchesByWords() {
+    @Test func wordsTypedAfterAPictureSearchWithIt() {
         let model = model()
         model.query = "dog"
         model.searchWithPicture(beach)
-        model.query = "c"
-        #expect(!model.isPictureSearch && model.query == "c" && model.pictureSession.wordsBefore.isEmpty)
+        model.query = "at night"
+        // The picture stays, and so do the words from before it for "Back to".
+        #expect(model.isPictureSearch && model.query == "at night" && model.pictureSession.wordsBefore == "dog")
+        #expect(model.searchToken?.title == "IMG_5012.HEIC")
+        // Deleting the typed words keeps the picture; the next ⌫ on the empty field is what takes it out.
+        model.query = ""
+        #expect(model.isPictureSearch && model.isSearching)
+        model.removeSearchToken()
+        #expect(model.query == "dog" && !model.isPictureSearch)
+    }
+
+    @Test func aSecondPictureStartsWithoutTheTypedWords() {
+        let model = model()
+        model.query = "dog"
+        model.searchWithPicture(beach)
+        model.query = "at night"
+        // Find Similar on a result: a new picture, a new search. The words from before the first picture stay.
+        model.searchWithPicture(page)
+        #expect(model.pictureQuery == page && model.query.isEmpty && model.pictureSession.wordsBefore == "dog")
+    }
+
+    @Test func typingClearsTheSelectionButKeepsTheFolds() {
+        let model = model()
+        let picture = LookoutUIFixtures.hit("/x/a.heic", kind: .image, segment: .image)
+        model.previewOverrides.pictureResults = LookoutSimilarResults(queryIsPicture: true, groups: [
+            .init(kind: .pictures, strong: [picture]), .init(kind: .documents),
+        ])
+        model.searchWithPicture(beach)
+        model.setPictureWeakExpanded(.documents, true)
+        model.lookoutSelection = picture.path
+        model.query = "at night"
+        #expect(model.lookoutSelection == nil && model.pictureWeakExpanded == [.documents])
     }
 
     @Test func aPictureSearchListsItsGroupsInOrder() {

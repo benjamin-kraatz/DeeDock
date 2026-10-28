@@ -256,6 +256,8 @@ nonisolated enum AnalyticsLookoutQuery: String, AnalyticsToken {
     case text
     /// A picture, or a file's stored vector (Find Similar).
     case image
+    /// A picture, or a file's stored vector, with words typed beside it.
+    case imageWords = "image_words"
 }
 
 /// Where a search with a picture came from.

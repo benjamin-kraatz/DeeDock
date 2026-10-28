@@ -5,9 +5,9 @@ import Foundation
 ///
 /// - A picture replaces the words in the field. The words from before the first picture are kept: a later picture
 ///   (Find Similar on a result of the picture search) replaces the picture and keeps them.
+/// - Words typed after the chip search together with the picture (DEE-126); the field holds them, not the session.
 /// - ⌫ on the empty field, ✕ on the chip, and "Back to …" remove the picture and give the words back.
 /// - The clear button and Escape remove the picture and the words.
-/// - Typing replaces the picture with a new search by words; the old words are gone.
 struct LookoutPictureSession: Equatable {
     /// The picture searched with, or nil while searching by words.
     private(set) var picture: LookoutPictureQuery?
@@ -33,11 +33,5 @@ struct LookoutPictureSession: Equatable {
         picture = nil
         wordsBefore = ""
         return words
-    }
-
-    /// The person typed into the field: the picture gives way to a search by words.
-    mutating func typed() {
-        picture = nil
-        wordsBefore = ""
     }
 }

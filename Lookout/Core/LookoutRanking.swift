@@ -23,6 +23,15 @@ nonisolated enum LookoutRanking {
     /// DigUp's evals 0.5 cut the list from 26.2 to 5.7 results per query and never folded an expected answer.
     static let strongRatio = 0.5
 
+    /// How much typed words count against the picture they're typed beside, 0…1: a file's meaning is
+    /// `(1 − w) × z(picture) + w × z(words)`, put on its own scale again (`Searcher.blend`). Measured on 67 labeled
+    /// cases ("this, but at night", "in orange", "a tree") and on a real index (2026-10-28, DEE-126): 0.4 put the answer
+    /// first in 58% of cases, against 0% for the picture alone and 13% for the words alone. Attribute changes peak at
+    /// 0.4, subject changes ("a tree") nearer 0.7, so people can move it (`pictureWordsWeights`).
+    static let pictureWordsWeight = 0.4
+    /// The range the picture–words slider offers. Past either end one side drowns the other.
+    static let pictureWordsWeights: ClosedRange<Double> = 0.1...0.9
+
     /// A folder is a result when at least this many of its direct-child files qualify.
     static let folderMinimumFiles = 3
     /// A folder scores the average of its best `folderMinimumFiles` files, plus this for each matching file beyond

@@ -50,8 +50,10 @@ struct HubFilesPreviewColumn: View {
             if let hit = model.selectedLookoutHit {
                 if model.isPictureSearch {
                     if !hit.isFolder {
-                        let queryIsPicture = model.pictureResults.queryIsPicture
-                        LookoutPictureWhyCard(why: LookoutPictureWhy(hit: hit, queryIsPicture: queryIsPicture),
+                        let results = model.pictureResults
+                        let queryIsPicture = results.queryIsPicture
+                        LookoutPictureWhyCard(why: LookoutPictureWhy(hit: hit, queryIsPicture: queryIsPicture,
+                                                                     words: results.words),
                                               picture: model.pictureQuery, queryIsPicture: queryIsPicture, hit: hit)
                             .transition(.opacity)
                     }

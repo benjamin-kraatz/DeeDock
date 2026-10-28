@@ -153,6 +153,27 @@ import Testing
         #expect(LookoutPictureWhy.matchTitle(hit: folder, group: .documents, queryIsPicture: false) == alike)
     }
 
+    @Test func whyItMatchedNamesTheWordsBesideThePicture() {
+        let picture = hit("/x/a.heic", kind: .image, z: 4.2)
+        let named = hit("/x/Sunset.jpg", kind: .image, z: 3.1, match: .both)
+        let byName = hit("/x/Sunset gradient.png", kind: .image, z: 0.4, segment: .name, match: .words)
+
+        let fits = LookoutPictureWhy(hit: picture, queryIsPicture: true, words: "at sunset")
+        #expect(fits.sentence == .alike && fits.wordsNote == .fits("at sunset") && fits.matchedInMeaning)
+        #expect(fits.text.hasPrefix(String(localized: .lookoutPictureWhyAlike)) && fits.text.contains("at sunset"))
+        #expect(LookoutPictureWhy(hit: named, queryIsPicture: true, words: "at sunset").wordsNote == .found)
+        // Found only by the words: no likeness claimed, no meter.
+        let words = LookoutPictureWhy(hit: byName, queryIsPicture: true, words: "at sunset")
+        #expect(words.sentence == .wordsOnly && words.wordsNote == nil && !words.matchedInMeaning)
+        #expect(words.text == String(localized: .lookoutPictureWhyWordsOnly))
+        // Without words, nothing changes.
+        #expect(LookoutPictureWhy(hit: picture, queryIsPicture: true).wordsNote == nil)
+
+        #expect(LookoutPictureWhy.matchTitle(hit: byName, group: .pictures, queryIsPicture: true) == nil)
+        #expect(LookoutPictureWhy.matchTitle(hit: named, group: .pictures, queryIsPicture: true)
+            == String(localized: .lookoutPictureMatchAlike))
+    }
+
     // MARK: Analytics
 
     @Test func aPictureSearchReportsItsSourceAndColdStartOnly() {
@@ -175,12 +196,28 @@ import Testing
         let values = opened.properties.values.mapValues(\.displayText)
         #expect(values["query"] == "image" && values["kind"] == "image" && values["section"] == "strong")
         #expect(!values.values.contains { $0.contains("Secret") || $0.contains("/Users") || $0.contains("IMG_1") })
+        #expect(values["words_weight"] == nil)
+    }
+
+    @Test func anOpenedResultOfPictureAndWordsSaysTheSlidersPlaceOnly() {
+        let result = hit("/Users/tester/Desktop/Sunset Sylt.jpg", kind: .image, z: 3, match: .both)
+        let opened = LookoutAnalytics.opened(result, section: .weak, rank: 2, scope: .folder, isLookup: false,
+                                             query: .imageWords, wordsWeight: 0.65)
+        let values = opened.properties.values.mapValues(\.displayText)
+        #expect(values["query"] == "image_words" && values["words_weight"] == "65" && values["match"] == "both")
+        #expect(!values.values.contains { $0.contains("Sunset") || $0.contains("/Users") })
+        // Only a search with both reports the slider.
+        let text = LookoutAnalytics.opened(result, section: .strong, rank: 1, scope: .thisMac, isLookup: false,
+                                           wordsWeight: 0.65)
+        #expect(text.properties.values["words_weight"] == nil)
+        #expect(AnalyticsCounter.lookoutPictureWordsAdded.key == "lookout_picture_words_added")
+        #expect(AnalyticsCounter.lookoutPictureWeightChanged.key == "lookout_picture_weight_changed")
     }
 
     private func hit(_ path: String, kind: FileKind, z: Double, segment: SegmentKind = .image,
-                     loc: Double? = nil) -> LookoutHit {
-        LookoutHit(path: path, kind: kind, folder: nil, score: z, z: z, cosine: nil, coverage: 0, keywordRank: nil,
-                   match: .meaning, segment: segment, segmentID: nil, loc: loc, locEnd: loc, snippet: nil,
-                   excerpt: nil, modified: nil, size: nil, info: [:])
+                     loc: Double? = nil, match: LookoutHit.Match = .meaning) -> LookoutHit {
+        LookoutHit(path: path, kind: kind, folder: nil, score: z, z: z, cosine: nil, coverage: match == .meaning ? 0 : 1,
+                   keywordRank: match == .meaning ? nil : 1, match: match, segment: segment, segmentID: nil, loc: loc,
+                   locEnd: loc, snippet: nil, excerpt: nil, modified: nil, size: nil, info: [:])
     }
 }

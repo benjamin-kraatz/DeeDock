@@ -9,12 +9,15 @@ enum LookoutAnalytics {
     /// - Parameters:
     ///   - section: `.strong` or `.weak`.
     ///   - rank: 1-based within its section.
-    ///   - query: `.image` for a search with a picture, where `rank` counts within the hit's group.
+    ///   - query: `.image` for a search with a picture, where `rank` counts within the hit's group; `.imageWords`
+    ///     when words were typed beside it.
+    ///   - wordsWeight: The picture–words slider's place, 0…1, for `.imageWords`; sent in whole percent.
     static func opened(_ hit: LookoutHit, section: AnalyticsLookoutSection, rank: Int,
                        scope: AnalyticsHubSearchScope, isLookup: Bool,
-                       query: AnalyticsLookoutQuery = .text) -> AnalyticsEvent {
+                       query: AnalyticsLookoutQuery = .text, wordsWeight: Double? = nil) -> AnalyticsEvent {
         .lookoutResultOpened(section: section, rank: rank, kind: AnalyticsLookoutKind(hit),
-                             match: AnalyticsLookoutMatch(hit.match), scope: scope, isLookup: isLookup, query: query)
+                             match: AnalyticsLookoutMatch(hit.match), scope: scope, isLookup: isLookup, query: query,
+                             wordsWeight: query == .imageWords ? wordsWeight.map { Int(($0 * 100).rounded()) } : nil)
     }
 
     /// `lookout_result_opened` for a Spotlight name result opened while Lookout was on, so name opens compare with

@@ -145,7 +145,8 @@ final class HubFilesModel: HubTabModel {
 
     var activePane: HubFilesPane { selectedTab.activePane }
 
-    /// True while a non-empty query, or a picture to search with, shows search results instead of panes.
+    /// True while a non-empty query, or a picture to search with (with or without words), shows search results instead
+    /// of panes.
     var isSearching: Bool { !trimmedQuery.isEmpty || pictureSession.isActive }
 
     var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -433,10 +434,12 @@ final class HubFilesModel: HubTabModel {
     private func queryDidChange(from oldValue: String) {
         // The model replacing the words for a picture runs `searchDidChange` itself.
         guard !settingQueryForPicture else { return }
-        let hadPicture = pictureSession.isActive
-        // Typing replaces the picture with a new search by words.
-        if hadPicture, !query.isEmpty { endPictureSearch() }
-        searchDidChange(wasSearching: hadPicture || !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        // Words typed after the picture's chip search together with it.
+        if pictureSession.isActive {
+            pictureWordsDidChange()
+            return
+        }
+        searchDidChange(wasSearching: !oldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 
     /// The search changed (new words, a picture, or neither): switches between panes and results when that changed,
@@ -610,6 +613,8 @@ struct HubFilesPreviewOverrides {
     var pictureReadSeconds: Double?
     /// The stored vector Find Similar reused, for "From your index · Page 7 · instant".
     var pictureStoredSource: LookoutSimilarSource?
+    /// The picture–words slider's place, for a search with a picture and words.
+    var pictureWordsWeight: Double?
 }
 
 /// Scrolls the search results to a row after arrow keys.

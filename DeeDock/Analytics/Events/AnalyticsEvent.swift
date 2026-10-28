@@ -99,10 +99,11 @@ enum AnalyticsEvent {
     case hubFileSearchResultOpened(scope: AnalyticsHubSearchScope, isFolder: Bool)
     /// A Files search result opened while Lookout was on: a Spotlight name result or a Lookout hit. `rank` is 1-based
     /// within its section (within its group for a search with a picture); `kind` and `match` are nil for a name
-    /// result. `query` says whether words or a picture were searched with. Never the query, a name or a path.
+    /// result. `query` says whether words, a picture, or both were searched with; `wordsWeight` is the picture–words
+    /// slider's place in percent for both, nil otherwise. Never the query, a name or a path.
     case lookoutResultOpened(section: AnalyticsLookoutSection, rank: Int, kind: AnalyticsLookoutKind?,
                              match: AnalyticsLookoutMatch?, scope: AnalyticsHubSearchScope, isLookup: Bool,
-                             query: AnalyticsLookoutQuery)
+                             query: AnalyticsLookoutQuery, wordsWeight: Int? = nil)
     /// A search with a picture started. `cold` is true when the picture reader had to load first. Never the picture,
     /// a name or a path.
     case lookoutImageSearch(source: AnalyticsLookoutImageSource, cold: Bool)

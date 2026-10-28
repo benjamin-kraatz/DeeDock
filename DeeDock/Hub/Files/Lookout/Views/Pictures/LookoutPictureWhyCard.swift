@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// "Why it matched" for a result of a search with a picture (the mockup's `.why` with `.cmp` and `.meter`): what was
-/// searched with ≈ the match, side by side, one sentence, and how close it is in three steps.
+/// searched with ≈ the match, side by side, one sentence, and how close it is in three steps. A file only typed words
+/// found shows its sentence alone: it isn't like the picture.
 ///
 /// A picture shows as its thumbnail; a document or page as a small page with a highlighted line.
 struct LookoutPictureWhyCard: View {
@@ -23,35 +24,18 @@ struct LookoutPictureWhyCard: View {
             Text(.lookoutWhyTitle)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.primary)
-            HStack(spacing: 8) {
-                LookoutComparisonSide(caption: .lookoutPictureYours) {
-                    if queryIsPicture, let picture {
-                        LookoutPictureThumbnail(picture: picture, size: 58, cornerRadius: Self.thumbnailRadius)
-                    } else {
-                        LookoutMiniPage()
-                    }
-                }
-                Text(verbatim: "≈")
-                    .font(.system(size: 16))
-                    .foregroundStyle(LookoutTheme(scheme).accent)
-                    .accessibilityHidden(true)
-                LookoutComparisonSide(caption: .lookoutPictureMatch) {
-                    if why.resultIsPicture {
-                        LookoutThumbnail(item: hit.fileItem, kind: LookoutHitKind(hit), cornerRadius: Self.thumbnailRadius)
-                    } else {
-                        LookoutMiniPage()
-                    }
-                }
+            if why.matchedInMeaning {
+                comparison
             }
-            .padding(.vertical, 4)
-            .accessibilityHidden(true)
             Text(verbatim: why.text)
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .lineSpacing(2)
                 .fixedSize(horizontal: false, vertical: true)
-            LookoutClosenessMeter(closeness: why.closeness)
-                .padding(.top, 2)
+            if why.matchedInMeaning {
+                LookoutClosenessMeter(closeness: why.closeness)
+                    .padding(.top, 2)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 10)
@@ -59,6 +43,32 @@ struct LookoutPictureWhyCard: View {
         .background(LookoutTheme(scheme).card, in: shape)
         .overlay { shape.strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
         .accessibilityElement(children: .combine)
+    }
+
+    /// What was searched with ≈ the match.
+    private var comparison: some View {
+        HStack(spacing: 8) {
+            LookoutComparisonSide(caption: .lookoutPictureYours) {
+                if queryIsPicture, let picture {
+                    LookoutPictureThumbnail(picture: picture, size: 58, cornerRadius: Self.thumbnailRadius)
+                } else {
+                    LookoutMiniPage()
+                }
+            }
+            Text(verbatim: "≈")
+                .font(.system(size: 16))
+                .foregroundStyle(LookoutTheme(scheme).accent)
+                .accessibilityHidden(true)
+            LookoutComparisonSide(caption: .lookoutPictureMatch) {
+                if why.resultIsPicture {
+                    LookoutThumbnail(item: hit.fileItem, kind: LookoutHitKind(hit), cornerRadius: Self.thumbnailRadius)
+                } else {
+                    LookoutMiniPage()
+                }
+            }
+        }
+        .padding(.vertical, 4)
+        .accessibilityHidden(true)
     }
 }
 
@@ -139,6 +149,21 @@ struct LookoutClosenessMeter: View {
                               picture: LookoutPicturePreviewData.dropped, queryIsPicture: true, hit: page)
         LookoutPictureWhyCard(why: LookoutPictureWhy(hit: page, queryIsPicture: false),
                               picture: LookoutPicturePreviewData.similarLease, queryIsPicture: false, hit: page)
+    }
+    .frame(width: 240)
+    .padding()
+    .background(.regularMaterial)
+    .environment(\.hubFilesIconSource, .typeOnly)
+}
+
+#Preview("Why it matched · picture and words") {
+    let sunset = LookoutPicturePreviewData.sunsetResults
+    let named = sunset.groups[0].strong[0], alike = sunset.groups[0].strong[1], byName = sunset.groups[0].weak[0]
+    VStack(spacing: 10) {
+        ForEach([named, alike, byName], id: \.path) { hit in
+            LookoutPictureWhyCard(why: LookoutPictureWhy(hit: hit, queryIsPicture: true, words: sunset.words),
+                                  picture: LookoutPicturePreviewData.dropped, queryIsPicture: true, hit: hit)
+        }
     }
     .frame(width: 240)
     .padding()

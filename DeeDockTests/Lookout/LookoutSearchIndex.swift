@@ -12,6 +12,8 @@ final class LookoutSearchIndex {
     let store: IndexStore
     private var nextAxis = 1
     private var nextInode: UInt64 = 1
+    /// The fresh axis each file's first vector took, by relative path.
+    private var axes: [String: Int] = [:]
 
     init() throws {
         store = try IndexStore(directory: folder.url.appendingPathComponent("index"))
@@ -35,6 +37,7 @@ final class LookoutSearchIndex {
                                             device: 1, lastUsed: nil))
         nextInode += 1
         let modality: Modality = segment == .image || segment == .pageImage ? .image : .text
+        if cosine != nil { axes[relative] = nextAxis }
         try store.addSegment(file: id, kind: segment, modality: modality, loc: loc, excerpt: excerpt, text: text,
                              vector: cosine.map(vector))
         try store.finish(id, state: "done")
@@ -55,6 +58,17 @@ final class LookoutSearchIndex {
             let cosine = -0.06 + 0.12 * Double(index) / Double(max(count - 1, 1))
             try add("background/b\(index).txt", cosine: cosine)
         }
+    }
+
+    /// A second query vector that points at `relative`'s own axis, `share` of the way from `query`: its cosine to
+    /// that file is `share × √(1 − cosine²)`, and to every other file (its own axis aside) `√(1 − share²) × cosine`.
+    /// A stand-in for words that describe one file the picture doesn't.
+    func vector(towards relative: String, share: Double = 1) -> [Float] {
+        guard let axis = axes[relative] else { preconditionFailure("\(relative) has no vector") }
+        var vector = [Float](repeating: 0, count: Vectors.dimension)
+        vector[axis] = Float(share)
+        vector[0] = Float((1 - share * share).squareRoot())
+        return vector
     }
 
     func searcher(loadVectors: Bool = true) throws -> Searcher {

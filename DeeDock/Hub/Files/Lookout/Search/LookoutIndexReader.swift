@@ -47,7 +47,7 @@ actor LookoutIndexReader: LookoutIndexSearching {
         let wasLoaded = searcher.vectorsLoaded
         let scope = request.scope.map(Self.indexPath)
         let results = try searcher.similar(to: request.vector, queryIsPicture: request.queryIsPicture,
-                                           excluding: Set(request.excluding.map(Self.indexPath)), scope: scope,
+                                           words: request.words, excluding: Set(request.excluding.map(Self.indexPath)), scope: scope,
                                            filter: request.filter, limit: request.limit)
         if !wasLoaded, searcher.vectorsLoaded { didReload() }
         return results

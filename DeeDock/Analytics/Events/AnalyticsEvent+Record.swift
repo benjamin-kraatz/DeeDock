@@ -202,10 +202,10 @@ extension AnalyticsEvent {
             ["action": .init(action), "method": .init(method), "item_count": .init(itemCount)]
         case let .hubFileSearchResultOpened(scope, isFolder):
             ["scope": .init(scope), "is_folder": .init(isFolder)]
-        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup, query):
+        case let .lookoutResultOpened(section, rank, kind, match, scope, isLookup, query, wordsWeight):
             ["section": .init(section), "rank": .init(rank), "kind": kind.map(AnalyticsValue.init),
              "match": match.map(AnalyticsValue.init), "scope": .init(scope), "is_lookup": .init(isLookup),
-             "query": .init(query)]
+             "query": .init(query), "words_weight": wordsWeight.map(AnalyticsValue.init)]
         case let .lookoutImageSearch(source, cold):
             ["source": .init(source), "cold": .init(cold)]
         case let .lookoutSetupStepViewed(step):

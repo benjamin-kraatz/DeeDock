@@ -28517,19 +28517,19 @@
       }
     },
     "lookoutPicturePrompt" : {
-      "comment" : "Files search field: VoiceOver label of the text field while a picture is being searched with. Typing replaces the picture with a search by words.",
+      "comment" : "Files search field: VoiceOver label of the text field while a picture is being searched with. Words typed there search together with the picture.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippen, um nach Wörtern zu suchen"
+            "value" : "Wörter hinzufügen, um mit dem Bild zu suchen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type to search by words instead"
+            "value" : "Add words to search with the picture"
           }
         }
       }
@@ -28746,6 +28746,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Back to “%@”"
+          }
+        }
+      }
+    },
+    "lookoutPictureWithWords" : {
+      "comment" : "After the picture's name above the results of a search with a picture and words. The placeholder is the words typed beside the picture, such as “at night”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ “%@”"
+          }
+        }
+      }
+    },
+    "lookoutPictureWordsHint" : {
+      "comment" : "Quiet line above the results of a search with a picture, until words are typed: typing in the search field after the picture searches with both.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe, um Wörter hinzuzufügen, etwa „bei Nacht“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type to add words, like “at night”"
+          }
+        }
+      }
+    },
+    "lookoutPictureWeightPicture" : {
+      "comment" : "Left end of the slider that sets how much typed words count against the picture searched with. Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture"
+          }
+        }
+      }
+    },
+    "lookoutPictureWeightWords" : {
+      "comment" : "Right end of the slider that sets how much typed words count against the picture searched with. Short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words"
+          }
+        }
+      }
+    },
+    "lookoutPictureWeightLabel" : {
+      "comment" : "VoiceOver label of the slider that balances the picture searched with against the words typed beside it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild und Wörter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picture and words"
+          }
+        }
+      }
+    },
+    "lookoutPictureWeightValue" : {
+      "comment" : "VoiceOver value of the picture–words slider. The number is how much the typed words count, from 10 to 90 percent.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wörter zählen %lld Prozent"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words count %lld percent"
+          }
+        }
+      }
+    },
+    "lookoutPictureWeightHelp" : {
+      "comment" : "Tooltip of the picture–words slider in a search with a picture and words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schieb Richtung Wörter, wenn deine Wörter ändern, was du suchst, und Richtung Bild, wenn sie es nur anpassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move toward Words when your words change what to find, toward Picture when they only adjust it."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyWordsFound" : {
+      "comment" : "Second sentence of “Why it matched” in a search with a picture and words: the result's name or text has the typed words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sein Name oder Text enthält die Wörter, die du eingegeben hast."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Its name or text has the words you typed."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyWordsFit" : {
+      "comment" : "Second sentence of “Why it matched” in a search with a picture and words: the typed words shaped this match by meaning. The placeholder is those words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es passt auch zu „%@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It also fits “%@”."
+          }
+        }
+      }
+    },
+    "lookoutPictureWhyWordsOnly" : {
+      "comment" : "“Why it matched” for a result of a search with a picture and words that only the typed words found: it isn't much like the picture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es enthält die Wörter, die du eingegeben hast, ähnelt deinem Bild aber kaum."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It has the words you typed but isn’t much like your picture."
           }
         }
       }

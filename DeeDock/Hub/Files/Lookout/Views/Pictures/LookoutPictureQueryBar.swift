@@ -3,12 +3,23 @@ import SwiftUI
 /// The bar above the results of a search with a picture (the mockup's `.qbar`): the picture, its name, how it was
 /// read ("New picture · read in 0.4 s · not saved", "From your index · Page 7 · instant") or a spinner while it's
 /// read, and "Back to “…”" when there were words before it.
+///
+/// Words typed beside the picture (DEE-126) follow its name ("+ “at night”"), and the picture–words slider
+/// (`LookoutPictureWordsSlider`) appears beside them. Until there are words, a quiet line says that typing adds them.
 struct LookoutPictureQueryBar: View {
     let picture: LookoutPictureQuery
     let subtitle: LookoutPictureSubtitle
     /// The words searched before the picture; empty hides "Back to".
     let wordsBefore: String
+    /// The words typed beside the picture, as the results were ranked with them; empty for none.
+    var words = ""
+    /// The picture–words slider's place.
+    var wordsWeight = LookoutRanking.pictureWordsWeight
+    /// Whether the line about adding words shows: the picture's results are in and there are no words yet.
+    var showsWordsHint = false
     let reduceMotion: Bool
+    var changeWeight: (Double) -> Void = { _ in }
+    var commitWeight: () -> Void = {}
     let goBack: () -> Void
 
     @Environment(\.colorScheme) private var scheme
@@ -19,10 +30,21 @@ struct LookoutPictureQueryBar: View {
         HStack(spacing: 12) {
             LookoutPictureThumbnail(picture: picture, size: 46)
             VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: picture.name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+                HStack(spacing: 5) {
+                    Text(verbatim: picture.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .layoutPriority(1)
+                    if !words.isEmpty {
+                        Text(.lookoutPictureWithWords(words))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(lookout.accent)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .transition(wordsTransition)
+                    }
+                }
                 HStack(spacing: 6) {
                     if subtitle.isBusy {
                         LookoutPictureSpinner(reduceMotion: reduceMotion)
@@ -34,9 +56,20 @@ struct LookoutPictureQueryBar: View {
                         .contentTransition(.opacity)
                 }
                 .animation(HubFilesMotion.quick, value: subtitle)
+                if showsWordsHint {
+                    Text(.lookoutPictureWordsHint)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                        .transition(.opacity)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
+            if !words.isEmpty {
+                LookoutPictureWordsSlider(weight: wordsWeight, change: changeWeight, commit: commitWeight)
+                    .transition(wordsTransition)
+            }
             if !wordsBefore.isEmpty {
                 Button(action: goBack) {
                     Text(.lookoutPictureBack(wordsBefore))
@@ -58,7 +91,14 @@ struct LookoutPictureQueryBar: View {
                                       startPoint: UnitPoint(x: 0, y: 0.2), endPoint: UnitPoint(x: 1, y: 0.8)))
         }
         .overlay { shape.strokeBorder(HubFilesTheme(scheme).line, lineWidth: 0.5) }
+        .animation(reduceMotion ? Animation?.some(.easeOut(duration: 0.15)) : HubFilesMotion.layout, value: words.isEmpty)
+        .animation(HubFilesMotion.quick, value: showsWordsHint)
         .padding(EdgeInsets(top: 8, leading: 8, bottom: 2, trailing: 8))
+    }
+
+    /// The words and the slider settle in from the trailing side; they only fade under Reduce Motion.
+    private var wordsTransition: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.92, anchor: .leading))
     }
 }
 
@@ -101,6 +141,11 @@ private struct LookoutPictureSpinner: View {
                                wordsBefore: "", reduceMotion: true) {}
         LookoutPictureQueryBar(picture: LookoutPicturePreviewData.similarLease, subtitle: .fromIndex(page: 7),
                                wordsBefore: "pets in the lease", reduceMotion: false) {}
+        LookoutPictureQueryBar(picture: LookoutPicturePreviewData.dropped, subtitle: .new(seconds: 0.35),
+                               wordsBefore: "", showsWordsHint: true, reduceMotion: false) {}
+        LookoutPictureQueryBar(picture: LookoutPicturePreviewData.dropped, subtitle: .new(seconds: 0.35),
+                               wordsBefore: "dog on the beach", words: "at sunset", wordsWeight: 0.4,
+                               reduceMotion: false) {}
     }
     .frame(width: 640)
     .padding()

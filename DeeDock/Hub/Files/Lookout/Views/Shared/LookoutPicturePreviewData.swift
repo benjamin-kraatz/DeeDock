@@ -31,6 +31,24 @@ enum LookoutPicturePreviewData {
         ]),
     ])
 
+    /// The beach photo with "at sunset" typed beside it: the sunset pictures rise, one only by its name, and the
+    /// holiday flat's page about the evening view.
+    static let sunsetResults = LookoutSimilarResults(queryIsPicture: true, groups: [
+        LookoutSimilarResults.Group(kind: .pictures, strong: [
+            hit("/Desktop/Holiday Sylt 2026/Sunset Westerland.jpg", kind: .image, z: 3.9, segment: .image,
+                match: .both, snippet: "«Sunset» Westerland"),
+            hit("/Desktop/Holiday Sylt 2026/IMG_4833.HEIC", kind: .image, z: 4.6, segment: .image),
+            hit("/Desktop/Holiday Sylt 2026/IMG_4790.HEIC", kind: .image, z: 3.1, segment: .image),
+        ], weak: [
+            hit("/Pictures/Wallpapers/Sunset gradient.png", kind: .image, z: 0.4, segment: .name, match: .words,
+                snippet: "«Sunset» gradient"),
+        ]),
+        LookoutSimilarResults.Group(kind: .documents, strong: [
+            hit("/Documents/Home/Ferienwohnung Dünenblick.pdf", kind: .pdf, z: 2.8, segment: .page, loc: 2,
+                excerpt: "Vom Balkon sehen Sie den Sonnenuntergang über dem Meer."),
+        ]),
+    ], words: "at sunset", terms: ["sunset"])
+
     /// Page 7 of the lease: documents that say something similar first, and no pictures of it.
     static let leaseResults = LookoutSimilarResults(queryIsPicture: false, groups: [
         LookoutSimilarResults.Group(kind: .documents, strong: [
@@ -54,7 +72,7 @@ enum LookoutPicturePreviewData {
     static func model(picture: LookoutPictureQuery, status: LookoutStatus = .ready,
                       phase: LookoutPictureSearch.Phase = .done,
                       results: LookoutSimilarResults = LookoutSimilarResults(queryIsPicture: true),
-                      seconds: Double? = 0.35, wordsBefore: String = "",
+                      seconds: Double? = 0.35, wordsBefore: String = "", words: String = "",
                       configure: (HubFilesModel) -> Void = { _ in }) -> HubFilesModel {
         HubFilesModel.preview { model in
             model.previewOverrides.lookoutStatus = status
@@ -64,15 +82,20 @@ enum LookoutPicturePreviewData {
             if picture == similarLease { model.previewOverrides.pictureStoredSource = leaseSource }
             model.query = wordsBefore
             model.searchWithPicture(picture)
+            // Typed after the chip, as a person would: the overridden results already hold them.
+            model.query = words
             model.lookoutSelection = results.groups.first?.strong.first?.path
             configure(model)
         }
     }
 
     private static func hit(_ relative: String, kind: FileKind, z: Double, segment: SegmentKind, loc: Double? = nil,
-                            excerpt: String? = nil) -> LookoutHit {
-        LookoutHit(path: home + relative, kind: kind, folder: nil, score: z, z: z, cosine: nil, coverage: 0,
-                   keywordRank: nil, match: .meaning, segment: segment, segmentID: nil, loc: loc, locEnd: loc,
-                   snippet: nil, excerpt: excerpt, modified: 1_786_874_400, size: 2_900_000, info: [:])
+                            excerpt: String? = nil, match: LookoutHit.Match = .meaning,
+                            snippet: String? = nil) -> LookoutHit {
+        let words = match != .meaning
+        return LookoutHit(path: home + relative, kind: kind, folder: nil, score: z + (words ? 2 : 0), z: z,
+                          cosine: nil, coverage: words ? 1 : 0, keywordRank: words ? 1 : nil, match: match,
+                          segment: segment, segmentID: nil, loc: loc, locEnd: loc, snippet: snippet, excerpt: excerpt,
+                          modified: 1_786_874_400, size: 2_900_000, info: [:])
     }
 }
