@@ -383,7 +383,9 @@ The picture shows as a chip in the search field. Above the results, a bar shows 
 
 The results come in two groups. For a picture: **Looks like it**, with photos and screenshots that look like it, and **About what it shows**, with documents and PDF pages about the same thing. For a document: **Says something similar**, then **Pictures of it**. Each group has its own **Weaker matches**. When nothing clearly fits, Lookout says so. Select a result to see **Why it matched**: your picture beside the match, one sentence, and how close it is, from **Somewhat alike** to **Very close**. The file you searched with never appears in its own results, and Find Similar works on these results too.
 
-Press ⌫ in the empty search field, or click ✕ on the chip, to go back to the words you searched before. **Back to “…”** above the results does the same. Typing starts a new search by words, and the clear button or Escape clears everything.
+Type after the chip to add words to the picture, such as "at night" or "in a glass jar". Lookout then finds what looks like your picture and also fits your words, and file names and text with your words count too. The words appear after the picture's name above the results, beside a **Picture–Words** slider. Move it toward **Words** when your words change what to find ("a tree" next to a beach photo), and toward **Picture** when they only adjust it ("at night"). Each new picture starts in between. **Why it matched** adds a line about your words, and a file that only has your words in its name or text says it isn't much like your picture.
+
+Press ⌫ in the empty search field, or click ✕ on the chip, to go back to the words you searched before the picture. **Back to “…”** above the results does the same. Delete the words you typed after the chip to search with the picture alone again. The clear button or Escape clears everything.
 
 ### Lookout settings
 

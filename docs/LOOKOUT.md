@@ -126,7 +126,7 @@ A picture can be the query instead of words. The design is the interactive mocku
 - **Find Similar.** A full-width button in the preview column above Open, Quick Look, and Reveal, an item in the context menu, ⌘⇧L, or dragging a search result onto the field. It works on one selected file, in search results and in the browser alike. It's hidden for folders and until Lookout can search (ready, reading files, or paused). It's disabled with "Lookout doesn't read this kind of file" for kinds Lookout doesn't index, by the crawl's own rules (`LookoutSimilarAvailability`). A document the index doesn't hold has nothing to search with, so it's disabled with "Lookout hasn't read this file yet" once the reader says so (`LookoutIndexSearching.indexedPaths`). The reader is asked when the file is selected; a file it doesn't hold is asked about again the next time, because the backfill may have read it since. A picture the index doesn't hold is read like a dropped one. Find Similar works on name results, Lookout results, the results of a search with a picture, so searches chain, and files in the browser, where there were no words, so the results bar has no "Back to".
 - **The DOKK tile.** A file dropped on the DOKK tile (or the open Apps tab) opens the Apps tab's file actions. When exactly one file was dropped and Lookout can search with it, a picture Lookout reads or a file the index holds, **Find Similar** comes first in the list, with the same glyph (`LauncherFileSimilar`, wired by `HubCoordinator`). The file actions ask Lookout once per batch. Choosing it ends the batch, switches to the Files tab, and searches with the file as Find Similar does.
 
-The picture becomes a chip in the field: its thumbnail, its name or "Pasted picture", and ✕. ⌫ in the empty field, ✕, and "Back to “…”" in the results bar remove it and bring back the words searched before it. The clear button and Escape remove both. Typing replaces the picture with a search by words. Find Similar on a result of a picture search replaces the picture and keeps the earlier words (`LookoutPictureSession`).
+The picture becomes a chip in the field: its thumbnail, its name or "Pasted picture", and ✕. Words typed after the chip search together with the picture ([With words](#with-words)); the chip narrows from 190 to 96 pt while they're there. ⌫ in the empty field, ✕, and "Back to “…”" in the results bar remove the picture and bring back the words searched before it. The clear button and Escape remove both. Find Similar on a result of a picture search replaces the picture, clears the words typed beside it, and keeps the earlier words (`LookoutPictureSession`).
 
 ### Reading the picture
 
@@ -142,9 +142,31 @@ Find Similar on a file in the index encodes nothing. It reuses a stored vector (
 
 The query's own kind comes first. An image vector is a picture query, and that includes a screenshot's picture and a rendered PDF page. Its groups are **Looks like it**, then **About what it shows**. A text vector is a document query, with **Says something similar**, then **Pictures of it**. A group with nothing above the gate says "Nothing stands out here." When neither group has a strong hit, the results give the honest message. Rows say **Looks alike** for a picture found with a picture, and **Same subject** otherwise. **Why it matched** shows the picture searched with ≈ the match, one sentence, and a three-step closeness meter from the hit's z: 4 and up is **Very close**, 3 and up **Close**, and the rest **Somewhat alike** (`LookoutPictureWhy`). The preview column is compact for a search with a picture, as in the mockup: a 140 pt well (200 pt for any other search result, 250 pt while browsing), one line of details ("Desktop › Holiday Sylt 2026 · 3.1 MB"), and, while nothing is selected (the picture is still being read, or nothing stood out), the picture searched with. The well is the part that gives: it shrinks to as little as 88 pt (150 pt for a search by words) before a long name or a two-line sentence could push the actions below the fold.
 
+### With words
+
+Words typed after the chip narrow the picture's search: "this photo, but at sunset", "like this receipt, from 2025" ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)). Typing never reads the picture again. `LookoutPictureSearch.updateWords` waits for the same 150 ms debounce as a search by words. The query service then embeds the words with the text model it already holds, and `Searcher.similar` searches with both vectors. Words typed while the picture is still being read wait for it. Deleting them searches with the picture alone again.
+
+- **Meaning.** Each vector is scored on its own query's scale (`Searcher.meaning`), and the two scales are blended: `(1 − w) × z(picture) + w × z(words)`, standardized again so `zGate` still means what it does (`Searcher.blend`). Blending the scores rather than the vectors keeps the weight independent of how far apart pictures and text sit in this index.
+- **Words.** The typed words count as keywords as they do in a search by words (`Searcher.wordMatches`, shared with `search`). A file qualifies by the blend or by half the words, and scores `max(z, 0) + 2 × coverage^1.5`. Lookups and kind words are weighed as in a search by words. Words that only tie the words to the picture ("but", "like", "same", "similar", "instead", "version", "just", "only": `Searcher.pictureConnectors`) don't count towards coverage, so "but black" covers a file with "black" fully. The vector still reads them.
+- **Groups.** The two groups stay, each ranked and split on its own. Rows highlight the words in snippets. A file only the words found keeps Lookout's words chip, and its **Why it matched** says "It has the words you typed but isn't much like your picture." without the comparison or the meter. Other results add "Its name or text has the words you typed." or "It also fits “at night”." (`LookoutPictureWhy.wordsNote`).
+- **Weight.** `LookoutRanking.pictureWordsWeight` is 0.4. The results bar shows the words after the picture's name ("+ “at sunset”") and a mini **Picture–Words** slider (`LookoutPictureWordsSlider`) from 0.1 to 0.9 in steps of 0.05. Moving it ranks again after 40 ms with the vectors in hand, so nothing is embedded again. A new picture starts at 0.4; a scope change or a restart for the same picture keeps the slider's place. Until there are words, a quiet line in the bar says "Type to add words, like “at night”".
+- **If the encoder fails,** the words count as keywords only, and meaning comes from the picture alone.
+
+**The spike (2026-10-28).** `LookoutBench combine` ranked 67 labeled cases from macOS's wallpaper thumbnails, copied under neutral names: 30 Light → Dark pairs ("at night"), 10 Dark → Light, 21 color changes ("in orange"), and 6 subject changes ("a tree" beside a beach). Top-1 share and MRR, the file searched with excluded:
+
+| Query | R@1 | MRR |
+| --- | --- | --- |
+| Picture alone | 0.00 | 0.33 |
+| Words alone | 0.13 | 0.24 |
+| Vector sum, best weight (0.7) | 0.60 | 0.76 |
+| Blended scores, 0.4 | 0.58 | 0.75 |
+| Blended scores, 0.4, with words matched in file names | 0.72 | 0.82 |
+
+Attribute changes peak at 0.4 (color 0.81, night 0.60 R@1). Subject changes do best near 0.7, which is why the slider exists. Turning back toward a light version stays hard at any weight (0.20 R@1). On a real index of 1,219 pictures, most of them a spice shop's product photos, and 58 documents, a pink peppercorn photo with "but black" found black peppercorns in the same white bowl first, and "ground into powder" found the ground spice. Herbs with "in a glass jar" found bay leaves in a glass jar third.
+
 ### Words in a dropped screenshot
 
-Not built. Lookout reads the text in screenshots when it indexes them, and the plan was to read a dropped screenshot's text too and match its codes and long numbers as exact words. Vision keeps about 100 MB cached in whatever process runs it. That would be either DOKK.app or the query service, which already holds about 900 MB with the encoder. It would also add 0.1–0.25 s to a picture query. And word matches don't fit the two groups, which rank by meaning alone, or their chips and sentences. Combining a picture with words is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
+Not built. Lookout reads the text in screenshots when it indexes them, and the plan was to read a dropped screenshot's text too and match its codes and long numbers as exact words. Vision keeps about 100 MB cached in whatever process runs it. That would be either DOKK.app or the query service, which already holds about 900 MB with the encoder. It would also add 0.1–0.25 s to a picture query. Typing the code beside the picture covers the common case now ([With words](#with-words)).
 
 ## Progress
 
@@ -296,6 +318,7 @@ The commands:
 - The picture-search probe (`probe-image`) starts as the query service does, with the text model only. It then loads the image encoder into it on the first picture and embeds pictures prepared the way the app prepares them (`QueryPicture`), at 280 and 140 tokens.
 - `index` does what the index service does for one sync, in one process, without XPC and without the power policy. It prints each file, the counts, the timings, and the peak memory.
 - `estimate` prints what onboarding shows for each folder, with its subfolders one level down. It reads metadata only.
+- `combine --index <folder> --cases <file>` measures searching with a picture and words ([With words](#with-words)). Each line of the tab-separated cases file is a picture, the words, and one or more answers (file names or path suffixes). It prints R@1, R@3, and MRR for the vector sum, the blended scores, and the blend with keyword coverage at weights from 0 to 1, then how many files pass the meaning gate on the blend's scale. `--show <n>` prints each case's top n, at `--weight` when given.
 
 ## Measured performance
 
@@ -325,7 +348,8 @@ The estimates in onboarding use DigUp's per-file costs, measured on an M4 Pro (`
 - The XPC services have not been exercised hands-on inside DOKK.app: idle exit, relaunch, and the replayed configuration.
 - Onboarding, macOS's Files and Folders prompts, and a real model download have not been exercised live.
 - Audio, video, and code are not indexed. Indexing them is Planned.
-- Combining a picture with words in one search is Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)), and so is reading the words in a dropped screenshot.
+- Reading the words in a dropped screenshot is Planned.
+- Searching with a picture and words has been measured with `LookoutBench combine` and covered by tests, but not exercised hands-on in DOKK.app: typing beside the chip, the slider, and how the ranking feels on a person's own photos.
 - Searching with a picture has not been exercised hands-on: real drags from Finder, browsers, and Photos, pasting, the drop well, the query service's encoder loading inside DOKK.app, and its idle exit. A Photos drag that carries only a file promise isn't read.
 - Find Similar in the browser and from the DOKK tile, dropping indexed documents on the field, and the field no longer inserting a dragged file's path have not been exercised hands-on. A picture dragged out of a browser that also carries its address as plain text may still insert that address while the field is being edited: it's text to the field editor.
 - The new document types have been read only in tests, on made-up files. Real LaTeX with heavy macros, subtitles with unusual cue settings, and web archives from other browsers than Safari may read less cleanly.
