@@ -12,10 +12,12 @@ import SwiftUI
 struct LookoutPictureWordsSlider: View {
     let weight: Double
     let change: (Double) -> Void
-    /// The thumb was let go after a move.
+    /// The thumb was let go at a different weight than it was picked up at.
     let commit: () -> Void
 
     @Environment(\.colorScheme) private var scheme
+    /// The weight when the thumb was picked up, so a click that moves nothing isn't counted.
+    @State private var startWeight: Double?
 
     var body: some View {
         let range = LookoutRanking.pictureWordsWeights
@@ -25,7 +27,12 @@ struct LookoutPictureWordsSlider: View {
             Slider(value: Binding(get: { weight }, set: { change(($0 * 20).rounded() / 20) }), in: range) {
                 Text(.lookoutPictureWeightLabel)
             } onEditingChanged: { editing in
-                if !editing { commit() }
+                if editing {
+                    startWeight = weight
+                } else {
+                    if let startWeight, startWeight != weight { commit() }
+                    startWeight = nil
+                }
             }
             .labelsHidden()
             .controlSize(.mini)
