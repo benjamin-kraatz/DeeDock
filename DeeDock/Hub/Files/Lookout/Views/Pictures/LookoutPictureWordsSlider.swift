@@ -4,18 +4,24 @@ import SwiftUI
 /// "Picture" on the left, "Words" on the right, a mini slider between.
 ///
 /// It ranks again as it moves (`LookoutPictureSearch.setWordsWeight`), with both vectors already in hand, so the
-/// results follow the thumb. Steps of 0.05 within `LookoutRanking.pictureWordsWeights`. VoiceOver reads it as one
-/// adjustable element whose value is how much the words count.
+/// results follow the thumb. Steps of 0.05 within `LookoutRanking.pictureWordsWeights`. It's a secondary control:
+/// 10.5 pt secondary labels and a mini track filled in Lookout's accent, like the words it weighs.
+///
+/// VoiceOver reads it as one adjustable element, "Picture and words", whose value is how much the words count; the
+/// two end labels stay out of its way.
 struct LookoutPictureWordsSlider: View {
     let weight: Double
     let change: (Double) -> Void
     /// The thumb was let go after a move.
     let commit: () -> Void
 
+    @Environment(\.colorScheme) private var scheme
+
     var body: some View {
         let range = LookoutRanking.pictureWordsWeights
         HStack(spacing: 6) {
             Text(.lookoutPictureWeightPicture)
+                .accessibilityHidden(true)
             Slider(value: Binding(get: { weight }, set: { change(($0 * 20).rounded() / 20) }), in: range) {
                 Text(.lookoutPictureWeightLabel)
             } onEditingChanged: { editing in
@@ -23,9 +29,11 @@ struct LookoutPictureWordsSlider: View {
             }
             .labelsHidden()
             .controlSize(.mini)
+            .tint(LookoutTheme(scheme).accent)
             .frame(width: 84)
             .accessibilityValue(Text(.lookoutPictureWeightValue(Int((weight * 100).rounded()))))
             Text(.lookoutPictureWeightWords)
+                .accessibilityHidden(true)
         }
         .font(.system(size: 10.5))
         .foregroundStyle(.secondary)

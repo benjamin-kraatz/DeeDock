@@ -28768,6 +28768,24 @@
         }
       }
     },
+    "lookoutPictureWithWordsAccessibility" : {
+      "comment" : "VoiceOver label for the words shown after the picture's name above the results of a search with a picture and words. On screen they follow a plus sign (+ “at night”); VoiceOver says this instead. The placeholder is the words typed beside the picture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mit „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "with “%@”"
+          }
+        }
+      }
+    },
     "lookoutPictureWordsHint" : {
       "comment" : "Quiet line above the results of a search with a picture, until words are typed: typing in the search field after the picture searches with both.",
       "extractionState" : "manual",
