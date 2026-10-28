@@ -15,7 +15,7 @@ final class BadgeMemoryStore {
 
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
 
-    func start() {
+    func start(at date: Date = .now) {
         if let stored = defaults.object(forKey: Self.key) {
             do {
                 guard let data = stored as? Data, data.count <= 4_000_000 else { throw CocoaError(.coderReadCorrupt) }
@@ -25,6 +25,13 @@ final class BadgeMemoryStore {
             } catch { requiresReset = true; storageFailed = true }
         }
         rekeyInstallations()
+        // Retention must hold across relaunches even while badge observation stays off, because
+        // `observe(_:at:)` is otherwise the only caller of `prune(at:)`. An unreadable document
+        // keeps its saved bytes until an explicit clear.
+        guard !requiresReset else { return }
+        let before = document
+        prune(at: date)
+        if document != before { persist() }
     }
 
     /// Replaces the live snapshot without appending a transition.
