@@ -45,7 +45,7 @@ struct RobiAnswerCard: View {
 /// The answer as it streams in, or the waiting line before the first words arrive. The spinner
 /// for both is in the prompt bar. A stopped answer keeps what arrived and says it was stopped.
 ///
-/// Feeds the answer's readable text, with its Markdown syntax taken out, to the pacer and shows
+/// Has the pacer follow the answer's readable text, with its Markdown syntax taken out, and shows
 /// what the pacer has revealed, formatted, with the answer's references as links. The waiting line
 /// stays until the first words are revealed, so it does not give way to an empty line during the
 /// pacer's initial hold.
@@ -56,8 +56,6 @@ private struct RobiAnswerText: View {
 
     var body: some View {
         let markdown = model.formattedAnswer
-        let input = RobiTextPacer.Input(target: markdown.text, isFinished: model.phase == .answered || model.isStopped,
-                                        reduceMotion: model.reduceMotion)
         // A stack rather than bare content, so the modifiers below apply once and not to each child.
         VStack(alignment: .leading, spacing: 10) {
             if !pacer.hasText {
@@ -81,8 +79,13 @@ private struct RobiAnswerText: View {
                 }
             }
         }
-        .onChange(of: input, initial: true) { pacer.update(input) }
-        .onDisappear { pacer.pause() }
+        .onAppear {
+            pacer.follow { [model] in
+                RobiTextPacer.Input(target: model.formattedAnswer.text, isFinished: model.phase == .answered || model.isStopped,
+                                    reduceMotion: model.reduceMotion)
+            }
+        }
+        .onDisappear { pacer.stop() }
     }
 
     /// The card's height is fixed (`RobiMetrics.cardHeight`, 320), so a proposal takes its room
