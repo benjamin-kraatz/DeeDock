@@ -7,8 +7,6 @@ import UniformTypeIdentifiers
 final class DockStore {
     @ObservationIgnored var openLauncher: (() -> Void)?
     var launcherCatalog: ApplicationCatalog { catalog }
-    let focusSession: FocusSessionController?
-    @ObservationIgnored var openFocusSession: (() -> Void)?
     var appMelt: AppMeltController?
     let actions: ActionTilesController?
     let displayID: String
@@ -107,9 +105,8 @@ final class DockStore {
     init(displayID: String, catalog: ApplicationCatalog, profiles: DisplayProfilesStore,
          trash: TrashController? = nil, shelf: ShelfController? = nil, volumes: VolumeController? = nil,
          capsules: SessionCapsuleController? = nil, actions: ActionTilesController? = nil,
-         focusSession: FocusSessionController? = nil, history: DockLocalHistoryStore? = nil,
+         history: DockLocalHistoryStore? = nil,
          pinWeather: PinWeatherStore? = nil, islands: DockIslandPlanStore? = nil) {
-        self.focusSession = focusSession
         self.actions = actions
         self.displayID = displayID
         self.catalog = catalog
@@ -244,7 +241,7 @@ final class DockStore {
         let visibleFolders = folders.filter { !hidden.contains($0.id) }
         var content = DockSectionProjection.entries(items: visibleItems, folders: visibleFolders, pins: visiblePins,
                                                   visibility: sections.visibility, expanded: sections.isExpanded,
-                                                  actions: actions?.dockItems ?? [], focus: focusSession?.item,
+                                                  actions: actions?.dockItems ?? [],
                                                   sessionCapsules: showsSessionCapsules ? capsules?.dockItems ?? [] : [],
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
@@ -761,7 +758,6 @@ final class DockStore {
         switch entry {
         case .melt(let pair, _): appMelt?.restore(pair)
         case .launcher: openLauncher?()
-        case .focus: openFocusSession?()
         case .action(let item): actions?.run(item.tile.id, source: .keyboard)
         case .app(let item): open(item)
         case .folder(let folder): openFolder?(folder, keyboardFocus)
@@ -783,5 +779,5 @@ final class DockStore {
     func stop() {
         if let stampObserver { NotificationCenter.default.removeObserver(stampObserver) }
         stampObserver = nil
-        previewPins = nil; openLauncher = nil; openFocusSession = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; patchBayAppOpened = nil; errorDidChange = nil; willMutateFavoriteIDs = nil; keyboardFocus = false; selectedID = nil }
 }

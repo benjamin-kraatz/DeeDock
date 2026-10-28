@@ -8,7 +8,7 @@ import Foundation
 /// themselves revealed.
 @MainActor
 final class DockPopoverPresenter {
-    enum Kind: Hashable { case folderStack, shelf, sessionCapsules, focus, notificationFeed, plugin }
+    enum Kind: Hashable { case folderStack, shelf, sessionCapsules, notificationFeed, plugin }
 
     private var dismiss: [Kind: () -> Void] = [:]
     private var openKind: Kind?

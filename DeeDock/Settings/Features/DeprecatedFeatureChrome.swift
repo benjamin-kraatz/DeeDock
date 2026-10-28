@@ -15,8 +15,8 @@ struct DeprecatedFeatureBadge: View {
 
 /// Warning shown at the top of every deprecated feature's settings page.
 ///
-/// One shared view so the 1.0.0 removal copy stays identical for Sims, Focus breathing,
-/// Focus debt, Pin weather, Quarantine stamp, Patch bay, and Magnetic Edges.
+/// One shared view so the 1.0.0 removal copy stays identical for Sims, Pin weather,
+/// Quarantine stamp, Patch bay, and Magnetic Edges.
 struct DeprecatedFeatureNotice: View {
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: SettingsMetrics.cardRadius, style: .continuous)

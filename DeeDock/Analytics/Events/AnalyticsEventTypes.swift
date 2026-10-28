@@ -83,7 +83,7 @@ nonisolated enum AnalyticsFileOperationStatus: String, AnalyticsToken {
 /// What started a Dock Mode switch.
 nonisolated enum AnalyticsModeSource: String, AnalyticsToken {
     case menuBar = "menu_bar", picker, settings, launcher, prepareWorkspace = "prepare_workspace"
-    case focusSession = "focus_session", previousMode = "previous_mode"
+    case previousMode = "previous_mode"
 }
 
 nonisolated enum AnalyticsModeEdit: String, AnalyticsToken {
@@ -143,10 +143,6 @@ nonisolated enum AnalyticsDiscoveryAction: String, AnalyticsToken {
 nonisolated enum AnalyticsFocusCommand: String, AnalyticsToken {
     case windowSearch = "window_search", modePicker = "mode_picker", openFiles = "open_files"
     case badgeMemory = "badge_memory", history, navigate, movePin = "move_pin", open, windowPeek = "window_peek", exit
-}
-
-nonisolated enum AnalyticsFocusSessionAction: String, AnalyticsToken {
-    case started, paused, resumed, extended, finished, dismissed
 }
 
 nonisolated enum AnalyticsPinAction: String, AnalyticsToken {

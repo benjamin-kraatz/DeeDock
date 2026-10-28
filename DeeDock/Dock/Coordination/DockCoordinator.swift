@@ -5,8 +5,6 @@ import Observation
 /// Application lifetime owner for display reconciliation, global pointer events, and exclusive keyboard focus.
 @MainActor @Observable
 final class DockCoordinator {
-    let focusSession = FocusSessionController()
-    let focusBreathing = FocusBreathingStore.shared
     let localHistory = DockLocalHistoryStore()
     let pinWeather = PinWeatherStore()
     let clipboardMuseum = ClipboardMuseumController()
@@ -16,7 +14,6 @@ final class DockCoordinator {
     let plugins = DockPluginController()
     let sims = DockSimsStore()
     let timeline: DockTimelineController
-    @ObservationIgnored private let focusPopover: FocusSessionCoordinator
     let actionTiles = ActionTilesController()
     let fileDestinations = LauncherFileDestinationsStore()
     let patchBay: PatchBayController
@@ -94,7 +91,6 @@ final class DockCoordinator {
     var updateIdleGate: UpdateIdleGate {
         UpdateIdleGate(
             isDragging: dragging.isDragging,
-            isFocusSessionPanelOpen: focusPopover.isOpen,
             isFilePickerActive: filePicker.isActive,
             isPopoverOpen: popovers.isOpen,
             isMenuTracking: panels.values.contains(where: \.isMenuTracking),
@@ -106,7 +102,7 @@ final class DockCoordinator {
 
     /// Hides the main-display callout while the pointer is in a dock interaction.
     var isUpdateAwarenessBlocked: Bool {
-        dragging.isDragging || focusPopover.isOpen || filePicker.isActive || popovers.isOpen
+        dragging.isDragging || filePicker.isActive || popovers.isOpen
             || panels.values.contains(where: \.isMenuTracking) || windowPeeks.isOpen
     }
     @ObservationIgnored private let dragging = DockDragCoordinator()
@@ -185,7 +181,6 @@ final class DockCoordinator {
             base: FoundationModelsSemanticStackOrganizer()
         )
         timeline = DockTimelineController(history: localHistory)
-        focusPopover = FocusSessionCoordinator(focus: focusSession, presenter: popovers)
         folderStacks = FolderStackCoordinator(presenter: popovers, organizer: semanticStacks)
         volumeDock = VolumeDockCoordinator(volumes: volumes, folderStacks: folderStacks)
         fusion = FusionCoordinator(shelf: shelf)
@@ -238,16 +233,7 @@ final class DockCoordinator {
             recipeProgress.show()
         }
         recipeProgress.openSettings = { [weak self] in self?.settingsModesRequest = true }
-        badges.focusSession = { [weak self] in self?.focusSession.session }
-        focusPopover.showDigest = { [weak self] in self?.showBadgeMemory(digest: true) }
-        focusPopover.saveCapsule = { [weak self] panel in self?.sessionCapsules.beginFromFocus(on: panel) }
-        focusPopover.keyboardDismissed = { [weak self] id in
-            guard let self, focusedID == id else { return }
-            endFocus(restore: false)
-        }
-        focusSession.start()
-        focusBreathing.start()
-        localHistory.start(session: focusSession.session)
+        localHistory.start()
         pinWeather.start()
         clipboardMuseum.start()
         clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
@@ -271,7 +257,7 @@ final class DockCoordinator {
         }
         discovery.interactionBlocked = { [weak self] in
             guard let self else { return true }
-            return !canSwitchModes || popovers.isOpen || focusedID != nil || focusSession.isActive
+            return !canSwitchModes || popovers.isOpen || focusedID != nil
         }
         discovery.targetScreen = { [weak self] in
             guard let self else { return nil }
@@ -300,20 +286,12 @@ final class DockCoordinator {
         sims.start()
         DeprecatedFeaturesRetirement.disableEnabledFlags(
             sims: sims,
-            focusBreathing: focusBreathing,
-            focusSession: focusSession,
             pinWeather: pinWeather,
             quarantine: .shared,
             patchBay: patchBay,
             dockSettings: settings
         )
-        badgeMemory.start(session: focusSession.session)
-        focusSession.changed = { [weak self] in
-            guard let self else { return }
-            localHistory.noteSession(focusSession.session)
-            badgeMemory.synchronize(session: focusSession.session)
-            refreshPanels()
-        }
+        badgeMemory.start()
         appMelt.compareWindows = { [weak self] pair, windows in
             guard let self else { return }
             if pair.comparison == nil { pair.comparison = FusionCoordinator(shelf: self.shelf) }
@@ -556,7 +534,6 @@ final class DockCoordinator {
             folderStacks.close(for: id, returnFocus: false)
             shelves.close(for: id, returnFocus: false)
             volumeDock.cards.close(for: id)
-            focusPopover.close(for: id)
             sessionCapsules.close(for: id, returnFocus: false)
             notificationFeedPopover.close(for: id)
             pluginPanels.close(for: id)
@@ -567,7 +544,7 @@ final class DockCoordinator {
         for display in enabledDisplays where panels[display.id] == nil {
             let store = DockStore(displayID: display.id, catalog: catalog, profiles: profiles,
                                   trash: trash, shelf: shelf, volumes: volumes, capsules: capsules, actions: actionTiles,
-                                  focusSession: focusSession, history: localHistory, pinWeather: pinWeather,
+                                  history: localHistory, pinWeather: pinWeather,
                                   islands: islandPlans)
             store.appMelt = appMelt
             store.refresh()
@@ -584,19 +561,11 @@ final class DockCoordinator {
             panel.interaction.actionTiles = actionTiles
             panel.interaction.timeline = timeline
             panel.interaction.pinWeather = pinWeather
-            panel.interaction.focusBreathing = focusBreathing
-            panel.interaction.focusSession = focusSession
-            panel.interaction.dockModes = profiles.modes
             panel.interaction.sims = sims
-            store.openFocusSession = { [weak self, weak panel] in
-                guard let self, let panel else { return }
-                focusPopover.toggle(on: panel)
-            }
-            panel.interaction.openFocusSession = store.openFocusSession
             panel.resignedFocus = { [weak self] in
                 guard let self else { return }
                 if focusedID == display.id, !folderStacks.isKeyboardActive, !shelves.isOpen, !windowPeeks.isKeyboardActive,
-                   !sessionCapsules.isOpen, !focusPopover.isOpen, !notificationFeedPopover.isOpen, !pluginPanels.isOpen,
+                   !sessionCapsules.isOpen, !notificationFeedPopover.isOpen, !pluginPanels.isOpen,
                    !modePicker.isKeyboardActive {
                     endFocus(restore: false)
                 }
@@ -845,7 +814,6 @@ final class DockCoordinator {
         folderStacks.reanchor()
         shelves.reanchor()
         volumeDock.cards.refresh()
-        focusPopover.reanchor()
         sessionCapsules.reanchor()
         notificationFeedPopover.reanchor()
         pluginPanels.reanchor()
@@ -1016,17 +984,8 @@ final class DockCoordinator {
         panels[id]?.focus()
     }
 
-    var canStartFocus: Bool { canSwitchModes && !focusSession.isActive && !focusSession.requiresReset }
     /// Prepare stays available so a blocked drag or menu can be reported before any side effect.
     var canPrepareWorkspace: Bool { profiles.modes.canEdit }
-
-    func startFocus(_ mode: DockMode) {
-        guard canStartFocus, let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
-        // Activating the already-active mode is a no-op in DockModesStore, not a failed start.
-        if current.id != profiles.modes.document.activeModeID, !activateMode(current.id, source: .focusSession) { return }
-        Analytics.track(.focusSession(.started))
-        focusSession.begin(modeID: current.id, name: current.name)
-    }
 
     func prepareWorkspace(_ mode: DockMode) {
         guard let current = profiles.modes.modes.first(where: { $0.id == mode.id }) else { return }
@@ -1038,15 +997,14 @@ final class DockCoordinator {
         if recipes.run != nil { recipeProgress.show() }
     }
 
-    /// Called only from a badge click, menu/keyboard command, Settings or the Focus panel.
-    func showBadgeMemory(path: String? = nil, digest: Bool = false) {
+    /// Called only from a badge click, menu/keyboard command or Settings.
+    func showBadgeMemory(path: String? = nil) {
         popovers.closeAll()
         windowPeeks.close(returnFocus: false)
         modePicker.close(returnFocus: false)
         endFocus(restore: false)
         Analytics.track(.toolOpened(.badgeMemory, trigger: Analytics.trigger()))
-        badgeMemory.synchronize(session: focusSession.session)
-        badgeMemoryWindow.show(path: path, digest: digest, returningTo: lastExternalApplication)
+        badgeMemoryWindow.show(path: path, returningTo: lastExternalApplication)
     }
 
     /// The Discovery callout's Turn On, which is the person's explicit opt-in.
@@ -1299,9 +1257,6 @@ final class DockCoordinator {
         dragging.stop()
         folderStacks.stop()
         shelves.stop()
-        focusPopover.stop()
-        focusSession.stop()
-        focusBreathing.stop()
         actionTiles.stop()
         patchBay.stop()
         recipes.stop()
@@ -1336,7 +1291,6 @@ final class DockCoordinator {
         robi.stop()
         badgeMemoryWindow.stop()
         clipboardMuseum.stop()
-        badges.focusSession = nil
         catalog.stop()
         volumeDock.stop()
         volumes.stop()

@@ -895,7 +895,6 @@ final class DockPanelController {
         interaction.volumeHoverChanged = nil; interaction.beginVolumeDrag = nil
         interaction.hideVolume = nil; interaction.prepareVolumeSettings = nil
         interaction.canMoveVolume = nil; interaction.moveVolume = nil
-        interaction.openFocusSession = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.openNotificationFeed = nil; interaction.notificationFeed = nil; interaction.openHarbor = nil
         interaction.clearNotificationFeed = nil; interaction.prepareNotificationFeedSettings = nil

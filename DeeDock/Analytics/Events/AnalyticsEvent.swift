@@ -204,10 +204,9 @@ enum AnalyticsEvent {
     case lineIconCoverage(LineIconCoverage)
     case toolOpened(AnalyticsTool, trigger: AnalyticsTrigger)
 
-    // Focus Dock and focus sessions
+    // Focus Dock
     case focusDockEntered(trigger: AnalyticsTrigger)
     case focusDockCommand(AnalyticsFocusCommand)
-    case focusSession(AnalyticsFocusSessionAction)
 
     // Updates
     /// One step of the update flow, with the versions, settings, and phase it happened in.

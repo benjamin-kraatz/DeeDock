@@ -4,7 +4,6 @@ import SwiftUI
 @MainActor @Observable
 final class BadgeMemoryPresentation {
     var path: String?
-    var tab = 0
     var activationFailed = false
 }
 
@@ -20,9 +19,8 @@ final class BadgeMemoryWindowController: NSObject, NSWindowDelegate {
 
     init(memory: BadgeMemoryStore) { self.memory = memory }
 
-    func show(path: String? = nil, digest: Bool = false, returningTo application: NSRunningApplication? = nil) {
+    func show(path: String? = nil, returningTo application: NSRunningApplication? = nil) {
         presentation.path = path
-        presentation.tab = digest ? 1 : 0
         presentation.activationFailed = false
         if let window {
             ExplicitWindowPresenter.shared.present(window)

@@ -261,9 +261,7 @@ private enum DockTimelinePreviewData {
         let base = Date(timeIntervalSinceReferenceDate: 760_000_000)
         let samples: [(DockLocalHistoryEvent.Kind, TimeInterval, String?)] = [
             (.pinAdded, -7_200, "Sample Notes"),
-            (.sessionStarted, -5_400, "Deep Work"),
-            (.sessionPaused, -4_800, nil),
-            (.sessionFinished, -3_600, nil),
+            (.pinsReordered, -4_800, nil),
             (.pinMoved, -1_800, "Sample Browser"),
             (.pinRemoved, -300, "Unavailable Sample"),
         ]

@@ -53,32 +53,9 @@ nonisolated struct BadgeAppMemory: Codable, Equatable {
     var touched: Date
 }
 
-/// Endpoints express net observed change. They are never a count of incoming messages.
-nonisolated struct BadgeDigestRow: Codable, Equatable {
-    var first: BadgeObservation
-    var last: BadgeObservation
-    var changes = 0
-    var hasGap = false
-}
-
-nonisolated struct BadgeFocusDigest: Codable, Equatable, Identifiable {
-    var id: UUID
-    var modeName: String
-    var started: Date
-    var ended: Date?
-    /// Retained separately because FocusSession clears its deadline when completing at startup.
-    var deadline: Date?
-    /// Deleted app rows stay excluded for this session, including across a relaunch.
-    var excludedPaths: Set<String> = []
-    var incomplete = false
-    var rows: [String: BadgeDigestRow] = [:]
-}
-
+/// Saved history from builds with the Focus Session digest also has `collectFocus`, `lastSessionID`,
+/// `active` and `digests`. Decoding ignores those keys and the next save drops them.
 nonisolated struct BadgeMemoryDocument: Codable, Equatable {
     var version = 1
-    var collectFocus = false
-    var lastSessionID: UUID?
     var apps: [String: BadgeAppMemory] = [:]
-    var active: BadgeFocusDigest?
-    var digests: [BadgeFocusDigest] = []
 }

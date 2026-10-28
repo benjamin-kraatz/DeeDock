@@ -108,14 +108,6 @@ final class SessionCapsuleCoordinator {
                                  trigger: Analytics.trigger()))
     }
 
-    /// The user explicitly chooses this from a finished focus session. Discovery and approval
-    /// use the normal capsule flow, including its existing permission choices.
-    func beginFromFocus(on panel: DockPanelController) {
-        close(returnFocus: false)
-        toggle(on: panel, anchorTarget: .focus)
-        state?.beginNewCapsule()
-    }
-
     /// Opens an editable app checkpoint without capturing windows or saving until the user confirms.
     func beginFromApplication(_ application: ApplicationReference, on panel: DockPanelController) {
         close(returnFocus: false)

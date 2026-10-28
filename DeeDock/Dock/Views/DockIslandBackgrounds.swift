@@ -21,9 +21,6 @@ struct DockIslandBackgrounds: View {
     let idleOpacity: Double
     let idleAnimation: Animation?
     let reduceTransparency: Bool
-    let reduceMotion: Bool
-    /// Focus Breathing's highlight, applied to every island as it is to the single surface.
-    var breathing: (active: Bool, intensity: Double)? = nil
 
     var body: some View {
         let frames = layout.islandFrames(sizes: sizes)
@@ -47,13 +44,6 @@ struct DockIslandBackgrounds: View {
                 accessibilityName: String(localized: .islandsAccessibilityIsland(span.island.displayName))
             )
             .animation(idleAnimation, value: idleOpacity)
-            .overlay {
-                if let breathing {
-                    FocusBreathingChrome(active: breathing.active, intensity: breathing.intensity, reduceMotion: reduceMotion,
-                                         cornerRadius: min(cornerRadius, min(frame.width, frame.height) / 2),
-                                         backgroundOpacity: idleOpacity)
-                }
-            }
             .frame(width: frame.width, height: frame.height)
             .position(x: frame.midX, y: frame.midY)
         }

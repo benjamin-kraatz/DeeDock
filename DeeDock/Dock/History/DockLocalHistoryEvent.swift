@@ -1,25 +1,21 @@
 import Foundation
 
-/// A single DDock-local history event.
+/// A single DOKK-local history event.
 ///
-/// Instantaneous by default. Session kinds may later carry a span via `endedAt` so
-/// DEE-45 can treat a Focus Session as one scrubable clip without a second store.
 /// Unknown future kinds decode as ``Kind/unrecognized(_:)`` so a newer writer cannot
 /// lock an older reader out of the document.
 nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let occurredAt: Date
-    var endedAt: Date? = nil
     let kind: Kind
-    var sessionID: UUID? = nil
     var displayID: String? = nil
     var subjectID: String? = nil
     var subjectName: String? = nil
-    /// Pin identity order after this mutation, when known. Session events omit this and inherit
-    /// the last snapshot for the same display while scrubbing.
+    /// Pin identity order after this mutation, when known. Events without one inherit the last
+    /// snapshot for the same display while scrubbing.
     var pinIDs: [String]? = nil
 
-    /// Pin mutations and Focus Session transitions recorded by DDock itself.
+    /// Pin mutations recorded by DOKK itself.
     ///
     /// New raw values must stay stable. DEE-45 may add playback markers; this slice
     /// must keep loading them as ``unrecognized(_:)`` rather than failing the document.
@@ -28,12 +24,13 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
         case pinRemoved
         case pinMoved
         case pinsReordered
-        case sessionStarted
-        case sessionPaused
-        case sessionResumed
-        case sessionFinished
-        case sessionDismissed
         case unrecognized(String)
+
+        /// Raw values Focus Sessions wrote before they were removed. Loading drops these events,
+        /// so older history neither fails to decode nor shows them as unrecognized markers.
+        static let retiredFocusSessionRawValues: Set<String> = [
+            "sessionStarted", "sessionPaused", "sessionResumed", "sessionFinished", "sessionDismissed",
+        ]
 
         var rawValue: String {
             switch self {
@@ -41,11 +38,6 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
             case .pinRemoved: "pinRemoved"
             case .pinMoved: "pinMoved"
             case .pinsReordered: "pinsReordered"
-            case .sessionStarted: "sessionStarted"
-            case .sessionPaused: "sessionPaused"
-            case .sessionResumed: "sessionResumed"
-            case .sessionFinished: "sessionFinished"
-            case .sessionDismissed: "sessionDismissed"
             case .unrecognized(let value): value
             }
         }
@@ -56,11 +48,6 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
             case "pinRemoved": self = .pinRemoved
             case "pinMoved": self = .pinMoved
             case "pinsReordered": self = .pinsReordered
-            case "sessionStarted": self = .sessionStarted
-            case "sessionPaused": self = .sessionPaused
-            case "sessionResumed": self = .sessionResumed
-            case "sessionFinished": self = .sessionFinished
-            case "sessionDismissed": self = .sessionDismissed
             default: self = .unrecognized(rawValue)
             }
         }
@@ -72,13 +59,6 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
             }
         }
 
-        var isSession: Bool {
-            switch self {
-            case .sessionStarted, .sessionPaused, .sessionResumed, .sessionFinished, .sessionDismissed: true
-            default: false
-            }
-        }
-
         var isRecognized: Bool {
             if case .unrecognized = self { return false }
             return true
@@ -86,7 +66,6 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
     }
 
     var isPinEvent: Bool { kind.isPin }
-    var isSessionEvent: Bool { kind.isSession }
 
     /// Glance title shown while scrubbing. App and folder names stay untranslated.
     var glanceTitle: LocalizedStringResource {
@@ -96,19 +75,12 @@ nonisolated struct DockLocalHistoryEvent: Codable, Equatable, Identifiable, Send
         case .pinRemoved: LocalizedStringResource.timelineEventPinRemoved(subject: subject)
         case .pinMoved: LocalizedStringResource.timelineEventPinMoved(subject: subject)
         case .pinsReordered: LocalizedStringResource.timelineEventPinsReordered
-        case .sessionStarted: LocalizedStringResource.timelineEventSessionStarted(subject: subject)
-        case .sessionPaused: LocalizedStringResource.timelineEventSessionPaused
-        case .sessionResumed: LocalizedStringResource.timelineEventSessionResumed
-        case .sessionFinished: LocalizedStringResource.timelineEventSessionFinished
-        case .sessionDismissed: LocalizedStringResource.timelineEventSessionDismissed
         case .unrecognized: LocalizedStringResource.timelineEventUnrecognized
         }
     }
 
     var isValid: Bool {
         occurredAt.timeIntervalSince1970.isFinite
-            && (endedAt?.timeIntervalSince1970.isFinite ?? true)
-            && (endedAt.map { $0 >= occurredAt } ?? true)
             && (displayID?.count ?? 0) <= 256
             && (subjectID?.count ?? 0) <= 4096
             && (subjectName?.count ?? 0) <= 512
@@ -133,7 +105,8 @@ extension DockLocalHistoryEvent.Kind: Codable {
 /// Versioned local-only history. Nothing here is imported from Screen Time or other apps.
 ///
 /// `replayEnabled` and `pinArchive` are optional on disk so documents written before pin
-/// preview still load. Replay stays off unless the user turns it on.
+/// preview still load. Replay stays off unless the user turns it on. Focus Session events from
+/// older builds are dropped while decoding; the next save writes the document without them.
 nonisolated struct DockLocalHistoryDocument: Codable, Equatable, Sendable {
     var version = 1
     var recordingEnabled = true
@@ -159,7 +132,8 @@ nonisolated struct DockLocalHistoryDocument: Codable, Equatable, Sendable {
         version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
         recordingEnabled = try container.decodeIfPresent(Bool.self, forKey: .recordingEnabled) ?? true
         replayEnabled = try container.decodeIfPresent(Bool.self, forKey: .replayEnabled) ?? false
-        events = try container.decodeIfPresent([DockLocalHistoryEvent].self, forKey: .events) ?? []
+        events = (try container.decodeIfPresent([DockLocalHistoryEvent].self, forKey: .events) ?? [])
+            .filter { !DockLocalHistoryEvent.Kind.retiredFocusSessionRawValues.contains($0.kind.rawValue) }
         pinArchive = try container.decodeIfPresent([String: DockPin].self, forKey: .pinArchive) ?? [:]
     }
 
@@ -242,9 +216,8 @@ enum DockLocalHistoryPinDiff {
 
 /// Maps the dock's ordered axis onto local history time. Position 0 is the oldest event.
 ///
-/// DEE-45 can reuse this for session playback: filter to one `sessionID`, then treat
-/// progress as playhead. Events that share a timestamp fall back to stable index spacing
-/// so each remains individually selectable.
+/// Events that share a timestamp fall back to stable index spacing so each remains
+/// individually selectable.
 enum DockTimelineMapping {
     static func progress(along position: CGFloat, length: CGFloat) -> Double {
         guard length > 0, position.isFinite, length.isFinite else { return 0 }

@@ -209,7 +209,6 @@ final class UpdateAwarenessStore {
 /// "in the middle of something."
 struct UpdateIdleGate: Equatable, Sendable {
     var isDragging = false
-    var isFocusSessionPanelOpen = false
     var isUpdateWindowOpen = false
     var isFilePickerActive = false
     var isPopoverOpen = false
@@ -222,7 +221,7 @@ struct UpdateIdleGate: Equatable, Sendable {
     static let idleThreshold: TimeInterval = 10 * 60
 
     var isBusy: Bool {
-        isDragging || isFocusSessionPanelOpen || isUpdateWindowOpen
+        isDragging || isUpdateWindowOpen
             || isFilePickerActive || isPopoverOpen || isMenuTracking || isWindowPeekOpen
     }
 

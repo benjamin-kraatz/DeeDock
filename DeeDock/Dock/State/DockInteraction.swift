@@ -8,15 +8,10 @@ final class DockInteraction {
     var appMelt: AppMeltController?
     /// Opens the DOKK Hub from this dock's DOKK tile, or closes it when it is open and anchored.
     @ObservationIgnored var openLauncher: (() -> Void)?
-    @ObservationIgnored var openFocusSession: (() -> Void)?
     /// Shared local-history scrub. Nil in previews that do not browse history.
     var timeline: DockTimelineController?
     /// Unused-pin weather. Nil in previews that do not persist last-used times.
     var pinWeather: PinWeatherStore?
-    /// Shared attention signals. Nil keeps previews independent of live app state.
-    var focusBreathing: FocusBreathingStore?
-    var focusSession: FocusSessionController?
-    var dockModes: DockModesStore?
     @ObservationIgnored var actionTiles: ActionTilesController?
     var badges: DockBadgeController?
     /// Shared notification feed. The tile reads its unread count here. Nil in previews.

@@ -38,7 +38,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case windowPeek
     case harbor
     case robi
-    case focusSessions
     case patchBay
     case actionTiles
     case multipleDisplays
@@ -51,15 +50,13 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case sims
     case discovery
     case soapBubbles
-    case focusBreathing
-    case focusDebt
     case quarantine
 
     var id: Self { self }
 
     /// Personality features slated for removal in 1.0.0. Launch turns their enable flags off.
     static let deprecatedPages: [SettingsPage] = [
-        .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay, .magneticEdges
+        .sims, .pinWeather, .quarantine, .patchBay, .magneticEdges
     ]
 
     /// True for the Deprecated sidebar section and the shared 1.0.0 removal notice.
@@ -78,7 +75,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .appearance, .appNames, .background, .position, .behavior, .shownApps: .dock
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor, .robi,
-             .focusSessions, .focusBreathing, .focusDebt, .patchBay, .actionTiles, .multipleDisplays, .permissions,
+             .patchBay, .actionTiles, .multipleDisplays, .permissions,
              .appSuggestions, .localHistory, .pinWeather, .clipboardMuseum, .magneticEdges, .sims, .soapBubbles,
              .discovery, .quarantine: .features
         }
@@ -117,9 +114,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .windowPeekTitle
         case .harbor: .harborName
         case .robi: .robiSettingsTitle
-        case .focusSessions: .focusTitle
-        case .focusBreathing: .focusBreathingTitle
-        case .focusDebt: .focusDebtTitle
         case .patchBay: .patchBayTitle
         case .actionTiles: .actionsTitle
         case .multipleDisplays: .secondaryDockTitle
@@ -159,9 +153,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .settingsFeaturePeekSubtitle
         case .harbor: .harborSettingsSubtitle
         case .robi: .robiSettingsSubtitle
-        case .focusSessions: .settingsFeatureFocusSubtitle
-        case .focusBreathing: .settingsFeatureFocusBreathingSubtitle
-        case .focusDebt: .settingsFeatureFocusDebtSubtitle
         case .patchBay: .patchBaySubtitle
         case .actionTiles: .settingsFeatureActionsSubtitle
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
@@ -203,9 +194,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: .symbol("macwindow.on.rectangle")
         case .harbor: .symbol("rectangle.3.group.fill")
         case .robi: .symbol("face.smiling.inverse")
-        case .focusSessions: .symbol("timer")
-        case .focusBreathing: .symbol("wind")
-        case .focusDebt: .symbol("hourglass")
         case .patchBay: .symbol("point.3.connected.trianglepath.dotted")
         case .actionTiles: .symbol("bolt.fill")
         case .multipleDisplays: .symbol("display.2")
@@ -245,9 +233,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: Color(red: 0.24, green: 0.50, blue: 0.94)
         case .harbor: Color(red: 0.30, green: 0.36, blue: 0.62)
         case .robi: Color(red: 0.36, green: 0.30, blue: 0.62)
-        case .focusSessions: Color(red: 0.92, green: 0.38, blue: 0.24)
-        case .focusBreathing: Color(red: 0.18, green: 0.62, blue: 0.58)
-        case .focusDebt: Color(red: 0.72, green: 0.48, blue: 0.22)
         case .patchBay: .teal
         case .actionTiles: Color(red: 0.60, green: 0.34, blue: 0.90)
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
@@ -287,9 +272,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .windowPeek: [Color(red: 0.44, green: 0.68, blue: 1.0), Color(red: 0.14, green: 0.36, blue: 0.88)]
         case .harbor: [Color(red: 0.42, green: 0.47, blue: 0.70), Color(red: 0.12, green: 0.14, blue: 0.24)]
         case .robi: [Color(red: 0.62, green: 0.54, blue: 0.92), Color(red: 0.20, green: 0.16, blue: 0.36)]
-        case .focusSessions: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
-        case .focusBreathing: [Color(red: 0.46, green: 0.86, blue: 0.80), Color(red: 0.10, green: 0.50, blue: 0.48)]
-        case .focusDebt: [Color(red: 0.92, green: 0.70, blue: 0.38), Color(red: 0.58, green: 0.36, blue: 0.14)]
         case .patchBay: [.mint, .teal]
         case .actionTiles: [Color(red: 0.78, green: 0.54, blue: 1.0), Color(red: 0.48, green: 0.22, blue: 0.84)]
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
@@ -323,8 +305,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .harbor: .harborSettingsKeywords
         case .robi: .robiSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
-        case .focusBreathing: .focusBreathingHelp
-        case .focusDebt: .focusDebtHelp
         case .quarantine: .quarantineSettingsHelp
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
@@ -333,7 +313,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .drives: .settingsDrivesKeywords
         case .hub: .settingsHubKeywords
         case .shelfAndTrash, .capsules, .badges, .windowPeek,
-             .focusSessions, .actionTiles, .multipleDisplays, .permissions: .settingsFeaturesKeywords
+             .actionTiles, .multipleDisplays, .permissions: .settingsFeaturesKeywords
         }
     }
 

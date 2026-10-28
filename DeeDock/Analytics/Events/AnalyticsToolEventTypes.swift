@@ -110,7 +110,6 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case localHistoryRecording = "local_history_recording"
     case localHistoryReplay = "local_history_replay"
     case peekHistoryEnabled = "peek_history_enabled"
-    case badgeMemoryCollectFocus = "badge_memory_collect_focus"
     case shelfSort = "shelf_sort"
     case shelfPresentation = "shelf_presentation"
     /// Days after which unused Shelf items move to compost; 0 is off.

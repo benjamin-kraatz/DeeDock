@@ -218,7 +218,7 @@ Preferences kept outside those models are reported with `area = features` and a 
 `AnalyticsFeatureSetting`: `discovery_enabled`, `launcher_suggestions_enabled`,
 `launcher_suggestions_paused`, `launcher_suggestion_prompts_enabled`, `clipboard_redact_secrets`,
 `clipboard_curator_enabled`, `local_history_recording`, `local_history_replay`,
-`peek_history_enabled`, `badge_memory_collect_focus`, `shelf_sort`, `shelf_presentation`,
+`peek_history_enabled`, `shelf_sort`, `shelf_presentation`,
 `shelf_compost_days` (0 is off), `system_dock_tuck` (only for a click in Settings or the tour,
 not for the restore at quit or the re-tuck at launch), and Lookout's `lookout_enabled`, `lookout_index_on_battery`
 and `lookout_folder_count` (a count, after a folder was added or removed in Settings; never the folders). They are not part of the person profile, so a person who never
@@ -353,7 +353,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 
 | Event | Properties |
 | --- | --- |
-| `mode_switched` | `source` (`menu_bar`, `picker`, `settings`, `launcher`, `prepare_workspace`, `focus_session`, `previous_mode`), `mode_count` |
+| `mode_switched` | `source` (`menu_bar`, `picker`, `settings`, `launcher`, `prepare_workspace`, `previous_mode`), `mode_count` |
 | `dock_mode_activated` | none. Sent with every `mode_switched`. |
 | `mode_edited` | `action` (`created`, `duplicated`, `deleted`, `renamed`, `reordered`, `recipe_updated`, `snapshot_saved`), `mode_count`, `step_count` for `recipe_updated` and `snapshot_saved` |
 | `workspace_prepared` | `step_count`, `completed_step_count`, `outcome`, `duration` |
@@ -408,7 +408,6 @@ Workspace recipes run Shortcuts too. Those runs are part of `workspace_prepared`
 | `tool_opened` | `tool` (`window_search`, `local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
 | `focus_dock_entered` | `trigger` |
 | `focus_dock_command` | `command` |
-| `focus_session` | `action` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
 | `robi_answered` | `model` (`on_device`, `claude`), `claude_model` (`haiku`, `sonnet`, `opus`; only when Claude answered), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
 | `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command`, `point` for clicking a reference in the answer, which spotlights it on the window) |

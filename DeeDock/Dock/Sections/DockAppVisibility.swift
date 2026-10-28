@@ -26,14 +26,13 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case launcher, focus, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, notificationFeed, harbor, volume(String), update, trash
+    case launcher, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, notificationFeed, harbor, volume(String), update, trash
     /// A plugin tile, by the plugin extension's bundle identifier.
     case plugin(String)
     var hitID: String {
         switch self {
         case .melt(let id): "melt:\(id.uuidString)"
         case .launcher: "launcher"
-        case .focus: "focus"
         case .action(let id): "action:\(id.uuidString)"
         case .app(let id): "app:\(id)"
         case .folder(let id): "folder:\(id.uuidString)"
@@ -71,7 +70,7 @@ struct DockGroupControl {
 enum DockSectionProjection {
     static func entries(items: [DockItem], folders: [FolderDockItem] = [], pins: [DockPin]? = nil,
                         visibility: DockAppVisibility, expanded: Bool,
-                        actions: [ActionDockItem] = [], focus: FocusDockItem? = nil,
+                        actions: [ActionDockItem] = [],
                         sessionCapsules: [SessionCapsuleDockItem] = [],
                         capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
                         notificationFeed: NotificationFeedDockItem? = nil,
@@ -103,7 +102,7 @@ enum DockSectionProjection {
         }
         // Utility tiles trail every application, sharing one divider. Volumes sit next to Trash,
         // where the system Dock kept removable media.
-        return applications + actions.map(DockRenderSlot.action) + (focus.map { [.focus($0)] } ?? []) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
+        return applications + actions.map(DockRenderSlot.action) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
             + (capsules.map { [.sessionCapsules($0)] } ?? [])
             + (shelf.map { [.shelf($0)] } ?? [])
             + (notificationFeed.map { [.notificationFeed($0)] } ?? []) + (harbor.map { [.harbor($0)] } ?? [])

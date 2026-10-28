@@ -41,62 +41,36 @@ struct DockLocalHistoryTests {
         #expect(DockLocalHistoryPinDiff.mutations(previous: [before], next: [.folder(folder)]).isEmpty)
     }
 
-    @Test("Only DDock-local pin and session kinds are written")
+    @Test("Only DOKK-local pin kinds are written")
     func localKindsOnly() throws {
         let suite = "HistoryKinds.\(UUID().uuidString)"
         let (history, defaults) = try store(suite)
         defer { defaults.removePersistentDomain(forName: suite) }
         history.start()
         history.recordPinChange(previous: [], next: [pin("safari")], displayID: "display.primary")
-        var session = FocusSession(id: UUID(), modeID: UUID(), modeName: "Deep Work", duration: 1500,
-                                   remainingWhenPaused: 1500, deadline: Date().addingTimeInterval(1500), phase: .running)
-        history.noteSession(session)
-        session.phase = .paused
-        session.deadline = nil
-        session.remainingWhenPaused = 900
-        history.noteSession(session)
 
-        #expect(history.events.allSatisfy { $0.isPinEvent || $0.isSessionEvent })
-        #expect(history.events.allSatisfy { $0.kind.isRecognized })
+        #expect(history.events.allSatisfy { $0.isPinEvent && $0.kind.isRecognized })
         #expect(history.events.contains { $0.kind == .pinAdded && $0.subjectName == "safari" })
-        #expect(history.events.contains { $0.kind == .sessionStarted && $0.subjectName == "Deep Work" })
-        #expect(history.events.contains { $0.kind == .sessionPaused })
     }
 
-    @Test("An already-running session after launch does not invent a start event")
-    func noBackfillOnLaunch() throws {
-        let suite = "HistoryBackfill.\(UUID().uuidString)"
+    @Test("Focus Session events stored by older builds are dropped on load")
+    func retiredSessionEventsDropped() throws {
+        let suite = "HistoryRetiredSessions.\(UUID().uuidString)"
         let (history, defaults) = try store(suite)
         defer { defaults.removePersistentDomain(forName: suite) }
-        let session = FocusSession(id: UUID(), modeID: UUID(), modeName: "Focus", duration: 1500,
-                                   remainingWhenPaused: 1500, deadline: Date().addingTimeInterval(1500), phase: .running)
-        history.start(session: session)
-        history.noteSession(session)
-        #expect(history.events.isEmpty)
-    }
+        let pinEvent = DockLocalHistoryEvent(id: UUID(), occurredAt: Date().addingTimeInterval(-60),
+                                             kind: .pinAdded, subjectName: "safari")
+        let placeholder = DockLocalHistoryEvent(id: UUID(), occurredAt: Date().addingTimeInterval(-30),
+                                                kind: .pinsReordered)
+        let encoded = try JSONEncoder().encode(DockLocalHistoryDocument(events: [pinEvent, placeholder]))
+        let payload = try #require(String(data: encoded, encoding: .utf8)?
+            .replacingOccurrences(of: "pinsReordered", with: "sessionStarted"))
+        defaults.set(Data(payload.utf8), forKey: "dock.local-history.v1")
 
-    @Test("Session events share a sessionID and close the start span on finish")
-    func sessionGrouping() throws {
-        let suite = "HistorySession.\(UUID().uuidString)"
-        let (history, defaults) = try store(suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
         history.start()
-        let started = Date(timeIntervalSince1970: 1_000)
-        var session = FocusSession(id: UUID(), modeID: UUID(), modeName: "Writing", duration: 1500,
-                                   remainingWhenPaused: 1500, deadline: started.addingTimeInterval(1500), phase: .running)
-        history.noteSession(session, at: started)
-        history.recordPinChange(previous: [], next: [pin("safari")], displayID: "display.primary",
-                                at: started.addingTimeInterval(10))
-        session.phase = .completed
-        session.deadline = nil
-        session.remainingWhenPaused = 0
-        let finished = started.addingTimeInterval(60)
-        history.noteSession(session, at: finished)
 
-        let grouped = history.events(forSession: session.id)
-        #expect(grouped.map(\.kind) == [.sessionStarted, .pinAdded, .sessionFinished])
-        #expect(grouped.allSatisfy { $0.sessionID == session.id })
-        #expect(grouped.first { $0.kind == .sessionStarted }?.endedAt == finished)
+        #expect(!history.requiresReset)
+        #expect(history.events.map(\.id) == [pinEvent.id])
     }
 
     @Test("Recording can be paused and history can be cleared")

@@ -10,11 +10,10 @@ struct DeprecatedFeaturesTests {
         #expect(SettingsSection.fixed.last == .deprecated)
         let last = SettingsPage.deprecatedPages
         #expect(Set(last) == [
-            .sims, .focusBreathing, .focusDebt, .pinWeather, .quarantine, .patchBay, .magneticEdges
+            .sims, .pinWeather, .quarantine, .patchBay, .magneticEdges
         ])
         let active = Set(SettingsSection.featureSections.flatMap(\.pageGroups).flatMap(\.self))
         #expect(active.contains(.soapBubbles))
-        #expect(active.contains(.focusSessions))
         #expect(active.contains(.shelfAndTrash))
         #expect(active.contains(.discovery))
         #expect(active.contains(.clipboardMuseum))
@@ -22,7 +21,6 @@ struct DeprecatedFeaturesTests {
         #expect(!active.contains(.magneticEdges))
         #expect(!active.contains(.sims))
         #expect(!active.contains(.patchBay))
-        #expect(!SettingsPage.focusSessions.isDeprecated)
         #expect(!SettingsPage.soapBubbles.isDeprecated)
         #expect(SettingsPage.magneticEdges.isDeprecated)
         #expect(SettingsPage.deprecatedPages.allSatisfy { $0.isDeprecated })
@@ -39,15 +37,11 @@ struct DeprecatedFeaturesTests {
     func forceOffPersists() throws {
         let suffix = UUID().uuidString
         let simsDefaults = try #require(UserDefaults(suiteName: "DeprecatedSims.\(suffix)"))
-        let breathingDefaults = try #require(UserDefaults(suiteName: "DeprecatedBreathing.\(suffix)"))
-        let focusDefaults = try #require(UserDefaults(suiteName: "DeprecatedFocus.\(suffix)"))
         let weatherDefaults = try #require(UserDefaults(suiteName: "DeprecatedWeather.\(suffix)"))
         let patchDefaults = try #require(UserDefaults(suiteName: "DeprecatedPatch.\(suffix)"))
         let magnetDefaults = try #require(UserDefaults(suiteName: "DeprecatedMagnet.\(suffix)"))
         defer {
             simsDefaults.removePersistentDomain(forName: "DeprecatedSims.\(suffix)")
-            breathingDefaults.removePersistentDomain(forName: "DeprecatedBreathing.\(suffix)")
-            focusDefaults.removePersistentDomain(forName: "DeprecatedFocus.\(suffix)")
             weatherDefaults.removePersistentDomain(forName: "DeprecatedWeather.\(suffix)")
             patchDefaults.removePersistentDomain(forName: "DeprecatedPatch.\(suffix)")
             magnetDefaults.removePersistentDomain(forName: "DeprecatedMagnet.\(suffix)")
@@ -57,15 +51,6 @@ struct DeprecatedFeaturesTests {
         sims.start()
         sims.setEnabled(true)
         #expect(sims.isEnabled)
-
-        let breathing = FocusBreathingStore(defaults: breathingDefaults)
-        breathing.setEnabled(true)
-        #expect(breathing.enabled)
-
-        let focus = FocusSessionController(defaults: focusDefaults)
-        focus.start()
-        focus.configureFocusDebt(enabled: true)
-        #expect(focus.focusDebt.enabled)
 
         let weather = PinWeatherStore(repository: PinWeatherRepository(defaults: weatherDefaults))
         weather.start()
@@ -94,8 +79,6 @@ struct DeprecatedFeaturesTests {
 
         DeprecatedFeaturesRetirement.disableEnabledFlags(
             sims: sims,
-            focusBreathing: breathing,
-            focusSession: focus,
             pinWeather: weather,
             quarantine: .shared,
             patchBay: patchBay,
@@ -103,8 +86,6 @@ struct DeprecatedFeaturesTests {
         )
 
         #expect(!sims.isEnabled)
-        #expect(!breathing.enabled)
-        #expect(!focus.focusDebt.enabled)
         #expect(!weather.enabled)
         #expect(!patchBay.document.enabled)
         #expect(!QuarantineStampController.shared.enabled)
@@ -113,13 +94,6 @@ struct DeprecatedFeaturesTests {
         let reloadedSims = DockSimsStore(repository: DockSimsRepository(defaults: simsDefaults))
         reloadedSims.start()
         #expect(!reloadedSims.isEnabled)
-
-        let reloadedBreathing = FocusBreathingStore(defaults: breathingDefaults)
-        #expect(!reloadedBreathing.enabled)
-
-        let reloadedFocus = FocusSessionController(defaults: focusDefaults)
-        reloadedFocus.start()
-        #expect(!reloadedFocus.focusDebt.enabled)
 
         let reloadedWeather = PinWeatherStore(repository: PinWeatherRepository(defaults: weatherDefaults))
         reloadedWeather.start()

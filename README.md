@@ -27,7 +27,7 @@ The dock itself matches the system Dock: Liquid Glass, magnification, running in
 - Rest on a running app to open Window Peek. From there you can pick a window, drop files into it, or mark up a screenshot.
 - Switch between Dock Modes, which are named sets of pins for every display. A mode can carry a recipe that opens apps, files, links, and Shortcuts.
 - Carry files across Spaces and displays on the Shelf.
-- Save what you were working on as a Session Capsule, and start a Focus Session timer from any mode.
+- Save what you were working on as a Session Capsule.
 - Open the DOKK Hub from its tile to launch apps, jump to windows, and browse, search, and copy files. Its search also finds Shelf files and Dock Modes. Run Shortcuts from Action Tiles, and see app badges with a history of what changed.
 - Turn on Robi, a small face on top of the window you're working in. Select something, click Robi, and ask it to explain, translate, summarize, or take the next step in that app.
 - Add plugins from other apps. Once you approve a plugin, it gets a tile you can pin or unpin, usually with a panel above it. Each plugin runs in its own process, so a plugin that stops never takes DOKK down.
