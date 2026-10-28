@@ -14,9 +14,18 @@ import UniformTypeIdentifiers
     var vector = LookoutSearchIndex.query
     private(set) var pictureWarmUps = 0
     private(set) var pictures: [QueryPicture] = []
+    /// Every text embedded, in order: the words typed beside a picture.
+    private(set) var queries: [String] = []
+    /// The words' vector: on axis 1, apart from every picture's.
+    var wordsVector: [Float] = (0..<Vectors.dimension).map { $0 == 1 ? 1 : 0 }
+    var failsWords = false
 
     func warmUp() async throws {}
-    func embed(query: String) async throws -> [Float] { LookoutSearchIndex.query }
+    func embed(query: String) async throws -> [Float] {
+        queries.append(query)
+        if failsWords { throw LookoutEncoderError.service("no text model") }
+        return wordsVector
+    }
     func invalidate() {}
 
     func warmUpPictureReader() async throws {

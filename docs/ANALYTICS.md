@@ -245,6 +245,8 @@ launches, and reset when sent:
 | `badge_detail_shown`, `badge_detail_shown_with_banner` | a Line dock label showed a badge count, without or with the newest notification banner under it |
 | `lookout_search_with_results`, `lookout_search_without_results` | a Files search ended (the query was cleared, a result opened, or the Hub or the Files tab closed) while Lookout was on and its final results had arrived: with hits, or with the "nothing stands out" state. One per search, from the last query typed |
 | `lookout_weak_matches_expanded` | the "Weaker matches" fold under Lookout's results was opened |
+| `lookout_picture_words_added` | words were typed beside a picture searched with. Once per picture |
+| `lookout_picture_weight_changed` | the picture–words slider was moved and let go |
 
 Magnification itself is not tracked. Its settings are.
 
@@ -258,6 +260,9 @@ opens with `section = weak` against `section = strong`, and `lookout_weak_matche
 
 `lookout_image_search` shows how people search with pictures and how often the first picture waits for the
 picture reader (`cold`); `lookout_result_opened` with `query = image` shows whether those searches end in an open.
+`lookout_picture_words_added` against `lookout_image_search` shows how often people add words to a picture, and
+`words_weight` on opens with `query = image_words` shows where the slider sits when a search works, to tune
+`LookoutRanking.pictureWordsWeight` (0.4).
 
 Lookout's onboarding events show where setup stops: `lookout_setup_step_viewed` against `lookout_setup_abandoned`
 by step, `lookout_access_result` for how often macOS's prompt is declined, and `lookout_model_download` for how long
@@ -338,7 +343,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `hub_files_view_changed` | `view` (`list`, `icons`, `columns`) |
 | `hub_files_sidebar_edited` | `action` (`add`, `remove`, `reorder`, `restore`, `undo`), `method` (`drag`, `drag_out`, `menu`, `shortcut`, `header_menu`, `settings`, `toast`, `popover`, `accessibility`), `item_count`. Never folder names or paths. |
 | `hub_file_search_result_opened` | `scope` (`this_mac`, `folder`), `is_folder`. Never the query or the result. |
-| `lookout_result_opened` | `section` (`names`, `strong`, `weak`), `rank` (1-based within its section; within its group for a search with a picture), `kind` (`screenshot`, `image`, `pdf`, `doc`, `folder`; absent for `names`), `match` (`meaning`, `words`, `both`; absent for `names`), `scope` (`this_mac`, `folder`), `is_lookup` (Lookout read the query as a code or number, so exact words counted double), `query` (`text` for typed words, `image` for a search with a picture or Find Similar). Sent for every Lookout result opened and, while Lookout is on, for every name result too, beside `hub_file_search_result_opened`. Never the query, the picture, a name, a path, or a score. |
+| `lookout_result_opened` | `section` (`names`, `strong`, `weak`), `rank` (1-based within its section; within its group for a search with a picture), `kind` (`screenshot`, `image`, `pdf`, `doc`, `folder`; absent for `names`), `match` (`meaning`, `words`, `both`; absent for `names`), `scope` (`this_mac`, `folder`), `is_lookup` (Lookout read the query as a code or number, so exact words counted double), `query` (`text` for typed words, `image` for a search with a picture or Find Similar, `image_words` when words were typed beside the picture), `words_weight` (the picture–words slider's place in whole percent, 10–90; only with `image_words`). Sent for every Lookout result opened and, while Lookout is on, for every name result too, beside `hub_file_search_result_opened`. Never the query, the picture, a name, a path, or a score. |
 | `lookout_image_search` | `source` (`drop` for a picture or indexed document dropped on the search field, `paste` for a picture pasted with ⌘V, `similar` for Find Similar on a search result from the preview column, the context menu, ⌘⇧L, or a result dragged onto the field, `browser` for Find Similar on a file in the Files browser, `hub_tile` for Find Similar in the Apps tab's file actions after a drop on the DOKK tile or the Apps tab), `cold` (the query service had to load its picture reader first; always `false` when a stored vector is used, which reads nothing). Sent when a search with a picture starts, once the stored vector is found or the picture reading starts. Never the picture, its name, or a path. |
 | `lookout_setup_step_viewed` | `step` (`welcome`, `folders`, `access`, `download`, `first_pass`). Sent each time a step of Lookout's onboarding comes on screen, also when onboarding opens again at a step. |
 | `lookout_setup_completed` | `folder_count` (folders chosen), `allowed_count` (macOS let Lookout read them), `skipped_count` (it didn't, or the folder was gone), `estimated_files` (the exact sum of the allowed folders' first-pass estimates), `index_on_battery`. Sent once, when the first pass starts and setup is applied. Never a folder or a path. |

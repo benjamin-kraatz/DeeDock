@@ -139,63 +139,9 @@ nonisolated final class Searcher {
 
         // Words: FTS5 with Porter stemming over file names, folder names, OCR, page and document text.
         let terms = Self.terms(text)
-        let patterns = Self.patterns(terms, prefixLast: prefixLast)
-        var words: [(file: Int64, segment: Int64, snippet: String?)] = []
-        var coverage: [Int64: Double] = [:]   // share of the query's words found anywhere in the file
-        var allowed: [Int64: Bool] = [:]      // the settings filter's verdict, existence included, asked once a file
-        if !patterns.isEmpty {
-            // The scope, the kinds and the settings' folders and types go into the query, so its LIMIT is spent on
-            // files that may be shown. Rows come best first, and a file counts towards `wordFiles` only once the
-            // filter, with its existence check, has accepted it: files deleted since the last sync can't crowd out a
-            // valid one further down. `wordWindow` caps the work, and snippets are made only for accepted files.
-            let match = SQLValue.text(patterns.joined(separator: " OR "))
-            var conditions = "", values = [match]
-            if let range {
-                conditions += " AND f.path >= ? AND f.path < ?"
-                values += [.text(range.lower), .text(range.upper)]
-            }
-            if let kinds {
-                conditions += " AND f.kind IN (\(kinds.map { _ in "?" }.joined(separator: ", ")))"
-                values += kinds.map(\.rawValue).sorted().map { .text($0) }
-            }
-            if let filter {
-                let condition = filter.sqlCondition(column: "f.path")
-                conditions += " AND " + condition.sql
-                values += condition.values
-            }
-            var seen = Set<Int64>()
-            var matched: [(file: Int64, segment: Int64)] = []
-            try store.db.scan("""
-                SELECT s.file, s.id, f.path FROM fts JOIN segments s ON s.id = fts.rowid JOIN files f ON f.id = s.file
-                WHERE fts MATCH ?\(conditions) ORDER BY bm25(fts, 3.0, 1.0) LIMIT \(Self.wordWindow)
-                """, values) { row in
-                let file = row.int(0)
-                if seen.insert(file).inserted {
-                    let ok = filter?.allows(row.text(2) ?? "") ?? true
-                    allowed[file] = ok
-                    if ok { matched.append((file, row.int(1))) }
-                }
-                return matched.count < Self.wordFiles
-            }
-            if !matched.isEmpty {
-                var snippets: [Int64: String] = [:]
-                try store.db.query("""
-                    SELECT rowid, snippet(fts, 1, '«', '»', '…', 12), original FROM fts
-                    WHERE fts MATCH ? AND rowid IN (\(matched.map { String($0.segment) }.joined(separator: ",")))
-                    """, [match]) { row in
-                    // Text that normalizing changed is quoted as it's written (with its hamza, harakat, joiners).
-                    snippets[row.int(0)] = row.text(2).flatMap { SearchText.snippet($0, terms: terms) } ?? row.text(1)
-                }
-                words = matched.map { ($0.file, $0.segment, snippets[$0.segment]) }
-                let files = words.map { String($0.file) }.joined(separator: ",")
-                for pattern in patterns {
-                    try store.db.query("""
-                        SELECT DISTINCT s.file FROM fts JOIN segments s ON s.id = fts.rowid
-                        WHERE fts MATCH ? AND s.file IN (\(files))
-                        """, [.text(pattern)]) { coverage[$0.int(0), default: 0] += 1 / Double(patterns.count) }
-                }
-            }
-        }
+        let found = try wordMatches(Self.patterns(terms, prefixLast: prefixLast), terms: terms, range: range,
+                                    kinds: kinds, filter: filter)
+        let (words, coverage, allowed) = (found.matches, found.coverage, found.allowed)
 
         // A file qualifies by standing out in meaning, or by containing at least half of the query's words.
         // Score: meaning z + a bonus that grows with word coverage, + 1 for the kind the query asks for.
@@ -275,6 +221,78 @@ nonisolated final class Searcher {
         return hits.prefix { $0.score >= top * ratio }.count
     }
 
+    /// What keyword search found for a query's words (`wordMatches`).
+    struct WordMatches {
+        /// The files the settings filter accepts, best first, each with its best segment and that segment's snippet.
+        var matches: [(file: Int64, segment: Int64, snippet: String?)] = []
+        /// The share of the query's words found anywhere in each of `matches`' files.
+        var coverage: [Int64: Double] = [:]
+        /// The settings filter's verdict, existence included, for every file the search stepped through.
+        var allowed: [Int64: Bool] = [:]
+    }
+
+    /// Keyword search for `patterns` (`Self.patterns(terms)`): FTS5 with Porter stemming over file names, folder
+    /// names, OCR, page and document text.
+    ///
+    /// The scope, the kinds and the settings' folders and types go into the query, so its LIMIT is spent on files that
+    /// may be shown. Rows come best first, and a file counts towards `wordFiles` only once the filter, with its
+    /// existence check, has accepted it: files deleted since the last sync can't crowd out a valid one further down.
+    /// `wordWindow` caps the work, and snippets are made only for accepted files.
+    ///
+    /// - Throws: SQLite errors.
+    func wordMatches(_ patterns: [String], terms: [String], range: (lower: String, upper: String)?,
+                     kinds: Set<FileKind>?, filter: LookoutSearchFilter?) throws -> WordMatches {
+        var found = WordMatches()
+        guard !patterns.isEmpty else { return found }
+        let match = SQLValue.text(patterns.joined(separator: " OR "))
+        var conditions = "", values = [match]
+        if let range {
+            conditions += " AND f.path >= ? AND f.path < ?"
+            values += [.text(range.lower), .text(range.upper)]
+        }
+        if let kinds {
+            conditions += " AND f.kind IN (\(kinds.map { _ in "?" }.joined(separator: ", ")))"
+            values += kinds.map(\.rawValue).sorted().map { .text($0) }
+        }
+        if let filter {
+            let condition = filter.sqlCondition(column: "f.path")
+            conditions += " AND " + condition.sql
+            values += condition.values
+        }
+        var seen = Set<Int64>()
+        var matched: [(file: Int64, segment: Int64)] = []
+        try store.db.scan("""
+            SELECT s.file, s.id, f.path FROM fts JOIN segments s ON s.id = fts.rowid JOIN files f ON f.id = s.file
+            WHERE fts MATCH ?\(conditions) ORDER BY bm25(fts, 3.0, 1.0) LIMIT \(Self.wordWindow)
+            """, values) { row in
+            let file = row.int(0)
+            if seen.insert(file).inserted {
+                let ok = filter?.allows(row.text(2) ?? "") ?? true
+                found.allowed[file] = ok
+                if ok { matched.append((file, row.int(1))) }
+            }
+            return matched.count < Self.wordFiles
+        }
+        guard !matched.isEmpty else { return found }
+        var snippets: [Int64: String] = [:]
+        try store.db.query("""
+            SELECT rowid, snippet(fts, 1, '«', '»', '…', 12), original FROM fts
+            WHERE fts MATCH ? AND rowid IN (\(matched.map { String($0.segment) }.joined(separator: ",")))
+            """, [match]) { row in
+            // Text that normalizing changed is quoted as it's written (with its hamza, harakat, joiners).
+            snippets[row.int(0)] = row.text(2).flatMap { SearchText.snippet($0, terms: terms) } ?? row.text(1)
+        }
+        found.matches = matched.map { ($0.file, $0.segment, snippets[$0.segment]) }
+        let files = found.matches.map { String($0.file) }.joined(separator: ",")
+        for pattern in patterns {
+            try store.db.query("""
+                SELECT DISTINCT s.file FROM fts JOIN segments s ON s.id = fts.rowid
+                WHERE fts MATCH ? AND s.file IN (\(files))
+                """, [.text(pattern)]) { found.coverage[$0.int(0), default: 0] += 1 / Double(patterns.count) }
+        }
+        return found
+    }
+
     /// The text of a page, a document's passage or a screenshot's OCR, as it's written: the preview shows the part of
     /// a document that matched.
     ///
@@ -307,7 +325,7 @@ nonisolated final class Searcher {
     /// Quote the matched words only when they come from the segment the hit points at, so a PDF hit on page 5 never
     /// shows page 2's words. A segment with no place and no text of its own (a screenshot's image vector) can borrow
     /// them from its file's OCR text, which describes the same picture; never from the name row.
-    private static func snippet(pointedAt segmentID: Int64, segment: SegmentRow,
+    static func snippet(pointedAt segmentID: Int64, segment: SegmentRow,
                                 keyword: (file: Int64, segment: Int64, snippet: String?)?,
                                 matchedKind: SegmentKind?) -> String? {
         let marked = { (text: String?) in text.flatMap { $0.contains("«") ? Excerpt.line($0, limit: 400) : nil } }

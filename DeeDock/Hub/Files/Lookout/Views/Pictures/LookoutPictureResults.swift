@@ -13,7 +13,10 @@ struct LookoutPictureResults: View {
     var body: some View {
         if let picture = model.pictureQuery {
             LookoutPictureQueryBar(picture: picture, subtitle: model.pictureSubtitle,
-                                   wordsBefore: model.pictureSession.wordsBefore, reduceMotion: reduceMotion) {
+                                   wordsBefore: model.pictureSession.wordsBefore, words: model.pictureWords,
+                                   wordsWeight: model.pictureWordsWeight, showsWordsHint: model.showsPictureWordsHint,
+                                   reduceMotion: reduceMotion, changeWeight: model.setPictureWordsWeight,
+                                   commitWeight: model.pictureWordsWeightCommitted) {
                 model.removePicture(restoringWords: true)
                 model.shell?.focusSearchField()
             }
@@ -45,7 +48,7 @@ struct LookoutPictureResults: View {
             let results = model.pictureResults
             ForEach(results.groups) { group in
                 LookoutPictureGroupSection(model: model, group: group, queryIsPicture: results.queryIsPicture,
-                                           reduceMotion: reduceMotion)
+                                           terms: results.terms, reduceMotion: reduceMotion)
             }
         case .nothing:
             EmptyView()
@@ -78,6 +81,20 @@ private struct LookoutPictureResultsPreview: View {
         picture: LookoutPicturePreviewData.dropped, results: LookoutPicturePreviewData.beachResults,
         wordsBefore: "dog on the beach"))
         .preferredColorScheme(.dark)
+}
+
+#Preview("Picture and words · at sunset") {
+    LookoutPictureResultsPreview(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.dropped, results: LookoutPicturePreviewData.sunsetResults,
+        words: "at sunset"))
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Picture and words · German") {
+    LookoutPictureResultsPreview(model: LookoutPicturePreviewData.model(
+        picture: LookoutPicturePreviewData.dropped, results: LookoutPicturePreviewData.sunsetResults,
+        words: "at sunset"))
+        .environment(\.locale, Locale(identifier: "de"))
 }
 
 #Preview("Find Similar on a page · light") {

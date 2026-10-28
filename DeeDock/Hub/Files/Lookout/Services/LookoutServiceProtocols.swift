@@ -107,12 +107,15 @@ nonisolated struct LookoutSearchRequest: Sendable, Equatable {
     var limit = 40
 }
 
-/// What `LookoutPictureSearch` asks the index reader for: a search with a vector alone (`Searcher.similar`).
+/// What `LookoutPictureSearch` asks the index reader for: a search with a vector, alone or with words typed beside it
+/// (`Searcher.similar`).
 nonisolated struct LookoutSimilarRequest: Sendable, Equatable {
     /// 768 L2-normalized floats.
     var vector: [Float]
     /// The vector is a picture's: the pictures group comes first.
     var queryIsPicture: Bool
+    /// Words typed beside the picture; nil for the picture alone.
+    var words: LookoutSimilarWords?
     /// Files never to return, as absolute paths (they're resolved as the index stores them): the file searched with.
     var excluding: Set<String> = []
     /// A folder to search inside, or nil for the whole index.
@@ -142,7 +145,7 @@ nonisolated protocol LookoutIndexSearching: Sendable {
     /// For each folder (absolute paths, as Settings lists them), how many files under it have something to find
     /// besides their name. Empty while there's no index to read.
     func searchableFileCounts(under folders: [String]) async -> [String: Int]
-    /// Searches with a vector alone, opening the index first if it has appeared since the last call.
+    /// Searches with a vector, alone or with words, opening the index first if it has appeared since the last call.
     ///
     /// - Returns: The results, or nil while there's no index to read yet.
     /// - Throws: SQLite errors.

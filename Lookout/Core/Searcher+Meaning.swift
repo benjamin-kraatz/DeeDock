@@ -31,6 +31,34 @@ nonisolated extension Searcher {
         return centered.map { ($0 - mean) / deviation }
     }
 
+    /// A picture's and typed words' meaning scores as one query's: their weighted sum, put on its own scale again.
+    ///
+    /// Each side is already on its own query's scale (`meaning`), so neither drowns the other by its raw cosines: a
+    /// picture's cosines to pictures run far above a sentence's. Summing them narrows the spread (the two disagree
+    /// on most files), so the sum is standardized once more and `LookoutRanking.zGate` keeps its meaning. The scale
+    /// comes from the rows in `setsScale`, as in `meaning`.
+    ///
+    /// A plain weighted sum of the two vectors ranked as well at its best weight, but that weight depends on how far
+    /// apart the two sit in this index; the scores' sum doesn't (2026-10-28, DEE-126: MRR 0.763 vs 0.754 on 67 cases).
+    ///
+    /// - Parameter weight: How much the words count, 0…1 (`LookoutRanking.pictureWordsWeight`).
+    static func blend(_ picture: [Double], _ words: [Double], weight: Double, setsScale: [Bool]? = nil) -> [Double] {
+        let weight = min(max(weight, 0), 1)
+        let blended = zip(picture, words).map { (1 - weight) * $0 + weight * $1 }
+        var count = 0.0, sum = 0.0
+        for row in blended.indices where setsScale?[row] ?? true {
+            count += 1
+            sum += blended[row]
+        }
+        let mean = sum / max(count, 1)
+        var squares = 0.0
+        for row in blended.indices where setsScale?[row] ?? true {
+            squares += (blended[row] - mean) * (blended[row] - mean)
+        }
+        let deviation = max((squares / max(count, 1)).squareRoot(), 0.02)
+        return blended.map { ($0 - mean) / deviation }
+    }
+
     /// The average score of each modality for this query. Small groups (< 20 vectors) take the average of all.
     static func modalityMeans(_ scores: [Float], _ modality: [Modality], setsScale: [Bool]? = nil) -> [Modality: Double] {
         var sum: [Modality: Double] = [:], count: [Modality: Int] = [:]

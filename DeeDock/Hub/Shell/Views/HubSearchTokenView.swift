@@ -1,13 +1,20 @@
 import SwiftUI
 
 /// The token before the search field's text (the mockup's `.tok`): an 18 pt thumbnail, the name, and ✕. It pops in
-/// with a short spring (`tokin`: from 0.6 scale), or fades under Reduce Motion.
+/// with a short spring (`tokin`: from 0.6 scale), or fades under Reduce Motion. While words are typed after it, it
+/// narrows (`compact`) so they have room; the full name stays in its tooltip and VoiceOver label.
 ///
 /// VoiceOver reads it as one element named by `token.accessibilityLabel`, with a Remove action; ✕ is its own button.
 struct HubSearchTokenView: View {
     let token: HubSearchToken
     let reduceMotion: Bool
+    /// Words follow the token in the field: its name is cut to leave them room.
+    var compact = false
     let remove: () -> Void
+
+    /// How wide the token may grow, alone and with words after it.
+    static let maxWidth: CGFloat = 190
+    static let compactMaxWidth: CGFloat = 96
 
     @Environment(\.colorScheme) private var scheme
     @State private var shown = false
@@ -33,7 +40,7 @@ struct HubSearchTokenView: View {
         .padding(.leading, 2)
         .padding(.trailing, 4)
         .frame(height: 22)
-        .frame(maxWidth: 190, alignment: .leading)
+        .frame(maxWidth: compact ? Self.compactMaxWidth : Self.maxWidth, alignment: .leading)
         .fixedSize(horizontal: true, vertical: false)
         .background(LookoutTheme(scheme).accentSoft, in: .rect(cornerRadius: 7, style: .continuous))
         .overlay {
@@ -110,6 +117,10 @@ private struct HubSearchTokenRemoveStyle: ButtonStyle {
                                                  fileURL: nil, image: nil,
                                                  accessibilityLabel: "Picture: Screenshot"),
                            reduceMotion: true) {}
+        HubSearchTokenView(token: HubSearchToken(id: UUID(), title: "Screenshot 2026-10-11 at 18.40.02.png",
+                                                 fileURL: nil, image: nil,
+                                                 accessibilityLabel: "Picture: Screenshot"),
+                           reduceMotion: false, compact: true) {}
     }
     .padding(20)
     .background(.regularMaterial)

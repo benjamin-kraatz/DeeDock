@@ -295,8 +295,10 @@ Only the field takes the drop. Every other drop target behaves as before. The pi
 chip in the field. The results start with a bar that shows the picture and how it was read. There's
 no names section. Lookout's matches come in two groups, **Looks like it** and **About what it
 shows**, each with its own **Weaker matches** fold. A document gets **Says something similar** and
-**Pictures of it** instead. ⌫ in the empty field or ✕ on the chip removes the picture and brings back the earlier
-words, and typing starts a new search by words. See [Searching with a picture](GUIDE.md#search-with-a-picture).
+**Pictures of it** instead. Words typed after the chip search together with the picture, and a
+**Picture–Words** slider in the results bar sets how much they count. ⌫ in the empty field or ✕ on the
+chip removes the picture and brings back the earlier words. See
+[Searching with a picture](GUIDE.md#search-with-a-picture).
 
 Down moves from the search field into the results, through the names, then Lookout's hits, then
 the weaker hits while their fold is open. Right and Left open and close the fold. Return opens the

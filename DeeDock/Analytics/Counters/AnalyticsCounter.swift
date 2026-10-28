@@ -37,6 +37,10 @@ enum AnalyticsCounter: Hashable {
     case lookoutSearchWithoutResults
     /// The "Weaker matches" fold under Lookout's results was opened.
     case lookoutWeakMatchesExpanded
+    /// Words were typed beside a picture searched with. Once per picture.
+    case lookoutPictureWordsAdded
+    /// The picture–words slider was moved and let go.
+    case lookoutPictureWeightChanged
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -56,6 +60,8 @@ enum AnalyticsCounter: Hashable {
         case .lookoutSearchWithResults: "lookout_search_with_results"
         case .lookoutSearchWithoutResults: "lookout_search_without_results"
         case .lookoutWeakMatchesExpanded: "lookout_weak_matches_expanded"
+        case .lookoutPictureWordsAdded: "lookout_picture_words_added"
+        case .lookoutPictureWeightChanged: "lookout_picture_weight_changed"
         }
     }
 }

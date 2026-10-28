@@ -257,14 +257,42 @@ None of these scenarios has been exercised.
 - [ ] Analytics in the debug log: `lookout_image_search` with `source` `browser`, `hub_tile`, and
   `drop` for a dropped document, and `cold: false` for every stored vector.
 
+### Searching with a picture and words (DEE-126)
+
+Implemented on `feature/dee-126`: words typed after the picture's chip search together with it, with a
+**Picture–Words** slider in the results bar. See [With words](LOOKOUT.md#with-words).
+
+Validation on 2026-10-28: `LookoutBench combine` on 67 labeled wallpaper cases put the answer first in
+58% of cases at the default weight (0.4), against 0% for the picture alone and 13% for the words alone,
+and 72% once words in file names count. The `LookoutSimilarSearchTests`, `LookoutPictureSearchTests`,
+`LookoutPictureSessionTests`, and `LookoutPicturePresentationTests` suites pass, also 5 times in parallel
+under load. DOKK.app was built but not launched.
+
+- [ ] Drop a photo, then type "at night" or "in black": the chip narrows, the words follow the
+  picture's name in the results bar, and the results change after a short pause without the
+  picture being read again.
+- [ ] Typing while the first picture is still being read waits for it and searches once.
+- [ ] The slider: moving it re-ranks at once; toward **Words** a subject change ("a tree") wins,
+  toward **Picture** the picture's likeness does. A new picture starts at the middle mark again.
+- [ ] A file only the words found shows the words chip and "It has the words you typed but isn't
+  much like your picture." without the comparison or the meter.
+- [ ] Deleting the typed words searches with the picture alone; the next ⌫ removes the picture and
+  brings back the words from before it. Escape clears everything.
+- [ ] Find Similar on a result of a search with words starts a new picture without the typed words.
+- [ ] VoiceOver: the field reads "Add words to search with the picture", and the slider reads
+  "Picture and words" with "Words count 40 percent".
+- [ ] English and German: the results bar fits the name, the words, the slider, and **Back to**.
+- [ ] Analytics in the debug log: `lookout_result_opened` with `query: image_words` and
+  `words_weight`, and the `lookout_picture_words_added` and `lookout_picture_weight_changed`
+  counters in `usage_summary`.
+
 ### Known gaps from code review
 
 - A picture dragged out of a browser that also carries its address as plain text may still insert
   the address while the field is being edited, because it's text to the field editor.
 - Release signing and notarization of the nested XPC services, and a CMake step in CI, are pending
   with Esi.
-- Audio, video, and code are Planned. Combining a picture with words, and reading the words in a
-  dropped screenshot, are Planned ([DEE-126](https://linear.app/d-zwei/issue/DEE-126)).
+- Audio, video, and code are Planned. Reading the words in a dropped screenshot is Planned.
 - The Files tab has no "Try Lookout" card with example searches, so the mockup's idle hint ("Or drop a
   picture on the search field to find ones like it.") has nowhere to go yet.
 - The engine can pause reading, but no control offers it yet.

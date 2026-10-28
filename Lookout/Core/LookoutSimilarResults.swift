@@ -1,5 +1,6 @@
-/// The results of a search with a picture or with a file's stored vector (`Searcher.similar`): no words, so no names,
-/// and two groups ranked on their own, because Lookout scores pictures and documents on separate scales.
+/// The results of a search with a picture or with a file's stored vector (`Searcher.similar`), alone or with words typed
+/// beside it: no names, and two groups ranked on their own, because Lookout scores pictures and documents on separate
+/// scales.
 ///
 /// The group the query belongs to comes first: for a picture, the pictures that look like it, then the documents
 /// about what it shows; for a document, the documents that say something similar, then the pictures of it. Each group
@@ -52,17 +53,30 @@ nonisolated struct LookoutSimilarResults: Sendable, Equatable {
     var queryIsPicture: Bool
     /// Both groups, in display order (`order(queryIsPicture:)`).
     var groups: [Group]
+    /// The words typed beside the picture that these results were ranked with, trimmed; empty for none. "Why it
+    /// matched" names them.
+    var words: String
+    /// Their keyword terms (`Searcher.terms`, without `Searcher.pictureConnectors`), for highlighting in snippets.
+    var terms: [String]
+    /// The words are a lookup (codes or long numbers), so exact words counted double.
+    var isLookup: Bool
 
     /// No results yet, with both groups empty in their order.
-    init(queryIsPicture: Bool) {
-        self.queryIsPicture = queryIsPicture
-        groups = Self.order(queryIsPicture: queryIsPicture).map { Group(kind: $0) }
+    init(queryIsPicture: Bool, words: String = "") {
+        self.init(queryIsPicture: queryIsPicture, groups: Self.order(queryIsPicture: queryIsPicture).map { Group(kind: $0) },
+                  words: words)
     }
 
-    init(queryIsPicture: Bool, groups: [Group]) {
+    init(queryIsPicture: Bool, groups: [Group], words: String = "", terms: [String] = [], isLookup: Bool = false) {
         self.queryIsPicture = queryIsPicture
         self.groups = groups
+        self.words = words
+        self.terms = terms
+        self.isLookup = isLookup
     }
+
+    /// Words were typed beside the picture.
+    var hasWords: Bool { !words.isEmpty }
 
     /// The group order: the query's own kind first.
     static func order(queryIsPicture: Bool) -> [GroupKind] {
@@ -79,6 +93,17 @@ nonisolated struct LookoutSimilarResults: Sendable, Equatable {
     func group(containing path: String) -> Group? {
         groups.first { group in group.all.contains { $0.path == path } }
     }
+}
+
+/// Words typed beside a picture (or a file Find Similar searches with), as `Searcher.similar` takes them.
+nonisolated struct LookoutSimilarWords: Sendable, Equatable {
+    /// What was typed, trimmed.
+    var text: String
+    /// Its query vector (`Prompts.query`), or nil when the encoder couldn't make one: the words then count as
+    /// keywords only.
+    var vector: [Float]?
+    /// How much the words count against the picture, 0…1 (`LookoutRanking.pictureWordsWeight`).
+    var weight: Double = LookoutRanking.pictureWordsWeight
 }
 
 /// What a file already in the index searches with (Find Similar): one of its stored vectors and what kind of vector

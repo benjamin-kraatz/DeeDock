@@ -8,6 +8,7 @@ let usage = """
            LookoutBench bench --models <folder> [--refs <folder>] [--image <file>]
            LookoutBench index --models <folder> --index <folder> --root <folder>... [--exclude <folder>]...
            LookoutBench estimate --root <folder>...
+           LookoutBench combine --models <folder> --index <folder> --cases <file> [--show <n>] [--weight <w>]
 
       --models   the folder with embeddinggemma-2-Q8_0.gguf and mmproj-embeddinggemma-2-Q8_0.gguf
       --refs     DigUp's Tests/LlamaRuntimeTests/Reference (photo.jpg, screen.png, speech.wav, vectors.json);
@@ -16,6 +17,9 @@ let usage = """
       --index    the folder index.sqlite goes in (created when missing); not the app's unless you pass it
       --root     a folder to index or estimate (repeatable)
       --exclude  a folder to skip inside the roots (repeatable)
+      --cases    picture, words and answers per line, tab-separated (CombineProbe)
+      --show     print each case's top n results at each method's best weight
+      --weight   the words' weight --show uses for every method instead
     """
 
 // Line by line even into a pipe, so the header and the probes' echoed output keep their order.
@@ -40,6 +44,11 @@ do {
         guard let index = arguments.folder("index") else { throw BenchFailure("missing --index <folder>") }
         try IndexCommand.run(models: arguments.requiredFolder("models"), index: index,
                              roots: arguments.folders("root"), excluded: arguments.folders("exclude"))
+    case "combine":
+        guard let cases = arguments.file("cases") else { throw BenchFailure("missing --cases <file>") }
+        try CombineProbe.run(models: arguments.requiredFolder("models"), index: arguments.requiredFolder("index"),
+                             cases: cases, show: Int(try arguments.number("show") ?? 0),
+                             weight: try arguments.number("weight"))
     case "estimate":
         try EstimateCommand.run(roots: arguments.folders("root"))
     case "probe-full":

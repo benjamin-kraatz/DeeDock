@@ -105,6 +105,78 @@ struct LookoutSimilarSearchTests {
         #expect(hit.page == 7 && hit.excerpt == "§ 12 Tierhaltung")
     }
 
+    // MARK: Words beside the picture
+
+    @Test func wordsBesideThePictureMoveItsResults() throws {
+        let index = try LookoutSearchIndex()
+        try index.background(200)
+        try index.add("pics/a.heic", kind: .image, cosine: 0.8, segment: .image, loc: nil)
+        try index.add("pics/b.heic", kind: .image, cosine: 0.6, segment: .image, loc: nil)
+        let searcher = try index.searcher()
+        let alone = try searcher.similar(to: query, queryIsPicture: true)
+        #expect(alone.groups[0].all.map(\.path) == [index.path("pics/a.heic"), index.path("pics/b.heic")])
+        #expect(!alone.hasWords)
+
+        // Words that describe b and not the picture: at the default weight they lift b above a.
+        var words = LookoutSimilarWords(text: "at night", vector: index.vector(towards: "pics/b.heic"))
+        let both = try searcher.similar(to: query, queryIsPicture: true, words: words)
+        #expect(both.groups[0].all.first?.path == index.path("pics/b.heic"))
+        #expect(both.words == "at night" && both.hasWords && both.terms == ["night"])
+        // Neither name has the word: both still match by meaning, on the blend's own scale.
+        #expect(both.all.allSatisfy { $0.match == .meaning && ($0.z ?? 0) >= LookoutRanking.zGate })
+
+        // Toward the picture, the picture's order comes back.
+        words.weight = LookoutRanking.pictureWordsWeights.lowerBound
+        let leaning = try searcher.similar(to: query, queryIsPicture: true, words: words)
+        #expect(leaning.groups[0].all.first?.path == index.path("pics/a.heic"))
+    }
+
+    @Test func typedWordsCountAsKeywords() throws {
+        let index = try LookoutSearchIndex()
+        try index.background(200)
+        try index.add("pics/a.heic", kind: .image, cosine: 0.8, segment: .image, loc: nil)
+        // Nothing like the picture, but its name has the word.
+        try index.add("pics/Sunset Westerland.jpg", kind: .image, cosine: 0.02, segment: .image, loc: nil)
+        // The encoder failed: the words count as keywords only, and "but" only ties them to the picture.
+        let words = LookoutSimilarWords(text: "but at sunset", vector: nil)
+        let results = try index.searcher().similar(to: query, queryIsPicture: true, words: words)
+        #expect(results.terms == ["sunset"] && !results.isLookup)
+        let named = try #require(results.all.first { $0.path == index.path("pics/Sunset Westerland.jpg") })
+        #expect(named.match == .words && named.coverage == 1 && named.keywordRank == 1)
+        // Scored as a search by words scores it: its little meaning plus the full word bonus.
+        #expect(abs(named.score - (max(named.z ?? 0, 0) + LookoutRanking.wordWeight)) < 1e-9)
+        let alike = try #require(results.all.first { $0.path == index.path("pics/a.heic") })
+        #expect(alike.match == .meaning && alike.coverage == 0)
+    }
+
+    @Test func theFileSearchedWithStaysOutOfTheWordMatches() throws {
+        let index = try LookoutSearchIndex()
+        try index.background(200)
+        try index.add("pics/Sunset.jpg", kind: .image, cosine: 0.9, segment: .image, loc: nil)
+        try index.add("pics/Sunset 2.jpg", kind: .image, cosine: 0.7, segment: .image, loc: nil)
+        let words = LookoutSimilarWords(text: "sunset", vector: nil)
+        let results = try index.searcher().similar(to: query, queryIsPicture: true, words: words,
+                                                   excluding: [index.path("pics/Sunset.jpg")])
+        #expect(results.all.map(\.path) == [index.path("pics/Sunset 2.jpg")])
+        #expect(results.all.first?.match == .both)
+    }
+
+    @Test func theBlendKeepsTheGatesScale() {
+        let scores: [Float] = (0..<200).map { Float(sin(Double($0)) * 0.05) } + [0.6, 0.4]
+        let other: [Float] = (0..<200).map { Float(cos(Double($0) * 1.7) * 0.05) } + [0.1, 0.7]
+        let modality = [Modality](repeating: .image, count: scores.count)
+        let picture = Searcher.meaning(scores, modality), words = Searcher.meaning(other, modality)
+        let blended = Searcher.blend(picture, words, weight: 0.4)
+        let mean = blended.reduce(0, +) / Double(blended.count)
+        let deviation = (blended.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / Double(blended.count)).squareRoot()
+        #expect(abs(mean) < 1e-9 && abs(deviation - 1) < 1e-9)
+        // Each side alone is the side itself: already on its own scale.
+        #expect(zip(Searcher.blend(picture, words, weight: 0), picture).allSatisfy { abs($0 - $1) < 1e-9 })
+        #expect(zip(Searcher.blend(picture, words, weight: 1), words).allSatisfy { abs($0 - $1) < 1e-9 })
+        // The last file, close to the words, rises above the one close to the picture.
+        #expect(blended[201] > blended[200])
+    }
+
     // MARK: Find Similar's vector
 
     @Test func findSimilarPrefersTheMatchedSegment() throws {
