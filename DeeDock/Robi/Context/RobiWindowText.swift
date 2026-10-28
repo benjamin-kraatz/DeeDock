@@ -61,9 +61,20 @@ nonisolated enum RobiWindowText {
 
     /// Text reads its value, then its title; a control its title, then its description. An empty
     /// field reads its placeholder or description instead, such as "Search", so the model can
-    /// still find it to type into. Nil when the element has nothing to say, so an unlabelled
-    /// control is descended into instead.
+    /// still find it to type into. A control or field with none of these reads the label beside
+    /// it that names it (`AXTitleUIElement`): a switch in a SwiftUI form or System Settings has no
+    /// title of its own. Nil when the element has nothing to say, so an unlabelled control is
+    /// descended into instead.
     static func label(of element: AXUIElement, kind: RobiLandmark.Kind) -> String? {
+        if let own = ownLabel(of: element, kind: kind) { return own }
+        guard kind.isControl || kind.isEditable,
+              let title = RobiAX.element(element, kAXTitleUIElementAttribute),
+              let text = (RobiAX.value(title, kAXValueAttribute) ?? RobiAX.value(title, kAXTitleAttribute)) as? String else { return nil }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : String(trimmed.prefix(120))
+    }
+
+    private static func ownLabel(of element: AXUIElement, kind: RobiLandmark.Kind) -> String? {
         let keys = if kind.isControl {
             [kAXTitleAttribute, kAXDescriptionAttribute]
         } else if kind.isEditable {

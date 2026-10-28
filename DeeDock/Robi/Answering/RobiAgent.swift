@@ -124,13 +124,24 @@ final class RobiAgent {
                                               instructions: instructions, usage: tokens, error: failure)
             }
         }
+        // A snapshot holds only the text of the response in progress. After a tool call the model
+        // answers in a new response, and the next snapshot starts over from its first words. The
+        // text written before the call is kept as a paragraph of its own, so the answer only ever
+        // grows: a snapshot that went back to a few words left the card showing them.
+        var earlier = ""
+        var latest = ""
         do {
             for try await snapshot in stream {
                 try Task.checkCancellation()
-                output = snapshot.content
+                if !snapshot.content.hasPrefix(latest) { earlier = Self.paragraphs(earlier, latest) }
+                latest = snapshot.content
+                output = Self.paragraphs(earlier, latest)
                 usage = snapshot.usage
-                update(snapshot.content)
+                update(output)
             }
+        } catch is GeneratedContent.ParsingError where !output.isEmpty || collector.hasSteps {
+            // The model ended its last response after a tool call without writing anything more.
+            // What it wrote and proposed before stands as the answer.
         } catch {
             observe(error)
             throw error

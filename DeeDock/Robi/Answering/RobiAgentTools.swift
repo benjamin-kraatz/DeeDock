@@ -44,6 +44,9 @@ nonisolated final class RobiStepCollector: Sendable {
         self.publish = publish
     }
 
+    /// At least one step was proposed.
+    var hasSteps: Bool { steps.withLock { !$0.isEmpty } }
+
     /// Adds `step` and returns what the tool tells the model.
     func add(_ step: RobiStep) -> String {
         let added: [RobiStep]? = steps.withLock { steps in
