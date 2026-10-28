@@ -185,12 +185,7 @@ final class WindowPeekPanelController {
         state.fileDrop = nil
         state.fileDragExited = nil
         state.fileDragEnded = nil
-        state.watch = nil
         state.markup = nil
-        state.pinPortal = nil
-        state.pinFrozen = nil
-        state.dropPortal = nil
-        state.portalTracking = nil
         state.addToFusion = nil
         state.startMelt = nil
         state.choose = nil
@@ -232,14 +227,8 @@ final class WindowPeekPanelController {
         case 0 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let id = state.selectedID { state.manage?(id) }
         case 8 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: state.chooseFiles?()
-        case 13 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty: if let id = state.selectedID { state.watch?(id) }
         case 46 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let id = state.selectedID { state.markup?(id) }
-        case 35 where event.modifierFlags.intersection([.command, .control]).isEmpty:
-            if let card = state.cards.first(where: { $0.id == state.selectedID }) {
-                if event.modifierFlags.contains(.option) { state.pinFrozen?(card.window) }
-                else { state.pinPortal?(card.window) }
-            }
         case 3 where event.modifierFlags.intersection([.command, .control, .option]).isEmpty:
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
                 state.addToFusion?(card.window)

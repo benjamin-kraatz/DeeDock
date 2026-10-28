@@ -180,7 +180,7 @@ struct WindowPeekHeroToolbarView: View {
         }
         .padding(.horizontal, 5)
         .padding(.vertical, 4)
-        .modifier(PortalChrome(opaque: reduceTransparency))
+        .modifier(WindowPeekHeroToolbarChrome(opaque: reduceTransparency))
         .frame(width: WindowPeekHeroToolbarPanel.size.width, height: WindowPeekHeroToolbarPanel.size.height)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.markupHeroToolbarAccessibility))
@@ -204,6 +204,20 @@ struct WindowPeekHeroToolbarView: View {
             try? await Task.sleep(for: .milliseconds(outcome == .failed ? 2_200 : 1_400))
             guard !Task.isCancelled else { return }
             saveOutcome = nil
+        }
+    }
+}
+
+/// Liquid Glass capsule behind the toolbar, or an opaque bordered capsule under Reduce Transparency.
+private struct WindowPeekHeroToolbarChrome: ViewModifier {
+    let opaque: Bool
+
+    func body(content: Content) -> some View {
+        if opaque {
+            content.background(Color(nsColor: .windowBackgroundColor), in: .capsule)
+                .overlay { Capsule().strokeBorder(.separator) }
+        } else {
+            content.glassEffect(.regular, in: .capsule)
         }
     }
 }

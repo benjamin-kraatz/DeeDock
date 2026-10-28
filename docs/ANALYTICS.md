@@ -18,7 +18,7 @@ public apps that have no Line glyph yet.
 - Icons, file names, paths, and file contents.
 - Window titles and URLs.
 - Launcher and search query text.
-- Names a person typed: Dock Modes, watches and watch presets, Shortcuts, drives, displays.
+- Names a person typed: Dock Modes, Shortcuts, drives, displays.
 - Clipboard contents.
 - Notification text: titles, subtitles, bodies, and the names of the apps that sent them. The
   notification feed reports counts only, and nothing when a notification arrives.
@@ -286,7 +286,7 @@ the 865 MB download takes and why it fails. The first pass's file names, which o
 | `stack_drop` | `operation` (`copy`, `move`), `item_count`, `file_type`, `target`, `outcome` |
 | `smart_grouping` | `source`, `result` (`generated`, `cached`, `failed`), `duration`, `candidate_count`, `failure` |
 
-### Window Peek, portals, Watch
+### Window Peek
 
 | Event | Properties |
 | --- | --- |
@@ -294,13 +294,6 @@ the 865 MB download takes and why it fails. The first pass's file names, which o
 | `peek_window_chosen` | `trigger` |
 | `peek_window_action` | `action`, `outcome`, `trigger` |
 | `markup` | `action`, `has_marks` |
-| `portal_pinned` | `source`, `outcome` |
-| `watch_setup_opened` | `trigger` |
-| `watch_started` | `uses_phrase`, `plays_sound`, `completion`, `uses_preset`, `has_region` |
-| `watch_detected` | `detection` (`change`, `phrase`), `duration`, `check_count` |
-| `watch_ended` | `reason`, `duration`, `check_count` |
-| `portal` | `action` (`paused`, `resumed`, `frozen`, `frame_saved`, `crop_opened`, `jumped`), `outcome` for `frame_saved` (`succeeded`, `failed`, `canceled`) and `jumped` |
-| `portal_closed` | `duration`, `frame_count`, `frozen`, `cropped` |
 | `file_handoff` | `action` (`shown`, `activated`, `copied`, `opened`), `file_count`, `exact_window`, `outcome`. `shown` fails when the dropped files cannot be routed. `opened` is `partial` when only some files opened. |
 
 ### Window Search and Fusion
@@ -388,8 +381,8 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `shortcut_run` | `source` (`tile`, `keyboard`, `drop`, `launcher`, `launcher_files`, `settings`), `file_count`, `outcome` (`succeeded`, `failed`, `canceled`), `duration` |
 | `shortcut_tile` | `action` (`pinned`, `unpinned`, `moved`, `accepts_files_on`, `accepts_files_off`, `reset`), `tile_count`. Never which Shortcut. |
 
-Workspace recipes and Watch run Shortcuts too. Those runs are part of `workspace_prepared` and
-`watch_*`, not `shortcut_run`.
+Workspace recipes run Shortcuts too. Those runs are part of `workspace_prepared`, not
+`shortcut_run`.
 
 ### Tools and focus
 
@@ -579,7 +572,6 @@ prompt or answer contains:
 | `semantic_stack_organize` | file and folder names, the generated group titles |
 | `dock_rumour_compose`, `dock_rumour_revise` | pinned app names, the generated dialogue |
 | `window_search_image_match` | the search phrase and the model's description of the window |
-| `window_watch_explanation` | the model's description of what changed in the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
 | `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu commands for Do It, and the answer, on this Mac or from Claude |
 | `robi_suggest_questions` | Robi's instructions, what the person picked, and the suggested questions |

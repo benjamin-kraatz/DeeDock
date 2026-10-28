@@ -3,7 +3,7 @@
 DEE-22 adds individual-window commands to Window Peek. Use the ellipsis button, the
 card's context menu, or its Window actions VoiceOver action. In keyboard Peek, A opens
 the selected card's native menu. Arrow keys and Return operate that menu; Escape cancels.
-The existing C, W, F, and P shortcuts keep their meanings.
+The existing C and F shortcuts keep their meanings.
 
 The menu offers Minimize or Restore, Close window, Move to display, Left half, Right half,
 Center window, Fill usable area, and one-step Undo for geometry. Unavailable actions are hidden.
@@ -84,7 +84,7 @@ DEE-22 Done, exercise:
 - Fixed and minimum sizes, fullscreen, modal windows, sheets, and capture-only cards.
 - A partial resize followed by failed movement, Undo, and changed constraints before Undo.
 - Mouse travel into the menu, all four dock edges, keyboard A, VoiceOver, Reduce Motion,
-  Reduce Transparency, and continued Watch, Fusion, Portal, and ordinary card selection.
+  Reduce Transparency, and continued Fusion and ordinary card selection.
 
 Model cases worth automated tests include overlap ties, coordinate conversion, clamping oversized
 windows, relative movement, half placement, accepted-size positioning, token invalidation,
