@@ -44,7 +44,7 @@ These are specifications for future tests. No tests were run for this implementa
 - Start a slow source-availability refresh, then use Show window, Open app, or Open saved document on another source. Remaining cards must finish their availability checks. Open link must cancel an older pending foreground action.
 - Cancel Resume during discovery or handle cleanup, then open another panel. It must not activate the fallback app or close the new panel. Cancel a queued AX selection before it starts and verify no minimize, activate, or raise operation runs.
 - Keep the breadcrumb draft open while the native document picker handles clicks. Picker navigation, confirmation, and cancellation must not trigger outside-click dismissal. Explicit panel/display teardown must still release the presentation.
-- Verify original New Capsule, app checkpoint creation, focus completion handoff, Resume menus, and corruption/reset behavior.
+- Verify original New Capsule, app checkpoint creation, Resume menus, and corruption/reset behavior.
 
 ## Manual acceptance checklist
 
