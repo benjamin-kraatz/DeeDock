@@ -86,7 +86,6 @@ nonisolated enum LauncherSuggestionSyntheticGenerator {
         let source = unfamiliar ? "synthetic.calendar" : noisy ? "synthetic.notes" : "synthetic.editor"
         let contextDate = date.addingTimeInterval(-1)
         let context = LauncherSuggestionContext(date: contextDate, foregroundID: source,
-            modeID: unfamiliar ? "synthetic.personal" : noisy ? "synthetic.research" : "synthetic.work",
             recentIDs: unfamiliar ? ["synthetic.mail", "synthetic.calendar"] : noisy ? ["synthetic.browser"] : ["synthetic.editor"],
             runningIDs: unfamiliar ? ["synthetic.mail", "synthetic.calendar"] : ["synthetic.editor", "synthetic.browser", "synthetic.terminal"],
             hour: calendar.component(.hour, from: contextDate), weekday: calendar.component(.weekday, from: contextDate))

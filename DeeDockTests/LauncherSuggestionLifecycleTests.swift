@@ -14,7 +14,7 @@ struct LauncherSuggestionLifecycleTests {
         document.impressions = (0..<10).map { index in
             let date = first.addingTimeInterval(Double(index) * 60)
             return LauncherSuggestionImpression(id: UUID(), date: date, appIDs: ["target"],
-                context: LauncherSuggestionContext(date: date, foregroundID: "source", modeID: nil),
+                context: LauncherSuggestionContext(date: date, foregroundID: "source"),
                 modelVersion: LauncherSuggestionBaseline.version)
         }
         try await repository.save(document, sequence: 1)
@@ -42,9 +42,9 @@ struct LauncherSuggestionLifecycleTests {
         let start = Date().addingTimeInterval(-30)
         observeTransition(store, start: start)
         #expect(!store.hasSession)
-        #expect(store.capture(foregroundID: "source", modeID: nil) == nil)
+        #expect(store.capture(foregroundID: "source") == nil)
         store.setEnabled(true)
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         #expect(await store.predict(context: context)?.rankedIDs.isEmpty == true)
         store.setPaused(true)
         observeTransition(store, start: start)
@@ -58,7 +58,7 @@ struct LauncherSuggestionLifecycleTests {
     @Test("Pause retires the snapshot while preserving prior learning for resume")
     func pauseRetiresSnapshot() async throws {
         let store = learnedStore()
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         let snapshot = try #require(await store.predict(context: context))
         #expect(snapshot.rankedIDs.contains("target"))
         store.setPaused(true)
@@ -76,7 +76,7 @@ struct LauncherSuggestionLifecycleTests {
         let store = learnedStore()
         store.exclude(appID: "other")
         store.suppressPrompts()
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         let snapshot = try #require(await store.predict(context: context))
         #expect(snapshot.rankedIDs.contains("target"))
         store.reset()
@@ -92,7 +92,7 @@ struct LauncherSuggestionLifecycleTests {
     @Test("Reversing an exclusion cannot resurrect erased learning or stale feedback")
     func exclusionRetiresLearning() async throws {
         let store = learnedStore()
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         let snapshot = try #require(await store.predict(context: context))
         store.exclude(appID: "target")
         #expect(store.excludedIDs.contains("target"))
@@ -105,19 +105,18 @@ struct LauncherSuggestionLifecycleTests {
         #expect(await store.predict(context: context)?.rankedIDs.isEmpty == true)
     }
 
-    @Test("A meaningful activation uses preceding foreground and mode without target leakage")
+    @Test("A meaningful activation uses the preceding foreground without target leakage")
     func precedingContext() throws {
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         var recorder = LauncherSuggestionRecorder()
         recorder.begin(now: start, foregroundID: "source", runningIDs: ["source", "target"])
-        recorder.activate("target", now: start.addingTimeInterval(10), modeID: "work")
+        recorder.activate("target", now: start.addingTimeInterval(10))
         let settled1 = recorder.settle(now: start.addingTimeInterval(12.9))
         #expect(settled1 == nil)
         let settled = recorder.settle(now: start.addingTimeInterval(13))
         let example = try #require(settled)
         #expect(example.targetID == "target")
         #expect(example.context.foregroundID == "source")
-        #expect(example.context.modeID == "work")
         #expect(example.context.date == start.addingTimeInterval(10))
         #expect(example.context.secondsSinceUse["target"] == nil)
         #expect(example.context.foregroundSeconds == nil)
@@ -128,7 +127,7 @@ struct LauncherSuggestionLifecycleTests {
     @Test("Predictions racing reset cannot restore a usable old ranking")
     func concurrentReset() async throws {
         let store = learnedStore()
-        let context = try #require(store.capture(foregroundID: "source", modeID: nil))
+        let context = try #require(store.capture(foregroundID: "source"))
         let pending = Task { await store.predict(context: context) }
         // Give the prediction its actor turn; ranking may finish before or after reset.
         // Both outcomes must be safe, without depending on a machine-specific sleep.
@@ -147,16 +146,16 @@ struct LauncherSuggestionLifecycleTests {
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         var recorder = LauncherSuggestionRecorder()
         recorder.begin(now: start, foregroundID: "source", runningIDs: ["source"])
-        recorder.activate("accidental", now: start.addingTimeInterval(10), modeID: nil)
-        recorder.activate("source", now: start.addingTimeInterval(11), modeID: nil)
+        recorder.activate("accidental", now: start.addingTimeInterval(10))
+        recorder.activate("source", now: start.addingTimeInterval(11))
         let settled3 = recorder.settle(now: start.addingTimeInterval(14))
         #expect(settled3 == nil)
-        recorder.activate("target", now: start.addingTimeInterval(15), modeID: nil)
-        recorder.activate(nil, now: start.addingTimeInterval(16), modeID: nil)
+        recorder.activate("target", now: start.addingTimeInterval(15))
+        recorder.activate(nil, now: start.addingTimeInterval(16))
         let settled4 = recorder.settle(now: start.addingTimeInterval(20))
         #expect(settled4 == nil)
         #expect(recorder.foregroundID == "source")
-        recorder.activate("target", now: start.addingTimeInterval(21), modeID: nil)
+        recorder.activate("target", now: start.addingTimeInterval(21))
         recorder.stop()
         let settled5 = recorder.settle(now: start.addingTimeInterval(25))
         #expect(settled5 == nil)
@@ -171,9 +170,9 @@ struct LauncherSuggestionLifecycleTests {
         let settled6 = recorder.settle(now: start.addingTimeInterval(10))
         #expect(settled6 == nil)
         recorder.terminated("target", now: start.addingTimeInterval(11), running: ["source", "target"])
-        #expect(recorder.context(now: start.addingTimeInterval(12), modeID: nil).secondsSinceTermination["target"] == nil)
+        #expect(recorder.context(now: start.addingTimeInterval(12)).secondsSinceTermination["target"] == nil)
         recorder.begin(now: start, foregroundID: "source", runningIDs: ["source", "target"])
-        recorder.activate("target", now: start.addingTimeInterval(1), modeID: nil)
+        recorder.activate("target", now: start.addingTimeInterval(1))
         let settled7 = recorder.settle(now: start.addingTimeInterval(4))
         #expect(settled7 == nil)
         #expect(recorder.foregroundID == "target")

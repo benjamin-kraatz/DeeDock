@@ -32,7 +32,7 @@ Local preferences live in `discovery.state.v1`. Unreadable data disables Discove
 
 ## Backlog
 
-File-drop tips for Throw or Window Peek, heavy-use Launcher tips, Modes tips, and long-unused pin tips remain planned. They have no active triggers in v0.
+File-drop tips for Throw or Window Peek, heavy-use Launcher tips, and long-unused pin tips remain planned. They have no active triggers in v0.
 
 ## Acceptance still required
 

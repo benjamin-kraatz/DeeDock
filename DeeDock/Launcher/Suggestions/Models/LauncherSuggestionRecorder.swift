@@ -22,12 +22,12 @@ nonisolated struct LauncherSuggestionRecorder {
         self.runningIDs = Array(Set(runningIDs).sorted().prefix(128))
     }
 
-    func context(now: Date, modeID: String?) -> LauncherSuggestionContext {
+    func context(now: Date) -> LauncherSuggestionContext {
         let calendar = Calendar.autoupdatingCurrent
         // Public idle/session signals cannot establish active-use duration through every lock
         // state. Omit this optional feature instead of labeling unattended time as active use.
         let duration: Double? = nil
-        return LauncherSuggestionContext(date: now, foregroundID: foregroundID, modeID: modeID,
+        return LauncherSuggestionContext(date: now, foregroundID: foregroundID,
             recentIDs: recentIDs, runningIDs: runningIDs,
             hour: calendar.component(.hour, from: now), weekday: calendar.component(.weekday, from: now),
             foregroundSeconds: duration,
@@ -49,13 +49,13 @@ nonisolated struct LauncherSuggestionRecorder {
         if foregroundID == id { foregroundID = nil; foregroundSince = nil }
     }
 
-    mutating func activate(_ id: String?, now: Date, modeID: String?) {
+    mutating func activate(_ id: String?, now: Date) {
         // DDock and unidentifiable/background helpers cannot be targets or erase the prior
         // context, but must cancel a pending accidental switch while they hold focus.
         guard let id else { pending = nil; return }
         guard id != foregroundID else { pending = nil; return }
         guard pending?.id != id else { return }
-        pending = (id, context(now: now, modeID: modeID), now)
+        pending = (id, context(now: now), now)
     }
 
     mutating func settle(now: Date) -> LauncherSuggestionExample? {

@@ -28,8 +28,8 @@ struct DockIslandPlanRepository {
 
 /// Island plans for every display, shared by the docks and Settings.
 ///
-/// Plans are per display, not per Dock Mode: switching modes keeps the island names and tints and
-/// reconciles the pin counts against the new pin list. A plan that fails to decode falls back to
+/// Plans are per display. A pin edit keeps the island names and tints and reconciles the pin
+/// counts against the new pin list. A plan that fails to decode falls back to
 /// automatic for that display and is replaced by the next edit.
 @MainActor @Observable
 final class DockIslandPlanStore {

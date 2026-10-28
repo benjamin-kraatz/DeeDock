@@ -52,7 +52,7 @@ struct LauncherSuggestionCoreMLTests {
         #expect(first.values.allSatisfy { $0.isFinite && $0 > 0 })
         let reused = try await engine.scores(context: context, examples: records, now: now)
         #expect(first == reused)
-        let otherContext = LauncherSuggestionContext(date: now, foregroundID: "another.source", modeID: "other")
+        let otherContext = LauncherSuggestionContext(date: now, foregroundID: "another.source")
         let varied = try await engine.scores(context: otherContext, examples: records, now: now)
         #expect(Set(varied.keys).isSubset(of: Set(first.keys)))
         #expect(!varied.isEmpty)
@@ -165,7 +165,7 @@ struct LauncherSuggestionCoreMLTests {
     }
 
     private func context(_ date: Date) -> LauncherSuggestionContext {
-        LauncherSuggestionContext(date: date, foregroundID: "source", modeID: "work", hour: 10, weekday: 2)
+        LauncherSuggestionContext(date: date, foregroundID: "source", hour: 10, weekday: 2)
     }
 
     private func examples(context: LauncherSuggestionContext, labels: [String]) -> [LauncherSuggestionExample] {

@@ -69,11 +69,6 @@ struct DockSettingsView: View {
                   profiles.displays.contains(where: { $0.id == requestedID }) else { return }
             select(.display(requestedID))
         }
-        .onChange(of: coordinator?.settingsModesRequest, initial: true) { _, requested in
-            guard requested == true else { return }
-            coordinator?.settingsModesRequest = false
-            select(.modes)
-        }
         .onChange(of: coordinator?.settingsDrivesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsDrivesRequest = false
@@ -155,14 +150,6 @@ struct DockSettingsView: View {
             if let plugins = coordinator?.plugins {
                 PluginsSettingsPane(controller: plugins)
             }
-        case .modes:
-            DockModesSettingsPane(store: profiles.modes,
-                                  activateMode: { coordinator?.activateMode($0, source: .settings) ?? profiles.modes.activate($0) },
-                                  deleteMode: { coordinator?.deleteMode($0) ?? profiles.modes.delete($0) },
-                                  applications: coordinator?.recipeApplications,
-                                  actions: coordinator?.actionTiles,
-                                  prepareWorkspace: { coordinator?.prepareWorkspace($0) },
-                                  canPrepareWorkspace: coordinator?.canPrepareWorkspace == true)
         case .display(let id):
             displayOverview(SettingsOverrideContext(profiles: profiles, id: id)).id(id)
         case nil:
@@ -240,10 +227,7 @@ struct DockSettingsView: View {
 
     private func restoreDefaults() {
         if let override { profiles.useDefaults(for: override.id) }
-        else {
-            store.restoreDefaults()
-            profiles.restoreDefaultVisibility()
-        }
+        else { store.restoreDefaults() }
     }
 
     /// A request from outside the window always lands where it was asked for, never mid-navigation.

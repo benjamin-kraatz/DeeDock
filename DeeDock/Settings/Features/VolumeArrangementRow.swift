@@ -40,8 +40,8 @@ struct VolumeArrangementRow: View {
             Spacer(minLength: SettingsMetrics.controlSpacing)
             VolumeVisibilityButton(name: entry.name, isHidden: entry.isHidden, setHidden: setHidden)
             SettingsMoreMenu {
-                Button(.dockModesMoveUp) { move(-1) }.disabled(!canMoveUp)
-                Button(.dockModesMoveDown) { move(1) }.disabled(!canMoveDown)
+                Button(.settingsListMoveUp) { move(-1) }.disabled(!canMoveUp)
+                Button(.settingsListMoveDown) { move(1) }.disabled(!canMoveDown)
                 if !isConnected {
                     Divider()
                     Button(.settingsDriveForget, role: .destructive, action: forget)

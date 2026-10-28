@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Independent, app-wide preferences. No Dock Mode participates in this document.
+/// Independent, app-wide preferences, separate from the dock settings.
 struct AtmosphereSettings: Codable, Equatable {
     var ambientLight = AtmosphereWindowLightSettings()
     var enabled = false

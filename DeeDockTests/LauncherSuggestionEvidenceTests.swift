@@ -60,7 +60,7 @@ struct LauncherSuggestionEvidenceTests {
         #expect(frozen.exampleCount == 8)
         store.setTuning(permissive)
         #expect(store.debugSnapshot?.history.map(\.id) == frozen.history.map(\.id))
-        let secondContext = LauncherSuggestionContext(date: Date(), foregroundID: "other", modeID: "work")
+        let secondContext = LauncherSuggestionContext(date: Date(), foregroundID: "other")
         _ = await store.predict(context: secondContext)
         #expect(store.debugSnapshot?.context == firstContext)
         await store.flush()
@@ -233,7 +233,7 @@ struct LauncherSuggestionEvidenceTests {
     }
 
     private func context(date: Date? = nil) -> LauncherSuggestionContext {
-        LauncherSuggestionContext(date: date ?? now, foregroundID: "source", modeID: "work", hour: 10, weekday: 2)
+        LauncherSuggestionContext(date: date ?? now, foregroundID: "source", hour: 10, weekday: 2)
     }
 
     private func document(_ labels: [String]) -> LauncherSuggestionDocument {

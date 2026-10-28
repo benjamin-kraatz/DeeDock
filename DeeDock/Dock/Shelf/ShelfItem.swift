@@ -59,7 +59,7 @@ nonisolated enum ShelfPresentation: String, Codable, CaseIterable, Sendable {
     case grid
 }
 
-/// The persisted Shelf. One shared bin, independent of display and of the active Dock Mode.
+/// The persisted Shelf. One shared bin, independent of display.
 nonisolated struct ShelfDocument: Codable, Equatable, Sendable {
     /// Version 2 adds Compost. Older apps must refuse it rather than discard the archive.
     static let currentVersion = 2

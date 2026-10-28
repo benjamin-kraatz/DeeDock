@@ -17,7 +17,7 @@ struct SettingsContext {
 
     /// Bindings for the shared defaults, or for one display when `override` is given.
     func source(_ override: SettingsOverrideContext? = nil) -> SettingsValueSource {
-        SettingsValueSource(store: store, profiles: profiles, context: override)
+        SettingsValueSource(store: store, context: override)
     }
 
     /// Unreadable preferences must not be quietly replaced by an edit, so persistent controls stay
@@ -28,7 +28,7 @@ struct SettingsContext {
 
     /// The failure worth showing under the current scope, most specific first.
     func errorMessage(_ override: SettingsOverrideContext?) -> LocalizedStringResource? {
-        if let override { return profiles.errorMessage ?? profiles.modes.errorMessage ?? profiles.pinErrors[override.id] }
-        return profiles.errorMessage ?? profiles.modes.errorMessage ?? store.errorMessage
+        if let override { return profiles.errorMessage ?? profiles.pinErrors[override.id] }
+        return profiles.errorMessage ?? store.errorMessage
     }
 }

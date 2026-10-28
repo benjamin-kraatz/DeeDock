@@ -18,7 +18,6 @@ final class LauncherSearchState {
     var shelf: ShelfController?
     var capsules: SessionCapsuleController?
     var actions: ActionTilesController?
-    var modes: DockModesStore?
     @ObservationIgnored var dispatch: ((LauncherSearchResult, Bool) -> Void)?
     @ObservationIgnored var explicitSearch: (() -> Void)?
     @ObservationIgnored private var service: WindowSearchService?
@@ -31,13 +30,12 @@ final class LauncherSearchState {
     var visible: [LauncherSearchResult] { Array(results.prefix(limit)) }
     var incompleteStores: Bool {
         shelf?.requiresReset == true || capsules?.requiresReset == true
-            || actions?.requiresReset == true || modes?.requiresReset == true
+            || actions?.requiresReset == true
     }
 
     func input(query: String, applications: [LauncherApplication], options: LauncherSearchOptions = LauncherSearchOptions()) -> LauncherSearchInput {
         LauncherSearchInput(query: query, kind: kind, applications: applications,
             capsules: capsules?.capsules ?? [], shelf: shelf?.items ?? [], shortcuts: actions?.tiles ?? [],
-            modes: modes?.modes.map { LauncherSearchName(id: $0.id, name: $0.name) } ?? [],
             windowRevision: windowRevision, options: options)
     }
 

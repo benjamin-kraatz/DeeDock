@@ -41,7 +41,6 @@ struct AnalyticsContextInputs {
 
     var displays: [Display] = []
     var sharedSettings: DockSettings = .defaults
-    var modeCount = 1
     var loginItem: LoginItemStatus = .unknown
     var accessibility: AnalyticsPermissionStatus = .unavailable
     var screenRecording: AnalyticsPermissionStatus = .unavailable
@@ -71,7 +70,6 @@ enum AnalyticsContext {
             "builtin_display_count": AnalyticsValue(inputs.displays.count(where: \.isBuiltIn)),
             "external_display_count": AnalyticsValue(inputs.displays.count { !$0.isBuiltIn }),
             "dock_count": AnalyticsValue(inputs.displays.count(where: \.hostsDock)),
-            "dock_mode_count": AnalyticsValue(inputs.modeCount),
             "system_dock_hidden": AnalyticsValue(inputs.systemDockHidden),
             "system_dock_tuck": AnalyticsValue(inputs.systemDockTuck),
             "system_dock_tucked_side": inputs.systemDockTuckedSide.map { AnalyticsValue($0) },

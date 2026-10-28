@@ -26,8 +26,7 @@ extension DeeDockDelegate {
                 pinnedFolderCount: pins.count { $0.folder != nil },
                 runningAppCount: store?.items.count(where: \.isRunning) ?? 0)
         }
-        inputs.sharedSettings = profiles.effectiveDefaultSettings
-        inputs.modeCount = profiles.modes.modes.count
+        inputs.sharedSettings = coordinator.settings.value
         inputs.loginItem = loginItems.status
         inputs.accessibility = AnalyticsPermissionStatus(windowAccess.status)
         inputs.screenRecording = AnalyticsPermissionStatus(screenCapture.status)

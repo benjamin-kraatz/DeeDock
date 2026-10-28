@@ -6,7 +6,7 @@ struct LauncherSuggestionTests {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)
 
     private func context(_ foreground: String = "source", date: Date? = nil) -> LauncherSuggestionContext {
-        LauncherSuggestionContext(date: date ?? now, foregroundID: foreground, modeID: "work", hour: 10, weekday: 2)
+        LauncherSuggestionContext(date: date ?? now, foregroundID: foreground, hour: 10, weekday: 2)
     }
 
     @Test("Expiry removes old outcomes, old captured contexts, and future records")

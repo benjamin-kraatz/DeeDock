@@ -12,7 +12,7 @@ static let configuration: MLModelConfiguration = {
 static let date = Date(timeIntervalSince1970: 1_800_000_000)
 
 static func context(_ category: Int) -> LauncherSuggestionContext {
-    LauncherSuggestionContext(date: date, foregroundID: "source.\(category)", modeID: "work", hour: category % 24, weekday: 2)
+    LauncherSuggestionContext(date: date, foregroundID: "source.\(category)", hour: category % 24, weekday: 2)
 }
 
 static func example(_ category: Int, label: String? = nil) throws -> MLDictionaryFeatureProvider {

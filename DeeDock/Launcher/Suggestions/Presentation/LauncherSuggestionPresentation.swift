@@ -49,12 +49,12 @@ final class LauncherSuggestionPresentation {
     }
     #endif
 
-    func begin(store: LauncherSuggestionsStore, foregroundID: String?, modeID: String?) {
+    func begin(store: LauncherSuggestionsStore, foregroundID: String?) {
         end()
         #if DEBUG
         debugDraw &+= 1
         #endif
-        guard let context = store.capture(foregroundID: foregroundID, modeID: modeID) else { return }
+        guard let context = store.capture(foregroundID: foregroundID) else { return }
         let token = generation
         task = Task { [weak self] in
             let result = await store.predict(context: context)

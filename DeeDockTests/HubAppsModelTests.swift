@@ -26,7 +26,7 @@ struct HubAppsModelTests {
         if !suggested.isEmpty {
             let date = Date()
             launcher.suggestions.installPreview(LauncherSuggestionSnapshot(
-                context: LauncherSuggestionContext(date: date, foregroundID: "example.source", modeID: nil),
+                context: LauncherSuggestionContext(date: date, foregroundID: "example.source"),
                 modelVersion: "test", rankedIDs: suggested.map { applications[$0].id },
                 createdAt: date, generation: store.revision))
         }

@@ -18,7 +18,7 @@ nonisolated enum LauncherSuggestionRanking {
         // Negative feedback matches the captured context; it never becomes a global ban.
         for item in feedback where item.date > cutoff && item.date <= now && item.context.date > cutoff && item.context.date <= now {
             guard !excluded.contains(item.appID), item.appID != context.foregroundID,
-                  item.context.foregroundID == context.foregroundID, item.context.modeID == context.modeID,
+                  item.context.foregroundID == context.foregroundID,
                   item.context.weekday == context.weekday, item.context.hour / 3 == context.hour / 3 else { continue }
             let decay = exp(-now.timeIntervalSince(item.date) / (21 * 86400))
             scores[item.appID, default: 0] += (item.kind == .useful ? 0.35 : -1.5) * decay

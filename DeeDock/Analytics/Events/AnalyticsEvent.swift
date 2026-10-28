@@ -126,15 +126,6 @@ enum AnalyticsEvent {
                          selectedCount: Int, movedCount: Int, protectedCount: Int, relatedSelected: Int,
                          usedFinder: Bool, unpinned: Bool)
 
-    // Dock Modes
-    case modeSwitched(AnalyticsModeSource, modeCount: Int)
-    case modeEdited(AnalyticsModeEdit, modeCount: Int, stepCount: Int? = nil)
-    case workspacePrepared(stepCount: Int, completedStepCount: Int, outcome: AnalyticsRecipeOutcome, duration: Double)
-    case workspaceRecipeStarted
-    case workspaceRecipeCompleted
-    case workspaceRecipeCanceled
-    case dockModeActivated
-
     // Dock extras
     case shelf(AnalyticsShelfAction, itemCount: Int, source: AnalyticsShelfSource?, trigger: AnalyticsTrigger)
     case capsule(AnalyticsCapsuleAction, windowCount: Int?, capsuleCount: Int, trigger: AnalyticsTrigger)

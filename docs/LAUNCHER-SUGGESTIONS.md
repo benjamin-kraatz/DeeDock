@@ -34,7 +34,7 @@ Both engines abstain when the evidence is too thin. The default requirements are
 - A nearest supporting example within squared feature distance 2.0.
 
 Support uses the same context features as Core ML: time, weekday, preceding foreground app,
-recent app sequence, running apps, and Dock Mode. Distance is squared Euclidean distance over
+recent app sequence, and running apps. Distance is squared Euclidean distance over
 the 256 Float32 features. Reconstruction uses `1 / max(distance, 0.000001)` as the weight.
 The denominator includes all selected neighbors; support counts only neighbors within the distance limit.
 Equal distances are ordered by newest date, then persistent example identity. Target identity never selects the evidence neighborhood.
@@ -85,7 +85,7 @@ Choose one of six scenarios:
 | One-day burst | Compresses historical examples into one UTC date. |
 | Conflicting routines | Distributes pattern-following outcomes among three apps. |
 | Changed habits | Historical outcomes favor Terminal; future outcomes favor Browser. |
-| Unfamiliar context | Queries use a different foreground app, mode, recent sequence, and running set. |
+| Unfamiliar context | Queries use a different foreground app, recent sequence, and running set. |
 
 Controls set the example count, history span, pattern strength, context noise, random seed, and reference date.
 The reference date uses UTC. Generation is reproducible, including example identities: the same settings and
@@ -141,7 +141,7 @@ New observations affect the next presentation. History below the evidence requir
 
 Each suggestion has contextual menu and accessibility actions:
 
-- **Useful suggestion** reinforces the app for the original foreground, Dock Mode, weekday, and three-hour time band.
+- **Useful suggestion** reinforces the app for the original foreground, weekday, and three-hour time band.
 - **Not useful right now** reduces the score in that context. It does not permanently exclude the app.
 - **Never suggest this app** excludes the app immediately. Settings can reverse the exclusion. Previously removed learning does not return.
 
@@ -162,7 +162,8 @@ Reset preserves deliberate exclusions, the feedback-prompt preference, and the e
 ## Local data and limits
 
 One recorder receives application-wide Workspace notifications. The history stores bundle identifiers, event times, foreground and recent apps,
-running-app identifiers, recency metadata, local hour and weekday, and the Dock Mode identifier.
+running-app identifiers, recency metadata, and local hour and weekday. Histories saved before
+DEE-150 may also hold a Dock Mode identifier, which DOKK no longer reads.
 It also stores suggestion impressions and explicit feedback with the original context and predictor version.
 It stores no document names, paths, URLs, titles, images, keystrokes, or app content. Learning has no upload, account, or sync service;
 only answers to the optional survey leave the Mac, through usage analytics.
@@ -194,7 +195,7 @@ while leaving another live process's files alone. The packaged model contains no
 
 ## Predictor and validation
 
-The baseline predictor combines decayed frequency, transitions, time, weekday, Dock Mode, recent apps, and recency.
+The baseline predictor combines decayed frequency, transitions, time, weekday, recent apps, and recency.
 Recent examples receive more weight, using a 21-day decay scale. Feedback adjusts normalized scores for matching contexts.
 These constants are tuning defaults, not measured optima.
 

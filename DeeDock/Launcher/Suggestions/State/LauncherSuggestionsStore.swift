@@ -33,7 +33,6 @@ final class LauncherSuggestionsStore {
     private var revokedAt: [String: Date] = [:]
     var isActive: Bool { enabled && !paused && ready && !storageUnavailable }
     var hasSession: Bool { sessionActive }
-    @ObservationIgnored var modeProvider: (() -> String?)?
     @ObservationIgnored var activityChanged: (() -> Void)?
     @ObservationIgnored private let defaults: UserDefaults?
     @ObservationIgnored private let repository: LauncherSuggestionsRepository
@@ -216,15 +215,15 @@ final class LauncherSuggestionsStore {
         invalidate(); savePreferences(); persist()
     }
 
-    func capture(foregroundID: String?, modeID: String?) -> LauncherSuggestionContext? {
+    func capture(foregroundID: String?) -> LauncherSuggestionContext? {
         let now = Date()
         maintenance(now: now)
         guard isActive else { return nil }
-        let context = recorder.context(now: now, modeID: modeID ?? modeProvider?())
+        let context = recorder.context(now: now)
         // The caller supplies the preserved pre-launcher foreground, which is more reliable
         // than querying NSWorkspace after another DDock panel has already taken focus.
         return LauncherSuggestionContext(date: now, foregroundID: eligible(foregroundID) ?? context.foregroundID,
-            modeID: context.modeID, recentIDs: context.recentIDs, runningIDs: context.runningIDs,
+            recentIDs: context.recentIDs, runningIDs: context.runningIDs,
             hour: context.hour, weekday: context.weekday, foregroundSeconds: context.foregroundSeconds,
             secondsSinceUse: context.secondsSinceUse, secondsSinceTermination: context.secondsSinceTermination)
     }
@@ -339,7 +338,7 @@ final class LauncherSuggestionsStore {
     func observeActivation(appID: String?, now: Date = Date()) {
         guard isActive, sessionActive else { return }
         if let appID, excludedIDs.contains(appID) { endSession(now: now); return }
-        recorder.activate(eligible(appID), now: now, modeID: modeProvider?())
+        recorder.activate(eligible(appID), now: now)
     }
 
     func settleActivation(now: Date = Date()) {
@@ -373,7 +372,7 @@ final class LauncherSuggestionsStore {
     func flush() async { await saveTask?.value }
 
     private func recordEvent(_ kind: LauncherSuggestionEvent.Kind, appID: String?, now: Date) {
-        document.events.append(.init(date: now, kind: kind, appID: appID, context: recorder.context(now: now, modeID: modeProvider?())))
+        document.events.append(.init(date: now, kind: kind, appID: appID, context: recorder.context(now: now)))
         persist()
     }
 

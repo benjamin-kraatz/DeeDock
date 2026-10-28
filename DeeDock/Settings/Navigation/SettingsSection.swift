@@ -9,7 +9,6 @@ enum SettingsSection: Hashable, Identifiable {
     case general
     case dock
     case atmosphere
-    case modes
     case extras
     case windowsFocus
     case suggestionsHistory
@@ -20,7 +19,7 @@ enum SettingsSection: Hashable, Identifiable {
     case display(String)
 
     /// What the app and the dock are; the sidebar's untitled first group.
-    static let primary: [SettingsSection] = [.general, .dock, .atmosphere, .modes]
+    static let primary: [SettingsSection] = [.general, .dock, .atmosphere]
     /// Opt-in capabilities, listed under the sidebar's Features heading.
     static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout, .plugins]
     /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
@@ -31,7 +30,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .general: "general"
         case .dock: "dock"
         case .atmosphere: "atmosphere"
-        case .modes: "modes"
         case .extras: "extras"
         case .windowsFocus: "windowsFocus"
         case .suggestionsHistory: "suggestionsHistory"
@@ -47,7 +45,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .general: .settingsGeneral
         case .dock: .settingsGroupDock
         case .atmosphere: .atmosphereTitle
-        case .modes: .dockModesTitle
         case .extras: .settingsExtras
         case .windowsFocus: .settingsWindowsFocus
         case .suggestionsHistory: .settingsSuggestionsHistory
@@ -62,7 +59,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .general: .settingsGeneralSummary
         case .dock: .settingsDockSummary
         case .atmosphere: .atmosphereSummary
-        case .modes: .settingsModesSummary
         case .extras: .settingsExtrasSummary
         case .windowsFocus: .settingsWindowsFocusSummary
         case .suggestionsHistory: .settingsSuggestionsHistorySummary
@@ -77,7 +73,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .general: .symbol("gearshape.fill")
         case .dock: .dock
         case .atmosphere: .symbol("sparkles")
-        case .modes: .symbol("square.stack.3d.up.fill")
         // The puzzle piece belongs to Plugins (DEE-140); Dock Extras are extra tiles.
         case .extras: .symbol("plus.app.fill")
         case .windowsFocus: .symbol("macwindow.on.rectangle")
@@ -93,7 +88,6 @@ enum SettingsSection: Hashable, Identifiable {
         case .general: [Color(red: 0.62, green: 0.65, blue: 0.70), Color(red: 0.36, green: 0.39, blue: 0.44)]
         case .dock, .display: [Color(red: 0.32, green: 0.78, blue: 1.0), Color(red: 0.06, green: 0.42, blue: 0.94)]
         case .atmosphere: [.pink, .orange]
-        case .modes: [.indigo, .purple]
         case .extras: [Color(red: 1.0, green: 0.47, blue: 0.72), Color(red: 0.83, green: 0.15, blue: 0.52)]
         case .windowsFocus: [Color(red: 1.0, green: 0.58, blue: 0.34), Color(red: 0.84, green: 0.24, blue: 0.16)]
         case .suggestionsHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
@@ -105,7 +99,7 @@ enum SettingsSection: Hashable, Identifiable {
         }
     }
 
-    /// Overview rows, grouped into the cards they are drawn in. Modes and Atmosphere have no
+    /// Overview rows, grouped into the cards they are drawn in. Atmosphere, Lookout, and Plugins have no
     /// sub-pages: the section is the page.
     var pageGroups: [[SettingsPage]] {
         switch self {
@@ -121,7 +115,7 @@ enum SettingsSection: Hashable, Identifiable {
             [[.windowPeek, .harbor, .robi], [.permissions]]
         case .suggestionsHistory:
             [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
-        case .modes, .atmosphere, .lookout, .plugins:
+        case .atmosphere, .lookout, .plugins:
             []
         }
     }
@@ -129,7 +123,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// Sections whose pages write dock preferences, so the window offers to restore them.
     var offersRestoreDefaults: Bool {
         switch self {
-        case .general, .atmosphere, .modes, .lookout, .plugins: false
+        case .general, .atmosphere, .lookout, .plugins: false
         case .dock, .display, .extras, .windowsFocus, .suggestionsHistory: true
         }
     }
@@ -141,7 +135,6 @@ enum SettingsSection: Hashable, Identifiable {
             [.settingsGeneralKeywords, .updatesAutomatic, .updatesAutomaticInstallation, .updatesIdleInstall, .updatesCheck]
         case .dock: [.settingsAppearanceKeywords, .settingsPositionKeywords, .settingsBehaviorKeywords]
         case .extras, .windowsFocus, .suggestionsHistory: [.settingsFeatures, .settingsFeaturesKeywords]
-        case .modes: [.dockModesKeywords]
         case .atmosphere: [.atmosphereSummary]
         case .lookout: [.lookoutSettingsKeywords]
         case .plugins: [.pluginsSettingsKeywords]

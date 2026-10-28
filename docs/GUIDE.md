@@ -15,7 +15,6 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Trash](#trash)
 - [External drives](#external-drives)
 - [Windows](#windows)
-- [Dock Modes](#dock-modes)
 - [Local History](#local-history)
 - [Session Capsules](#session-capsules)
 - [Action Tiles](#action-tiles)
@@ -127,7 +126,7 @@ The folder stack header has a Sort by menu with Recency, Alphabetical, and Size.
 
 Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in the [DOKK Hub](HUB.md#open-in-hub) and choose grid or list presentation.
 
-Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display, independently of Dock Modes. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
+Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
 
@@ -139,13 +138,13 @@ Each island is a block of ice: a frosted rim, a soft sheen, and a lit edge on th
 
 **Look** holds the dock-wide choices: the **Ice block**, **Frost**, or **Flat** style; where the **Colour** comes from (**By island** uses a fixed palette, purple for the tile, gold for pinned apps, teal for running apps, graphite for extras; **From icons** averages the icons inside each island; **Accent colour**; or **None**); and sliders for tint strength, glow, the gap between islands, island padding, and the rim width, plus a **Lamp** switch that removes the lit line on the screen side, with sliders for its thickness and opacity (Ice block only). Icon size, spacing, and magnification come from **Dock → Appearance**. The glass blur is set by macOS and cannot be changed.
 
-**Islands on a display** lists that dock's islands in order. Rename any island, pick its colour, or use the row's menu to **Start a New Island Before…** one of its pins or to merge it with a neighbour. On the dock, a pinned app's context menu has an **Islands** submenu with **Start a New Island Here**, **Merge with Previous/Next Island**, a **Colour** list, and **Reset Islands**. Pins remember their island when you reorder them: a pin dragged into another island joins it, a pin dropped at the end of the row joins the last island, and an island whose last pin leaves disappears. The arrangement is saved per display; switching Dock Modes keeps the names and colours and fits the counts to the mode's pins.
+**Islands on a display** lists that dock's islands in order. Rename any island, pick its colour, or use the row's menu to **Start a New Island Before…** one of its pins or to merge it with a neighbour. On the dock, a pinned app's context menu has an **Islands** submenu with **Start a New Island Here**, **Merge with Previous/Next Island**, a **Colour** list, and **Reset Islands**. Pins remember their island when you reorder them: a pin dragged into another island joins it, a pin dropped at the end of the row joins the last island, and an island whose last pin leaves disappears. The arrangement is saved per display.
 
 ## Shelf
 
 The Shelf is a staging area for files you are carrying somewhere else. Drop files on it, walk to another Space, display, or full-screen app, and drag them back out. It appears before Trash in the trailing utility area, shares that divider, and is enabled by default. Under **Features → Shelf**, turn it off for the whole app.
 
-One Shelf is shared by every dock, so an item staged on one display is immediately on all of them. Its contents are independent of the active Dock Mode. The tile stays visible when empty, so the target never moves; a badge shows the item count once something is staged.
+One Shelf is shared by every dock, so an item staged on one display is immediately on all of them. The tile stays visible when empty, so the target never moves; a badge shows the item count once something is staged.
 
 **The Shelf never touches the filesystem.** An item is a security-scoped reference to a file that stays exactly where it was. Dragging an item out hands other applications an ordinary file URL, exactly as Finder would, and the item deliberately stays on the Shelf: taking something out is a copy of the reference, not a hand-off. Nothing is moved, copied, or deleted.
 
@@ -253,20 +252,6 @@ closure of both windows. A combined DOKK icon keeps the pair reachable when mini
 Native title bars remain, and pairs last for the current DOKK session. Window Access is
 required. See [App Fusion](APP-MELT.md) for setup, recovery, and validation limits.
 
-## Dock Modes
-
-Open **Settings → Modes** to create, rename, duplicate, reorder, activate, or delete named configurations. DOKK keeps at least one mode. New modes copy the active mode, while names must be non-empty and unique without regard to capitalization. Deleting the active mode selects the nearest remaining configuration.
-
-**Snapshot workspace…** creates an editable recipe draft from open apps, visible window context, and DOKK pins. Review the choices, name the draft, and save it as a new mode. Saving leaves the active mode unchanged. Window titles require existing Screen Recording access and help with review only. **Prepare Workspace** reopens the chosen apps and resources. See [recipe photography](RECIPE-PHOTOGRAPHY.md) for capture and playback limits.
-
-Each mode owns the ordered app and folder pins for every remembered display, plus the shared App Visibility choice and any display-specific App Visibility overrides. Pinning, unpinning, reordering, folder presentation changes, and App Visibility edits apply directly to the active mode. Appearance, placement, auto-hide, Trash, Window Peek, and other controls remain independent.
-
-The menu-bar **Dock Mode** submenu switches configurations across all connected docks after the new choice has saved successfully. Ordinary switching updates pins and app visibility only. **Prepare Workspace** is a separate command: it activates the chosen mode, then runs that mode's optional recipe in order. **Previous Mode** toggles between the last two configurations. During Focus Dock, press M, use Up or Down, then Return to switch. P prepares the selected mode's workspace. Escape closes the picker without switching. Switching is unavailable while a native menu, file picker, or drag operation is active, and closes open Window Peek and folder panels before changing the docks. Prepare reports that blocked state and does not open apps, files, links, or Shortcuts. A recipe does not replay after launch or arrange windows.
-
-Existing installations migrate their current display pin lists and App Visibility values into an initial **Default** mode. The older preference keys remain for rollback but are no longer authoritative. If the modes document is corrupt, DOKK continues with the recoverable legacy layout, blocks persistent mode and pin edits, and offers an explicit reset in Settings rather than silently overwriting the stored evidence.
-
-Choose a named configuration from **Dock Mode** in the menu-bar item, or press M in Focus Dock to open the keyboard mode picker. A mode changes every display's pins and App Visibility together; it does not launch, quit, hide, or reorder running-only apps. **Prepare Workspace** is a separate command that runs that mode's optional recipe.
-
 ## Local History
 
 Choose **Browse Local History** from the menu-bar item, or press **H** in Focus Dock. The dock under the pointer becomes a time axis of DOKK-local pin events. Drag along the chrome to scrub; arrows move to the previous or next event. Escape or **H** again leaves the timeline. Nothing is imported from macOS Screen Time or other apps. **Settings → Features → Local History** can pause recording and clear stored events. An empty dock shows a privacy explanation instead of a blank track. Focus Session events recorded by older versions are dropped when history loads.
@@ -289,7 +274,7 @@ The underlying window-context service is feature-neutral: its public values cont
 
 ## Action Tiles
 
-Open **Settings → Features → Action Tiles** and pin a shortcut. Installed Shortcuts load when that page appears; **Reload Shortcuts** refreshes the list. Tiles appear in the same order on every display, independently of Dock Modes. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
+Open **Settings → Features → Action Tiles** and pin a shortcut. Installed Shortcuts load when that page appears; **Reload Shortcuts** refreshes the list. Tiles appear in the same order on every display. Settings provides Run, Cancel, Unpin, and ordering controls. Up to 30 tiles can be pinned.
 
 Click a tile or select it in Focus Dock and press Return to run it. Drop files onto a tile to pass them as shortcut input. Each tile allows one run at a time and shows progress, a completion checkmark, or an error. Saved shortcut identifiers survive renames; shortcuts that are removed or unavailable report the helper's error. DOKK never retries a run automatically.
 
@@ -299,8 +284,8 @@ Shortcuts may show their own permission or input dialogs. Configure the shortcut
 
 The **DOKK** tile opens the DOKK Hub, one large panel with three tabs. **Apps** is the app
 launcher, with suggestions, grid and list browsing, **Ask Robi**, and file actions for files
-dropped on the tile. Its search also finds windows, Capsules and Breadcrumbs, Shelf files, pinned
-Shortcuts, and Dock Modes. **Windows** shows open windows grouped by app. **Files** is a file
+dropped on the tile. Its search also finds windows, Capsules and Breadcrumbs, Shelf files, and
+pinned Shortcuts. **Windows** shows open windows grouped by app. **Files** is a file
 browser with browser tabs, split view, Quick Look, Spotlight search, and a copy queue. With
 [Lookout](#lookout) set up, its search also finds files by what's in them. The Hub
 opens next to its tile and closes like a popover. The pin button turns it into a normal window that
@@ -505,8 +490,7 @@ DOKK checks for newly installed plugins when it comes to the front and when you 
 
 ## Atmosphere
 
-**Settings → Atmosphere** adds optional ambient light to every drawable display, independently
-of Dock Modes. It starts off. Choose 69 for candles and hearts, Minimal for a subtle color
+**Settings → Atmosphere** adds optional ambient light to every drawable display. It starts off. Choose 69 for candles and hearts, Minimal for a subtle color
 wash, Focus for a soft glow, or Party for party décor and denser particles. Density controls
 particles. Light intensity scales the edge wash from a faint rim to a stronger glow
 without covering the desktop. Click corner décor to toggle its light; hold it to
@@ -537,13 +521,13 @@ Choose **Settings…** from the menu-bar item or app menu.
 
 ### Features and per-display defaults
 
-**Settings → Features** collects DOKK's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General and Modes, above the Defaults section, because everything in it is app-wide.
+**Settings → Features** collects DOKK's opt-in capabilities: Session Capsules, the Shelf, the Trash tile, and Window Peek with its Window Access and Screen Recording permissions. It sits beside General, above the Defaults section, because everything in it is app-wide.
 
 That is the distinction the sidebar draws. Panes under **Defaults** describe how a dock looks and where it sits, so each display can override them individually. A feature is either on or off for DOKK as a whole; no display holds its own copy. Appearance, Position, and Behavior keep their per-display overrides exactly as before.
 
 ### Displays and inheritance
 
-The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. App-wide General, Modes, and Features sit above them. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance, position, and behavior overrides on that display while preserving its pins and visibility.
+The Settings sidebar retains the appearance/position panes, search, cards, and live previews, and adds connected and remembered displays. App-wide General and Features sit above them. **Defaults** changes the shared values. Selecting a display exposes **Show Dock** and the same controls. Editing a control creates an explicit override; **Use Default** restores inheritance for that control. **Use Defaults** clears all appearance, position, and behavior overrides on that display while preserving its pins and visibility.
 
 With multiple connected desktop displays, selecting a display in the active Settings window outlines that monitor and shows its name. The marker stays across settings categories, works when that display’s dock is disabled, and disappears on Defaults, disconnected profiles, or leaving Settings. Mirrored followers do not receive separate markers.
 

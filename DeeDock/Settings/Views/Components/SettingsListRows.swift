@@ -160,7 +160,7 @@ struct SettingsPermissionRow: View {
             }
             SettingsButtonRow(title: .badgeMemoryReview) {}
             SettingsListFooter {
-                Button(.dockModesNew, systemImage: "plus") {}
+                Button(.launcherFileDestinationAdd, systemImage: "folder.badge.plus") {}
             }
         }
     }

@@ -66,10 +66,6 @@ nonisolated enum LauncherSearchIndex {
             append(.shortcut(tile.id), kind: .shortcut, name: tile.name, source: String(localized: .unifiedPinnedShortcut),
                    action: .unifiedRunShortcut, key: "4" + tile.id.uuidString)
         }
-        for mode in input.modes {
-            append(.mode(mode.id), kind: .mode, name: mode.name, source: String(localized: .unifiedModeSource),
-                   action: .unifiedSwitchMode, key: "5" + mode.id.uuidString)
-        }
         guard !Task.isCancelled else { return [] }
         for index in results.indices {
             guard let app = results[index].application else { continue }

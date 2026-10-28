@@ -372,6 +372,45 @@ Implemented on `feat/notification-panel`. An opt-in Notification Feed reads Noti
 
 Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
 
+## DEE-150 Dock Modes removed
+
+Dock Modes and the workspace recipes built on them are gone, with no replacement. PostHog never
+received a `mode_switched` event. Settings → Modes, the menu-bar **Dock Mode** submenu, the
+Focus Dock **M** picker, Prepare Workspace and its progress window, Snapshot workspace, mode
+results in the Hub search, the `modes` analytics section value, the `mode_switched`,
+`dock_mode_activated`, `mode_edited`, `workspace_prepared`, and `workspace_recipe_*` events,
+the `mode_picker` Focus Dock command, and the `dock_mode_count` property are removed.
+
+The active mode owned each persistent display's pins, the shared App Visibility, and each
+display's App Visibility override. The keys that held those values before modes
+(`dock.pins.v3.<display>`, `dock.settings.v1`, `dock.displays.v1`) stopped changing when
+modes arrived. `DockModesMigration` runs once at launch, before the stores load. It writes the
+active mode's values back to those keys and then removes `dock.modes.v1`. Inactive modes and
+recipes are discarded. The modes key goes only after every write succeeds, so a quit midway
+repeats the same writes. Missing, corrupt, or invalid mode data leaves the other keys as they
+are; the old store fell back to them in that case. An unreadable settings or profiles
+document is skipped, since only an explicit reset may replace it. Every other setting and
+per-display override never belonged to a mode and is untouched.
+
+Dependent behavior changes:
+
+- App Visibility edits are saved as shared settings and display overrides, like every other
+  dock setting. Settings no longer names a mode beside the control.
+- App suggestions no longer record the active mode. Stored contexts that hold a mode identifier
+  still decode; the identifier is ignored, and its feature region stays zero.
+- Settings shows a remembered display's saved pins while it is disconnected, as it did through
+  the active mode.
+- The Drives and Action Tiles settings keep their Move Up and Move Down commands
+  under new string keys with the same translations.
+
+`DockModesMigrationTests` covers the active mode surviving unchanged, a second run and a run
+after an interrupted cleanup, missing, corrupt, and invalid mode data, and per-display overrides
+across a reconnect in a different order.
+
+On 2026-10-27, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-derivedDataPath /tmp/dee-150-dd build-for-testing CODE_SIGNING_ALLOWED=NO` succeeded,
+compiling the app and test targets. No tests were run, and the app was not launched.
+
 ## DEE-149 deprecated extras removed
 
 Dock Sims with AI icon rumours, Pin weather (icon rust), Quarantine stamp, Patch bay, and
@@ -644,7 +683,7 @@ Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock
 
 ## DEE-36 dock as timeline
 
-Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits into `dock.local-history.v1`. (It also recorded Focus Session transitions until DEE-148 removed them.) **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events. Mode activation does not write pin history.
+Implemented on `cursor/dee-36-dock-timeline-dfa6`. DDock records its own pin edits into `dock.local-history.v1`. (It also recorded Focus Session transitions until DEE-148 removed them.) **Browse Local History** (menu bar, or **H** in Focus Dock) treats that display's dock chrome as a time axis. Position along the resting glass maps oldest to newest. Escape or **H** again leaves the timeline. Folder presentation and bookmark refreshes are not events.
 
 The event model keeps `Kind.unrecognized` so DEE-45 can add playback markers without a second store. New pin events also store post-change `pinIDs` and an archive of resolvable pins. Recording is on by default and limited to 500 events or 90 days. **Show pins while browsing** is off by default, including on older documents. When it is on, the glance follows the playhead immediately. Arrow keys apply that pin order at once. Pointer scrub waits 200 ms on one event. The glance card sits in a taller inward reserve so it is not clipped. Resting on the card does not move the playhead. Leaving the timeline, or turning the toggle off, restores saved pins. Preview never writes `savePins` or records new history. **Settings → Features → Local History** can pause recording and clear the log. Corrupt bytes are reported and never overwritten.
 
@@ -658,48 +697,6 @@ This environment has no Xcode. Compilation, generated string symbols, and native
 - With **Show pins while browsing** off, scrub and confirm pins stay as they are. Turn it on, pause on an older pin event, and confirm the dock icons change after a short pause, then return when you leave the timeline. Confirm saved pins did not change.
 - Confirm the system Dock is unchanged and that no Screen Time or other-app activity appears.
 - Exercise keyboard-only operation (H, arrows, Escape), VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and auto-hide while the timeline is open.
-
-## DEE-67 recipe photography
-
-Implemented on `feature/dee-67`. Settings → Modes → **Snapshot workspace…** captures running apps, eligible visible window metadata, and the active mode's pins into an in-memory draft. The draft can be named, edited, and saved as a new inactive mode using the existing DEE-21 recipe format. See [recipe photography](RECIPE-PHOTOGRAPHY.md) for the save contract, API choices, and limits.
-
-Window metadata is optional and requires existing Screen Recording access. Apps and pins remain available after denied access, unavailable discovery, or no visible windows. Window titles remain ephemeral. No screenshot, OCR, exact window restoration, or automatic preparation is included.
-
-The focused Debug app build passed with Xcode 27 using `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/deedock-dee67-build CODE_SIGNING_ALLOWED=NO build`. The final build emitted no Swift diagnostics for this change. The App Intents metadata tool reported its usual skipped-extraction warning. Static catalog inspection confirmed 17 new English/German keys and no changes to existing entries. `git diff --check` passed. No tests, app launch, previews, or automated visual checks were run. Compilation does not establish native acceptance.
-
-Required native acceptance remains pending:
-
-- Capture with and without Screen Recording access, with no visible windows, and after revoking access. Confirm accurate fallback copy and no permission request.
-- Capture multiple windows of one app, duplicate app pins, pinned folders, and more than 12 choices. Confirm deduplication, visible overflow, and selection after removing a step.
-- Edit the name and steps, cancel, and compare saved modes. Save a second draft and confirm one new mode, unchanged active and previous modes, and no app or Shortcut launch.
-- Repair a stale folder bookmark through the native picker. Add a link and a Shortcut, reorder steps, save, and explicitly Prepare Workspace through the existing DEE-21 action.
-- Inspect connected, disconnected, and session-only display pin layouts. Change or delete the source mode while a draft is open and confirm that the draft retains its captured layout.
-- Dismiss during discovery, reopen, exercise sleep/wake, and change Spaces or full-screen windows during capture. A dismissed draft must not receive a late result.
-- Exercise keyboard-only editing, VoiceOver, German copy, Reduce Motion, Reduce Transparency, and a short Settings window.
-
-Model cases worth later tests: app identity deduplication and pin bookmark precedence, folder path deduplication, empty and oversized bookmarks, the 12-step selection boundary, duplicate and whitespace-only names, draft cancellation without persistence, one-write save failure, and preservation of active/previous IDs and captured session display state. These tests were not added or run.
-
-## DEE-21 workspace recipes
-
-Implemented on `cursor/workspace-recipes-4b01` as an optional recipe on each Dock Mode. Settings → Modes edits ordered app, file or folder, HTTP(S) link, and Shortcut steps. Installed Shortcuts load when the recipe editor appears; **Reload Shortcuts** remains a manual refresh. Prepare workspace is a separate explicit action from the Modes pane, the menu-bar **Prepare Workspace** submenu, and the Focus Dock picker (P, or the briefcase control). Ordinary mode switching still updates pins and visibility only.
-
-`WorkspaceRecipeCoordinator` owns one in-memory run with pending, running, succeeded, failed, skipped, and canceled step states. A failed step stops the sequence; Retry and Skip are explicit. Cancel cannot undo apps or Shortcut effects that already ran. The same recipe cannot overlap. A blocked drag, menu, or file picker is reported before any open. Progress is not persisted and is not replayed after launch. Duplicating a mode copies the recipe and starts no action. Deleting a mode does not delete source files.
-
-Window arrangement, Launcher Prepare actions, startup replay, shell commands, forced quit, and unsaved-document restoration are out of scope.
-
-Model cases worth later tests, not run here: missing recipe keys on v1 documents, unknown step kinds dropped without locking pins, duplicate step IDs sanitized, the 12-step bound, HTTP(S)-only links, bookmark size rejection, duplicate-mode recipe copy, and blocked-prepare reporting with no side effects.
-
-No Xcode build or tests were run. This environment has no Xcode. Compilation and native interaction remain pending.
-
-### Required hands-on acceptance
-
-- Build a recipe with an app, folder, HTTP(S) link, and Shortcut. Prepare it and confirm each real outcome.
-- Switch the same mode from the menu bar and Focus Dock. Confirm no recipe step runs.
-- Cancel between steps and during a Shortcut. Completed effects remain. Pending steps do not run.
-- Restart after a partial run. Confirm it does not replay.
-- Rename a Shortcut, remove an app, move a file, duplicate and delete a mode. Repair the broken step without losing the rest of the recipe. Deleting a mode must leave source files on disk.
-- Invoke Prepare during a drag, menu, or file picker. Confirm the blocked state is reported and nothing opens.
-- Exercise keyboard-only operation, VoiceOver, Reduce Motion, Reduce Transparency, sleep/wake, and rapid repeated Prepare of the same recipe.
 
 ## DEE-32 Metal running indicators withdrawn
 
@@ -1745,32 +1742,9 @@ display or Space), click an unstaged card, and open the context menu. Use a wind
 exercise file handoff. Check all dock edges, negative origins, a secondary display, Spaces,
 full-screen apps, Reduce Motion, Reduce Transparency, and GPU and memory use during scrubbing.
 
-## Dock Modes
-
-Implemented on 2026-09-04 as an app-wide named configuration layer over display pins and App Visibility. The first launch after this change creates **Default** from the existing shared visibility, display visibility overrides, and every remembered display's typed pins. Legacy keys remain untouched for rollback, while subsequent pin and visibility edits write to the active mode.
-
-The versioned modes document stores ordered stable IDs, names, active and previous IDs, shared App Visibility, and each remembered display's pins and optional visibility override. Saves complete before live state changes. Load corruption preserves the recoverable legacy projection, blocks persistent pin and mode edits, and exposes an explicit Settings reset. A newly discovered display copies the primary display's pins independently in every mode.
-
-**Settings → Modes** supports creation by duplicating the active mode, renaming, arbitrary duplication, reordering, activation, and deletion while retaining at least one mode. Names are trimmed and unique under case- and diacritic-insensitive comparison. App Visibility remains in Behavior, where Defaults edits the active mode's shared value and displays can create or clear independent overrides. Other settings remain outside modes.
-
-The menu-bar **Dock Mode** submenu lists modes in their saved order, marks the active one, exposes Previous Mode, and opens management. Focus Dock opens an anchored keyboard picker with M; Up and Down navigate, Return selects, and Escape returns to the dock. Switching closes Window Peek and folder stacks, cancels window discovery, and is blocked during native menu tracking, file picking, and drag sessions. Connected docks refresh together after persistence succeeds, while running-only applications keep discovery order.
-
-Authored Swift Testing coverage includes legacy migration and key retention, corrupt recovery, failed-save atomicity, naming, ordering, duplication, active deletion, previous-mode toggling, live-edit isolation, display visibility overrides, new-display seeding across modes, four-edge geometry with a negative display origin, and keyboard picker navigation. Deterministic SwiftUI samples cover normal management, long names, corrupt-storage recovery, the picker, and its reduced-transparency rendering. Preview dependencies neither inspect applications nor touch real preferences.
-
-Xcode's focused build-for-testing completed successfully in 4.747 seconds, compiling the app and test targets without executing tests. The subsequent focused DeeDock app build completed successfully, and Xcode reported no warning-level diagnostics. No test suite, SwiftUI preview, automated visual check, app launch, or permission-sensitive runtime action was performed.
-
-### Required hands-on acceptance
-
-- Switch among at least three modes from the menu bar and Focus Dock. Confirm Previous Mode toggles the last two modes and selecting the active mode does nothing.
-- Edit pins, folder presentation, shared App Visibility, and a display visibility override in each mode. Restart and confirm isolation, order, inheritance, and remembered disconnected displays.
-- Attach a new display and confirm each mode seeds it from that mode's primary-display pins while inheriting shared visibility. Repeat with a negative-origin arrangement and each dock edge.
-- Switch with Window Peek and a folder stack open. Confirm both close, focus selection repairs to a stable surviving item or its nearest neighbor, and running-only app order remains unchanged.
-- Confirm switching is disabled during native menus, file selection, and cross-display or Finder drags. Cancel each operation and verify switching becomes available again.
-- Exercise long localized names, VoiceOver actions, Reduce Motion, Reduce Transparency, sleep/wake, display removal, and corrupt modes reset in a disposable preferences domain.
-
 ## Shelf
 
-Implemented on 2026-09-04 as the first dock tile that owns content rather than pointing at an application. A shared `ShelfController` holds security-scoped references to user-dropped files; nothing is copied, moved, or deleted. The document is stored under `dock.shelf.v1`, independent of display profiles and of Dock Modes, and is injected into every `DockStore` beside the existing `TrashController` so one edit re-renders every dock.
+Implemented on 2026-09-04 as the first dock tile that owns content rather than pointing at an application. A shared `ShelfController` holds security-scoped references to user-dropped files; nothing is copied, moved, or deleted. The document is stored under `dock.shelf.v1`, independent of display profiles, and is injected into every `DockStore` beside the existing `TrashController` so one edit re-renders every dock.
 
 `FolderStackPanelController`'s window, dismissal monitors, and show/close animation were extracted into `DockPopoverPanelController`, with the placement math and pointer shape moved alongside it as `DockPopoverGeometry` and `DockPopoverShape`. `DockPopoverPresenter` keeps at most one popover open across features and displays. Folder stacks keep their own state, view, and key handling and were rebuilt on the shared shell; `DockPanelController.folderStackAnchor(for:)`, `holdFolderStack(_:)`, and its `folderStackHeld` flag became `popoverAnchor(for:)`, `holdPopover(_:)`, and `popoverHeld`.
 
@@ -1843,7 +1817,7 @@ When the Shelf is visible and Smart remains selected, startup and persisted Shel
 
 DEE-13 extends this flow with manual breadcrumbs, editable saved notes, dated source previews, and separate return actions. See [breadcrumb validation and manual acceptance](BREADCRUMBS.md). Compilation is recorded there separately from native acceptance. DEE-13 remains In Progress until native review.
 
-Implemented on 2026-09-04 as an app-wide, user-initiated checkpoint feature. Its trailing collection tile appears before Shelf and Trash, carries the saved-capsule count, opens from a pointer click or Focus Dock Return, and can be disabled under Features. Every approved checkpoint is also projected before that tile as its own temporary Dock item using the user-approved continuation title; selecting it opens that capsule directly, and deleting it removes the item. Saved Dock items and collection rows expose matching Resume and Delete context menus, with the existing confirmation before deletion. One shared `SessionCapsuleController` persists at most 30 approved capsules under `dock.session-capsules.v1`, independent of displays and Dock Modes. Invalid versions, duplicate identities, empty required text, and oversized collections are rejected rather than read as an empty collection.
+Implemented on 2026-09-04 as an app-wide, user-initiated checkpoint feature. Its trailing collection tile appears before Shelf and Trash, carries the saved-capsule count, opens from a pointer click or Focus Dock Return, and can be disabled under Features. Every approved checkpoint is also projected before that tile as its own temporary Dock item using the user-approved continuation title; selecting it opens that capsule directly, and deleting it removes the item. Saved Dock items and collection rows expose matching Resume and Delete context menus, with the existing confirmation before deletion. One shared `SessionCapsuleController` persists at most 30 approved capsules under `dock.session-capsules.v1`, independent of displays. Invalid versions, duplicate identities, empty required text, and oversized collections are rejected rather than read as an empty collection.
 
 Creating a capsule discovers eligible visible windows through public ScreenCaptureKit metadata and excludes DeeDock, nonstandard layers, and tiny surfaces. The user explicitly chooses up to twelve windows. The feature then performs serial one-shot window capture, accurate on-device Vision OCR with automatic language detection, and Foundation Models 2 multimodal generation using `Attachment(CGImage)`. `FoundationModelsSessionCapsuleComposer` uses `SystemLanguageModel.default`, an `@Generable` response, `@Guide` constraints, greedy `GenerationOptions`, and a 500-token response limit. Window titles, OCR, and images are explicitly treated as untrusted data; no prompt asks the model to return JSON. If Apple Intelligence is unavailable or generation fails, metadata creates a useful editable fallback draft.
 
@@ -1871,7 +1845,7 @@ Authored Swift Testing coverage covers Smart persistence, metadata loading, outp
 - Switch Sort and Layout, close and reopen the panel, then restart DeeDock, confirming both choices persist.
 - Confirm Copy pastes real files in Finder, not text.
 - Confirm the grid layout's remove button is clickable and that rubber-band selection still works between grid tiles.
-- Open Settings and confirm Features sits below Modes, that Behavior no longer shows Shelf or Trash, that Previews is gone, and that searching for "shelf", "trash", "peek", or "permissions" finds Features.
+- Open Settings and confirm Features sits below General, that Behavior no longer shows Shelf or Trash, that Previews is gone, and that searching for "shelf", "trash", "peek", or "permissions" finds Features.
 - Confirm a display's Use Defaults and the Customized pills no longer mention any feature, and that toggling a feature changes every display's dock at once.
 
 
@@ -1950,8 +1924,7 @@ with visible layer-zero windows. Pins, folders, utility tiles, and all App Visib
 retain their normal behavior on every display, including the primary.
 Finder is the one pin exception on filtered secondary docks: it requires a visible Finder
 window on that display. Desktop windows are excluded and its saved pin is preserved. ScreenCaptureKit supplies metadata
-only; largest frame overlap in Quartz coordinates selects a display. Saved pins and Dock
-Mode preferences are preserved. Missing permission or enumeration failure restores ordinary
+only; largest frame overlap in Quartz coordinates selects a display. Saved pins are preserved. Missing permission or enumeration failure restores ordinary
 dock contents; a disabled primary also restores ordinary contents everywhere.
 
 One shared task refreshes at a three-second interval while multiple enabled docks and an
@@ -2302,8 +2275,8 @@ after these changes. No additional native acceptance is claimed.
 ## DEE-20: unified Launcher
 
 Implemented on `feature/dee-20` in the existing worktree. The Launcher combines app metadata,
-window titles, Capsules/Breadcrumbs including saved OCR, staged Shelf names, pinned Shortcuts,
-and named Dock Modes. See [Launcher controls](LAUNCHER.md#mixed-search) for ranking, evidence
+window titles, Capsules/Breadcrumbs including saved OCR, staged Shelf names, and pinned
+Shortcuts. DEE-150 removed Dock Modes from search. See [Launcher controls](LAUNCHER.md#mixed-search) for ranking, evidence
 labels, source limits, and action behavior. No persisted format or permission changes were added.
 
 Focused unsigned Debug app compilation passed with Xcode 27.0, build 27A5252f, Swift 5 and the
@@ -2326,7 +2299,7 @@ need hands-on acceptance. Do not mark DEE-20 Done on compilation alone.
 
 `python3 scripts/benchmark-launcher-search.py` compiles the production ranker with `swiftc -O`
 and runs synthetic in-memory metadata on an Apple M4 with macOS 27.0. Dataset: 10,000 apps,
-200 windows, 30 capsules, 50 Shelf references, 30 pinned Shortcuts, and 100 modes. Capsule
+200 windows, 30 capsules, 50 Shelf references, and 30 pinned Shortcuts. Before DEE-150 the set also held 100 modes. Capsule
 summaries contain 6,000 characters; matching consumes the existing bounded field prefixes.
 Each query has one warm-up and 20 measured iterations. No files, live windows, permissions,
 or models are accessed. Local output: `/tmp/DeeDock-DEE20-benchmark.log`.
@@ -2349,7 +2322,7 @@ latency or discovery completeness. Shelf and capsule counts match their current 
 - Accents, aliases, width folding, invisible formatting, and transposed letters retain app matching.
 - Older ranking tasks cannot publish after query/filter changes, closure, or reopening.
 - Provider completion preserves selected identity; deletion leaves no replacement Return target.
-- Missing Shelf references, consumed/closed AX windows, deleted modes, and concurrent Shortcut
+- Missing Shelf references, consumed/closed AX windows, and concurrent Shortcut
   runs fail through their original owners without activating another object.
 - Saved OCR is historical evidence; metadata typing never calls capture or model services.
 - Pagination keeps an existing selection visible, and empty-query app browsing retains grid/list.
@@ -2393,7 +2366,7 @@ of this correction remains pending. Further subagent review was stopped at the u
 ## DEE-27: explicit window focus
 
 Settings commands now share one presentation path, including menu-bar and app commands, dock
-context menus, Window Peek, Window Search, Dock Modes, and onboarding. The scene registers its
+context menus, Window Peek, Window Search, and onboarding. The scene registers its
 actual native window. Existing windows are reused and deminiaturized. Presentation leaves menu
 tracking before ordering the target and requesting app activation; an activation notification
 reasserts key focus on that target. Requests end on confirmed focus, close, app deactivation,
@@ -2508,7 +2481,7 @@ Pending hands-on acceptance:
 
 ## Downloads and utility reordering
 
-Downloads uses the existing folder stack with a stable built-in identity and a per-display grid/list preference. Downloads, Capsules, and Shelf share a per-display saved order. Pin persistence, Dock Modes, and Trash ordering remain separate. Ordinary Shelf drags reorder the tile; Option-drag retains bulk file export. Utility movement uses the shared native drag coordinator, floating icon, animated insertion gap, Escape cancellation, and edge scrolling. Insertion hit testing uses resting geometry so preview movement cannot move its own target.
+Downloads uses the existing folder stack with a stable built-in identity and a per-display grid/list preference. Downloads, Capsules, and Shelf share a per-display saved order. Pin persistence and Trash ordering remain separate. Ordinary Shelf drags reorder the tile; Option-drag retains bulk file export. Utility movement uses the shared native drag coordinator, floating icon, animated insertion gap, Escape cancellation, and edge scrolling. Insertion hit testing uses resting geometry so preview movement cannot move its own target.
 
 Compilation is checked with the DeeDock Debug scheme. Tests and automated visual checks were not run. Native acceptance remains pending: opening and refreshing Downloads, file-access denial, grid/list persistence, drag and Escape on all four edges, crowded/scrolling docks, independent display ordering after relaunch, VoiceOver movement, Shelf Option-drag, Reduce Motion, auto-hide, Spaces, and display removal during a drag.
 
@@ -2587,7 +2560,7 @@ dimming, layout, and exclusive color sources. Intensity is a 0…1 slider. The m
 the original 0.07 Minimal and 0.18 other-preset wash. The low end stays a faint rim, and
 the high end stays short of a full-screen overlay. Documents saved before intensity decode
 the midpoint default without dropping other Atmosphere fields. Atmosphere does not share
-intensity or activation state with Dock Modes or soap bubbles.
+intensity or activation state with soap bubbles.
 
 Each drawable non-mirrored display owns a full-frame click-through ambient panel. Only two
 84-point corner panels accept input for 69 and Party. These panels cannot become key or
@@ -2635,8 +2608,7 @@ acceptance were not run.
 Pending native acceptance:
 
 - DE/EN Settings, default-off persistence, all presets, density and intensity endpoints,
-  and exclusive color sources across relaunches. Confirm Mode switches do not change
-  Atmosphere.
+  and exclusive color sources across relaunches.
 - Multi-display negative origins, Retina scaling, mirroring, hot-plug, panorama extremes,
   and fallback layouts. Check shared bezels and the full-display gradient.
 - Idle dimming, fullscreen on one display, Space changes, sleep/wake, lock/unlock, and
@@ -3171,7 +3143,7 @@ The app was not launched. None of the following has been exercised by hand:
 
 Implemented on `feature/dee-85-islands` after the interactive mockup `docs/mockups/dokk-islands.html` (wallpapers, Ice block / Frost / Flat, tint modes, edit mode with drag-to-split, light/dark, side dock, Reduce Motion and Transparency). The locked values are corner radius 22, gap 12, rim 4.5, tint strength 0.7×, glow 1.35×; icon size, spacing, and magnification come from the existing Appearance settings. The mockup's 32pt blur has no counterpart: native Liquid Glass sets its own blur, recorded as a limitation.
 
-- `DockIslandPlan` stores, per display under `dock.islands.v1.<displayID>`, consecutive pin counts per island plus names and tints; pin order stays in the pin list. `following(previous:next:relocated:)` runs after every saved pin edit so an unmoved pin keeps its island and a moved or new pin joins its new neighbour's. Plans are per display, not per Dock Mode; a mode switch reconciles counts.
+- `DockIslandPlan` stores, per display under `dock.islands.v1.<displayID>`, consecutive pin counts per island plus names and tints; pin order stays in the pin list. `following(previous:next:relocated:)` runs after every saved pin edit so an unmoved pin keeps its island and a moved or new pin joins its new neighbour's. Plans are per display.
 - `DockIslandAssignment.spans` groups render slots into tile, pinned (split by the plan), running, and utilities islands. The DOKK tile placed among pins splits the pinned run around it; gaps and collapsed section controls join the open island.
 - `DockGeometry.IslandLayout` replaces dividers with per-island padding and gaps and exposes `islandFrames(sizes:)`; the union stays the surface for hit testing, visibility, and the approach ghost. The glass thickness grows to the island padding across the dock.
 - `DockIslandBackgroundView` layers native glass with a light tint, a vertical wash, the light leak and lamp on the screen-edge side, a diagonal sheen, and the frosted rim. Reduce Transparency and the Flat style draw a solid tinted slab. Running indicators (dot, bar, square) take the island colour; the DOKK tile's halo hides at rest inside an island.

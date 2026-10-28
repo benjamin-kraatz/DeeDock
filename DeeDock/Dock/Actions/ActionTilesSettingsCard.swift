@@ -29,9 +29,9 @@ struct ActionTilesSettingsCard: View {
                         }
                         .disabled(controller.requiresReset)
                         Divider()
-                        Button(.dockModesMoveUp) { controller.move(tile.id, by: -1) }
+                        Button(.settingsListMoveUp) { controller.move(tile.id, by: -1) }
                             .disabled(index == 0 || controller.requiresReset)
-                        Button(.dockModesMoveDown) { controller.move(tile.id, by: 1) }
+                        Button(.settingsListMoveDown) { controller.move(tile.id, by: 1) }
                             .disabled(index == controller.tiles.count - 1 || controller.requiresReset)
                         Divider()
                         Button(.actionUnpin, role: .destructive) { controller.unpin(tile.id) }

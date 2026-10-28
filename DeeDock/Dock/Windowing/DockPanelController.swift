@@ -25,7 +25,6 @@ final class DockPanelController {
     private var popoverHeld = false
     private var windowPeekHeld = false
     private var volumeCardHeld = false
-    private var modePickerHeld = false
     /// Held while an anchored DOKK Hub points at this dock's tile.
     private var hubHeld = false
     private var lastDisplay: DisplaySnapshot?
@@ -43,7 +42,6 @@ final class DockPanelController {
     var escape: (() -> Void)?
     var exclusiveInteractionBegan: (() -> Void)?
     var windowSearchRequested: (() -> Void)?
-    var modePickerRequested: (() -> Void)?
     var timelineRequested: (() -> Void)?
     var isMenuTracking: Bool { menuHeld }
 
@@ -257,7 +255,7 @@ final class DockPanelController {
         // An open stack makes every dock dismissal-only. Clearing the pointer settles
         // magnification and hover without changing the dock's visible hold region.
         // Timeline scrub keeps the resting axis stable, so magnification is suppressed.
-        interaction.setPointer(inside && !popoverHeld && !modePickerHeld && !timelineHeld ? sample.inverse(point) : nil)
+        interaction.setPointer(inside && !popoverHeld && !timelineHeld ? sample.inverse(point) : nil)
         // Scrub only on the glass, and only from real pointer events. The glance card is a
         // rest area: mapping its X/Y onto the axis jumped the playhead and cancelled pin dwell.
         // Geometry-only refresh (apply preview, catalog) must not rematerialize the playhead.
@@ -273,14 +271,14 @@ final class DockPanelController {
             if [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(eventType), inside { mouseHeld = true }
             if [.leftMouseUp, .rightMouseUp, .otherMouseUp].contains(eventType) { mouseHeld = false }
         }
-        let suppress = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
+        let suppress = pickerHeld || popoverHeld || windowPeekHeld || volumeCardHeld || idleSuspended || menuHeld || interaction.dragActive || store.errorMessage != nil
             || timelineHeld
             || (visibility.phase != .visible && visibility.phase != .hideDelay)
         if suppress != interaction.suppressTooltips {
             interaction.suppressTooltips = suppress
             if suppress { interaction.tooltips.clear() }
         }
-        let held = pickerHeld || popoverHeld || hubHeld || windowPeekHeld || volumeCardHeld || modePickerHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
+        let held = pickerHeld || popoverHeld || hubHeld || windowPeekHeld || volumeCardHeld || dragHeld || mouseHeld || menuHeld || !accessibilityIDs.isEmpty || store.keyboardFocus || store.errorMessage != nil || timelineHeld
         if inside || held { lastUse = Date() }
         // The stable envelope provides a safe pointer route, but rendered content can extend
         // beyond it during layout or magnification. Never hide under a clickable dock region.
@@ -556,21 +554,6 @@ final class DockPanelController {
         updatePointer()
     }
 
-    func holdModePicker(_ held: Bool) {
-        modePickerHeld = held
-        if held { visibility.showImmediately(); interaction.tooltips.clear() }
-        updatePointer()
-    }
-
-    func modePickerAnchor() -> DockModePickerAnchor? {
-        guard !stopped, let display = lastDisplay, let settings = lastSettings else { return nil }
-        let rect = store.selectedTarget.flatMap { interaction.iconRects[$0.hitID] } ?? interaction.surfaceRect
-        let screenRect = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
-                                y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
-                                width: rect.width, height: rect.height)
-        return DockModePickerAnchor(source: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
-    }
-
     struct WindowPeekContext {
         let anchor: WindowPeekAnchor
         let settings: DockSettings
@@ -782,12 +765,6 @@ final class DockPanelController {
             Analytics.track(.focusDockCommand(.windowSearch))
             windowSearchRequested?(); return true
         }
-        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
-           event.charactersIgnoringModifiers?.lowercased() == "m" {
-            Analytics.track(.focusDockCommand(.modePicker))
-            modePickerRequested?()
-            return true
-        }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
            event.charactersIgnoringModifiers?.lowercased() == "o" {
             if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }), item.isAvailable {
@@ -890,8 +867,7 @@ final class DockPanelController {
         timelineRequested = nil
         interaction.timeline = nil
         windowSearchRequested = nil
-        modePickerRequested = nil
-        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; modePickerHeld = false; hubHeld = false
+        accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; hubHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }
 }

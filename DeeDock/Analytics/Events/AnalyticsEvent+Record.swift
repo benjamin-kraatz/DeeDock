@@ -58,13 +58,6 @@ extension AnalyticsEvent {
         case .lookoutAccessResult: "lookout_access_result"
         case .hubWindowActivated: "hub_window_activated"
         case .hubAppUninstall: "hub_app_uninstall"
-        case .modeSwitched: "mode_switched"
-        case .modeEdited: "mode_edited"
-        case .workspacePrepared: "workspace_prepared"
-        case .workspaceRecipeStarted: "workspace_recipe_started"
-        case .workspaceRecipeCompleted: "workspace_recipe_completed"
-        case .workspaceRecipeCanceled: "workspace_recipe_canceled"
-        case .dockModeActivated: "dock_mode_activated"
         case .shelf: "shelf"
         case .capsule: "session_capsule"
         case .trash: "trash"
@@ -234,13 +227,6 @@ extension AnalyticsEvent {
              "selected_count": .init(selectedCount), "moved_count": .init(movedCount),
              "protected_count": .init(protectedCount), "related_selected": .init(relatedSelected),
              "used_finder": .init(usedFinder), "unpinned": .init(unpinned)]
-        case let .modeSwitched(source, modeCount):
-            ["source": .init(source), "mode_count": .init(modeCount)]
-        case let .modeEdited(edit, modeCount, stepCount):
-            ["action": .init(edit), "mode_count": .init(modeCount), "step_count": stepCount.map(AnalyticsValue.init)]
-        case let .workspacePrepared(stepCount, completedStepCount, outcome, duration):
-            ["step_count": .init(stepCount), "completed_step_count": .init(completedStepCount),
-             "outcome": .init(outcome), "duration": .init(duration)]
         case let .shelf(action, itemCount, source, trigger):
             ["action": .init(action), "item_count": .init(itemCount), "source": source.map(AnalyticsValue.init),
              "trigger": .init(trigger)]
@@ -322,8 +308,7 @@ extension AnalyticsEvent {
              "missing_pinned_bundle_ids": .init(coverage.missingPinned)]
         case let .toolOpened(tool, trigger):
             ["tool": .init(tool), "trigger": .init(trigger)]
-        case .onboardingCompleted, .workspaceRecipeStarted, .workspaceRecipeCompleted, .workspaceRecipeCanceled,
-             .dockModeActivated, .clipboardCaptureEnabled:
+        case .onboardingCompleted, .clipboardCaptureEnabled:
             [:]
         case let .focusDockEntered(trigger):
             ["trigger": .init(trigger)]

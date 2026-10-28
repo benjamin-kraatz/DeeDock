@@ -2,11 +2,11 @@ import Foundation
 
 /// Object identity includes its kind. A file, app, and capsule with the same name remain separate actions.
 nonisolated enum LauncherSearchID: Hashable, Sendable {
-    case application(String), window(UUID), capsule(UUID), shelf(UUID), shortcut(UUID), mode(UUID)
+    case application(String), window(UUID), capsule(UUID), shelf(UUID), shortcut(UUID)
 }
 
 nonisolated enum LauncherSearchKind: String, CaseIterable, Identifiable, Sendable {
-    case all, application, window, capsule, shelf, shortcut, mode
+    case all, application, window, capsule, shelf, shortcut
     var id: Self { self }
     var title: LocalizedStringResource {
         switch self {
@@ -16,7 +16,6 @@ nonisolated enum LauncherSearchKind: String, CaseIterable, Identifiable, Sendabl
         case .capsule: .unifiedCapsules
         case .shelf: .unifiedShelf
         case .shortcut: .unifiedShortcuts
-        case .mode: .unifiedModes
         }
     }
     var symbol: String {
@@ -27,7 +26,6 @@ nonisolated enum LauncherSearchKind: String, CaseIterable, Identifiable, Sendabl
         case .capsule: "archivebox"
         case .shelf: "doc"
         case .shortcut: "bolt"
-        case .mode: "rectangle.3.group"
         }
     }
 }
@@ -47,12 +45,6 @@ nonisolated struct LauncherSearchResult: Identifiable, Sendable {
     var group = ""
 }
 
-/// Copies only searchable metadata, never mode configuration or file contents.
-nonisolated struct LauncherSearchName: Equatable, Sendable {
-    let id: UUID
-    let name: String
-}
-
 nonisolated struct LauncherSearchInput: Equatable, Sendable {
     var query: String
     var kind: LauncherSearchKind
@@ -60,7 +52,6 @@ nonisolated struct LauncherSearchInput: Equatable, Sendable {
     var capsules: [SessionCapsule]
     var shelf: [ShelfItem]
     var shortcuts: [ActionTile]
-    var modes: [LauncherSearchName]
     var windowRevision: UUID
     var options = LauncherSearchOptions()
 }

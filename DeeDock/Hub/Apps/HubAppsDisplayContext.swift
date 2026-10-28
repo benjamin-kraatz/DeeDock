@@ -16,8 +16,8 @@ struct HubAppsDisplayContext {
     var usesLineIcons: Bool
     /// When line glyphs play their motion on the source display.
     var lineIconMotion: LineIconMotionPlayback
-    /// The source display's effective app visibility (the active Dock Mode can hide pinned or
-    /// running apps), which suggestions respect.
+    /// The source display's effective app visibility (it can hide pinned or running apps),
+    /// which suggestions respect.
     var appVisibility: DockAppVisibility
     /// Bundle ID of the app that was frontmost before the Hub took focus. It is the suggestion
     /// context; nil falls back to the current frontmost app when that is not DOKK.
