@@ -53,4 +53,33 @@ struct BadgeMemoryRekeyTests {
         #expect(after.checked?.value == .count(37))
         #expect(after.changes.map(\.value) == [.count(37)])
     }
+
+    @Test("Starting prunes expired history even when badges are never observed")
+    func startPrunesExpiredHistory() throws {
+        let now = Date()
+        var document = BadgeMemoryDocument()
+        document.apps["/Applications/Old.app"] = BadgeAppMemory(
+            checked: BadgeCheck(value: .count(3), date: now.addingTimeInterval(-31 * 86400)),
+            changes: [BadgeChange(value: .count(3), date: now.addingTimeInterval(-8 * 86400))],
+            touched: now.addingTimeInterval(-8 * 86400))
+        document.apps["/Applications/Recent.app"] = BadgeAppMemory(
+            changes: [BadgeChange(value: .count(1), date: now.addingTimeInterval(-86400))],
+            touched: now.addingTimeInterval(-86400))
+
+        let suite = "BadgeStartPrune.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defaults.removePersistentDomain(forName: suite)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.set(try JSONEncoder().encode(document), forKey: "dock.badge-memory.v1")
+
+        let store = BadgeMemoryStore(defaults: defaults)
+        store.start(at: now)
+
+        // Old.app's observation is past seven days and its baseline past 30, so only Recent.app stays.
+        #expect(store.document.apps.count == 1)
+        #expect(store.document.apps.values.first?.changes.map(\.value) == [.count(1)])
+        let saved = try #require(defaults.data(forKey: "dock.badge-memory.v1"))
+        let reloaded = try JSONDecoder().decode(BadgeMemoryDocument.self, from: saved)
+        #expect(reloaded.apps.count == 1)
+    }
 }
