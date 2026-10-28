@@ -46,6 +46,15 @@ struct BenchArguments {
         options[name]?.last.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) }
     }
 
+    /// The number given as `--name`, or nil when it's missing.
+    ///
+    /// - Throws: `BenchFailure` when it isn't a number.
+    func number(_ name: String) throws -> Double? {
+        guard let text = options[name]?.last else { return nil }
+        guard let value = Double(text) else { throw BenchFailure("--\(name): \(text) isn't a number") }
+        return value
+    }
+
     /// The folder given as `--name`.
     ///
     /// - Throws: `BenchFailure` when the option is missing or isn't a folder.
