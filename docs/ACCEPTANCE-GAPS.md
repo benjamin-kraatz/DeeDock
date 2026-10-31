@@ -60,6 +60,7 @@ These groups remain open. Passing model tests closes only the matching automated
 | Appearance and accessibility | VoiceOver operation, Reduce Motion and Reduce Transparency in native windows, light/dark contrast, magnification, launch animations, indicators, and Atmosphere. |
 | Onboarding and updates | First-launch paths, login-item behavior, update discovery, idle-install gates, and relaunch. Release publishing remains Esi's responsibility. |
 | macOS Dock tuck-away | The user's manual `defaults` probe passed before implementation. The built switch still needs Settings and tour use, quit/relaunch, update relaunch, logout/login, force quit, edge following, and badge recovery after Dock restarts. See [checklist](ACCEPTANCE.md#tuck-away-hands-on-acceptance). |
+| Apps' own Dock menu items | Pressing rows and submenu rows through the built menu, apps with recents and no windows, and Finder with windows open. Fullscreen and plain auto-hide without the tuck remain unmeasured. See [checklist](ACCEPTANCE.md#apps-own-dock-menu-items). |
 | Resource use and teardown | Measured idle CPU and memory, capture shutdown, observer and task cleanup, and repeated lifecycle transitions. No performance acceptance was established by these tests. |
 
 The native UI tool can inspect and click Settings and Launcher controls. Opening DOKK's application
