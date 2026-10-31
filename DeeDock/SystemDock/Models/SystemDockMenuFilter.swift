@@ -25,10 +25,11 @@ nonisolated enum SystemDockMenuFilter {
         if let last = sections.last, last.count == 1, !last[0].children.isEmpty { sections.removeLast() }
         // Recent documents are the one section the Dock closes with two separators.
         if sections.count >= 2, sections[1].isEmpty { sections.removeFirst(2) }
-        // Only the first remaining section can be windows. The current window is checked, but an
-        // application in the background has no check, so its titles are compared as well. Windows
-        // on another Space are missing from those titles, which is why one match is enough.
-        if let first = sections.first, first.contains(where: { $0.isChecked || windowTitles.contains($0.title) }) {
+        // Only the first remaining section can be windows. Windows on another Space are missing
+        // from the titles, which is why one match is enough. Checkmarks are no evidence, because
+        // an application's own toggle has them too: a window left in by mistake is a duplicate
+        // row that still works, whereas a section dropped by mistake loses the application's rows.
+        if let first = sections.first, first.contains(where: { windowTitles.contains($0.title) }) {
             sections.removeFirst()
         }
 

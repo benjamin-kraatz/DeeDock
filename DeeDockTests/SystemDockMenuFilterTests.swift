@@ -15,8 +15,8 @@ struct SystemDockMenuFilterTests {
         }
     }
 
-    private func titles(_ rows: [String?], windows: Set<String> = [], submenus: Set<String> = ["Options"], checked: Set<String> = []) -> [String] {
-        SystemDockMenuFilter.applicationEntries(in: entries(rows, submenus: submenus, checked: checked), windowTitles: windows)
+    private func titles(_ rows: [String?], windows: Set<String> = [], submenus: Set<String> = ["Options"]) -> [String] {
+        SystemDockMenuFilter.applicationEntries(in: entries(rows, submenus: submenus), windowTitles: windows)
             .map(\.title)
     }
 
@@ -27,13 +27,21 @@ struct SystemDockMenuFilterTests {
         #expect(titles(rows, windows: ["DeeDock — New Editor"], submenus: ["Open Developer Tool", "Options"]) == ["Open Developer Tool"])
     }
 
-    @Test("A checked window goes even when another Space hides its title from the window list")
-    func checkedWindow() {
-        let rows: [String?] = ["…/dzwei/Topos", nil, "New Window", "New Tab", nil, "Options", nil] + Self.systemSection
-        #expect(titles(rows, checked: ["…/dzwei/Topos"]) == ["New Window", "New Tab"])
+    @Test("One known title removes the window section, even when another Space hides the rest")
+    func windowSection() {
+        let rows: [String?] = ["…/dzwei/Topos", "Hidden Space", nil, "New Window", "New Tab", nil, "Options", nil] + Self.systemSection
+        #expect(titles(rows, windows: ["…/dzwei/Topos"]) == ["New Window", "New Tab"])
     }
 
-    @Test("Without a check or known title, the first section stays with the application's rows")
+    @Test("A checked command in the first section stays with its neighbours")
+    func checkedCommand() {
+        let rows: [String?] = ["Shuffle", "Next Track", nil, "Options", nil] + Self.systemSection
+        let filtered = SystemDockMenuFilter.applicationEntries(in: entries(rows, checked: ["Shuffle"]), windowTitles: [])
+        #expect(filtered.map(\.title) == ["Shuffle", "Next Track"])
+        #expect(filtered[0].isChecked)
+    }
+
+    @Test("Without a known title, the first section stays with the application's rows")
     func unmatchedFirstSection() {
         let rows: [String?] = ["New Window", nil, "Options", nil] + Self.systemSection
         #expect(titles(rows) == ["New Window"])
@@ -42,14 +50,13 @@ struct SystemDockMenuFilterTests {
     @Test("An app with only a window and the Dock's sections adds nothing")
     func nothingOfItsOwn() {
         let rows: [String?] = ["T3 Code", nil, "Options", nil] + Self.systemSection
-        #expect(titles(rows, checked: ["T3 Code"]).isEmpty)
+        #expect(titles(rows, windows: ["T3 Code"]).isEmpty)
     }
 
     @Test("Several application sections keep their order and a separator between them")
     func applicationSections() {
         let rows: [String?] = ["Chat", nil, "Recent", "More", nil, "Other", nil, "Options", nil] + Self.systemSection
-        let filtered = SystemDockMenuFilter.applicationEntries(in: entries(rows, submenus: ["More", "Options"], checked: ["Chat"]),
-                                                               windowTitles: [])
+        let filtered = SystemDockMenuFilter.applicationEntries(in: entries(rows, submenus: ["More", "Options"]), windowTitles: ["Chat"])
         #expect(filtered.map(\.title) == ["Recent", "More", "", "Other"])
         #expect(filtered[1].children.count == 1)
     }
