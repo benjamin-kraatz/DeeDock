@@ -3370,3 +3370,39 @@ The app was not launched. Not exercised:
 - unpinning across several displays;
 - a standard (non-admin) user;
 - VoiceOver and keyboard use of the sheet.
+
+## Apps' own Dock menu items
+
+### Implemented
+
+- A running app's context menu shows the rows it adds to its macOS Dock menu, below the window list, while the macOS Dock is tucked away.
+- `SystemDockMenuReader` opens the Dock tile's menu with `AXShowMenu`, reads it, and dismisses it, with a 300 ms limit. Pressing a row reopens the menu, checks the title at every level, and presses it through the Dock.
+- `SystemDockMenuFilter` keeps the app's rows by menu shape, because Accessibility exposes nothing that separates them from recents, windows, and the Dock's own commands.
+
+### API limitations
+
+macOS has no public way to ask another app for its Dock menu. `applicationDockMenu` runs only inside the owning app, and the Dock fetches the result over a private channel (`CopyAppMenu`). The read depends on undocumented Dock behaviour and on the menu layout observed on macOS 27, so check both on each new macOS version.
+
+### Validation status
+
+Measured on a Mac with three displays with 60 fps ScreenCaptureKit capture, using a debug probe that read and dismissed the menu:
+
+| Scenario | Result |
+| --- | --- |
+| Dock tucked away, menu held open up to 500 ms | Nothing in captures; the user saw nothing during a 1.5 s hold on the Dock's display |
+| Dock visible, menu held open 400 ms | Menu captured, which shows capture can see it |
+| Dock visible, immediate read and dismiss | Every read flashed for about 30–60 ms: 5 of 8 painted the menu, 3 only the tile highlight |
+| Read time | 44–90 ms typical, 236 ms for the first read through DOKK |
+| DOKK on the same display as the tucked Dock | The user confirmed no second menu and a normal DOKK menu |
+
+The filter's rules come from Finder, Helium, ChatGPT, Xcode, Ghostty, WhatsApp, and T3 Code. The app and test target compile. Tests were not run, and the built menu has not been exercised by hand.
+
+### Hands-on acceptance
+
+- Tucked Dock: Xcode shows **Open Developer Tool**, and a row inside it opens the tool.
+- A plain row, such as **New Window** in a browser, runs and brings the app forward as it does from the macOS Dock.
+- Recents, windows, Options, and the Dock's commands stay out, including for Finder with windows open.
+- An app that adds nothing opens its menu with no empty section.
+- Restored Dock: no rows, no read, and no delay.
+
+Fullscreen apps and plain auto-hide without DOKK's tuck are not covered. VoiceOver reaches the rows through the context menu; the tile's accessibility actions do not include them.

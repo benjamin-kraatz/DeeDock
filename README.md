@@ -40,7 +40,7 @@ DOKK works without special permissions. A few features need one, and DOKK asks o
 
 | Permission | Used by |
 | --- | --- |
-| Accessibility | Window lists in app menus, Window Peek window selection, Radar window control, App Fusion, app badges, the Notification Feed, Robi, and resuming Session Capsules |
+| Accessibility | Window lists in app menus, apps' own Dock menu items, Window Peek window selection, Radar window control, App Fusion, app badges, the Notification Feed, Robi, and resuming Session Capsules |
 | Screen Recording | Window Peek and Radar thumbnails and features that capture window contents, such as Session Capsules, markup, window search, and Robi's regions. Also secondary docks that show only the apps with windows on their display |
 | Automation for Finder | Opening and emptying the Trash, and App Fusion folder navigation |
 

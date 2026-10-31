@@ -36,6 +36,8 @@ struct DockContextMenuBridge: NSViewRepresentable {
         private var snapshot: ApplicationMenuSnapshot?
         private var discoveryID: UUID?
         private var selectedWindowToken: ApplicationWindowToken?
+        private var dockMenuRead: Task<Void, Never>?
+        private var dockMenuEntries: [SystemDockMenuEntry] = []
 
         override func hitTest(_ point: NSPoint) -> NSView? {
             guard let event = NSApp.currentEvent,
@@ -49,6 +51,29 @@ struct DockContextMenuBridge: NSViewRepresentable {
         override func mouseDown(with event: NSEvent) { show(event) }
 
         private func show(_ event: NSEvent) {
+            guard let item, dockMenuRead == nil else { return }
+            guard interaction?.canReadApplicationDockMenu?(item) == true,
+                  let read = interaction?.readApplicationDockMenu else {
+                present(event)
+                return
+            }
+            // The read has to finish before the menu opens, because the Dock's menu opening in
+            // another process can dismiss one that is already tracking. The dock stays up meanwhile.
+            tracking?(true)
+            dockMenuRead = Task { [weak self] in
+                let entries = await read(item)
+                guard let self, !Task.isCancelled else { return }
+                dockMenuRead = nil
+                guard self.item?.id == item.id, window != nil else {
+                    tracking?(false)
+                    return
+                }
+                dockMenuEntries = entries
+                present(event)
+            }
+        }
+
+        private func present(_ event: NSEvent) {
             guard let item else { return }
             meltChooser?.cancel()
             if let controller = interaction?.appMelt {
@@ -110,6 +135,10 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 menu.addItem(.separator())
             }
             addWindows(snapshot.windowState, to: menu)
+            if !dockMenuEntries.isEmpty {
+                addDockMenuEntries(dockMenuEntries, to: menu)
+                menu.addItem(.separator())
+            }
 
             if item.isAvailable {
                 addItem(.actionOpen, symbol: "arrow.up.forward.app", action: #selector(openApplication), to: menu)
@@ -244,6 +273,30 @@ struct DockContextMenuBridge: NSViewRepresentable {
             menu.addItem(.separator())
         }
 
+        /// Adds the rows the app put in its macOS Dock menu. Their titles come from the app.
+        private func addDockMenuEntries(_ entries: [SystemDockMenuEntry], to menu: NSMenu) {
+            for entry in entries {
+                guard !entry.isSeparator else {
+                    menu.addItem(.separator())
+                    continue
+                }
+                let row = NSMenuItem(title: entry.title, action: nil, keyEquivalent: "")
+                row.isEnabled = entry.isEnabled
+                row.state = entry.isChecked ? .on : .off
+                if entry.children.isEmpty {
+                    row.action = #selector(pressDockMenuEntry(_:))
+                    row.target = self
+                    row.representedObject = entry
+                } else {
+                    let submenu = NSMenu()
+                    submenu.autoenablesItems = false
+                    addDockMenuEntries(entry.children, to: submenu)
+                    row.submenu = submenu
+                }
+                menu.addItem(row)
+            }
+        }
+
         @discardableResult
         private func addItem(_ title: LocalizedStringResource, symbol: String? = nil,
                              action: Selector, to menu: NSMenu) -> NSMenuItem {
@@ -297,6 +350,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
             perform(.selectWindow(token))
         }
 
+        @objc private func pressDockMenuEntry(_ sender: NSMenuItem) {
+            guard let item, let entry = sender.representedObject as? SystemDockMenuEntry else { return }
+            let press = interaction?.pressApplicationDockMenuEntry
+            DispatchQueue.main.async { Analytics.performing(.menu) { press?(entry, item) } }
+        }
+
         private func perform(_ action: ApplicationMenuAction) {
             guard let item else { return }
             let handler = interaction?.performApplicationMenuAction
@@ -328,9 +387,12 @@ struct DockContextMenuBridge: NSViewRepresentable {
             tracking?(false)
             trackedMenu = nil
             snapshot = nil
+            dockMenuEntries = []
         }
 
         func stop() {
+            dockMenuRead?.cancel()
+            dockMenuRead = nil
             meltChooser?.cancel()
             meltChooser = nil
             trackedMenu?.cancelTracking()

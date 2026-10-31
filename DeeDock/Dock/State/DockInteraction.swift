@@ -75,6 +75,10 @@ final class DockInteraction {
     @ObservationIgnored var beginApplicationWindowDiscovery: ((DockItem, ApplicationMenuSnapshot, @escaping (ApplicationWindowMenuState) -> Void) -> UUID?)?
     @ObservationIgnored var cancelApplicationWindowDiscovery: ((UUID) -> Void)?
     @ObservationIgnored var performApplicationMenuAction: ((ApplicationMenuAction, DockItem) -> Void)?
+    /// Whether a context menu should wait for the app's macOS Dock rows. False keeps it instant.
+    @ObservationIgnored var canReadApplicationDockMenu: ((DockItem) -> Bool)?
+    @ObservationIgnored var readApplicationDockMenu: ((DockItem) async -> [SystemDockMenuEntry])?
+    @ObservationIgnored var pressApplicationDockMenuEntry: ((SystemDockMenuEntry, DockItem) -> Void)?
     @ObservationIgnored var windowPeekHoverChanged: ((DockItem?) -> Void)?
     @ObservationIgnored var openWindowPeek: ((DockItem) -> Void)?
     @ObservationIgnored var openFolder: ((FolderDockItem, Bool) -> Void)?

@@ -22,6 +22,7 @@ final class DockCoordinator {
     let displayIndicator = DisplaySelectionIndicatorController()
     /// The macOS Dock switch. Quitting restores it through the app delegate, not `stop()`.
     let systemDockTuck = SystemDockTuckController()
+    private let systemDockMenus = SystemDockMenuReader()
     /// One-shot navigation consumed by Settings, including when its window is first created.
     var settingsDisplayRequest: String?
     /// One-shot route used by Window Peek's permission fallback.
@@ -592,6 +593,22 @@ final class DockCoordinator {
                     if let error = outcome.message { panel.store.errorMessage = error }
                     else if succeeded, action.activatesApplication { panel.store.applicationOpened?() }
                 })
+            }
+            // Reading opens the macOS Dock's own menu, which macOS draws unless the Dock is tucked
+            // away, so a visible Dock goes without these rows instead of flashing on every click.
+            panel.interaction.canReadApplicationDockMenu = { [weak self] item in
+                guard let self, systemDockTuck.isTucked else { return false }
+                return applicationMenus.snapshot(for: item).isRunning
+            }
+            panel.interaction.readApplicationDockMenu = { [weak self] item in
+                guard let self else { return [] }
+                let processes = applicationMenus.snapshot(for: item).processes.map(\.processIdentifier)
+                return await systemDockMenus.applicationEntries(applicationURL: item.resolvedURL ?? item.reference.url,
+                                                                processes: processes)
+            }
+            panel.interaction.pressApplicationDockMenuEntry = { [weak self] entry, item in
+                guard let reader = self?.systemDockMenus else { return }
+                Task { await reader.press(entry, applicationURL: item.resolvedURL ?? item.reference.url) }
             }
             panel.interaction.windowPeekHoverChanged = { [weak self, weak panel] item in
                 guard let self, let panel else { return }
