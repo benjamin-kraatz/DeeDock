@@ -137,13 +137,13 @@ actor SystemDockMenuReader {
     private func row(at path: [SystemDockMenuEntry.Step], in menu: AXUIElement) -> AXUIElement? {
         var current = menu
         var match: AXUIElement?
-        for step in path {
+        for (depth, step) in path.enumerated() {
             let rows = children(of: current)
             guard rows.indices.contains(step.index) else { return nil }
             let row = rows[step.index]
             guard attribute(kAXTitleAttribute, of: row) as? String ?? "" == step.title else { return nil }
             match = row
-            if step != path.last {
+            if depth < path.count - 1 {
                 guard let submenu = children(of: row).first else { return nil }
                 current = submenu
             }
