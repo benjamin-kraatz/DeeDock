@@ -17,7 +17,7 @@ import Foundation
 /// links what it mentions as `[words](#number)`; `RobiReferencedAnswer` turns those links into
 /// references the card can spotlight. Every generation is reported to PostHog LLM analytics
 /// through `AIObservability`, like DOKK's other model calls, with the prompt and answer in full and
-/// never the API key.
+/// never the API key. Claude's reports add the API's cache diagnostics: see `cacheDiagnostics`.
 @MainActor
 final class RobiAgent {
     enum Model {
@@ -38,6 +38,19 @@ final class RobiAgent {
         /// The interaction's trace, shared with its suggested questions.
         let trace: AIObservability.Trace
     }
+
+    /// Compares each Claude request with the one before it and says why the prompt cache missed.
+    ///
+    /// It belongs to the agent, not an answer: every question gets a fresh session, so the first
+    /// request of a question is only ever compared because this outlives the last one. The API
+    /// compares the prefix the two share, and a new question always differs from the last at the
+    /// user message, so `messages_changed` on a first request is normal. What matters is a
+    /// `system_changed` or `tools_changed` there, and any miss on a later request of a tool loop.
+    ///
+    /// Robi answers one question at a time except while a parked answer keeps generating. If that
+    /// overlaps a new Claude answer, reports can land on the wrong `robi_answer`. Only analytics are
+    /// affected, and an object per answer would cost an executor per question.
+    private let cacheDiagnostics = ClaudeCacheDiagnostics()
 
     /// Nil when the on-device model can answer now, otherwise why not.
     static var onDeviceUnavailableReason: LocalizedStringResource? {
@@ -65,9 +78,10 @@ final class RobiAgent {
         case let .claude(choice, key, effort):
             let name = choice.claudeModel
             let claude = ClaudeLanguageModel(name: name, auth: .apiKey(key),
-                                             fixedEffort: effort == .high ? .high : .medium, timeout: 90)
+                                             fixedEffort: effort == .high ? .high : .medium,
+                                             cacheDiagnostics: cacheDiagnostics, timeout: 90)
             try await run(claude, budget: 60_000, paging: .roomy, request: request, observed: (name.id, "anthropic"),
-                          secret: key, propose: propose, update: update)
+                          secret: key, cacheDiagnostics: cacheDiagnostics, propose: propose, update: update)
         }
     }
 
@@ -79,9 +93,12 @@ final class RobiAgent {
     ///   - secret: The API key the request uses. The key travels only in the request's header,
     ///     but should it ever appear in the window's text, an answer, or an error, it is replaced
     ///     before anything is reported.
+    ///   - cacheDiagnostics: What collects the API's cache reports for this answer; nil for a
+    ///     model that has none.
     ///   - paging: How much of the menu the model sees at once; tighter for the on-device model.
     private func run<Model: LanguageModel>(_ model: Model, budget: Int, paging: RobiMenuCatalog.Paging, request: Request,
                                            observed: (model: String, provider: String), secret: String?,
+                                           cacheDiagnostics: ClaudeCacheDiagnostics? = nil,
                                            propose: @escaping @MainActor (RobiProposal) -> Void,
                                            update: @escaping @MainActor (String) -> Void) async throws {
         let collector = RobiStepCollector { proposal in Task { @MainActor in propose(proposal) } }
@@ -105,7 +122,6 @@ final class RobiAgent {
         }
         let started = Date()
         var output = ""
-        var usage: LanguageModelSession.Usage?
         // Reported once the stream ends, whether it finished, failed or was stopped, so a stopped
         // answer still shows what it cost. Detached, because a stopped answer's task is cancelled.
         func observe(_ error: Error?) {
@@ -116,13 +132,15 @@ final class RobiAgent {
             let failure = error.flatMap { $0 is CancellationError || Task.isCancelled ? nil : redacted(Self.message(for: $0)) }
             let input = redacted(image == nil ? prompt : prompt + "\n[Picture attached: \(pictureLabel)]")
             let instructions = redacted(instructions)
-            let tokens = usage.map { AIObservability.Usage(input: $0.input.totalTokenCount, output: $0.output.totalTokenCount) }
+            let reports = cacheDiagnostics?.takeReports() ?? []
+            let tokens = Self.tokens(session.usage, reports: reports)
+            let cache = AIObservability.CacheDiagnostics(reports)
             let trace = request.trace, answer = redacted(output), limit = Self.maximumResponseTokens
             Task.detached {
                 await AIObservability.capture(trace: trace, name: "robi_answer", input: input, output: answer, startedAt: started,
                                               maximumResponseTokens: limit, stream: true,
                                               model: observed.model, provider: observed.provider,
-                                              instructions: instructions, usage: tokens, error: failure)
+                                              instructions: instructions, usage: tokens, cacheDiagnostics: cache, error: failure)
             }
         }
         // A snapshot holds only the text of the response in progress. After a tool call the model
@@ -137,7 +155,6 @@ final class RobiAgent {
                 if !snapshot.content.hasPrefix(latest) { earlier = Self.paragraphs(earlier, latest) }
                 latest = snapshot.content
                 output = Self.paragraphs(earlier, latest)
-                usage = snapshot.usage
                 update(output)
             }
         } catch is GeneratedContent.ParsingError where !output.isEmpty || collector.hasSteps {
@@ -148,6 +165,23 @@ final class RobiAgent {
             throw error
         }
         observe(nil)
+    }
+
+    /// The token counts to report, or nil when the model reported none. `usage` is the session's,
+    /// not a snapshot's: a snapshot counts only the response in progress, so after a tool call it
+    /// would leave out the responses before it.
+    ///
+    /// The session's input total folds cache reads and writes in, so when the API reported per
+    /// request the three are added up from there instead. Those reports arrive with the response's
+    /// first event, so an answer stopped early still reports what its prompt cost.
+    private static func tokens(_ usage: LanguageModelSession.Usage, reports: [ClaudeCacheDiagnostics.Report]) -> AIObservability.Usage? {
+        let input = usage.input.totalTokenCount, output = usage.output.totalTokenCount
+        guard !reports.isEmpty else {
+            return input == 0 && output == 0 ? nil : AIObservability.Usage(input: input, output: output)
+        }
+        return AIObservability.Usage(input: reports.map(\.inputTokens).reduce(0, +), output: output,
+                                     cacheRead: reports.map(\.cacheReadInputTokens).reduce(0, +),
+                                     cacheCreation: reports.map(\.cacheCreationInputTokens).reduce(0, +))
     }
 
     /// Two responses' text as consecutive paragraphs; either alone when the other is empty.
@@ -275,6 +309,25 @@ final class RobiAgent {
         }
         if let error = error as? URLError, error.code == .notConnectedToInternet { return String(localized: .robiErrorOffline) }
         return String(localized: .robiErrorGeneric(error.localizedDescription))
+    }
+}
+
+private extension AIObservability.CacheDiagnostics {
+    /// The API's reports as analytics values, one per request of an answer.
+    init(_ reports: [ClaudeCacheDiagnostics.Report]) {
+        var outcomes: [String] = []
+        var missed = 0
+        for report in reports {
+            switch report.outcome {
+            case .firstRequest: outcomes.append("first_request")
+            case .noDivergence: outcomes.append("no_divergence")
+            case .pending: outcomes.append("pending")
+            case let .cacheMiss(reason, missedInputTokens):
+                outcomes.append(reason)
+                missed += missedInputTokens ?? 0
+            }
+        }
+        self.init(outcomes: outcomes, missedInputTokens: missed)
     }
 }
 

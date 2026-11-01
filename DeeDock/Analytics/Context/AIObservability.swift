@@ -42,8 +42,22 @@ nonisolated enum AIObservability {
 
     /// Token counts a model reported for one generation.
     nonisolated struct Usage: Sendable {
+        /// Prompt tokens. With cache counts set, the uncached remainder only: PostHog treats
+        /// Anthropic's cache tokens as separate from `$ai_input_tokens` when it works out cost, so
+        /// a total here would charge them twice.
         let input: Int
         let output: Int
+        var cacheRead: Int? = nil
+        var cacheCreation: Int? = nil
+    }
+
+    /// What the Claude API said about prompt caching for one generation.
+    nonisolated struct CacheDiagnostics: Sendable {
+        /// One entry per API request, in order: `first_request`, `no_divergence`, `pending`, or the
+        /// API's `cache_miss_reason` type.
+        let outcomes: [String]
+        /// The API's estimate of the prompt lost to those misses, a magnitude and not a bill.
+        let missedInputTokens: Int
     }
 
     /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
@@ -54,11 +68,13 @@ nonisolated enum AIObservability {
     /// - Parameters:
     ///   - instructions: The session's instructions, sent as a system message before `input`.
     ///   - usage: Token counts, when the model reports them.
+    ///   - cacheDiagnostics: The cache comparison, for a request that opted in to one.
     ///   - error: A message safe to show the person, for a generation that failed.
     static func capture(trace: Trace, name: String, input: String, output: String? = nil,
                         startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
                         model: String = "apple_foundation_models", provider: String = "apple",
-                        instructions: String? = nil, usage: Usage? = nil, error: String? = nil) async {
+                        instructions: String? = nil, usage: Usage? = nil,
+                        cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil) async {
         var properties: [String: Any] = [
             "$ai_trace_id": trace.id,
             "$ai_session_id": sessionID,
@@ -73,6 +89,12 @@ nonisolated enum AIObservability {
         if let usage {
             properties["$ai_input_tokens"] = usage.input
             properties["$ai_output_tokens"] = usage.output
+            if let cacheRead = usage.cacheRead { properties["$ai_cache_read_input_tokens"] = cacheRead }
+            if let cacheCreation = usage.cacheCreation { properties["$ai_cache_creation_input_tokens"] = cacheCreation }
+        }
+        if let cacheDiagnostics, !cacheDiagnostics.outcomes.isEmpty {
+            properties["cache_diagnostics"] = cacheDiagnostics.outcomes
+            properties["cache_missed_input_tokens"] = cacheDiagnostics.missedInputTokens
         }
         if let error {
             properties["$ai_is_error"] = true
@@ -89,7 +111,8 @@ nonisolated enum AIObservability {
     }
 }
 
-/// Bypasses the product-analytics property allowlist only for documented `$ai_*` manual-capture fields.
+/// Bypasses the product-analytics property allowlist only for documented `$ai_*` manual-capture
+/// fields and the cache diagnostics listed in docs/ANALYTICS.md.
 nonisolated struct AIObservabilityRecord: @unchecked Sendable {
     let name: String
     let properties: [String: Any]

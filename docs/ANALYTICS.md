@@ -545,7 +545,11 @@ and `apple`, or `claude-haiku-5-5`, `claude-sonnet-5-5` or `claude-opus-5-5` and
 `true`, the full prompt (`$ai_input`, with the session's instructions as a system message where a
 caller passes them) and the full answer (`$ai_output_choices`). Robi's answers also carry
 `$ai_input_tokens` and `$ai_output_tokens` from the session's usage, and `$ai_is_error` with
-`$ai_error` (the message the card shows) when a request fails. A stopped answer is reported with
+`$ai_error` (the message the card shows) when a request fails. Claude's answers report
+`$ai_input_tokens` as the uncached remainder, with `$ai_cache_read_input_tokens` and
+`$ai_cache_creation_input_tokens` beside it, because PostHog prices Anthropic's three separately.
+They also carry the API's cache diagnostics; see [Robi's cache diagnostics](#robis-cache-diagnostics).
+A stopped answer is reported with
 what arrived before the stop. API keys are never part of an event: callers pass only text, and
 anything in it shaped like an API key or access token (Anthropic, OpenAI, GitHub, AWS, Google,
 Slack) is replaced with `[API key]` before sending, for every feature.
@@ -568,6 +572,39 @@ prompt or answer contains:
 
 One Robi interaction, from the click to the card closing, is one trace: its suggested questions
 and every answer asked in it share a `$ai_trace_id`.
+
+### Robi's cache diagnostics
+
+Each Claude request names the response before it, and the API reports the first place the two
+requests differ. A `robi_answer` with Claude carries the result:
+
+| Property | Meaning |
+| --- | --- |
+| `cache_diagnostics` | One entry per API request of the answer, in order. An answer that used a tool has several. |
+| `cache_missed_input_tokens` | The API's estimate of the prompt after those differences, summed. It is a magnitude, not a billing number. |
+
+An entry is one of these:
+
+| Value | Meaning |
+| --- | --- |
+| `first_request` | Nothing to compare with: the first Claude request since Robi started. |
+| `no_divergence` | The prompt matched. With no cache reads, the entry had expired or the prompt was too short to cache. |
+| `pending` | The comparison was not ready when the response started. Inconclusive. |
+| `model_changed`, `system_changed`, `tools_changed`, `messages_changed` | The first thing that differed. |
+| `previous_message_not_found` | The previous fingerprint expired, or it came from another key's workspace. Not a sign that anything changed. |
+| `unavailable` | The API produced no comparison. |
+
+The first entry of an answer compares it with the previous question, so `messages_changed` there is
+expected, because a new question replaces the old one. `system_changed` there means the instructions
+changed, which they do between apps and when a window is resized. `tools_changed` there means the
+set of tools differs: Robi offers tools only for what the window holds (a press for buttons, a
+toggle for checkboxes, typing for fields) and none for a question that cannot act. Any miss after
+the first entry of an answer is worth looking at, because those requests only append to the same
+conversation.
+
+A parked answer keeps generating, so it can overlap a new one. Their entries and input and cache
+token counts can then land on each other's event, or compare the two answers with each other. Only
+analytics are affected.
 
 These events pass the same consent gate as everything else. The Privacy card and the tour say
 that requests and answers of AI features, Robi and Apple Intelligence ones, are shared in full, and
