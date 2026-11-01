@@ -602,6 +602,10 @@ toggle for checkboxes, typing for fields) and none for a question that cannot ac
 the first entry of an answer is worth looking at, because those requests only append to the same
 conversation.
 
+A parked answer keeps generating, so it can overlap a new one. Their entries and input and cache
+token counts can then land on each other's event, or compare the two answers with each other. Only
+analytics are affected.
+
 These events pass the same consent gate as everything else. The Privacy card and the tour say
 that requests and answers of AI features, Robi and Apple Intelligence ones, are shared in full, and
 Robi's settings say so too. Setting `capturesContent` to

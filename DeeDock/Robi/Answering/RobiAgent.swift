@@ -46,6 +46,10 @@ final class RobiAgent {
     /// compares the prefix the two share, and a new question always differs from the last at the
     /// user message, so `messages_changed` on a first request is normal. What matters is a
     /// `system_changed` or `tools_changed` there, and any miss on a later request of a tool loop.
+    ///
+    /// Robi answers one question at a time except while a parked answer keeps generating. If that
+    /// overlaps a new Claude answer, reports can land on the wrong `robi_answer`. Only analytics are
+    /// affected, and an object per answer would cost an executor per question.
     private let cacheDiagnostics = ClaudeCacheDiagnostics()
 
     /// Nil when the on-device model can answer now, otherwise why not.
@@ -118,7 +122,6 @@ final class RobiAgent {
         }
         let started = Date()
         var output = ""
-        var usage: LanguageModelSession.Usage?
         // Reported once the stream ends, whether it finished, failed or was stopped, so a stopped
         // answer still shows what it cost. Detached, because a stopped answer's task is cancelled.
         func observe(_ error: Error?) {
@@ -130,7 +133,7 @@ final class RobiAgent {
             let input = redacted(image == nil ? prompt : prompt + "\n[Picture attached: \(pictureLabel)]")
             let instructions = redacted(instructions)
             let reports = cacheDiagnostics?.takeReports() ?? []
-            let tokens = Self.tokens(usage, reports: reports)
+            let tokens = Self.tokens(session.usage, reports: reports)
             let cache = AIObservability.CacheDiagnostics(reports)
             let trace = request.trace, answer = redacted(output), limit = Self.maximumResponseTokens
             Task.detached {
@@ -152,7 +155,6 @@ final class RobiAgent {
                 if !snapshot.content.hasPrefix(latest) { earlier = Self.paragraphs(earlier, latest) }
                 latest = snapshot.content
                 output = Self.paragraphs(earlier, latest)
-                usage = snapshot.usage
                 update(output)
             }
         } catch is GeneratedContent.ParsingError where !output.isEmpty || collector.hasSteps {
@@ -165,15 +167,19 @@ final class RobiAgent {
         observe(nil)
     }
 
-    /// The token counts to report. The session's input total folds cache reads and writes in, so
-    /// when the API reported per request the three are added up from there instead. Those reports
-    /// arrive with the response's first event, so an answer stopped before its first snapshot,
-    /// which has no session usage yet, still reports what its prompt cost.
-    private static func tokens(_ usage: LanguageModelSession.Usage?, reports: [ClaudeCacheDiagnostics.Report]) -> AIObservability.Usage? {
+    /// The token counts to report, or nil when the model reported none. `usage` is the session's,
+    /// not a snapshot's: a snapshot counts only the response in progress, so after a tool call it
+    /// would leave out the responses before it.
+    ///
+    /// The session's input total folds cache reads and writes in, so when the API reported per
+    /// request the three are added up from there instead. Those reports arrive with the response's
+    /// first event, so an answer stopped early still reports what its prompt cost.
+    private static func tokens(_ usage: LanguageModelSession.Usage, reports: [ClaudeCacheDiagnostics.Report]) -> AIObservability.Usage? {
+        let input = usage.input.totalTokenCount, output = usage.output.totalTokenCount
         guard !reports.isEmpty else {
-            return usage.map { AIObservability.Usage(input: $0.input.totalTokenCount, output: $0.output.totalTokenCount) }
+            return input == 0 && output == 0 ? nil : AIObservability.Usage(input: input, output: output)
         }
-        return AIObservability.Usage(input: reports.map(\.inputTokens).reduce(0, +), output: usage?.output.totalTokenCount ?? 0,
+        return AIObservability.Usage(input: reports.map(\.inputTokens).reduce(0, +), output: output,
                                      cacheRead: reports.map(\.cacheReadInputTokens).reduce(0, +),
                                      cacheCreation: reports.map(\.cacheCreationInputTokens).reduce(0, +))
     }
