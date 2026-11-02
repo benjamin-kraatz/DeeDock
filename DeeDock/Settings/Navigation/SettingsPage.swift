@@ -45,6 +45,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case clipboardMuseum
     case discovery
     case soapBubbles
+    case appHealth
 
     var id: Self { self }
 
@@ -62,7 +63,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor, .robi,
              .actionTiles, .multipleDisplays, .permissions,
-             .appSuggestions, .localHistory, .clipboardMuseum, .soapBubbles, .discovery: .features
+             .appSuggestions, .localHistory, .clipboardMuseum, .soapBubbles, .discovery, .appHealth: .features
         }
     }
 
@@ -107,6 +108,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: .discoveryTitle
         case .soapBubbles: .soapBubblesTitle
         case .permissions: .windowPeekPermissionsTitle
+        case .appHealth: .appHealthTitle
         }
     }
 
@@ -141,6 +143,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
+        case .appHealth: .appHealthSettingsSubtitle
         default: nil
         }
     }
@@ -177,6 +180,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: .symbol("lightbulb.fill")
         case .soapBubbles: .symbol("circle.dotted")
         case .permissions: .symbol("lock.fill")
+        case .appHealth: .symbol("waveform.path.ecg")
         }
     }
 
@@ -211,6 +215,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: .teal
         case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
+        case .appHealth: Color(red: 0.16, green: 0.62, blue: 0.50)
         }
     }
 
@@ -245,6 +250,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .discovery: [.mint, .teal]
         case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
+        case .appHealth: [Color(red: 0.36, green: 0.86, blue: 0.66), Color(red: 0.06, green: 0.50, blue: 0.40)]
         }
     }
 
@@ -261,6 +267,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .harbor: .harborSettingsKeywords
         case .robi: .robiSettingsKeywords
         case .soapBubbles: .soapBubblesSettingsKeywords
+        case .appHealth: .appHealthSettingsKeywords
         case .appearance, .appNames, .background: .settingsAppearanceKeywords
         case .position: .settingsPositionKeywords
         case .behavior, .shownApps: .settingsBehaviorKeywords

@@ -1855,6 +1855,1194 @@
         }
       }
     },
+    "appHealthAnswerExpected" : {
+      "comment" : "Answer button in an App Health prompt: the app is busy for a reason the person knows about.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie erwartet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expected"
+          }
+        }
+      }
+    },
+    "appHealthAnswerExpectedHint" : {
+      "comment" : "VoiceOver hint for the Expected answer in an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert, dass die App aus einem bekannten Grund beschäftigt ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves that the app is busy for a reason you know."
+          }
+        }
+      }
+    },
+    "appHealthAnswerMisbehaving" : {
+      "comment" : "Answer button in an App Health prompt: the app is doing something it shouldn't.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macht Probleme"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Misbehaving"
+          }
+        }
+      }
+    },
+    "appHealthAnswerMisbehavingHint" : {
+      "comment" : "VoiceOver hint for the Misbehaving answer in an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert, dass etwas nicht stimmt. Danach kannst du sagen, was."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves that something is wrong. You can say what next."
+          }
+        }
+      }
+    },
+    "appHealthAnswerNotSure" : {
+      "comment" : "Answer button in an App Health prompt: the person can't tell.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiß nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not sure"
+          }
+        }
+      }
+    },
+    "appHealthAnswerNotSureHint" : {
+      "comment" : "VoiceOver hint for the Not sure answer in an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert, dass du es nicht sagen kannst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves that you can't tell."
+          }
+        }
+      }
+    },
+    "appHealthCollect" : {
+      "comment" : "Switch that turns App Health data collection on. Off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Daten sammeln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collect app health data"
+          }
+        }
+      }
+    },
+    "appHealthCollectHelp" : {
+      "comment" : "Explains the App Health collection switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle 20 Sekunden notiert DOKK, wie viel CPU, Speicher und Energie jede App nutzt, und speichert die Zahlen auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every 20 seconds, DOKK notes how much CPU, memory, and energy each app uses, and saves the numbers on this Mac."
+          }
+        }
+      }
+    },
+    "appHealthDataEmpty" : {
+      "comment" : "Value of the stored-data row when App Health has written nothing yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Daten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No data yet"
+          }
+        }
+      }
+    },
+    "appHealthDataSummary" : {
+      "comment" : "Value of the stored-data row: total size, then the day of the oldest data, such as '2.4 MB · since 30 Oct'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(size)@ · seit %(date)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(size)@ · since %(date)@"
+          }
+        }
+      }
+    },
+    "appHealthDelete" : {
+      "comment" : "Destructive button and confirmation action that deletes every App Health file, labels included.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Daten löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data"
+          }
+        }
+      }
+    },
+    "appHealthDeleteConfirm" : {
+      "comment" : "Title of the confirmation before deleting all App Health data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle App-Monitor-Daten löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all App Health data?"
+          }
+        }
+      }
+    },
+    "appHealthDeleteFailed" : {
+      "comment" : "Error shown when some App Health files could not be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte nicht alle App-Monitor-Dateien löschen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK couldn't delete all App Health files."
+          }
+        }
+      }
+    },
+    "appHealthDeleteHelp" : {
+      "comment" : "Message of the confirmation before deleting all App Health data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit werden alle App-Monitor-Dateien auf diesem Mac gelöscht, auch deine Bewertungen. Wenn das Sammeln eingeschaltet ist, läuft es weiter."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes every App Health file on this Mac, including your labels. If collection is on, it keeps going."
+          }
+        }
+      }
+    },
+    "appHealthDeleting" : {
+      "comment" : "Value of the stored-data row while all App Health files are being deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird gelöscht …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleting…"
+          }
+        }
+      }
+    },
+    "appHealthDetailDrainingBattery" : {
+      "comment" : "Follow-up choice after Misbehaving: the app drains the battery.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leert den Akku"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draining battery"
+          }
+        }
+      }
+    },
+    "appHealthDetailFrozen" : {
+      "comment" : "Follow-up choice after Misbehaving: the app doesn't respond.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reagiert nicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frozen"
+          }
+        }
+      }
+    },
+    "appHealthDetailHint" : {
+      "comment" : "VoiceOver hint for each follow-up choice after Misbehaving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert „Macht Probleme“ mit diesem Detail."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves Misbehaving with this detail."
+          }
+        }
+      }
+    },
+    "appHealthDetailMemoryGrowing" : {
+      "comment" : "Follow-up choice after Misbehaving: the app uses more and more memory.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher wächst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory growing"
+          }
+        }
+      }
+    },
+    "appHealthDetailSpinning" : {
+      "comment" : "Follow-up choice after Misbehaving: the app keeps the processor busy without end.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dauerlast"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spinning"
+          }
+        }
+      }
+    },
+    "appHealthDontAskApp" : {
+      "comment" : "Menu item on an App Health prompt that stops prompts about this app. Settings can undo it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu dieser App nicht mehr fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don’t Ask About This App"
+          }
+        }
+      }
+    },
+    "appHealthDontAskHelp" : {
+      "comment" : "Footnote under the list of apps labelling never asks about.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei diesen Apps fragt der Bewertungsmodus nie nach. Ihre Daten werden weiter gesammelt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labelling never asks about these apps. Their data is still collected."
+          }
+        }
+      }
+    },
+    "appHealthDontAskRemove" : {
+      "comment" : "VoiceOver label of the button removing an app from the list labelling never asks about. The argument is the app name from macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei %(app)@ wieder nachfragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask about %(app)@ again"
+          }
+        }
+      }
+    },
+    "appHealthDontAskTitle" : {
+      "comment" : "Heading of the list of apps labelling never asks about.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Nachfrage bei"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not asked about"
+          }
+        }
+      }
+    },
+    "appHealthExport" : {
+      "comment" : "Button that saves all App Health data as a zip archive through a save panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten exportieren …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export data…"
+          }
+        }
+      }
+    },
+    "appHealthExportFailed" : {
+      "comment" : "Error shown when the App Health export archive could not be written.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK konnte die Daten nicht exportieren. Versuch einen anderen Ort."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK couldn't export the data. Try another location."
+          }
+        }
+      }
+    },
+    "appHealthExportFileName" : {
+      "comment" : "Default file name, without extension, of an App Health export. The argument is the date as YYYY-MM-DD.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK App-Monitor %(date)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK App Health %(date)@"
+          }
+        }
+      }
+    },
+    "appHealthExporting" : {
+      "comment" : "Value of the stored-data row while an export archive is being written.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird exportiert …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporting…"
+          }
+        }
+      }
+    },
+    "appHealthFollowUpQuestion" : {
+      "comment" : "Follow-up question after answering Misbehaving in an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was scheint nicht zu stimmen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What seems wrong?"
+          }
+        }
+      }
+    },
+    "appHealthFollowUpSkip" : {
+      "comment" : "Button that skips the follow-up question after Misbehaving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "appHealthFollowUpSkipHint" : {
+      "comment" : "VoiceOver hint for Skip in the follow-up after Misbehaving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert „Macht Probleme“ ohne Detail."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves Misbehaving without a detail."
+          }
+        }
+      }
+    },
+    "appHealthLabelling" : {
+      "comment" : "Switch that turns on labelling mode, in which DOKK occasionally asks whether a busy app behaves as expected. Disabled while collection is off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewertungsmodus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labelling mode"
+          }
+        }
+      }
+    },
+    "appHealthLabellingHelp" : {
+      "comment" : "One-line explanation under the labelling mode switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ab und zu fragt DOKK, ob sich eine ausgelastete App wie erwartet verhält. Deine Antworten ordnen die Daten ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now and then, DOKK asks whether a busy app is behaving as expected. Your answers label the data."
+          }
+        }
+      }
+    },
+    "appHealthPausedUntilTomorrow" : {
+      "comment" : "Status row in App Health settings after the person chose to pause labelling prompts for the rest of the day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewertung bis morgen pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Labelling paused until tomorrow"
+          }
+        }
+      }
+    },
+    "appHealthPauseToday" : {
+      "comment" : "Menu item on an App Health prompt that pauses all prompts until midnight. Settings can resume early.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewertung für heute pausieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause Labelling for Today"
+          }
+        }
+      }
+    },
+    "appHealthPickerEmpty" : {
+      "comment" : "Shown in the App Health picker before the first measurements arrive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine App-Daten. Versuch es in ein paar Sekunden noch einmal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No app data yet. Try again in a few seconds."
+          }
+        }
+      }
+    },
+    "appHealthPickerFilter" : {
+      "comment" : "Placeholder of the filter field in the App Health picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps filtern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter apps"
+          }
+        }
+      }
+    },
+    "appHealthPickerNoMatch" : {
+      "comment" : "Shown in the App Health picker when the filter matches no app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passende App"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching app"
+          }
+        }
+      }
+    },
+    "appHealthPickerRowHint" : {
+      "comment" : "VoiceOver hint for an app in the App Health picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt, wie sich diese App gerade verhält."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks how this app is behaving right now."
+          }
+        }
+      }
+    },
+    "appHealthPickerRowValue" : {
+      "comment" : "Usage shown next to an app in the App Health picker. cpu is a percentage such as '140 %'; memory is a size such as '1.2 GB'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(cpu)@ CPU · %(memory)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(cpu)@ CPU · %(memory)@"
+          }
+        }
+      }
+    },
+    "appHealthPickerShowAll" : {
+      "comment" : "Button in the App Health picker that shows every watched app. count is how many there are.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle %(count)lld Apps zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show all %(count)lld apps"
+          }
+        }
+      }
+    },
+    "appHealthPickerTitle" : {
+      "comment" : "Title of the App Health picker that lists running apps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche App macht Probleme?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which app is acting up?"
+          }
+        }
+      }
+    },
+    "appHealthPrivacyNote" : {
+      "comment" : "What App Health records and how the data is kept, shown next to a lock in its settings. Transparent, not alarming.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle 20 Sekunden zeichnet der App-Monitor für jede App CPU-Zeit, Speicherbedarf, Idle-Wake-ups und Energieverbrauch auf; ob eine App reagiert (nur wenn DOKK bereits Zugriff auf die Bedienungshilfen hat); welche App vorne ist; wie lange du Tastatur oder Maus nicht benutzt hast; Ruhezustand und Aufwachen, Stromquelle und Temperaturzustand; und deine Bewertungen. Er speichert nur App-Kennungen und Zahlen, nie Fenstertitel, Dateinamen oder Inhalte, in einem Ordner auf diesem Mac. Nichts wird hochgeladen. Die Daten bleiben 30 Tage erhalten, höchstens 50 MB."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every 20 seconds, App Health records each app's CPU time, memory footprint, idle wake-ups, and energy use; whether an app responds (only if Accessibility is already allowed for DOKK); which app is in front; how long since you last used the keyboard or mouse; sleep and wake, power source, and thermal state; and your labels. It keeps app identifiers and numbers only, never window titles, file names, or content, in a folder on this Mac. Nothing is uploaded. Data is kept for 30 days, up to 50 MB."
+          }
+        }
+      }
+    },
+    "appHealthShowInFinder" : {
+      "comment" : "Link at the end of App Health's privacy note in Settings. Opens the folder that holds the recorded data in Finder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "appHealthPromptAnnouncement" : {
+      "comment" : "VoiceOver announcement when an App Health labelling prompt appears; focus does not move. The argument is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Monitor fragt: Verhält sich %(app)@ wie erwartet?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Health asks: Is %(app)@ behaving as expected?"
+          }
+        }
+      }
+    },
+    "appHealthPromptClose" : {
+      "comment" : "Accessibility label of the close button on an App Health question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "appHealthPromptCloseHint" : {
+      "comment" : "VoiceOver hint of the close button on an App Health question.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließt die Frage ohne Antwort."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closes the question without an answer."
+          }
+        }
+      }
+    },
+    "appHealthPromptMore" : {
+      "comment" : "Accessibility label of the … menu on an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "appHealthPromptMoreHint" : {
+      "comment" : "VoiceOver hint of the … menu on an App Health prompt.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu dieser App nicht mehr fragen oder Fragen für heute pausieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop asking about this app, or pause questions for today."
+          }
+        }
+      }
+    },
+    "appHealthPromptQuestion" : {
+      "comment" : "Question in an App Health labelling prompt. The argument is the app's name as macOS reports it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhält sich %(app)@ wie erwartet?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is %(app)@ behaving as expected?"
+          }
+        }
+      }
+    },
+    "appHealthReasonHang" : {
+      "comment" : "Reason under an App Health prompt: the app did not answer a responsiveness check.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hat auf eine Prüfung nicht reagiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Didn’t respond to a check"
+          }
+        }
+      }
+    },
+    "appHealthReasonMemory" : {
+      "comment" : "Reason under an App Health prompt. amount is a size such as '1.2 GB'; duration is a length such as '10 minutes'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher ist in %2$(duration)@ um %1$(amount)@ gewachsen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory grew %1$(amount)@ in %2$(duration)@"
+          }
+        }
+      }
+    },
+    "appHealthReasonOrdinary" : {
+      "comment" : "Reason under an App Health prompt about an app that is busy but not suspicious.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit ein paar Minuten beschäftigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busy for a few minutes"
+          }
+        }
+      }
+    },
+    "appHealthReasonSpinBackground" : {
+      "comment" : "Reason under an App Health prompt. cpu is a percentage such as '140 %' (100 % is one core); duration is a length such as '3 minutes'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzt seit %2$(duration)@ %1$(cpu)@ CPU im Hintergrund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using %1$(cpu)@ CPU for %2$(duration)@ in the background"
+          }
+        }
+      }
+    },
+    "appHealthReasonSpinIdle" : {
+      "comment" : "Reason under an App Health prompt while the person was away from the Mac. cpu is a percentage such as '140 %'; duration is a length such as '3 minutes'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzt seit %2$(duration)@ %1$(cpu)@ CPU, während du weg warst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using %1$(cpu)@ CPU for %2$(duration)@ while you were away"
+          }
+        }
+      }
+    },
+    "appHealthReasonWakeups" : {
+      "comment" : "Reason under an App Health prompt. count is a formatted number of wake-ups per second, such as '600'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weckt den Mac %(count)@-mal pro Sekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waking the Mac %(count)@ times a second"
+          }
+        }
+      }
+    },
+    "appHealthResume" : {
+      "comment" : "Button that ends a paused labelling day early, so prompts can appear again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
+    },
+    "appHealthResumeHint" : {
+      "comment" : "VoiceOver hint for the Resume button of paused labelling.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewertungsfragen können heute wieder erscheinen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lets labelling questions appear again today."
+          }
+        }
+      }
+    },
+    "appHealthSettingsKeywords" : {
+      "comment" : "Search synonyms that find the App Health settings page. Comma-separated; not shown.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Monitor, App-Zustand, CPU, Speicher, Energie, Batterie, Wake-ups, hängt, eingefroren, Trainingsdaten, Bewertungen, Export"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "app health, CPU, memory, energy, battery, wake-ups, hang, frozen, spinning, training data, labels, export"
+          }
+        }
+      }
+    },
+    "appHealthSettingsSubtitle" : {
+      "comment" : "Short description of App Health on the Features overview in Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufzeichnen, wie Apps CPU und Speicher nutzen, als Trainingsdaten auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record how apps use CPU and memory, as training data on this Mac"
+          }
+        }
+      }
+    },
+    "appHealthSomethingOff" : {
+      "comment" : "Menu-bar menu item that opens a picker to label an app that misbehaves right now. Shown only in App Health labelling mode.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade stimmt etwas nicht…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something’s Off Right Now…"
+          }
+        }
+      }
+    },
+    "appHealthStatusCollecting" : {
+      "comment" : "Status line under “Stored data” in App Health settings while sampling runs. Follows a small coloured dot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sammelt alle 20 Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collecting every 20 seconds"
+          }
+        }
+      }
+    },
+    "appHealthStatusPaused" : {
+      "comment" : "Status line under “Stored data” in App Health settings while collection is on but sampling is paused by sleep, display sleep, or a locked session.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausiert, solange der Mac nicht genutzt wird"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused while the Mac isn’t in use"
+          }
+        }
+      }
+    },
+    "appHealthStoredData" : {
+      "comment" : "Row title for the amount of App Health data stored on this Mac.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherte Daten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stored data"
+          }
+        }
+      }
+    },
+    "appHealthThanks" : {
+      "comment" : "Short confirmation after an App Health label was saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danke, notiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thanks, noted."
+          }
+        }
+      }
+    },
+    "appHealthTitle" : {
+      "comment" : "Name of the App Health feature, which records per-app resource use as local training data. Settings page title and card heading.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Monitor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Health"
+          }
+        }
+      }
+    },
     "behaviorApproachColor" : {
       "comment" : "Picker label choosing the approach glow's color.",
       "extractionState" : "manual",

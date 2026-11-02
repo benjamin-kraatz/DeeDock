@@ -107,6 +107,10 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 DiscoverySettingsCard(discovery: coordinator.discovery)
             }
+        case .appHealth:
+            if let appHealth = context.appHealth {
+                AppHealthSettingsCard(controller: appHealth)
+            }
         case .soapBubbles:
             SettingsCard(title: .soapBubblesTitle, footnote: .soapBubblesSettingsHelp) {
                 SettingsToggleRow(title: .soapBubblesEnable, subtitle: .soapBubblesEnableHelp,

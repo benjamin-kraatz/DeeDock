@@ -9,6 +9,7 @@ struct DockSettingsView: View {
     let windowAccess: WindowAccessController
     let screenCapture: ScreenCaptureAccessController
     var coordinator: DockCoordinator? = nil
+    var appHealth: AppHealthController? = nil
     @State private var selection: SettingsSection? = .dock
     /// An empty path shows the selected section’s overview.
     @State private var path: [SettingsPage] = []
@@ -17,7 +18,8 @@ struct DockSettingsView: View {
 
     private var context: SettingsContext {
         SettingsContext(store: store, profiles: profiles, loginItems: loginItems, menuBarIcon: menuBarIcon,
-                        windowAccess: windowAccess, screenCapture: screenCapture, coordinator: coordinator)
+                        windowAccess: windowAccess, screenCapture: screenCapture, coordinator: coordinator,
+                        appHealth: appHealth)
     }
 
     /// The display being edited, when the sidebar has one selected.
@@ -207,6 +209,7 @@ struct DockSettingsView: View {
         case .windowPeek: isOn = value.windowPeekEnabled
         case .soapBubbles: isOn = value.soapBubbleEffects
         case .multipleDisplays: isOn = value.secondaryDisplayAppsOnly
+        case .appHealth: isOn = appHealth?.settings.collecting ?? false
         default: return nil
         }
         return isOn ? .settingsStatusOn : .settingsStatusOff

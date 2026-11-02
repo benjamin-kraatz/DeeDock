@@ -12,6 +12,12 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
     let updater = AppUpdater()
     let loginItems = LoginItemController(service: SystemLoginItemService())
     let menuBarIcon = MenuBarIconController()
+    /// App Health's collector. Cheap to create; it reads nothing and samples nothing until `start()`.
+    let appHealth = AppHealthController.live()
+    /// App Health's labelling prompts and the manual picker. Owned here, beside the collector, so the collector
+    /// stays free of windows; it hooks into the collector only from `start()`.
+    private(set) lazy var appHealthLabelling = AppHealthLabellingCoordinator(controller: appHealth,
+                                                                            dependencies: .live())
     private let lineIconCoverage = LineIconCoverageReporter()
     private(set) lazy var onboarding = OnboardingWindowController(
         loginItems: loginItems, settings: coordinator.settings, systemDockTuck: coordinator.systemDockTuck)
@@ -35,6 +41,13 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         windowAccess.refresh()
         screenCapture.refresh()
         coordinator.start()
+        // After the docks exist, so a prompt can find a tile to attach to.
+        appHealth.anchorProvider = { [weak coordinator] bundleID in
+            coordinator?.appHealthAnchor(forBundleID: bundleID)
+        }
+        // Before the collector starts, so its first pause already closes questions through `willPause`.
+        appHealthLabelling.start()
+        appHealth.start()
         updater.start()
         coordinator.updateAwareness = updater.awareness
         coordinator.openUpdateTile = { [weak updater] item in
@@ -92,6 +105,10 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         loginItems.stop()
         windowAccess.stop()
         screenCapture.stop()
+        // Before the docks stop, so its last records (and any interrupted prompt) are written while anchors exist.
+        appHealth.stop(waitForWrites: true)
+        // After the collector, whose stop recorded any open question as interrupted through `willPause`.
+        appHealthLabelling.stop()
         coordinator.stop()
         lineIconCoverage.stop()
         Analytics.shared.stop()

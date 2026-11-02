@@ -41,6 +41,14 @@ enum AnalyticsCounter: Hashable {
     case lookoutPictureWordsAdded
     /// The picture–words slider was moved and let go.
     case lookoutPictureWeightChanged
+    /// An App Health labelling prompt got an answer: Expected, Misbehaving, or Not sure. Never the app or answer.
+    case appHealthPromptAnswered
+    /// An App Health prompt expired or was closed without an answer.
+    case appHealthPromptIgnored
+    /// A label was given through "Something's off right now…".
+    case appHealthManualLabel
+    /// App Health data was exported to a zip archive.
+    case appHealthExported
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -62,6 +70,10 @@ enum AnalyticsCounter: Hashable {
         case .lookoutWeakMatchesExpanded: "lookout_weak_matches_expanded"
         case .lookoutPictureWordsAdded: "lookout_picture_words_added"
         case .lookoutPictureWeightChanged: "lookout_picture_weight_changed"
+        case .appHealthPromptAnswered: "app_health_prompt_answered"
+        case .appHealthPromptIgnored: "app_health_prompt_ignored"
+        case .appHealthManualLabel: "app_health_manual_label"
+        case .appHealthExported: "app_health_exported"
         }
     }
 }

@@ -110,7 +110,8 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras:
             [[.islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed],
              [.actionTiles, .soapBubbles],
-             [.multipleDisplays]]
+             [.multipleDisplays],
+             [.appHealth]]
         case .windowsFocus:
             [[.windowPeek, .harbor, .robi], [.permissions]]
         case .suggestionsHistory:
