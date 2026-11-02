@@ -14,6 +14,8 @@ struct SettingsContext {
     let windowAccess: WindowAccessController
     let screenCapture: ScreenCaptureAccessController
     var coordinator: DockCoordinator?
+    /// Nil in previews of the whole window, which run no collector.
+    var appHealth: AppHealthController?
 
     /// Bindings for the shared defaults, or for one display when `override` is given.
     func source(_ override: SettingsOverrideContext? = nil) -> SettingsValueSource {

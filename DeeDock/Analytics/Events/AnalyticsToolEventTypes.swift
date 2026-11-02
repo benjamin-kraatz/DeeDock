@@ -123,6 +123,10 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case lookoutIndexOnBattery = "lookout_index_on_battery"
     /// How many folders Lookout reads, after one was added or removed in Settings.
     case lookoutFolderCount = "lookout_folder_count"
+    /// App Health's "Collect app health data" switch in Settings.
+    case appHealthEnabled = "app_health_enabled"
+    /// App Health's "Labelling mode" switch in Settings.
+    case appHealthLabelling = "app_health_labelling"
 }
 
 /// Which window permissions Harbor had when it opened.

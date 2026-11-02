@@ -220,7 +220,8 @@ Preferences kept outside those models are reported with `area = features` and a 
 `peek_history_enabled`, `shelf_sort`, `shelf_presentation`,
 `shelf_compost_days` (0 is off), `system_dock_tuck` (only for a click in Settings or the tour,
 not for the restore at quit or the re-tuck at launch), and Lookout's `lookout_enabled`, `lookout_index_on_battery`
-and `lookout_folder_count` (a count, after a folder was added or removed in Settings; never the folders). They are not part of the person profile, so a person who never
+and `lookout_folder_count` (a count, after a folder was added or removed in Settings; never the folders), and App Health's
+`app_health_enabled` and `app_health_labelling`. They are not part of the person profile, so a person who never
 changed one is on its default.
 
 `settings_viewed` with `via = request` means a menu item, a dock tile, or another feature opened
@@ -247,12 +248,19 @@ launches, and reset when sent:
 | `lookout_weak_matches_expanded` | the "Weaker matches" fold under Lookout's results was opened |
 | `lookout_picture_words_added` | words were typed beside a picture searched with. Once per picture |
 | `lookout_picture_weight_changed` | the picture–words slider was moved and let go |
+| `app_health_prompt_answered` | an App Health labelling prompt got an answer (Expected, Misbehaving, or Not sure) |
+| `app_health_prompt_ignored` | an App Health prompt expired or was closed without an answer |
+| `app_health_manual_label` | a label was given through "Something's off right now…" |
+| `app_health_exported` | App Health data was exported to a zip archive |
 
 Magnification itself is not tracked. Its settings are.
 
 Badge counters are plain counts. They never include the badge text, the app, or the banner.
 Comparing `badge_acknowledged_dock_click` with the other acknowledgement routes across
 `dock_icon_style` shows whether the Line ring sends people to the dock.
+
+App Health's counters are plain counts. They never include the app, the answer, the suspicion
+reasons, or anything from the recorded data, which stays on the Mac.
 
 Lookout's counters and `lookout_result_opened` tune its strong/weak split (`LookoutRanking.strongRatio`, 0.5):
 opens with `section = weak` against `section = strong`, and `lookout_weak_matches_expanded` against

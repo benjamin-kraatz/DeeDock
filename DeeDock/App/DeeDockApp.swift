@@ -63,6 +63,7 @@ struct DeeDockApp: App {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
                 OpenSystemSettingsCloneButton()
+                AppHealthMenuButton(controller: delegate.appHealth) { delegate.appHealthLabelling.showPicker() }
             } header: { Text(.menuSectionTools) }
             Divider()
             OpenDockSettingsButton()
@@ -108,7 +109,8 @@ struct DeeDockApp: App {
                              loginItems: delegate.loginItems, menuBarIcon: delegate.menuBarIcon,
                              windowAccess: delegate.windowAccess,
                              screenCapture: delegate.screenCapture,
-                             coordinator: delegate.coordinator)
+                             coordinator: delegate.coordinator,
+                             appHealth: delegate.appHealth)
             .background { SettingsWindowRegistration() }
             .environment(\.appUpdater, delegate.updater)
         }

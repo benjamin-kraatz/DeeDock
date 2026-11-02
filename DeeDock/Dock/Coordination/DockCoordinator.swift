@@ -864,6 +864,31 @@ final class DockCoordinator {
     /// The dock state for one display, or nil when that display hosts no dock.
     func dockStore(for displayID: String) -> DockStore? { panels[displayID]?.store }
 
+    /// Where an App Health prompt about `bundleID` attaches, in AppKit screen coordinates.
+    ///
+    /// Falls back in order: the app's tile on a fully shown dock (primary display first), the primary display's
+    /// dock surface if that dock is fully shown (any shown dock otherwise), then the main screen's lower-right
+    /// corner. An auto-hidden or hiding dock never anchors a prompt, since it would point at nothing visible.
+    /// Nil only when there is no screen at all.
+    func appHealthAnchor(forBundleID bundleID: String) -> AppHealthAnchor? {
+        let primaryID = enabledDisplays.first(where: \.isPrimary)?.id
+        let shown = panels.filter { $0.value.isFullyShown }
+            .sorted { lhs, rhs in lhs.key == primaryID ? true : rhs.key == primaryID ? false : lhs.key < rhs.key }
+            .map(\.value)
+        for panel in shown {
+            // Tile keys are `ApplicationReference.id`, the bundle identifier for any running app.
+            // A tile scrolled out of an overflowing dock keeps a frame outside the surface; skip it.
+            guard let anchor = panel.popoverAnchor(for: .app(bundleID)), !anchor.icon.isNull, !anchor.icon.isEmpty,
+                  panel.surfaceAnchor().map({ $0.icon.intersects(anchor.icon) }) ?? true else { continue }
+            return AppHealthAnchor(kind: .tile, rect: anchor.icon, edge: anchor.edge, visibleFrame: anchor.visibleFrame)
+        }
+        if let anchor = shown.lazy.compactMap({ $0.surfaceAnchor() }).first {
+            return AppHealthAnchor(kind: .dock, rect: anchor.icon, edge: anchor.edge, visibleFrame: anchor.visibleFrame)
+        }
+        guard let screen = NSScreen.main ?? NSScreen.screens.first else { return nil }
+        return AppHealthAnchor.screen(visibleFrame: screen.visibleFrame)
+    }
+
     /// Opens or closes Harbor from the menu.
     func showHarbor() { harbor.toggle() }
 

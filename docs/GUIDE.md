@@ -23,6 +23,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
 - [Robi on your windows](#robi-on-your-windows)
+- [App Health](#app-health)
 - [Plugins](#plugins)
 - [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
@@ -463,6 +464,18 @@ Clicking Robi never activates DOKK, so the app keeps its selection and stays in 
 **Answers.** By default Robi answers with Apple Intelligence on this Mac, and what you pick never leaves it. Under **Answers** you can choose **Claude** instead, with your own Anthropic API key. Pick **Haiku 5.5** for the fastest and cheapest answers, **Sonnet 5.5** (the default) for a balance, or **Opus 5.5** for the most capable and most expensive ones, and set **Medium** or **High** effort. The card's footer names the model that answered. DOKK keeps the key in your Keychain, and your question and its context go from this Mac straight to Anthropic, billed to your Anthropic account. When Claude is chosen and no key is saved, Robi's card asks for one, or answers this question on this Mac instead.
 
 Robi reads a window only when you click it or press its shortcut, and it keeps nothing afterwards: no history, and nothing written to disk. If you share usage statistics, Robi's requests and answers are shared in full, like those of DOKK's other AI features: your question, what you picked, and the answer, never your API key: anything that looks like an API key is removed. Pictures are not sent there. See [Robi](ROBI.md) for how it follows windows, what it can read in which apps, and its limits.
+
+## App Health
+
+App Health records how running apps use CPU, memory, wake-ups, and energy, as training data for a future model that tells a misbehaving app from a busy one. It is off by default and shows no alerts. Turn it on in **Settings → Dock Extras → App Health → Collect app health data**.
+
+Every 20 seconds DOKK notes each app's CPU time, memory footprint, idle wake-ups, and energy, which app is in front, and how long since you last used the keyboard or mouse. If Accessibility is already allowed for DOKK, it also checks whether a few busy or frontmost apps respond; it never asks for the permission itself. Collection pauses while the Mac or its displays sleep and while another user is active. A status line under **Stored data** in Settings says whether DOKK is collecting right now.
+
+With **Labelling mode** on, DOKK now and then asks whether a busy app is behaving as expected. Your answers label the data. The question appears next to the app's dock tile with a line saying what DOKK noticed, such as "Using 140% CPU for 3 minutes in the background". Answer **Expected**, **Misbehaving**, or **Not sure**; after Misbehaving you can say what seems wrong, or skip. The question never takes focus and stays put while you work elsewhere. It goes away by itself after a minute without an answer, and waits while the pointer is over it. Click it once to use the keyboard: Tab or the arrow keys to move, Return or Space to choose, Escape to close. At most eight questions appear in an hour, and its **⋯** menu can stop questions about one app or pause them until tomorrow. Settings shows both and can undo them.
+
+When something feels wrong before DOKK asks, choose **Something's Off Right Now…** from the menu-bar menu. Pick the app from the list of the busiest apps (type to filter, or use the arrow keys and Return), then answer the same question. Escape closes the list without saving anything.
+
+The data stays in a folder on this Mac for 30 days, up to 50 MB. Once there is data, **Show in Finder** at the end of the privacy note opens that folder. It holds app identifiers and numbers only: no window titles, file names, or content. Nothing is uploaded. **Export data…** saves a zip you can share deliberately, and **Delete all data** removes every file. See [App Health](APP-HEALTH.md) for the file format, the rules, and the limits.
 
 ## Plugins
 

@@ -608,6 +608,25 @@ final class DockPanelController {
         return rect
     }
 
+    /// Whether this dock is on screen and fully revealed: not stopped, not ordered out, and not auto-hidden or
+    /// mid-transition. Anchors to a hidden dock would point at nothing the person can see.
+    var isFullyShown: Bool {
+        !stopped && panel.isVisible && visibility.exposesContent && visibility.progress == 0
+    }
+
+    /// The dock surface as an anchor rect, in AppKit screen coordinates, for prompts about an app without a tile.
+    func surfaceAnchor() -> DockPopoverAnchor? {
+        guard !stopped, let display = lastDisplay, let settings = lastSettings else { return nil }
+        let rect = interaction.surfaceRect
+        guard !rect.isNull, !rect.isEmpty else { return nil }
+        // Root space (top-left origin, y down, relative to the content) to AppKit screen space (bottom-left
+        // origin, y up), as `popoverAnchor(for:)` converts a tile.
+        let screenRect = CGRect(x: panel.frame.minX + interaction.contentOrigin.x + rect.minX,
+                                y: panel.frame.maxY - interaction.contentOrigin.y - rect.maxY,
+                                width: rect.width, height: rect.height)
+        return DockPopoverAnchor(icon: screenRect, edge: settings.edge, visibleFrame: display.visibleFrame)
+    }
+
     /// A picture of this dock as it is drawn right now, for Harbor's strip to transform from.
     ///
     /// Nil while the dock is hidden or revealing, so the strip enters
