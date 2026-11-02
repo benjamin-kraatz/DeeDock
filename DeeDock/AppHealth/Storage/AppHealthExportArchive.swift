@@ -71,9 +71,15 @@ nonisolated enum AppHealthExportArchive {
             throw AppHealthExportError.failed
         }
         do {
-            // The save panel already confirmed replacing an existing file.
+            // The save panel already confirmed replacing an existing file. `replaceItemAt` needs both items on one
+            // volume and the destination may be an external or network drive, so the zip is first moved next to it.
             if fileManager.fileExists(atPath: destination.path) {
-                _ = try fileManager.replaceItemAt(destination, withItemAt: zip)
+                let nearby = try fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask,
+                                                 appropriateFor: destination, create: true)
+                defer { try? fileManager.removeItem(at: nearby) }
+                let staged = nearby.appending(path: destination.lastPathComponent)
+                try fileManager.moveItem(at: zip, to: staged)
+                _ = try fileManager.replaceItemAt(destination, withItemAt: staged)
             } else {
                 try fileManager.moveItem(at: zip, to: destination)
             }

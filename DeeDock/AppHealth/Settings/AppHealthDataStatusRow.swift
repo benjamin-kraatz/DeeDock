@@ -55,7 +55,7 @@ struct AppHealthDataStatusRow: View {
     }
 }
 
-/// "● Collecting every 20 seconds" or "● Paused while the Mac sleeps": a dot in the page tint while sampling runs,
+/// "● Collecting every 20 seconds" or "● Paused while the Mac isn’t in use": a dot in the page tint while sampling runs,
 /// a quiet one while it is paused. Nothing animates while idle; the dot's halo is a static shadow.
 struct AppHealthCollectorStatusLine: View {
     let phase: AppHealthController.Phase

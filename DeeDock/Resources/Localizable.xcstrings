@@ -2780,7 +2780,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speicher in %2$(duration)@ um %1$(amount)@ gewachsen"
+            "value" : "Speicher ist in %2$(duration)@ um %1$(amount)@ gewachsen"
           }
         },
         "en" : {
@@ -2978,13 +2978,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pausiert, während der Mac schläft"
+            "value" : "Pausiert, solange der Mac nicht genutzt wird"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paused while the Mac sleeps"
+            "value" : "Paused while the Mac isn’t in use"
           }
         }
       }
