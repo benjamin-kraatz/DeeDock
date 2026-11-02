@@ -135,13 +135,17 @@ final class AppHealthController {
         if settings.collecting { beginRecording() }
     }
 
-    /// Stops collecting for quit and waits briefly for the final records to reach disk.
-    func stop() {
+    /// Stops collecting for quit.
+    ///
+    /// - Parameter waitForWrites: Blocks the main thread for up to a second until the final records (interrupted
+    ///   labels, `collectorStop`) are on disk. Only `applicationWillTerminate` should pass true: the process exits
+    ///   right after it returns. Anywhere else the queued writes finish on their own.
+    func stop(waitForWrites: Bool = false) {
         guard started else { return }
         endRecording(.quit)
         started = false
         summaryTask?.cancel()
-        flushWritesBeforeExit()
+        if waitForWrites { flushWritesBeforeExit() }
     }
 
     /// The collection switch. Turning it off also makes labelling inert; the labelling switch keeps its value.

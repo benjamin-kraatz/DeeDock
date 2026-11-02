@@ -106,7 +106,7 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         windowAccess.stop()
         screenCapture.stop()
         // Before the docks stop, so its last records (and any interrupted prompt) are written while anchors exist.
-        appHealth.stop()
+        appHealth.stop(waitForWrites: true)
         // After the collector, whose stop recorded any open question as interrupted through `willPause`.
         appHealthLabelling.stop()
         coordinator.stop()

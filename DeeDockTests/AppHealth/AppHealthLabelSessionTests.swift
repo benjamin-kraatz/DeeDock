@@ -166,8 +166,11 @@ struct AppHealthLabelSessionTests {
     }
 }
 
+/// Polls until `condition` holds. The deadline is generous because the whole suite runs in parallel and long
+/// main-actor suites (Core ML training, synthetic playback) can hold these tests up for several seconds; an
+/// uncontended run still returns within a few milliseconds.
 @MainActor
-func labellingEventually(timeout: Duration = .seconds(3), _ condition: () async -> Bool) async -> Bool {
+func labellingEventually(timeout: Duration = .seconds(30), _ condition: () async -> Bool) async -> Bool {
     let deadline = ContinuousClock.now + timeout
     while ContinuousClock.now < deadline {
         if await condition() { return true }

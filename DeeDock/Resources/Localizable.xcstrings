@@ -2780,13 +2780,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speicher in %(duration)@ um %(amount)@ gewachsen"
+            "value" : "Speicher in %2$(duration)@ um %1$(amount)@ gewachsen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Memory grew %(amount)@ in %(duration)@"
+            "value" : "Memory grew %1$(amount)@ in %2$(duration)@"
           }
         }
       }
@@ -2816,13 +2816,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nutzt seit %(duration)@ %(cpu)@ CPU im Hintergrund"
+            "value" : "Nutzt seit %2$(duration)@ %1$(cpu)@ CPU im Hintergrund"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using %(cpu)@ CPU for %(duration)@ in the background"
+            "value" : "Using %1$(cpu)@ CPU for %2$(duration)@ in the background"
           }
         }
       }
@@ -2834,13 +2834,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nutzt seit %(duration)@ %(cpu)@ CPU, während du weg warst"
+            "value" : "Nutzt seit %2$(duration)@ %1$(cpu)@ CPU, während du weg warst"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Using %(cpu)@ CPU for %(duration)@ while you were away"
+            "value" : "Using %1$(cpu)@ CPU for %2$(duration)@ while you were away"
           }
         }
       }
