@@ -486,12 +486,22 @@ final class AppHealthController {
     }
 
     /// Removes every App Health file. Queued writes land first; later writes start a new file.
+    ///
+    /// While collecting, deletion is a collection boundary: open questions close as interrupted and pending
+    /// terminations are written before the files go, and the in-memory history is dropped, so a later backfill
+    /// can neither re-add deleted samples nor skip ones it believes are on disk. Sampling then restarts from a
+    /// baseline, after the deletion.
     func deleteAllData() {
         guard storageActivity == .idle else { return }
         storageActivity = .deleting
         storageError = nil
+        let restart = samplingTask != nil
+        if restart { pauseSampling(.disabled) }
+        recentHistory.removeAll()
         // Quiet apps get a fresh baseline row in the new file instead of waiting up to 30 minutes.
         writeStates.removeAll()
+        failedHangChecks.removeAll()
+        lastTick = nil
         let previous = writeChain
         let store = dependencies.store
         let deletion = Task.detached { () -> Bool in
@@ -499,6 +509,7 @@ final class AppHealthController {
             do { try await store.deleteAll(); return true } catch { return false }
         }
         writeChain = Task.detached { _ = await deletion.value }
+        if restart { startSampling(.enabled) }
         storageTask = Task { [weak self] in
             let succeeded = await deletion.value
             guard let self else { return }

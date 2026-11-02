@@ -18,7 +18,9 @@ name is "App-Monitor". Code uses the `AppHealth` prefix; the feature lives in `D
 - **Labelling paused until tomorrow — Resume**, after "Pause labelling for today".
 - **Stored data**: total size and first day ("2.4 MB · since 30 Oct"), or "No data yet".
 - **Export data…** (a `.zip` through a save panel) and **Delete all data** (with confirmation).
-  Deleting keeps collection running if it is on; the next tick starts a new file.
+  Deleting keeps collection running if it is on. An open question closes as interrupted, the
+  in-memory history is dropped, and sampling restarts from a baseline: the new file begins with
+  `collectorStart` (`enabled`).
 - What is recorded, in plain words.
 - **Not asked about**: apps on the "Don't ask" list, each with a button to ask about it again.
 

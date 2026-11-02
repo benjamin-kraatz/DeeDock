@@ -158,6 +158,23 @@ struct AppHealthControllerTests {
         controller.stop()
     }
 
+    @Test("Deleting while collecting drops the history and restarts sampling from a baseline after the deletion")
+    func deleteIsACollectionBoundary() async throws {
+        let (controller, store, sampler, _) = makeController(collecting: true)
+        controller.start()
+        #expect(await appHealthEventually { controller.history(for: "com.example.Busy").count >= 2 })
+        controller.deleteAllData()
+        // Checked before any await, so no tick can have refilled it.
+        let history = controller.history(for: "com.example.Busy")
+        #expect(history.isEmpty)
+        #expect(controller.phase == .collecting)
+        #expect(await appHealthEventually { await sampler.resetCount == 2 })
+        #expect(await appHealthEventually { await store.count(type: "tick") >= 1 })
+        // The new file begins with the restart, not with records from before the deletion.
+        #expect(await store.events().first == .collector(.collectorStart, reason: .enabled))
+        controller.stop()
+    }
+
     @Test("Busy apps are written as active every tick; the tick hook carries every app")
     func tickHook() async throws {
         let (controller, store, _, _) = makeController(collecting: true)
