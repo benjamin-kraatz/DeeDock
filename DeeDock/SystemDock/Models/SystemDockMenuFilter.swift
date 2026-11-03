@@ -14,7 +14,8 @@ nonisolated enum SystemDockMenuFilter {
     ///
     /// - Parameters:
     ///   - entries: The top level of the Dock's menu as read.
-    ///   - windowTitles: Titles of the application's windows, which DOKK's menu already lists.
+    ///   - windowTitles: Titles of the application's windows. DOKK's menu leaves windows to
+    ///     Window Peek, so the Dock's window rows stay out.
     static func applicationEntries(in entries: [SystemDockMenuEntry], windowTitles: Set<String>) -> [SystemDockMenuEntry] {
         var sections = entries.split(omittingEmptySubsequences: false, whereSeparator: \.isSeparator).map(Array.init)
 
