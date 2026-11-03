@@ -5,6 +5,39 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-155 notification feed triage
+
+Implemented on `codex/dee-155-notification-feed-triage` to the approved mockup `docs/mockups/notification-feed-triage.html`. The feed groups notifications into per-app stacks that unfold inline, rows and stacks clear with a two-finger trackpad swipe or a mouse drag, opening an app from anywhere removes its entries, and an opt-in **Clear when closed** setting empties what was seen on close. Five count-only analytics events were added. The design is in [Notification feed](NOTIFICATION-FEED.md#triage-dee-155) and the behaviour in the [user guide](GUIDE.md#notification-feed).
+
+Validation on 2026-11-03: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /private/tmp/claude-501/dee155-DerivedData CODE_SIGNING_ALLOWED=NO build` and `build-for-testing` succeeded. New tests in `DeeDockTests/NotificationFeedTriageTests.swift` cover grouping order, folding and selection repair, exact-match auto-clear and system alerts, the unread count after removals, Clear when closed keeping arrivals while closed, the setting's default and decoding, swipe intent, rubber band and release outcomes, and the analytics records and tokens. The tests were not run. The app was not launched, and previews were not rendered.
+
+### Required hands-on acceptance
+
+None of these scenarios has been exercised.
+
+- [ ] With entries from Messages ×2, Mail ×3, Calendar, Slack, and a system alert, the feed shows a Messages stack and a Mail stack with counts 2 and 3, plain rows for Calendar, Slack, and System, and stacks positioned by their newest entry.
+- [ ] A folded stack draws at most three cards, each 4 pt lower and 8 pt narrower per side, with no text showing through the front card in light, dark, and Reduce Transparency.
+- [ ] Clicking a stack unfolds it in place under the header (sender, count, Show Less, ✕); rows slide out from under the front card. Show Less slides them back.
+- [ ] A new notification for an existing stack slides in at the front and the previous front moves behind it.
+- [ ] The stack's ✕, the header's ✕, and **Clear N Notifications** fold the stack, then the card fades. The German menu reads "N Mitteilungen löschen".
+- [ ] Two-finger swipe left on a row: a short swipe snaps open at the **Clear** button, a long swipe (past 40 %) or a quick flick clears, a swipe right rubber-bands. Clicking the red button clears; clicking elsewhere closes it.
+- [ ] Mouse drag left on a row behaves the same, and the release does not open the app.
+- [ ] Swiping a folded stack reads **Clear All** and clears the whole stack.
+- [ ] Scrolling the list vertically with the trackpad, including slightly diagonal scrolls and momentum, never moves a row sideways. A mouse wheel scrolls normally.
+- [ ] A horizontal swipe ends with no list scrolling from its momentum.
+- [ ] Clicking a row whose app resolves: the row (or its stack) drops toward the dock, the app's tile bounces as before, the popover closes, and the app comes forward. Repeat with the dock on the left, right, and top edges.
+- [ ] With the feed open, Command-Tab to an app that has entries: its entries drop and the others spring up.
+- [ ] With the feed closed, click the app's dock tile, use Spotlight, and Command-Tab: the badge drops by the unread entries removed, and reopening shows them gone.
+- [ ] Two installed apps that share a name, and a notification from an app that is not installed: activating any app never removes those entries. System alerts stay.
+- [ ] **Clear when closed** is off by default. On: close the feed, receive a notification, reopen. Only the new entry remains, with its unread dot.
+- [ ] Turning **Clear when closed** on or off in Settings sends `setting_changed` with `key = notificationFeedClearsOnClose`.
+- [ ] Keyboard: ↑↓ treat a folded stack as one item, → and Return unfold, ← folds and moves the selection to the front card, Delete clears a selected stack, Command-C on a stack copies its newest entry, Escape closes an open swipe before the feed.
+- [ ] VoiceOver: a folded stack reads "Mail, 3 notifications" with the newest banner as its value and offers Open App, Expand, Copy Text, and Clear. Rows in an unfolded stack offer Show Less. Peeking cards are not read.
+- [ ] Reduce Motion: nothing slides; arrivals, removals, unfold, and fold cross-fade in 150 ms; the swipe still follows the fingers; the bell does not swing.
+- [ ] English and German copy, including "Show Less" / "Weniger", "Clear" / "Löschen", "Clear All" / "Alle löschen", and the **Clear when closed** subtitle.
+- [ ] Analytics in the debug log: `notification_feed_row_opened`, `notification_feed_row_removed` with each `method`, `notification_feed_group_cleared`, `notification_feed_cleared_all` with each `source`, and `notification_feed_auto_cleared` carry counts and tokens only, and nothing is sent when a notification arrives.
+- [ ] The scroll-wheel monitor is gone after the feed closes: trackpad scrolling elsewhere in DOKK, such as the Hub, is unaffected.
+
 ## Running in Background
 
 Implemented on `benn/background-app-dock-status`. On macOS 27, an app whose main process quits while its helpers keep running keeps its tile with a muted indicator, a **Running in Background** line in the hover label, a VoiceOver status and action, and **Stop Running in Background** in place of Quit. The state comes from private Launch Services calls and is off, silently, wherever they cannot be read. The design and safety rules are in [Running in Background](BACKGROUND-APPS.md), and behavior is in the [user guide](GUIDE.md#use-the-dock).

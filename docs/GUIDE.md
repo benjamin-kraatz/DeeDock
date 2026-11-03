@@ -421,7 +421,17 @@ Click an app badge, choose **Badge details** from its context menu, or press **B
 
 The Notification Feed keeps the notification banners macOS shows, so you can read them after they disappear. It is off by default. Turn it on in **Settings → Features → Notification Feed → Collect notifications**, then allow Accessibility access with the **Enable** button in that card. DOKK asks macOS for access only when you click **Enable**. The first launch of a version with the feed also shows a DOKK Discovery tip with a **Turn On** button. Turning it on there opens the same Settings page when access is still missing.
 
-A bell tile appears after Shelf on every dock. Its red badge counts what arrived since you last opened the feed, and the bell rings once when a banner arrives (Reduce Motion skips the ring). Click the tile to open the feed. Each entry shows the sending app, how long ago it arrived, and the title, subtitle, and text the banner showed. Click an entry to open the sending app. Its context menu also offers **Copy Text** and **Remove**. **Clear All** empties the feed. With the feed open, the arrow keys select an entry, Return opens its app, Delete removes it, Command-C copies its text, Command-Delete clears the feed, and Escape closes it. Right-click the tile to open, clear, or reach Settings.
+A bell tile appears after Shelf on every dock. Its red badge counts what arrived since you last opened the feed, and the bell rings once when a banner arrives (Reduce Motion skips the ring). Click the tile to open the feed. Each entry shows the sending app, how long ago it arrived, and the title, subtitle, and text the banner showed. Click an entry to open the sending app. Its context menu also offers **Copy Text** and **Remove**. **Clear All** empties the feed. Right-click the tile to open, clear, or reach Settings.
+
+Notifications from the same app stack, newest in front, with a count beside the app's name and the older ones peeking out underneath. Click a stack to unfold it; **Show Less** folds it again. The ✕ on a stack, or on an unfolded stack's header, clears that app's notifications, and so does **Clear N Notifications** in its context menu. A single notification is a plain row.
+
+To clear a notification with a gesture, swipe left on it with two fingers on the trackpad, or drag it left with the mouse. A short swipe uncovers a red **Clear** button; a longer or quicker one clears it straight away. Swiping a stack clears the whole stack. Scrolling up and down is not affected.
+
+Opening an app clears its notifications from the feed, whether you open it from the feed, its dock tile, Command-Tab, or anywhere else. This only happens when the notification's app name matches exactly one app; system alerts stay until you remove them. With the feed closed, you see this as a smaller badge.
+
+Turn on **Clear when closed** in the feed's Settings card to empty the feed of everything you saw each time you close it. Notifications that arrive while it is closed stay, marked as new.
+
+With the feed open, the up and down arrows select a notification or a stack, the right arrow unfolds a stack and the left arrow folds it, Return opens the app (or unfolds a stack), Delete removes the notification or clears the stack, Command-C copies its text, Command-Delete clears the feed, and Escape closes an uncovered **Clear** button or the feed. VoiceOver reads a stack as one item, such as "Mail, 3 notifications", with actions to open the app, expand, and clear.
 
 What the feed can see:
 
