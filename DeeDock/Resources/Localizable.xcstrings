@@ -50479,19 +50479,19 @@
       }
     },
     "windowSearchStale" : {
-      "comment" : "Window search: This source changed, closed, or cannot be reached. Refresh titles or capture it again. No other window was substituted.",
+      "comment" : "Hub search error after choosing a window result: that window changed or closed. DOKK brought no other window forward instead.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Quelle wurde geändert, geschlossen oder ist nicht erreichbar. Aktualisiere die Titel oder erfasse sie erneut. Es wurde kein anderes Fenster als Ersatz gewählt."
+            "value" : "Dieses Fenster hat sich geändert oder wurde geschlossen. Suche erneut, um die aktuellen Fenster zu sehen. Es wurde kein anderes Fenster nach vorne geholt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This source changed, closed, or cannot be reached. Refresh titles or capture it again. No other window was substituted."
+            "value" : "This window changed or closed. Search again to see current windows. No other window was brought forward."
           }
         }
       }
