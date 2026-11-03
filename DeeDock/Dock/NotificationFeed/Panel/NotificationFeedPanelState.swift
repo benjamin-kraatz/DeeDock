@@ -109,10 +109,44 @@ final class NotificationFeedPanelState {
         selection = items[min(max(index + offset, 0), items.count - 1)].id
     }
 
-    /// Keeps the selection on a neighbor after its item goes away.
-    func repairSelection(in items: [NotificationFeedItem], removedIndex: Int?) {
-        guard let current = selection, !items.contains(where: { $0.id == current }) else { return }
-        guard !items.isEmpty else { selection = nil; return }
-        selection = items[min(removedIndex ?? 0, items.count - 1)].id
+    // MARK: - Reconciling
+
+    /// Brings unfolded stacks and the selection in line with the feed after its entries changed,
+    /// by an arrival, a cap eviction, or a removal.
+    ///
+    /// The selection is an item identifier, and a folded stack's item is its front entry, which
+    /// changes when the sender posts again. Without this the selection would stay on the entry
+    /// that slid behind the front card, and Return, →, Delete, and Command-C would act on nothing
+    /// until the next arrow key.
+    /// - A selected entry now hidden inside a folded stack moves to that stack's front.
+    /// - A selected entry that left the feed moves to what survived of its folded stack, else to
+    ///   its nearest surviving neighbor in the previous order: the next item, or the one before
+    ///   when nothing after it survived. Positions are not used, because arrivals in the same
+    ///   change shift them.
+    /// - Unfolded groups that are gone or down to one entry are forgotten.
+    func reconcile(from previous: [NotificationFeedEntry], to current: [NotificationFeedEntry]) {
+        // Read before pruning, so the neighbors are the rows the person last saw.
+        let previousItems = selection == nil ? [] : items(in: previous)
+        pruneExpanded(in: current)
+        guard let selected = selection else { return }
+        let currentItems = items(in: current)
+        let groups = NotificationFeedGrouping.groups(current)
+        // The item that now shows an entry: its own row, or the front of the folded stack hiding it.
+        func visibleItem(for id: NotificationFeedEntry.ID) -> NotificationFeedEntry.ID? {
+            if currentItems.contains(where: { $0.id == id }) { return id }
+            return groups.first { $0.entries.contains { $0.id == id } }?.front.id
+        }
+        if let visible = visibleItem(for: selected) {
+            if visible != selected { selection = visible }
+            return
+        }
+        guard let index = previousItems.firstIndex(where: { $0.id == selected }) else {
+            selection = currentItems.first?.id
+            return
+        }
+        let item = previousItems[index]
+        let stackmates = item.isCollapsedStack ? item.group.entries.dropFirst().map(\.id) : []
+        let neighbors = (previousItems[(index + 1)...] + previousItems[..<index].reversed()).map(\.id)
+        selection = (stackmates + neighbors).lazy.compactMap(visibleItem(for:)).first ?? currentItems.first?.id
     }
 }

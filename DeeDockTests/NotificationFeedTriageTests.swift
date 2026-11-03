@@ -64,7 +64,89 @@ struct NotificationFeedTriageTests {
         #expect(state.expanded.isEmpty)
     }
 
+    @Test("A sender posting again into a folded, selected stack moves the selection to the new front")
+    func arrivalKeepsStackSelected() {
+        let store = NotificationFeedStore()
+        let state = NotificationFeedPanelState()
+        store.entriesDidChange = { state.reconcile(from: $0, to: $1) }
+        store.ingest([reading("m1", app: "Messages"), reading("m2", app: "Messages"), reading("c1", app: "Calendar")],
+                     at: start)
+        state.select(by: 1, in: state.items(in: store.entries))
+        #expect(state.selection == "m1")
+
+        store.ingest([reading("m0", app: "Messages")], at: start)
+        let current = state.items(in: store.entries).first { $0.id == state.selection }
+        #expect(state.selection == "m0")
+        #expect(current?.isCollapsedStack == true)
+        #expect(current?.group.entries.map(\.id) == ["m0", "m1", "m2"])
+    }
+
+    @Test("A selection inside an unfolded stack stays put when the sender posts again")
+    func arrivalKeepsUnfoldedSelection() throws {
+        let entries = [entry("m1", "Messages"), entry("m2", "Messages")]
+        let state = NotificationFeedPanelState()
+        state.setExpanded(try #require(NotificationFeedGrouping.groups(entries).first), true)
+        state.selection = "m2"
+        state.reconcile(from: entries, to: [entry("m0", "Messages")] + entries)
+        #expect(state.selection == "m2")
+        #expect(state.expanded == ["app:Messages"])
+    }
+
+    @Test("Cap eviction forgets an unfolded stack it shrinks and repairs a selection it removes")
+    func evictionReconciles() throws {
+        let store = NotificationFeedStore()
+        let state = NotificationFeedPanelState()
+        store.entriesDidChange = { state.reconcile(from: $0, to: $1) }
+        store.ingest([reading("o1", app: "Old"), reading("o2", app: "Old")], at: start)
+        state.setExpanded(try #require(NotificationFeedGrouping.groups(store.entries).first), true)
+        state.selection = "o2"
+
+        let arrivals = (0..<(NotificationFeedStore.capacity - 1)).map { reading("n\($0)", app: "New \($0)") }
+        store.ingest(arrivals, at: start)
+        #expect(store.entries.count == NotificationFeedStore.capacity)
+        #expect(store.entries.last?.id == "o1")
+        // "Old" is down to one entry, so it no longer counts as unfolded.
+        #expect(state.expanded.isEmpty)
+        // "o2" was evicted; the selection lands on the item now at its position, the last one.
+        #expect(state.selection == "o1")
+    }
+
+    @Test("A removed selection moves to what is left of its stack, else to the next or previous item")
+    func removalRepairsSelection() {
+        let entries = [entry("m1", "Messages"), entry("m2", "Messages"), entry("c1", "Calendar"), entry("x1", "Mail")]
+        let state = NotificationFeedPanelState()
+        state.selection = "m1"
+        state.reconcile(from: entries, to: Array(entries.dropFirst()))
+        #expect(state.selection == "m2")
+
+        state.selection = "c1"
+        state.reconcile(from: entries, to: [entries[0], entries[1], entries[3]])
+        #expect(state.selection == "x1")
+
+        state.selection = "x1"
+        state.reconcile(from: entries, to: Array(entries.prefix(3)))
+        #expect(state.selection == "c1")
+
+        state.reconcile(from: entries, to: [])
+        #expect(state.selection == nil)
+    }
+
     // MARK: - Auto-clear
+
+    @Test("Two installed apps named Notes block auto-clear even when only one is running")
+    func autoClearPoolsRunningAndInstalled() {
+        let notesA = reference("com.example.notes", "Notes")
+        let notesB = reference("org.other.notes", "Notes")
+        let mail = reference("com.apple.mail", "Mail")
+        let resolver = NotificationFeedAppResolver(running: { [notesA, mail] }, installed: { [notesA, notesB, mail] })
+        let entries = [entry("1", "Notes"), entry("2", "Mail"), entry("3", "Notes")]
+
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesA.id, resolver: resolver).isEmpty)
+        // A running app listed again among installed apps is still one application.
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: mail.id, resolver: resolver) == ["2"])
+        // Open App keeps preferring the running one, which is the app the person is using.
+        #expect(resolver.application(named: "Notes")?.id == notesA.id)
+    }
 
     @Test("An activated app clears only entries whose name resolves to exactly that app")
     func autoClearMatchesExactly() {
@@ -217,6 +299,22 @@ struct NotificationFeedTriageTests {
                 == ["header", "keyboard", "tile_menu", "voice_over", "settings"])
     }
 
+    @Test("The seen set keeps only entries the feed still has")
+    func seenWhileViewingIsBounded() {
+        let store = NotificationFeedStore()
+        store.isViewing = true
+        let total = NotificationFeedStore.capacity + 20
+        for index in 0..<total {
+            store.ingest([reading("n\(index)")], at: start)
+        }
+        #expect(store.seenWhileViewing.count == NotificationFeedStore.capacity)
+        #expect(store.seenWhileViewing == Set(store.entries.map(\.id)))
+
+        store.remove(["n\(total - 1)"])
+        #expect(!store.seenWhileViewing.contains("n\(total - 1)"))
+        #expect(store.seenWhileViewing.count == NotificationFeedStore.capacity - 1)
+    }
+
     @Test("Removing and clearing report how many entries left")
     func removalCounts() {
         let store = NotificationFeedStore()
@@ -232,8 +330,8 @@ struct NotificationFeedTriageTests {
         NotificationFeedEntry(id: id, appName: app, title: "Title", subtitle: nil, body: "Body", arrivedAt: start)
     }
 
-    private func reading(_ id: String) -> NotificationBannerReading {
-        NotificationBannerReading(id: id, description: "App, Title \(id), Body", title: "Title \(id)",
+    private func reading(_ id: String, app: String = "App") -> NotificationBannerReading {
+        NotificationBannerReading(id: id, description: "\(app), Title \(id), Body", title: "Title \(id)",
                                   subtitle: nil, body: "Body")
     }
 

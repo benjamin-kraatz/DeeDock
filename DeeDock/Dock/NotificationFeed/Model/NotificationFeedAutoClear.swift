@@ -2,9 +2,10 @@ import AppKit
 
 /// Decides which entries leave the feed when an application comes to the front.
 ///
-/// Uses the same sender-to-app resolution as the row's Open App: a banner's name counts only
-/// when it resolves to exactly one application. Ambiguous and unknown names never match, and
-/// system alerts, which name no app, are never cleared this way.
+/// A banner's name counts only when it resolves to exactly one application among everything
+/// running and installed (``NotificationFeedAppResolver/unambiguousApplication(named:)``).
+/// Ambiguous and unknown names never match, and system alerts, which name no app, are never
+/// cleared this way.
 nonisolated enum NotificationFeedAutoClear {
     /// The identity ``ApplicationReference/id`` uses for a running application, or nil when it
     /// has neither a bundle identifier nor a bundle location.
@@ -12,11 +13,22 @@ nonisolated enum NotificationFeedAutoClear {
         application.bundleIdentifier ?? application.bundleURL?.standardizedFileURL.path
     }
 
+    /// The entries an activation of the application with `applicationID` clears.
+    ///
+    /// Uses the resolver's strict, pooled resolution, never the running-first one Open App uses:
+    /// with two installed apps named "Notes", activating the running one clears nothing.
+    /// - Returns: Matching identifiers in feed order.
+    @MainActor
+    static func entryIDs(in entries: [NotificationFeedEntry], activated applicationID: String,
+                         resolver: NotificationFeedAppResolver) -> [NotificationFeedEntry.ID] {
+        entryIDs(in: entries, applicationID: applicationID, resolve: { resolver.unambiguousApplication(named: $0) })
+    }
+
     /// The entries whose sender resolves to the application with `applicationID`.
     ///
     /// - Parameters:
     ///   - entries: The feed's entries.
-    ///   - applicationID: The activated application's ``ApplicationReference/id``.
+    ///   - applicationID: The application's ``ApplicationReference/id``.
     ///   - resolve: The single application a banner's name refers to, or nil when there is no
     ///     unambiguous match. Called once per distinct name.
     /// - Returns: Matching identifiers in feed order.

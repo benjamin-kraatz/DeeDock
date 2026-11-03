@@ -8,9 +8,11 @@ import SwiftUI
 /// Opening marks every entry read.
 ///
 /// Triage (DEE-155):
-/// - Bringing an app forward, from the feed or anywhere else, removes its entries. The sender is
-///   matched with the same exact-name resolution as Open App, never guessed, and system alerts
-///   are never cleared this way. ``applicationActivated(_:)`` receives every activation.
+/// - Opening an entry's app from the feed removes the entries that resolve to it, using the
+///   running-first resolution that picked the app to open.
+/// - Any other activation removes an app's entries only when their name belongs to that app
+///   alone among running and installed apps, never guessed. System alerts are never cleared
+///   this way. ``applicationActivated(_:)`` receives every activation.
 /// - With **Clear when closed** on, closing the feed removes what was shown while it was open.
 ///
 /// Analytics receive counts and closed vocabularies only: never text, app names, or bundle
@@ -20,7 +22,8 @@ final class NotificationFeedCoordinator {
     private let feed: NotificationFeedController
     private let presenter: DockPopoverPresenter
     private let catalog: ApplicationCatalog
-    /// Shared by the popover and activation matching, so both resolve a name the same way.
+    /// Shared by the popover and activation matching. Open App and auto-clear use its two
+    /// resolutions; see ``NotificationFeedAppResolver``.
     private let resolver: NotificationFeedAppResolver
     private var controller: DockPopoverPanelController<NotificationFeedPanel>?
     private var state: NotificationFeedPanelState?
@@ -83,6 +86,12 @@ final class NotificationFeedCoordinator {
             self?.close()
         }
         state.swipe.onCommit = { [weak self] id, isStack in self?.swiped(id, isStack: isStack) }
+        // Every change to the entries, arrivals and cap evictions included, keeps the selection
+        // and unfolded stacks pointing at something the panel shows. Runs in the same
+        // transaction as the change, so a stale selection is never rendered.
+        store.entriesDidChange = { [weak state] previous, current in
+            state?.reconcile(from: previous, to: current)
+        }
 
         let next = DockPopoverPanelController(anchor: anchor, keyboard: keyboard, clickFocus: true,
                                               ideal: CGSize(width: 380, height: 480)) { chrome in
@@ -106,6 +115,7 @@ final class NotificationFeedCoordinator {
             reportClose()
             pendingClose?.cancel()
             pendingClose = nil
+            feed.store.entriesDidChange = nil
             flushRemovals()
             state.swipe.stop()
             feed.store.isViewing = false
@@ -149,15 +159,16 @@ final class NotificationFeedCoordinator {
 
     /// Removes the entries of an application that came to the front.
     ///
-    /// Called for every activation except DOKK's own. Only names that resolve to exactly this
-    /// application match. With the feed open the entries drop toward the dock; with it closed
-    /// only the tile's badge changes.
+    /// Called for every activation except DOKK's own. Only names that belong to this application
+    /// alone, among running and installed apps together, match: when two installed apps share a
+    /// name, activating either clears nothing. With the feed open the entries drop toward the
+    /// dock; with it closed only the tile's badge changes.
     func applicationActivated(_ application: NSRunningApplication) {
         guard !feed.store.isEmpty, let applicationID = NotificationFeedAutoClear.applicationID(of: application) else { return }
         // An app launched since the last lookup may now be the only match for its name.
         resolver.invalidate()
-        let ids = Set(NotificationFeedAutoClear.entryIDs(in: feed.store.entries, applicationID: applicationID,
-                                                         resolve: { resolver.application(named: $0) }))
+        let ids = Set(NotificationFeedAutoClear.entryIDs(in: feed.store.entries, activated: applicationID,
+                                                         resolver: resolver))
             .subtracting(pendingIDs)
         guard !ids.isEmpty else { return }
         removeAnimated(ids, style: .drop)
@@ -169,6 +180,11 @@ final class NotificationFeedCoordinator {
     /// Brings the sending app forward when its name resolves to exactly one application, and
     /// takes every entry from that app with it. The notification itself cannot be reopened: its
     /// banner is gone.
+    ///
+    /// Uses the running-first ``NotificationFeedAppResolver/application(named:)``, so a name an
+    /// installed app shares opens the running one. The person picked this entry, so entries with
+    /// the same name are treated as that app's too. The activation that follows runs the stricter
+    /// auto-clear, which finds nothing left to remove.
     ///
     /// The entries drop toward the dock while the app opens, then the popover closes, so the
     /// drop is visible before the panel fades. If the app fails to open, its entries are still
@@ -288,12 +304,11 @@ final class NotificationFeedCoordinator {
             feed.store.remove(pending.ids)
             return
         }
-        let removedIndex = state.items(in: feed.store.entries).firstIndex { pending.ids.contains($0.id) }
+        // The store's change hook prunes unfolded stacks and repairs the selection inside the
+        // animation, so the neighbor it lands on springs into place with the rest.
         withAnimation(motion) {
             feed.store.remove(pending.ids)
-            state.pruneExpanded(in: feed.store.entries)
         }
-        state.repairSelection(in: state.items(in: feed.store.entries), removedIndex: removedIndex)
         state.unstage(pending.ids)
     }
 

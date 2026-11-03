@@ -17,7 +17,20 @@ final class NotificationFeedStore {
     /// How many banner identifiers are remembered for deduplication after their entry is gone.
     static let seenCapacity = 512
 
-    private(set) var entries: [NotificationFeedEntry] = []
+    private(set) var entries: [NotificationFeedEntry] = [] {
+        didSet {
+            // Entries evicted by the cap or removed can no longer be cleared, so the seen set
+            // only ever holds entries the feed still has.
+            if !seenWhileViewing.isEmpty {
+                seenWhileViewing.formIntersection(entries.lazy.map(\.id))
+            }
+            entriesDidChange?(oldValue, entries)
+        }
+    }
+    /// Called after every change to ``entries`` with the previous and current entries, in the
+    /// same transaction. The notification feed coordinator sets it while the popover is open so
+    /// the panel's selection follows arrivals and evictions, and clears it on close.
+    @ObservationIgnored var entriesDidChange: ((_ previous: [NotificationFeedEntry], _ current: [NotificationFeedEntry]) -> Void)?
     /// Entries that arrived since the feed was last opened. Drives the tile's badge.
     private(set) var unreadCount = 0
     /// True while the feed's popover is open. Arrivals the person can already see are not unread.
@@ -31,8 +44,9 @@ final class NotificationFeedStore {
             seenWhileViewing = Set(entries.map(\.id))
         }
     }
-    /// Entries shown during the current or last viewing session. Read by ``clearSeen()``.
-    @ObservationIgnored private var seenWhileViewing: Set<NotificationFeedEntry.ID> = []
+    /// Entries shown during the current or last viewing session that are still in the feed.
+    /// Read by ``clearSeen()``. Never larger than ``capacity``.
+    @ObservationIgnored private(set) var seenWhileViewing: Set<NotificationFeedEntry.ID> = []
     /// Identifiers in arrival order, so the oldest can be forgotten first.
     @ObservationIgnored private var seenOrder: [String] = []
     @ObservationIgnored private var seen: Set<String> = []
@@ -54,10 +68,10 @@ final class NotificationFeedStore {
         guard !added.isEmpty else { return 0 }
         // Batches are newest first. A batch almost always holds one banner; when several arrive in
         // one pass, their on-screen order is kept because the tree carries no arrival time.
-        entries.insert(contentsOf: added, at: 0)
-        if entries.count > Self.capacity { entries.removeLast(entries.count - Self.capacity) }
+        // One assignment, so observers see a single change that already respects the cap.
         if isViewing { seenWhileViewing.formUnion(added.map(\.id)) }
-        else { unreadCount = min(unreadCount + added.count, entries.count) }
+        entries = Array((added + entries).prefix(Self.capacity))
+        if !isViewing { unreadCount = min(unreadCount + added.count, entries.count) }
         return added.count
     }
 
