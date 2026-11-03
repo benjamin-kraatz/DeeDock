@@ -61,6 +61,8 @@ nonisolated enum AnalyticsFileHandoffAction: String, AnalyticsToken {
 
 nonisolated enum AnalyticsSuggestionFeedback: String, AnalyticsToken {
     case useful, notNow = "not_now"
+    /// "Never suggest this app" on a Suggested card.
+    case excluded
 
     init(_ kind: LauncherSuggestionFeedback.Kind) {
         switch kind {

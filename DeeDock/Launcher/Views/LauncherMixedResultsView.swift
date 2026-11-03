@@ -65,6 +65,15 @@ struct LauncherMixedResultsView<Header: View>: View {
                     .onChange(of: state.results.map(\.id), initial: true) {
                         if let id = state.selectedID { proxy.scrollTo(id, anchor: .center) }
                     }
+                    // A new results list starts at the top. The Bool transform calls the action
+                    // only when it flips, so scrolling does no analytics work per frame.
+                    .onAppear { state.scrolled = false }
+                    .onScrollGeometryChange(for: Bool.self) { geometry in
+                        geometry.contentOffset.y > LauncherVisit.scrollThreshold
+                    } action: { _, scrolled in
+                        state.scrolled = scrolled
+                        if scrolled { launcher.recordScrolled() }
+                    }
                 }
             }
         }
@@ -82,6 +91,7 @@ private struct LauncherMixedResultRow: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var appIcon: NSImage?
     @State private var hovered = false
+    private var blocked: Bool { result.unavailable || state.actionBusy || shortcutStatus?.busy == true }
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = result.id else { return nil }
         return state.actions?.statuses[id]
@@ -141,15 +151,17 @@ private struct LauncherMixedResultRow: View {
         .task(id: result.application?.reference.url) {
             appIcon = result.application.map { launcher.icon(for: $0) }
         }
-        .disabled(
-            result.unavailable || state.actionBusy
-                || shortcutStatus?.busy == true
-        )
+        .disabled(blocked)
         .contextMenu {
             LauncherMixedResultMenu(result: result, launcher: launcher)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isSelected] : [])
+        // Without this, VoiceOver's default action reports a click (see LauncherResultButton).
+        .accessibilityAction {
+            guard !blocked else { return }
+            Analytics.performing(.voiceOver) { state.activate(result) }
+        }
         .help(result.source)
     }
 }
@@ -164,14 +176,14 @@ struct LauncherMixedResultMenu: View {
                 .disabled(launcher.search.actionBusy || launcher.search.ranking)
         } else {
             Button {
-                launcher.search.activate(result)
+                Analytics.performing(.menu) { launcher.search.activate(result) }
             } label: {
                 Text(result.action)
             }
             .disabled(result.unavailable || launcher.search.actionBusy)
             if case .shelf = result.id {
                 Button {
-                    launcher.search.activate(result, reveal: true)
+                    Analytics.performing(.menu) { launcher.search.activate(result, reveal: true) }
                 } label: {
                     Text(.unifiedRevealFile)
                 }

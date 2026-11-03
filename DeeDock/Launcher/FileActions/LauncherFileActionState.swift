@@ -21,6 +21,9 @@ final class LauncherFileActionState {
     @ObservationIgnored var actionsController: ActionTilesController?
     @ObservationIgnored var catalog: ApplicationCatalog?
     @ObservationIgnored var didOpen: (() -> Void)?
+    /// Called when an activation is accepted (Find Similar included), for the Apps tab's visit
+    /// count. Wired by ``LauncherState/begin(pins:foregroundID:)`` and cleared by ``end()``.
+    @ObservationIgnored var didStartAction: (() -> Void)?
     /// Lookout's Find Similar, which the Hub offers (`HubCoordinator`); nil elsewhere.
     @ObservationIgnored var similar: LauncherFileSimilar?
     /// The batch's one file once Lookout said it can search with it: Find Similar is listed for it.
@@ -79,6 +82,7 @@ final class LauncherFileActionState {
         chooser.cancel()
         resetForPresentation()
         didOpen = nil
+        didStartAction = nil
     }
 
     /// Replaces the current batch. The supplied access object is kept; URLs are not re-leased.
@@ -199,11 +203,13 @@ final class LauncherFileActionState {
         if case .findSimilar = item.id {
             // Not a file operation: Lookout searches with the file in the Files tab, and reports that itself.
             guard isActive, !status.isPending, let similarURL, let similar else { return }
+            didStartAction?()
             similar.run(similarURL)
             return
         }
         guard isActive, !status.isPending, !ranking, actions.contains(where: { $0.id == item.id }) else { return }
         guard !item.unavailable || item.support == .mixed else { return }
+        didStartAction?()
         status = .pending
         let token = UUID()
         operationGeneration = token

@@ -5,10 +5,7 @@ struct LauncherSearchAppSections: View {
     let launcher: LauncherState
     let results: [LauncherSearchResult]
 
-    private var groups: [String] {
-        var seen: Set<String> = []
-        return results.filter { $0.application != nil }.compactMap { seen.insert($0.group).inserted ? $0.group : nil }
-    }
+    private var groups: [String] { LauncherSearchResult.applicationGroups(results) }
 
     var body: some View {
         ForEach(groups, id: \.self) { group in

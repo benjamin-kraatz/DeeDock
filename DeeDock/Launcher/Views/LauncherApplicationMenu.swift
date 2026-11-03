@@ -1,6 +1,9 @@
 import SwiftUI
 
 /// Shared actions for grid and list results, scoped to the launcher’s source display.
+///
+/// Open and Show in Finder run with the `menu` trigger, so `launcher_result_activated` can tell
+/// them from a click on the tile.
 struct LauncherApplicationMenu: View {
     let application: LauncherApplication
     let state: LauncherState
@@ -9,21 +12,25 @@ struct LauncherApplicationMenu: View {
 
     var body: some View {
         Button {
-            if let searchResult { state.search.activate(searchResult) }
-            else if isSuggestion { state.openSuggested(application) }
-            else { state.open(application) }
+            Analytics.performing(.menu) {
+                if let searchResult { state.search.activate(searchResult) }
+                else if isSuggestion { state.openSuggested(application) }
+                else { state.launch(application) }
+            }
         } label: {
             Label { Text(.launcherMenuOpen) } icon: { Image(systemName: "arrow.up.forward.app") }
         }
         Button {
-            if let searchResult { state.search.activate(searchResult, reveal: true) }
-            else { state.showInFinder(application) }
+            Analytics.performing(.menu) {
+                if let searchResult { state.search.activate(searchResult, reveal: true) }
+                else { state.reveal(application, suggested: isSuggestion) }
+            }
         } label: {
             Label { Text(.applicationMenuShowInFinder) } icon: { Image(systemName: "folder") }
         }
         Divider()
         Button {
-            state.favorites.toggle(application.id)
+            state.toggleFavorite(application)
         } label: {
             Label {
                 Text(state.favorites.ids.contains(application.id) ? .launcherRemoveFavorite : .launcherAddFavorite)
@@ -43,10 +50,7 @@ struct LauncherApplicationMenu: View {
         Menu {
             ForEach(state.pinDestinations) { display in
                 Button {
-                    state.dockStore?.copyPin?(
-                        .application(application.reference),
-                        display.id
-                    )
+                    state.pin(application, onDisplay: display.id)
                 } label: {
                     Label { Text(verbatim: display.name) } icon: { Image(systemName: "display") }
                 }
@@ -57,15 +61,15 @@ struct LauncherApplicationMenu: View {
         .disabled(state.pinDestinations.isEmpty)
         Divider()
         Button {
-            state.createCapsule?(application.reference)
+            state.createCapsule(for: application)
         } label: {
             Label { Text(.launcherMenuCreateCapsule) } icon: { Image(systemName: "capsule.portrait") }
         }
         // Hidden for apps macOS protects (System Integrity Protection) and for DOKK itself.
-        if let uninstall = state.uninstall, AppUninstallPathPolicy.allowsApp(application.reference.url) {
+        if state.uninstall != nil, AppUninstallPathPolicy.allowsApp(application.reference.url) {
             Divider()
             Button(role: .destructive) {
-                uninstall(application)
+                state.beginUninstall(application)
             } label: {
                 Label { Text(.hubUninstallMenu) } icon: { Image(systemName: "trash") }
             }
