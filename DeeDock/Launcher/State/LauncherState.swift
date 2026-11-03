@@ -92,6 +92,8 @@ final class LauncherState {
             || sort != .name || grouping != .none
     }
     /// Restores the defaults that ``hasCustomBrowseOptions`` checks. Layout stays as chosen.
+    ///
+    /// Reported as `launcher_option_changed` with `option = reset`, not as one event per option.
     func resetBrowseOptions() {
         search.kind = .all
         filter = .all
@@ -99,6 +101,28 @@ final class LauncherState {
         showsNestedApplications = false
         sort = .name
         grouping = .none
+        recordOptionChange(.reset)
+    }
+
+    /// Sets a browse option a person chose, and reports it when the value changed.
+    ///
+    /// Menu pickers and sort chips call this. Other changes assign the property directly and are
+    /// not reported one by one: ``resetBrowseOptions()`` reports a single `reset`, and the Recent
+    /// filter choosing its own sort reports nothing.
+    /// - Parameters:
+    ///   - keyPath: The option, such as `\.filter` or `\.search.kind`.
+    ///   - value: The chosen value.
+    ///   - option: Builds the analytics form of the chosen value.
+    func choose<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<LauncherState, Value>, _ value: Value,
+                                  as option: (Value) -> AnalyticsLauncherOption) {
+        guard self[keyPath: keyPath] != value else { return }
+        self[keyPath: keyPath] = value
+        recordOptionChange(option(value))
+    }
+
+    private func recordOptionChange(_ option: AnalyticsLauncherOption) {
+        Analytics.track(.launcherOptionChanged(option))
+        visit.recordOptionChange()
     }
     // Geometry updates must not invalidate the Launcher or recompute its app results every frame.
     @ObservationIgnored var browseScroll: LauncherBrowseScroll?
@@ -135,6 +159,8 @@ final class LauncherState {
     @ObservationIgnored private var presentationGeneration = UUID()
     /// When the current presentation began, for `launcher_closed`. Nil while closed.
     @ObservationIgnored private var presentedAt: Date?
+    /// Counts for `launcher_closed`; reset by ``begin(pins:foregroundID:)``.
+    @ObservationIgnored private(set) var visit = LauncherVisit()
     @ObservationIgnored private var icons: [String: NSImage] = [:]
     @ObservationIgnored private let iconProvider: ((LauncherApplication) -> NSImage)?
 
@@ -142,6 +168,7 @@ final class LauncherState {
         self.catalog = catalog
         self.iconProvider = iconProvider
         fileActions.catalog = catalog
+        search.didActivate = { [weak self] result, reveal in self?.reportSearchActivation(result, reveal: reveal) }
     }
 
     /// True when at least one discovered app passes the current location and nested-app filters.
@@ -257,10 +284,12 @@ final class LauncherState {
     func begin(pins: [ApplicationReference], foregroundID: String? = nil) {
         presentationGeneration = UUID()
         presentedAt = Date()
+        visit = LauncherVisit()
         isActive = true
         search.begin()
         fileActions.resetForPresentation()
         fileActions.didOpen = { [weak self] in self?.didOpen?() }
+        fileActions.didStartAction = { [weak self] in self?.recordVisit(.fileAction) }
         initialPinnedIDs = Set(pins.map(\.id))
         error = nil; selectedID = nil; keyboardNavigationActive = false
         suggestions.begin(store: catalog.suggestions, foregroundID: foregroundID)
@@ -274,11 +303,15 @@ final class LauncherState {
     #endif
 
     /// Ends the presentation: cancels discovery, ranking, Robi, an open file chooser, and pending
-    /// suggestion work. Safe to call when already ended.
-    func end() {
+    /// suggestion work, and reports the visit as `launcher_closed`. Safe to call when already ended;
+    /// only the first call reports.
+    /// - Parameter exit: How the tab was left, for the outcome of a visit without an action.
+    func end(_ exit: LauncherVisit.Exit = .closed) {
         isActive = false
         if let presentedAt {
-            Analytics.track(.launcherClosed(duration: Date().timeIntervalSince(presentedAt), hadQuery: !query.isEmpty))
+            Analytics.track(.launcherClosed(duration: Date().timeIntervalSince(presentedAt), hadQuery: !query.isEmpty,
+                                            outcome: visit.outcome(exit), actionCount: visit.actionCount,
+                                            optionCount: visit.optionCount, scrolled: visit.scrolled))
             self.presentedAt = nil
         }
         suggestions.end()
@@ -299,6 +332,8 @@ final class LauncherState {
         return icon
     }
 
+    /// Opens an app without reporting it. Entry points report first: ``launch(_:)``,
+    /// ``openSuggested(_:)``, and mixed search through ``LauncherSearchState/activate(_:reveal:)``.
     func open(_ application: LauncherApplication) {
         error = nil
         let token = presentationGeneration
@@ -324,14 +359,78 @@ final class LauncherState {
         fileActions.chooseFiles()
     }
 
+    /// Opens an app from the grid or list (browsing, or Robi's picks) and reports where it was.
+    func launch(_ application: LauncherApplication) {
+        reportBrowseActivation(application, suggested: false, reveal: false)
+        open(application)
+    }
+
+    /// Shows an app from the grid, the list, or a Suggested card in Finder and reports it.
+    /// - Parameter suggested: The app was a Suggested card's.
+    func reveal(_ application: LauncherApplication, suggested: Bool = false) {
+        reportBrowseActivation(application, suggested: suggested, reveal: true)
+        showInFinder(application)
+    }
+
     func togglePin(_ application: LauncherApplication) {
         guard let dockStore else { return }
+        recordVisit(.managed)
         let succeeded = Analytics.performing(.launcher) {
             pinnedIDs.contains(application.id)
                 ? dockStore.removePin(application.id)
                 : dockStore.insertPins([.application(application.reference)], at: dockStore.pins.count)
         }
         if !succeeded { error = dockStore.errorMessage }
+    }
+
+    /// Pins an app on another display's dock ("Pin on Display").
+    func pin(_ application: LauncherApplication, onDisplay displayID: String) {
+        guard let copyPin = dockStore?.copyPin else { return }
+        recordVisit(.managed)
+        Analytics.performing(.launcher) { copyPin(.application(application.reference), displayID) }
+    }
+
+    func toggleFavorite(_ application: LauncherApplication) {
+        let adding = !favorites.ids.contains(application.id)
+        favorites.toggle(application.id)
+        Analytics.track(.launcherFavoriteChanged(favorite: adding))
+        recordVisit(.managed)
+    }
+
+    /// Starts a capsule from an app. The owner dismisses the Hub.
+    func createCapsule(for application: LauncherApplication) {
+        guard let createCapsule else { return }
+        recordVisit(.tool)
+        createCapsule(application.reference)
+    }
+
+    /// Opens the uninstall sheet for an app. Does nothing without an ``uninstall`` handler.
+    func beginUninstall(_ application: LauncherApplication) {
+        guard let uninstall else { return }
+        recordVisit(.managed)
+        uninstall(application)
+    }
+
+    /// Clears launch history after the person confirmed it.
+    func clearHistory() {
+        history.clear()
+        Analytics.track(.launcherHistoryCleared)
+        recordVisit(.managed)
+    }
+
+    /// Records an action for this visit's `launcher_closed`. Ignored outside a presentation.
+    ///
+    /// Views call this for actions whose work happens outside the launcher: DOKK tools, Capture &
+    /// image search, and Settings (``LauncherVisit/Action/tool``).
+    func recordVisit(_ action: LauncherVisit.Action) {
+        guard isActive else { return }
+        visit.record(action)
+    }
+
+    /// The grid, list, or search results moved away from the top. Called on the change only.
+    func recordScrolled() {
+        guard isActive else { return }
+        visit.recordScrolled()
     }
 
     func showInFinder(_ application: LauncherApplication) {
@@ -347,10 +446,10 @@ final class LauncherState {
             // A removed suggestion must never silently activate the next ordinary result.
             guard let item = items.first(where: { $0.id == selectedID }) else { return }
             if case .suggested = item.id { openSuggested(item.application) }
-            else { open(item.application) }
+            else { launch(item.application) }
         } else if let item = items.first {
             if case .suggested = item.id { openSuggested(item.application) }
-            else { open(item.application) }
+            else { launch(item.application) }
         }
     }
 
@@ -372,6 +471,7 @@ final class LauncherState {
         let apps = library.applications.filter { isBrowsable($0, home: home) }
         let robi = robi
         robiBusy = true
+        recordVisit(.robi)
         robiTask = Task { [weak self] in
             do {
                 let ids = try await robi.suggestions(task: task, applications: apps)

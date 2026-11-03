@@ -36,7 +36,7 @@ struct HubAppsView: View {
         // Uninstall… from an app's context menu; it slides down from under the Hub's header.
         .overlay(alignment: .top) { HubUninstallOverlay(uninstaller: model.uninstaller) }
         .confirmationDialog(Text(.launcherClearHistory), isPresented: $confirmClear) {
-            Button(role: .destructive) { launcher.history.clear() } label: { Text(.launcherClearHistory) }
+            Button(role: .destructive) { launcher.clearHistory() } label: { Text(.launcherClearHistory) }
         } message: { Text(.launcherClearHistoryDetail) }
         .onChange(of: confirmClear) { _, presented in model.setDialogPresented(presented) }
     }
