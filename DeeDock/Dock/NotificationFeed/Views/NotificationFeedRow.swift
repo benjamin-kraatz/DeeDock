@@ -128,13 +128,14 @@ struct NotificationFeedRow: View {
         .onTapGesture(perform: actions.primary)
         .contextMenu { menu }
         .help(helpText)
-        .accessibilityHidden(placement.isPeek)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(accessibilityValue)
         .accessibilityHint(placement.isStackFront ? Text(.notificationFeedStackHint) : Text(verbatim: ""))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
         .accessibilityActions { accessibilityActions }
+        // Last, so it hides the element built above; before it, peeking cards were still read.
+        .accessibilityHidden(placement.isPeek)
     }
 
     // MARK: - Menus and actions
