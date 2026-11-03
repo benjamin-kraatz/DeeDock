@@ -436,6 +436,25 @@ delete it in Keychain Access.
 `ClipboardMuseumCleanupTests` covers the deletion, a neighbouring folder surviving, a second run,
 a Mac that never used the Museum, a failed deletion retried, and an unresolvable folder skipped.
 
+## DEE-152 window list removed from app menus
+
+An app tile's context menu no longer lists the app's windows. **Loading Windows…**, the window
+rows, the **No Windows** and **Windows Unavailable** rows, the minimized marker, and the menu's
+own window discovery and its cancellation are removed, with three unused String Catalog keys.
+The fix PR #394 proposed for the menu's window session was not ported.
+
+Window Peek, the tile's VoiceOver window actions, and file handoff keep their own window
+discovery and select windows through the same menu controller. `app_menu_action` still sends
+`select_window`, now only from VoiceOver. The menu's commands, Badge Memory, App Melt, Islands,
+and the app's own Dock menu rows keep their order. The menu still takes the dock's tracking hold
+when it opens and releases it when it closes. The macOS Dock's window rows stay filtered out of
+the app's own rows, so no window list returns through them.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination 'platform=macOS' -derivedDataPath /private/tmp/claude-501/dee152b-DerivedData
+CODE_SIGNING_ALLOWED=NO` succeeded for `build` and `build-for-testing`, compiling the app and
+test targets. No tests were run, and the app was not launched.
+
 ## DEE-156 Find a Window removed
 
 Find a Window is gone, with no replacement. The **Find a Window** item in the DOKK menu and the
@@ -1670,6 +1689,8 @@ The confirmation preference was then added and checked in a signed Debug build. 
 - Confirm Reduce Motion, Reduce Transparency, idle fading, tooltip behavior, dark appearance, different backing scales, negative display origins, Spaces, and full-screen apps do not regress the tile.
 
 ## Window-aware application menus
+
+DEE-152 later removed the context menu's window rows; see [DEE-152](#dee-152-window-list-removed-from-app-menus). Discovery, selection, and the VoiceOver window actions below remain.
 
 Implemented on 2026-09-03. App Sandbox, signing settings, and entitlements were left unchanged.
 
@@ -3444,7 +3465,7 @@ The app was not launched. Not exercised:
 
 ### Implemented
 
-- A running app's context menu shows the rows it adds to its macOS Dock menu, below the window list, while the macOS Dock is tucked away.
+- A running app's context menu shows the rows it adds to its macOS Dock menu, above Open, while the macOS Dock is tucked away.
 - `SystemDockMenuReader` opens the Dock tile's menu with `AXShowMenu`, reads it, and dismisses it, with a 300 ms limit. Pressing a row reopens the menu, checks the title at every level, and presses it through the Dock.
 - `SystemDockMenuFilter` keeps the app's rows by menu shape, because Accessibility exposes nothing that separates them from recents, windows, and the Dock's own commands.
 

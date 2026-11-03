@@ -8737,42 +8737,6 @@
         }
       }
     },
-    "applicationMenuMinimized" : {
-      "comment" : "Accessibility description for a minimized window marker.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimiert"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimized"
-          }
-        }
-      }
-    },
-    "applicationMenuNoWindows" : {
-      "comment" : "Disabled context-menu row when a running app exposes no selectable windows.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Fenster"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Windows"
-          }
-        }
-      }
-    },
     "applicationMenuOpenWindow" : {
       "comment" : "VoiceOver action for a specific window. title is supplied by the target application.",
       "extractionState" : "manual",
@@ -8967,24 +8931,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading Windows…"
-          }
-        }
-      }
-    },
-    "applicationMenuWindowsUnavailable" : {
-      "comment" : "Disabled menu row when Accessibility window discovery failed.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster nicht verfügbar"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Windows Unavailable"
           }
         }
       }
