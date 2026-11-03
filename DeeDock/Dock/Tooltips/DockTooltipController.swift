@@ -27,9 +27,14 @@ final class DockTooltipController {
     @ObservationIgnored private let scheduler: any DockVisibilityScheduling
     @ObservationIgnored private var pending: DockScheduledAction?
     @ObservationIgnored private var generation = UUID()
+    /// False for the Settings preview, so playing a preview never counts as a tooltip shown.
+    @ObservationIgnored private let countsReveals: Bool
 
-    init(scheduler: (any DockVisibilityScheduling)? = nil) {
+    /// - Parameter countsReveals: Whether reveals feed the `tooltip_shown_*` counters. Only the
+    ///   dock's own controller does; previews pass false.
+    init(scheduler: (any DockVisibilityScheduling)? = nil, countsReveals: Bool = true) {
         self.scheduler = scheduler ?? DockVisibilityScheduler()
+        self.countsReveals = countsReveals
     }
 
     func update(_ next: Request) {
@@ -38,8 +43,9 @@ final class DockTooltipController {
         guard let target = next.target, next.preset != .off else { visible = nil; return }
         // Only dock captions preserve the old label during a new target's delay.
         if next.preset.placement != .dockCenter { visible = nil }
+        let counts = countsReveals
         let reveal = { [weak self] in
-            if self?.visible != target { Analytics.count(.tooltipShown(keyboard: next.keyboard)) }
+            if counts, self?.visible != target { Analytics.count(.tooltipShown(keyboard: next.keyboard)) }
             withAnimation(next.preset.animation(reduceMotion: next.reduceMotion)) { self?.visible = target }
         }
         if next.keyboard || next.preset.delay == 0 { reveal(); return }

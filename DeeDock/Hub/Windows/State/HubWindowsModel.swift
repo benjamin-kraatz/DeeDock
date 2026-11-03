@@ -5,7 +5,7 @@ import Observation
 ///
 /// Discovery reuses Radar's ``HarborWindowService`` through ``HubWindowsSource``. It runs only while
 /// the tab is visible: ``hubTabDidAppear(shell:)`` starts it and installs workspace observers,
-/// ``hubTabDidDisappear()`` cancels every task it owns and releases the service session. Main-actor isolated.
+/// ``hubTabDidDisappear(_:)`` cancels every task it owns and releases the service session. Main-actor isolated.
 @MainActor @Observable
 final class HubWindowsModel: HubTabModel {
     /// Where discovery stands.
@@ -107,7 +107,7 @@ final class HubWindowsModel: HubTabModel {
         refresh(recapture: true)
     }
 
-    func hubTabDidDisappear() {
+    func hubTabDidDisappear(_ exit: HubTabExit) {
         removeObservers()
         pendingRefresh?.cancel()
         pendingRefresh = nil
@@ -291,7 +291,7 @@ final class HubWindowsModel: HubTabModel {
 
     /// App launch, quit, hide, and unhide change which windows exist; a Space switch changes which
     /// are on screen. A detached Hub also refreshes when another app activates, since it stays open
-    /// while people work. Removed again in ``hubTabDidDisappear()``.
+    /// while people work. Removed again in ``hubTabDidDisappear(_:)``.
     private func installObservers() {
         removeObservers()
         let center = NSWorkspace.shared.notificationCenter

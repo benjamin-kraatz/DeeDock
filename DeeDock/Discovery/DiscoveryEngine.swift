@@ -20,15 +20,15 @@ final class DiscoveryEngine {
     }
     private var saved: Saved
     private var unreadable = false
-    private var signals: [DiscoveryProposal.Signal: (count: Int, last: Date)] = [:]
+    /// Signal progress per proposal: how often its signal arrived and when it last did. One signal
+    /// can feed several proposals, such as the launch announcements. Showing a tip spends only its
+    /// own progress, so the others queued on that signal stay eligible in this process.
+    private var progress: [String: (count: Int, last: Date)] = [:]
     private(set) var queue: [String] = []
     private(set) var visible: DiscoveryProposal?
     private var sessionCount = 0
     private var nextSlot: Date?
     var enabled: Bool { saved.enabled && !unreadable }
-    var needsClipboardSignal: Bool {
-        enabled && catalog.contains { $0.signal == .clipboardChanged && !suppressed($0) }
-    }
 
     init(defaults: UserDefaults = .standard, catalog: [DiscoveryProposal]? = nil) {
         self.defaults = defaults
@@ -44,15 +44,16 @@ final class DiscoveryEngine {
         // Explicitly changing the switch repairs only Discovery's unreadable preferences.
         unreadable = false
         saved.enabled = enabled
-        queue.removeAll(); signals.removeAll(); visible = nil
+        queue.removeAll(); progress.removeAll(); visible = nil
         persist()
     }
 
     func record(_ signal: DiscoveryProposal.Signal, at now: Date) {
         guard enabled else { return }
-        signals[signal] = (min((signals[signal]?.count ?? 0) + 1, 100), now)
         for proposal in catalog where proposal.signal == signal && !suppressed(proposal) {
-            if signals[signal]!.count >= proposal.threshold,
+            let count = min((progress[proposal.id]?.count ?? 0) + 1, 100)
+            progress[proposal.id] = (count, now)
+            if count >= proposal.threshold,
                !queue.contains(proposal.id), visible?.id != proposal.id {
                 queue.append(proposal.id)
             }
@@ -87,8 +88,8 @@ final class DiscoveryEngine {
         queue.firstIndex { id in
             guard let proposal = catalog.first(where: { $0.id == id }),
                   now >= saved.snoozed[id, default: .distantPast],
-                  let signal = signals[proposal.signal] else { return false }
-            return now.timeIntervalSince(signal.last) >= proposal.calmInterval
+                  let progress = progress[id] else { return false }
+            return now.timeIntervalSince(progress.last) >= proposal.calmInterval
         }
     }
 
@@ -97,7 +98,8 @@ final class DiscoveryEngine {
         if forever { saved.dismissed.insert(proposal.id) }
         else { saved.snoozed[proposal.id] = now.addingTimeInterval(proposal.snoozeInterval) }
         visible = nil
-        signals[proposal.signal] = nil
+        // The shown tip has to qualify again from scratch; other tips keep their progress.
+        progress[proposal.id] = nil
         persist()
     }
 

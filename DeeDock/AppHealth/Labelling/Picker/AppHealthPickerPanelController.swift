@@ -118,7 +118,7 @@ final class AppHealthPickerPanelController: AppHealthPickerPresenting {
     }
 
     /// DOKK was activated to give the picker focus. If it still is and no other DOKK window took over, hand focus
-    /// back to the app the person was using, as Window Search does.
+    /// back to the app the person was using.
     private func restorePreviousApplication() {
         defer { previousApplication = nil }
         guard let previousApplication, !previousApplication.isTerminated,

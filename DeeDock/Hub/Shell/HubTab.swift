@@ -9,6 +9,14 @@ enum HubTab: String, CaseIterable, Codable, Sendable, Identifiable {
     var id: Self { self }
 }
 
+/// Why a tab stopped being visible, passed to ``HubTabModel/hubTabDidDisappear(_:)``.
+enum HubTabExit: Sendable {
+    /// Another tab was selected in the open Hub.
+    case switchedTab
+    /// The Hub closed, including a close-and-reopen that moves it to another display.
+    case closed
+}
+
 /// Why an anchored Hub must stay open through an outside click or loss of key status.
 ///
 /// Holds are counted per reason, so nested begin/end pairs from independent owners compose.
@@ -67,11 +75,12 @@ protocol HubTabModel: AnyObject {
     var searchPrompt: LocalizedStringResource { get }
 
     /// The tab became visible in an open Hub. Start discovery or monitors here; `shell` stays valid
-    /// until the matching `hubTabDidDisappear()`.
+    /// until the matching `hubTabDidDisappear(_:)`.
     func hubTabDidAppear(shell: HubShell)
 
     /// The tab was hidden or the Hub closed. Cancel discovery and stop monitors here.
-    func hubTabDidDisappear()
+    /// - Parameter exit: Whether another tab took its place or the Hub closed.
+    func hubTabDidDisappear(_ exit: HubTabExit)
 
     /// A key-down event while the Hub is key and this tab is visible.
     ///

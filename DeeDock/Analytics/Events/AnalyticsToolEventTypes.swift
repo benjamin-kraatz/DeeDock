@@ -1,6 +1,6 @@
 import Foundation
 
-// Closed vocabularies for tool events: Shortcut tiles, Window Search, Fusion, the file handoff
+// Closed vocabularies for tool events: Shortcut tiles, Fusion, the file handoff
 // panel, and Launcher suggestions. Every value is a compile-time constant.
 
 /// Where a pinned Shortcut was run from.
@@ -21,21 +21,6 @@ nonisolated enum AnalyticsShortcutSource: String, AnalyticsToken {
 
 nonisolated enum AnalyticsShortcutTileAction: String, AnalyticsToken {
     case pinned, unpinned, moved, acceptsFilesOn = "accepts_files_on", acceptsFilesOff = "accepts_files_off", reset
-}
-
-/// Why a Window Search result matched.
-nonisolated enum AnalyticsWindowSearchEvidence: String, AnalyticsToken {
-    case metadata, text, capsule, historicalOCR = "historical_ocr", image
-
-    init(_ evidence: WindowSearchEvidence) {
-        switch evidence {
-        case .metadata: self = .metadata
-        case .text: self = .text
-        case .capsule: self = .capsule
-        case .historicalOCR: self = .historicalOCR
-        case .image: self = .image
-        }
-    }
 }
 
 /// One step of a Fusion run.
@@ -76,6 +61,8 @@ nonisolated enum AnalyticsFileHandoffAction: String, AnalyticsToken {
 
 nonisolated enum AnalyticsSuggestionFeedback: String, AnalyticsToken {
     case useful, notNow = "not_now"
+    /// "Never suggest this app" on a Suggested card.
+    case excluded
 
     init(_ kind: LauncherSuggestionFeedback.Kind) {
         switch kind {
@@ -98,15 +85,13 @@ nonisolated enum AnalyticsSuggestionPromptAnswer: String, AnalyticsToken {
     }
 }
 
-/// App-wide feature preferences that live outside the dock, atmosphere, menu-bar, and update
-/// settings models. Each is reported through `setting_changed` with `area = features`.
+/// App-wide feature preferences that live outside the dock, menu-bar, and update settings
+/// models. Each is reported through `setting_changed` with `area = features`.
 nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case discoveryEnabled = "discovery_enabled"
     case launcherSuggestionsEnabled = "launcher_suggestions_enabled"
     case launcherSuggestionsPaused = "launcher_suggestions_paused"
     case launcherSuggestionPromptsEnabled = "launcher_suggestion_prompts_enabled"
-    case clipboardRedactSecrets = "clipboard_redact_secrets"
-    case clipboardCuratorEnabled = "clipboard_curator_enabled"
     case localHistoryRecording = "local_history_recording"
     case localHistoryReplay = "local_history_replay"
     case peekHistoryEnabled = "peek_history_enabled"

@@ -36,8 +36,9 @@ protocol HarborIntents: AnyObject {
 @MainActor @Observable
 final class HarborCoordinator: HarborIntents {
     let session = HarborSession()
-    /// Whether the global shortcut is registered. False when disabled or owned by another app.
-    private(set) var shortcutAvailable = false
+    /// The global shortcuts DOKK holds. Empty when the shortcuts are off; a combination another app
+    /// owns is missing while the other one keeps working.
+    private(set) var heldShortcuts: Set<HarborShortcut.Combination> = []
 
     /// Every drawable display, including ones without a DOKK dock, so no window peeks through.
     @ObservationIgnored var displays: () -> [DisplaySnapshot] = { [] }
@@ -55,6 +56,8 @@ final class HarborCoordinator: HarborIntents {
     /// The app that was in front before Harbor, for Escape to return to.
     @ObservationIgnored var previousApplication: () -> NSRunningApplication? = { nil }
     @ObservationIgnored var prepareSettingsRoute: () -> Void = {}
+    /// Runs when a presentation appears, whatever opened it. Discovery stops suggesting Radar then.
+    @ObservationIgnored var didOpen: () -> Void = {}
 
     @ObservationIgnored private let service = HarborWindowService()
     @ObservationIgnored private let wallpapers = HarborWallpaperLoader()
@@ -86,23 +89,25 @@ final class HarborCoordinator: HarborIntents {
 
     // MARK: Lifecycle
 
-    /// Registers or releases the global shortcut.
+    /// Registers or releases both global shortcuts, which one Settings switch controls.
+    ///
+    /// Enabling again retries only a combination that another app held last time.
     func configureShortcut(enabled: Bool) {
         if enabled {
-            guard !shortcut.isRegistered else { return }
-            shortcutAvailable = shortcut.start { [weak self] in
-                Analytics.performing(.hotkey) { self?.toggle() }
+            guard heldShortcuts.count < HarborShortcut.Combination.allCases.count else { return }
+            heldShortcuts = shortcut.start { [weak self] combination in
+                Analytics.performing(combination == .primary ? .hotkey : .hotkeyAlternate) { self?.toggle() }
             }
         } else {
             shortcut.stop()
-            shortcutAvailable = false
+            heldShortcuts = []
         }
     }
 
     func stop() {
         close(raising: nil, outcome: .interrupted, animated: false)
         shortcut.stop()
-        shortcutAvailable = false
+        heldShortcuts = []
     }
 
     // MARK: Opening and closing
@@ -317,6 +322,7 @@ final class HarborCoordinator: HarborIntents {
         let appCount = Set(contents.values.flatMap { $0.groups.map(\.id) }).count
         Analytics.track(.harborOpened(trigger: trigger, windowCount: windowCount, appCount: appCount,
                                       displayCount: displays.count, access: AnalyticsHarborAccess(discovery.access)))
+        didOpen()
         // Let the panels draw once with the backdrop clear and the strip in the dock's shape, so
         // both have a start state to animate from.
         await Task.yield()

@@ -34,8 +34,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
         private var meltChooser: AppMeltWindowPickerMenu?
         private var trackedMenu: NSMenu?
         private var snapshot: ApplicationMenuSnapshot?
-        private var discoveryID: UUID?
-        private var selectedWindowToken: ApplicationWindowToken?
         private var dockMenuRead: Task<Void, Never>?
         private var dockMenuEntries: [SystemDockMenuEntry] = []
 
@@ -79,7 +77,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
             if let controller = interaction?.appMelt {
                 meltChooser = AppMeltWindowPickerMenu(controller: controller)
             } else { meltChooser = nil }
-            selectedWindowToken = nil
             snapshot = interaction?.applicationMenuSnapshot?(item)
                 ?? ApplicationMenuSnapshot(processes: [], windowState: .hidden)
 
@@ -88,15 +85,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
             menu.autoenablesItems = false
             rebuild(menu)
             trackedMenu = menu
-
-            if let snapshot, snapshot.windowState == .loading {
-                discoveryID = interaction?.beginApplicationWindowDiscovery?(item, snapshot) { [weak self, weak menu] state in
-                    guard let self, let menu, trackedMenu === menu, let previous = self.snapshot else { return }
-                    self.snapshot = ApplicationMenuSnapshot(processes: previous.processes, windowState: state,
-                                                            isRunningInBackground: previous.isRunningInBackground)
-                    if self.meltChooser?.isTracking != true { self.rebuild(menu) }
-                }
-            }
 
             NSMenu.popUpContextMenu(menu, with: event, for: self)
             finishTracking()
@@ -134,7 +122,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 addItem(.badgeMemoryDetails, symbol: "app.badge", action: #selector(showBadgeMemory), to: menu)
                 menu.addItem(.separator())
             }
-            addWindows(snapshot.windowState, to: menu)
             if !dockMenuEntries.isEmpty {
                 addDockMenuEntries(dockMenuEntries, to: menu)
                 menu.addItem(.separator())
@@ -241,38 +228,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
             return parent
         }
 
-        private func addWindows(_ state: ApplicationWindowMenuState, to menu: NSMenu) {
-            switch state {
-            case .hidden:
-                return
-            case .loading:
-                addDisabledItem(.applicationMenuWindowsLoading, to: menu)
-            case .unavailable:
-                addDisabledItem(.applicationMenuWindowsUnavailable, to: menu)
-            case .loaded(let windows):
-                guard !windows.isEmpty else {
-                    addDisabledItem(.applicationMenuNoWindows, to: menu)
-                    menu.addItem(.separator())
-                    return
-                }
-                let titles = ApplicationContextMenuProjection.windowTitles(
-                    windows,
-                    untitled: String(localized: .applicationMenuUntitledWindow)
-                )
-                for (window, title) in zip(windows, titles) {
-                    let entry = NSMenuItem(title: title, action: #selector(selectWindow(_:)), keyEquivalent: "")
-                    entry.target = self
-                    entry.representedObject = window.token
-                    entry.state = window.isMain ? .on : .off
-                    if window.isMinimized {
-                        entry.image = NSImage(systemSymbolName: "minus.square", accessibilityDescription: String(localized: .applicationMenuMinimized))
-                    }
-                    menu.addItem(entry)
-                }
-            }
-            menu.addItem(.separator())
-        }
-
         /// Adds the rows the app put in its macOS Dock menu. Their titles come from the app.
         private func addDockMenuEntries(_ entries: [SystemDockMenuEntry], to menu: NSMenu) {
             for entry in entries {
@@ -307,12 +262,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
             return entry
         }
 
-        private func addDisabledItem(_ title: LocalizedStringResource, to menu: NSMenu) {
-            let entry = NSMenuItem(title: String(localized: title), action: nil, keyEquivalent: "")
-            entry.isEnabled = false
-            menu.addItem(entry)
-        }
-
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
         func menuDidClose(_ menu: NSMenu) { finishTracking() }
 
@@ -341,14 +290,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func bringAllToFront() { perform(.bringAllToFront) }
         @objc private func quitApplication() { perform(.quit) }
         @objc private func stopRunningInBackground() { perform(.stopRunningInBackground) }
-
-        @objc private func selectWindow(_ sender: NSMenuItem) {
-            guard let token = sender.representedObject as? ApplicationWindowToken else { return }
-            selectedWindowToken = token
-            trackedMenu?.cancelTracking()
-            finishTracking()
-            perform(.selectWindow(token))
-        }
 
         @objc private func pressDockMenuEntry(_ sender: NSMenuItem) {
             guard let item, let entry = sender.representedObject as? SystemDockMenuEntry else { return }
@@ -380,10 +321,6 @@ struct DockContextMenuBridge: NSViewRepresentable {
         @objc private func resetIslands() { Analytics.performing(.menu) { interaction?.resetIslands?() } }
 
         private func finishTracking() {
-            if selectedWindowToken == nil, let discoveryID {
-                interaction?.cancelApplicationWindowDiscovery?(discoveryID)
-            }
-            discoveryID = nil
             tracking?(false)
             trackedMenu = nil
             snapshot = nil

@@ -63,7 +63,7 @@ struct LauncherSuggestionCard: View {
         .accessibilityValue(Text(reason))
         .accessibilityHint(Text(.hubAppsSuggestionHint))
         .accessibilityAddTraits(selected ? [.isSelected] : [])
-        .accessibilityAction { state.openSuggested(application) }
+        .accessibilityAction { Analytics.performing(.voiceOver) { state.openSuggested(application) } }
         .accessibilityActions { LauncherSuggestionActions(application: application, state: state) }
         .help(Text(verbatim: application.reference.url.path))
     }

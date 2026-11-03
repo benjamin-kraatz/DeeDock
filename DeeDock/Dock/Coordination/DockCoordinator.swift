@@ -6,7 +6,6 @@ import Observation
 @MainActor @Observable
 final class DockCoordinator {
     let localHistory = DockLocalHistoryStore()
-    let clipboardMuseum = ClipboardMuseumController()
     /// Collected notification banners, shared by every display's feed tile and Settings.
     let notificationFeed = NotificationFeedController()
     /// DOKK's plugins: discovery, pins, and one session per pinned plugin, shared by every dock and Settings.
@@ -16,7 +15,6 @@ final class DockCoordinator {
     let fileDestinations = LauncherFileDestinationsStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
-    let atmosphere = AtmosphereController()
     let discovery = DiscoveryController()
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
@@ -121,9 +119,6 @@ final class DockCoordinator {
     let islandPlans = DockIslandPlanStore()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
-    @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
-    private(set) var searchShortcutAvailable = false
-    @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     let peekHistory = PeekHistoryStore.live()
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
@@ -207,7 +202,7 @@ final class DockCoordinator {
     func start() {
         guard !started else { return }
         started = true
-        atmosphere.start()
+        AtmosphereCleanup.runInBackground()
         robi.prepareSettingsRoute = { [weak self] in self?.settingsRobiRequest = true }
         robi.didUse = { [weak self] in self?.discovery.markUsed(.robi) }
         robi.start()
@@ -216,15 +211,13 @@ final class DockCoordinator {
         actionTiles.start()
         fileDestinations.start()
         localHistory.start()
-        clipboardMuseum.start()
-        clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
-        if clipboardMuseum.store.captureEnabled || !clipboardMuseum.store.exhibits.isEmpty {
-            discovery.markUsed(.clipboardMuseum)
-        }
+        ClipboardMuseumCleanup.runInBackground()
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
         if robi.store.settings.isEnabled { discovery.markUsed(.robi) }
+        // Someone who turned Radar's shortcuts off has been to its settings, and the tip names a shortcut.
+        if !settings.value.harborShortcutEnabled { discovery.markUsed(.harbor) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configurePlugins()
         configureHarbor()
@@ -252,9 +245,6 @@ final class DockCoordinator {
         discovery.openDestination = { [weak self] destination in
             guard let self else { return .none }
             switch destination {
-            case .clipboardMuseum:
-                showClipboardMuseum()
-                return .none
             case .notificationFeed:
                 return enableNotificationFeedFromDiscovery()
             case .islands:
@@ -262,6 +252,9 @@ final class DockCoordinator {
                 return .none
             case .robi:
                 return enableRobiFromDiscovery()
+            case .harbor:
+                harbor.open()
+                return .none
             }
         }
         discovery.start()
@@ -386,7 +379,6 @@ final class DockCoordinator {
         }
         capsules.didChange = { [weak self] in
             self?.sessionCapsules.reload()
-            self?.windowSearch.reloadCapsules()
             self?.refreshPanels()
         }
         catalog.activated = { [weak self] app in
@@ -407,6 +399,8 @@ final class DockCoordinator {
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
+            // Same permanent suppression as at start-up: the Radar tip names a shortcut that is now off.
+            if self?.settings.value.harborShortcutEnabled == false { self?.discovery.markUsed(.harbor) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureHubGlass()
             self?.configureVolumeReads()
@@ -427,7 +421,6 @@ final class DockCoordinator {
         configureVolumeReads()
         volumes.start()
         capsules.start()
-        searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
         displayService.start()
         // After the first reconcile, so the macOS Dock is placed away from the real dock.
@@ -495,7 +488,6 @@ final class DockCoordinator {
         let knownProfiles = Set(profiles.document.profiles.keys)
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
         reportDisplayChange(displays, knownProfiles: knownProfiles)
-        atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
@@ -545,7 +537,6 @@ final class DockCoordinator {
                 // A context menu or drag replaces the plain card; a question or refusal stays.
                 if volumeDock.cards.isOpen, volumeDock.cards.isShowingInfo { volumeDock.cards.close() }
             }
-            panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
             panel.timelineRequested = { [weak self] in self?.browseLocalHistory() }
             panel.escape = { [weak self] in
                 guard let self else { return }
@@ -918,19 +909,8 @@ final class DockCoordinator {
         }
         harbor.previousApplication = { [weak self] in self?.lastExternalApplication }
         harbor.prepareSettingsRoute = { [weak self] in self?.settingsHarborRequest = true }
+        harbor.didOpen = { [weak self] in self?.discovery.markUsed(.harbor) }
         harbor.configureShortcut(enabled: settings.value.harborShortcutEnabled)
-    }
-
-    /// Opens metadata search only after a menu or keyboard action.
-    func searchWindows() {
-        harbor.close(raising: nil, outcome: .interrupted, animated: false)
-        hub.dismissAnchored()
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        timeline.end()
-        endFocus(restore: false)
-        Analytics.track(.toolOpened(.windowSearch, trigger: Analytics.trigger()))
-        windowSearch.show(returningTo: lastExternalApplication)
     }
 
     func focusDock() {
@@ -994,14 +974,6 @@ final class DockCoordinator {
         return .openSettings
     }
 
-    /// Called only from a menu command or Settings. Never opened by hover or a clipboard change.
-    func showClipboardMuseum() {
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        endFocus(restore: false)
-        clipboardMuseum.show(returningTo: lastExternalApplication)
-    }
-
     /// Reopens the uninstall sheet that was waiting for DOKK to relaunch with Full Disk Access.
     ///
     /// Waits a moment so the docks exist and the Hub can anchor to one.
@@ -1049,7 +1021,6 @@ final class DockCoordinator {
             guard let self else { return }
             hub.dismissAfterAction()
             switch tool {
-            case .clipboardMuseum: showClipboardMuseum()
             case .localHistory: browseLocalHistory()
             case .fusion: showFusion()
             // Needs a SwiftUI openWindow action, so the launcher view opens it directly.
@@ -1098,10 +1069,6 @@ final class DockCoordinator {
     private func configureLauncherSearch(_ launcher: LauncherState) {
         let search = launcher.search
         search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles
-        search.explicitSearch = { [weak self] in
-            self?.hub.dismissAfterAction()
-            self?.searchWindows()
-        }
         search.dispatch = { [weak self, weak launcher] result, reveal in
             guard let self, let launcher else { return }
             let search = launcher.search
@@ -1152,8 +1119,6 @@ final class DockCoordinator {
         hub.stop()
         systemDockTuck.stop()
         discovery.stop()
-        clipboardMuseum.didUse = nil
-        atmosphere.stop()
         guard started else { return }
         started = false
         occupancy.stop()
@@ -1189,8 +1154,6 @@ final class DockCoordinator {
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
-        searchShortcut.stop()
-        windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()
         applicationMenus.stop()
@@ -1208,7 +1171,6 @@ final class DockCoordinator {
         notificationFeed.stop()
         robi.stop()
         badgeMemoryWindow.stop()
-        clipboardMuseum.stop()
         catalog.stop()
         volumeDock.stop()
         volumes.stop()

@@ -19,7 +19,12 @@ final class LauncherSearchState {
     var capsules: SessionCapsuleController?
     var actions: ActionTilesController?
     @ObservationIgnored var dispatch: ((LauncherSearchResult, Bool) -> Void)?
-    @ObservationIgnored var explicitSearch: (() -> Void)?
+    /// Reports an accepted activation (`result`, `reveal`) before it is dispatched. Set by ``LauncherState``,
+    /// which knows the query and the visit.
+    @ObservationIgnored var didActivate: ((LauncherSearchResult, Bool) -> Void)?
+    /// Whether the mixed results are scrolled away from the top, for `launcher_result_activated`.
+    /// Written by the results view when that changes, never per scroll frame.
+    @ObservationIgnored var scrolled = false
     @ObservationIgnored private var service: WindowSearchService?
     @ObservationIgnored private var sources: [WindowSearchSource] = []
     @ObservationIgnored private var discovery: Task<Void, Never>?
@@ -40,7 +45,7 @@ final class LauncherSearchState {
     }
 
     func begin() {
-        active = true; selectedID = nil; actionError = nil; actionBusy = false
+        active = true; selectedID = nil; actionError = nil; actionBusy = false; scrolled = false
         refreshWindows()
     }
 
@@ -126,7 +131,7 @@ final class LauncherSearchState {
     func activate(_ result: LauncherSearchResult, reveal: Bool = false) {
         guard active, !actionBusy, !ranking, results.contains(where: { $0.id == result.id }), !result.unavailable else { return }
         actionError = nil
-        Analytics.track(.launcherResultActivated(result.kind, reveal: reveal, trigger: Analytics.trigger()))
+        didActivate?(result, reveal)
         dispatch?(result, reveal)
     }
 

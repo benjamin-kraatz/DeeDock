@@ -433,6 +433,121 @@ Implemented on `feat/notification-panel`. An opt-in Notification Feed reads Noti
 
 Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
 
+## DEE-157 Atmosphere removed
+
+Atmosphere is gone, with no replacement. Settings → Atmosphere and its sidebar entry and search
+keywords, the ambient and corner-décor panels on every display, the focused-window light, wallpaper
+and app-icon color sampling, the Foundation Models Mood palette, the Image Playground corner
+image, the `atmosphere` value of `setting_changed` `area` and of `settings_viewed` `section`, and
+the `atmosphere_mood_palette` AI span are removed. Atmosphere had no Discovery tip, no menu
+items, and no events of its own. 58 String Catalog keys went with it. Nothing that Atmosphere
+started is left running: its two-second gate timer, sleep/wake/Space/activation observers,
+wallpaper reads, focused-window Accessibility subscriptions, window captures, and model sessions
+all belonged to `AtmosphereController` and its parts, which are deleted.
+
+Dependent behavior changes:
+
+- Discovery's fullscreen check converts the target screen to Quartz coordinates with
+  `DisplayQuartzFrame.quartzFrame`, a move of the old `AtmosphereDisplayLayout.quartzFrame`
+  with the same formula. Discovery's own window-coverage test and timer are unchanged.
+- The Settings sidebar's first group lists General and Dock.
+
+Atmosphere kept its data in two keys of DOKK's standard UserDefaults: `atmosphere.settings.v1`
+(the settings document, window light included) and `atmosphere.decor.v1` (the generated corner
+image as PNG data). It wrote no files; Image Playground's temporary file belongs to the system.
+`AtmosphereCleanup` runs once at launch, off the main actor. It removes those two keys, then sets
+`cleanup.atmosphere.v1`. No other key is touched.
+
+`AtmosphereCleanupTests` covers removing both keys while neighbouring keys survive, a second run
+leaving restored keys alone, and a Mac that never used Atmosphere.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination 'platform=macOS' -derivedDataPath /private/tmp/claude-501/dee157-DerivedData
+CODE_SIGNING_ALLOWED=NO build` and the same command with `build-for-testing` succeeded, with no
+new warnings in the changed files. No tests were run, and the app was not launched.
+
+## DEE-153 Clipboard Museum removed
+
+Clipboard Museum is gone, with no replacement. Its window, slideshow, Settings → Features →
+Clipboard Museum page, the **Clipboard Museum…** items in the menu-bar menu and app menu, the
+Hub Apps tool tile, the Discovery tip, the on-device curator labels and image analysis, and the
+`clipboard_museum` and `clipboard_capture_enabled` events, the `clipboard_redact_secrets` and
+`clipboard_curator_enabled` feature settings, the `clipboardMuseum` value of
+`launcher_tool_opened` and `discovery_callout`, and the `clipboard_wall_label` AI span are
+removed. 115 String Catalog keys went with it.
+
+Dependent behavior changes:
+
+- Discovery loses its only clipboard recipe, so it no longer polls `NSPasteboard.changeCount`.
+  The `clipboardChanged` signal and the watcher timer are removed. The Notification Feed,
+  Islands, Robi, and Radar announcements are unchanged. A stored `discovery.state.v1` that names
+  `clipboardMuseum` as used or dismissed still decodes; the entry matches nothing.
+- The Hub Apps tool row lists Local History, App Compare, and System Settings Clone.
+- Shelf keeps its own clipboard paste (`Application Support/<bundle id>/Clipboard`), which never
+  shared code or storage with the Museum.
+
+The Museum kept clipboard copies on disk. `ClipboardMuseumCleanup` runs once at launch, off the
+main actor. It deletes `Application Support/<bundle id>/ClipboardMuseum` (`collection.json`,
+`Images/*.png`, `Vault/*.sealed`), then sets `cleanup.clipboard-museum.v1`. The Museum wrote no
+UserDefaults keys. Nothing outside that folder is touched, and when Application Support or the
+bundle identifier can't be resolved the cleanup skips rather than fall back to another folder. A
+folder that cannot be deleted is logged and retried at the next launch.
+
+The vault key (login keychain, generic password "DOKK Clipboard Museum", service
+`<bundle id>.clipboard-museum`, account `vault-key`) is deliberately left. Deleting from the
+file-based keychain can show a password or access prompt at launch, and there's no reliable way to
+suppress it. With the sealed files gone the key decrypts nothing; anyone who wants it gone can
+delete it in Keychain Access.
+
+`ClipboardMuseumCleanupTests` covers the deletion, a neighbouring folder surviving, a second run,
+a Mac that never used the Museum, a failed deletion retried, and an unresolvable folder skipped.
+
+## DEE-152 window list removed from app menus
+
+An app tile's context menu no longer lists the app's windows. **Loading Windows…**, the window
+rows, the **No Windows** and **Windows Unavailable** rows, the minimized marker, and the menu's
+own window discovery and its cancellation are removed, with three unused String Catalog keys.
+The fix PR #394 proposed for the menu's window session was not ported.
+
+Window Peek, the tile's VoiceOver window actions, and file handoff keep their own window
+discovery and select windows through the same menu controller. `app_menu_action` still sends
+`select_window`, now only from VoiceOver. The menu's commands, Badge Memory, App Melt, Islands,
+and the app's own Dock menu rows keep their order. The menu still takes the dock's tracking hold
+when it opens and releases it when it closes. The macOS Dock's window rows stay filtered out of
+the app's own rows, so no window list returns through them.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination 'platform=macOS' -derivedDataPath /private/tmp/claude-501/dee152b-DerivedData
+CODE_SIGNING_ALLOWED=NO` succeeded for `build` and `build-for-testing`, compiling the app and
+test targets. No tests were run, and the app was not launched.
+
+## DEE-156 Find a Window removed
+
+Find a Window is gone, with no replacement. The **Find a Window** item in the DOKK menu and the
+app menu, the global Command-Shift-Space hot key, the Focus Dock `/` key, the Hub's
+**Capture & image search…** menu item, and the window itself are removed: live title search,
+**Choose Windows…** and **Capture Selected** (OCR of up to four windows), **Search Images with
+AI**, and the Saved Capsules tab with its capsule detail and delete. So are the
+`window_search_activated` and `window_search_closed` events, the `window_search` values of
+`tool_opened` and `focus_dock_command`, the `window_search_image_match` AI trace, 53 String
+Catalog keys, and `WINDOW_SEARCH.md`.
+
+The Hub's Apps-tab search kept what it used. `WindowSearchService` (metadata-only window
+discovery and exact-window activation), `WindowSearchSource`, `WindowSearchResult`,
+`WindowSearchMatcher`, and `WindowSearchIndex` moved from `Dock/Search` to `Launcher/Search`.
+The index keeps only the live and saved scopes; its captured scope and image results are gone.
+Matching, ranking, and the "yesterday" rule are unchanged, so Hub window and Capsule results
+are the same as before. Session Capsules, Breadcrumbs, the window-context capture service,
+Radar, Window Peek, and the app context menu's window list are untouched.
+
+Find a Window kept captures in memory only and stored no preferences, so there is nothing to
+clean up at launch. Radar's and Robi's Carbon hot keys share the old signature under their own
+IDs and are unaffected.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination platform=macOS -derivedDataPath /private/tmp/claude-501/dee156-DerivedData CODE_SIGNING_ALLOWED=NO build`
+and `build-for-testing` both succeeded, compiling the app and test targets. No tests were run, and the app was not launched.
+
 ## DEE-150 Dock Modes removed
 
 Dock Modes and the workspace recipes built on them are gone, with no replacement. PostHog never
@@ -738,7 +853,7 @@ placement, or relaunch.
 
 ## DEE-74 DDock Discovery
 
-Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
+Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. DEE-153 removed that recipe with the Museum. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
 
 Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-74-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Generated string symbols and new source target membership compiled. The final build reported only the App Intents metadata warning. Automated tests, previews, and native interaction checks were not run. Compilation does not establish native acceptance.
 
@@ -1641,6 +1756,8 @@ The confirmation preference was then added and checked in a signed Debug build. 
 
 ## Window-aware application menus
 
+DEE-152 later removed the context menu's window rows; see [DEE-152](#dee-152-window-list-removed-from-app-menus). Discovery, selection, and the VoiceOver window actions below remain.
+
 Implemented on 2026-09-03. App Sandbox, signing settings, and entitlements were left unchanged.
 
 ### Behavior and boundaries
@@ -2215,11 +2332,12 @@ Window Watch (DEE-11, DEE-25) and window portals (DEE-14, DEE-23) were removed i
 used either feature, so the code, settings, strings, analytics events, and acceptance notes went
 with them.
 
-## DEE-15: window search
+## DEE-15: window search, removed
 
-Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
-
-See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
+Find a Window (DEE-15) was removed in DEE-156. Its window, shortcuts, capture and image search,
+strings, analytics events, and reference document went with it. The live-window and
+saved-capsule matching it shared with the Hub search remains; see
+[DEE-156](#dee-156-find-a-window-removed).
 
 ## DEE-12: files through Window Peek
 
@@ -2426,6 +2544,8 @@ of this correction remains pending. Further subagent review was stopped at the u
 
 ## DEE-27: explicit window focus
 
+Historical record. Window Search (Find a Window) was removed in DEE-156; its mentions below describe the build at the time.
+
 Settings commands now share one presentation path, including menu-bar and app commands, dock
 context menus, Window Peek, Window Search, and onboarding. The scene registers its
 actual native window. Existing windows are reused and deminiaturized. Presentation leaves menu
@@ -2613,6 +2733,9 @@ compilation alone.
 
 ## DEE-73 Atmosphere
 
+DEE-157 removed Atmosphere and deletes its stored preferences at launch. See
+[DEE-157 Atmosphere removed](#dee-157-atmosphere-removed). The notes below are kept as history.
+
 Atmosphere replaces the internal DEE-71 skin. Mode-owned fields, setters, controls, menu
 commands, and both old renderers are removed. Existing mode documents ignore the retired
 fields; no preferences migrate. The new app-wide settings document defaults to disabled.
@@ -2682,6 +2805,9 @@ Pending native acceptance:
   window, input interception, timer, or particle timeline behind.
 
 ## DEE-41 Clipboard Museum
+
+DEE-153 removed Clipboard Museum and deletes its stored data at launch. See
+[DEE-153 Clipboard Museum removed](#dee-153-clipboard-museum-removed). The notes below are kept as history.
 
 Settings → Features → Clipboard Museum turns collecting on. It is off by default, and the
 menu-bar item and app menu gain **Clipboard Museum…**. The window groups exhibits by day in a
@@ -2913,6 +3039,9 @@ Validation on 2026-09-13:
   persistence. Also check that another display shares favorites while retaining its own pins.
 
 ## Atmosphere ambient light
+
+DEE-157 removed this with the rest of Atmosphere. See
+[DEE-157 Atmosphere removed](#dee-157-atmosphere-removed). The notes below are kept as history.
 
 Settings → Features → Atmosphere now includes an opt-in halo around the focused window.
 It has five color modes: average window color, dominant window color, random, daylight,
@@ -3408,7 +3537,7 @@ The app was not launched. Not exercised:
 
 ### Implemented
 
-- A running app's context menu shows the rows it adds to its macOS Dock menu, below the window list, while the macOS Dock is tucked away.
+- A running app's context menu shows the rows it adds to its macOS Dock menu, above Open, while the macOS Dock is tucked away.
 - `SystemDockMenuReader` opens the Dock tile's menu with `AXShowMenu`, reads it, and dismisses it, with a 300 ms limit. Pressing a row reopens the menu, checks the title at every level, and presses it through the Dock.
 - `SystemDockMenuFilter` keeps the app's rows by menu shape, because Accessibility exposes nothing that separates them from recents, windows, and the Dock's own commands.
 

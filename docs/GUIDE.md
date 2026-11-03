@@ -25,14 +25,13 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Robi on your windows](#robi-on-your-windows)
 - [App Health](#app-health)
 - [Plugins](#plugins)
-- [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
 - [Settings](#settings)
 - [App updates](#app-updates)
 
 ## Get started
 
-DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK. [Tuck away the macOS Dock](#tuck-away-the-macos-dock) moves it out of the way with one click.
+DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK. [Tuck away the macOS Dock](#tuck-away-the-macos-dock) moves it out of the way with one click.
 
 ### BIG DIKK
 
@@ -64,7 +63,7 @@ The illustrations use production code, not artwork. Placement runs the same `Doc
 - Neon, Aura, and the withdrawn Metal styles (Plasma, Hologram, Solar Flare, Prism, Lava Chrome, Singularity, Glitch) load as Dot, rather than failing to load.
 - Choose **Appearance → App launch animation** for Classic Bounce, Spring, Pulse, Wobble, Flip, or Indicator only. Classic Bounce is the default. Select a preset to preview it; shared defaults and per-display overrides are supported. Reduce Motion keeps the loading indicator.
 - Right-click an app for opening and Finder commands, running-app commands, and **Pin** or **Unpin**. Running-app commands include Hide or Show, Bring All to Front, and cooperative Quit. One icon represents every matching regular process, so those commands apply to all matching instances. An app running in background offers **Stop Running in Background** where Quit would be, also as a VoiceOver action. It asks the remaining processes to quit, and after three seconds force-quits any that are still running. If the app has been reopened by then, nothing is stopped. Nothing is shown when the stop finds nothing to end; the tile simply keeps its muted indicator until the processes are gone. The item never appears for apps that are running normally or not at all, nor on systems where DOKK cannot read the background state. Pins belong to that display and persist across restarts; unpinned running apps remain visible on every dock until they quit. While a tile's context menu is open, the rest of the dock dims so you can tell which tile the menu belongs to. A line-icon dock keeps the tile's glow lit, and the hover label stays hidden until the menu closes. With Reduce Transparency, the other tiles darken instead of fading.
-- A running app's context menu also shows the rows the app puts in its macOS Dock menu, such as **Open Developer Tool** in Xcode or **New Window** in a browser. They sit below the window list and do what they do in the macOS Dock, submenus and disabled rows included. Apps add these rows only while running. This needs [Accessibility access](#permissions-and-window-menus) and a macOS Dock that is [tucked away](#tuck-away-the-macos-dock). macOS offers no way to ask an app for these rows directly, so DOKK reads them from the macOS Dock by opening its menu for a moment, which macOS would visibly flash on a Dock that is on screen. If the read fails or takes too long, the menu opens without them.
+- A running app's context menu also shows the rows the app puts in its macOS Dock menu, such as **Open Developer Tool** in Xcode or **New Window** in a browser. They sit above **Open** and do what they do in the macOS Dock, submenus and disabled rows included. Apps add these rows only while running. This needs [Accessibility access](#permissions-and-window-menus) and a macOS Dock that is [tucked away](#tuck-away-the-macos-dock). macOS offers no way to ask an app for these rows directly, so DOKK reads them from the macOS Dock by opening its menu for a moment, which macOS would visibly flash on a Dock that is on screen. If the read fails or takes too long, the menu opens without them.
 - Initially pinned apps are Finder, Safari, Mail, Calendar, and System Settings when installed. Newly opened regular apps join the running section automatically.
 - Choose **Focus Dock** from the DOKK menu-bar item or app menu. It targets the enabled dock under the pointer, falling back to the primary enabled dock and then the first enabled display in Settings. Left/right arrows select an app on top and bottom docks; up/down arrows select an app on side docks. Return opens it, Space opens Window Peek for a running app, and Escape returns focus to the previous app. An outline marks the keyboard-selected icon, independently of running indicators. Only one dock has keyboard focus at a time; the command is disabled when all docks are disabled.
 - Choose **Quit DOKK** from the menu-bar item or app menu to close it.
@@ -200,7 +199,7 @@ Open **Settings → Features → Permissions** to manage Window Access and Scree
 
 Application-level actions do not need Accessibility access. For a running app, its context menu can Hide or Show every matching instance, Bring All to Front, or request a cooperative Quit. Available app bundles also offer Open, Open Files, and Show in Finder. These commands remain available when window access is off.
 
-When window access is enabled, a menu opens immediately with **Loading Windows…**, then replaces that row with the app's top-level standard windows and dialogs. Select a row to restore a minimized window when supported, activate its owning app, and raise that exact window. Main windows are marked, untitled windows receive a localized fallback, and duplicate titles stay separate. The same commands are exposed as VoiceOver actions.
+The context menu does not list an app's windows; use [Window Peek](#window-peek) to pick one. The same app commands are exposed as VoiceOver actions. When window access is enabled, VoiceOver's actions also list the app's top-level standard windows and dialogs. Choosing one restores a minimized window when supported, activates its owning app, and raises that exact window. Untitled windows receive a localized fallback, and duplicate titles stay separate.
 
 Window discovery and selection use the public macOS Accessibility API. Moving between Spaces and full-screen transitions is best-effort because public APIs do not expose complete Space ownership or guarantee activation. Windows owned by unusual helper processes may not appear under the regular app represented by the icon.
 
@@ -222,15 +221,9 @@ Capture the selected windows, review or correct their visible text, and choose C
 
 See [App Compare](APP_FUSION.md) for input lifetime, save recovery, and storage behavior. Compilation is separate from [pending native acceptance](ACCEPTANCE.md#app-compare-dee-16).
 
-### Find a window
-
-Choose **Find a Window** from the DOKK menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
-
-**Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DOKK does not collect a continuous screen history. See the [window search reference](WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
-
 ### Radar
 
-Radar shows every window in the current Space at once, grouped by app. Press Option-Shift-Command-Space from any app, choose **Show Radar** from the DOKK menu, or click the Radar tile. The tile is off by default; turn it on in **Settings → Windows & Focus → Radar**, where you can also turn off the shortcut and show app names in the strip. When another app already uses the shortcut, Settings says so and the menu stops showing it.
+Radar shows every window in the current Space at once, grouped by app. It replaces Find a Window. Press Shift-Command-Space or Option-Shift-Command-Space from any app, choose **Show Radar** from the DOKK menu, or click the Radar tile. The tile is on for new installs; on a Mac that ran an earlier DOKK it stays as it was, which is off unless you turned it on. Change it in **Settings → Windows & Focus → Radar**, where one switch also turns off both shortcuts, and you can show app names in the strip. Each shortcut works on its own: when another app already uses one, Settings names it and says which one still opens Radar, and the menu shows the one DOKK holds. A DOKK Discovery tip announces Shift-Command-Space until you open Radar; its **Open Radar** button opens it.
 
 Radar covers each display with its blurred wallpaper and flies the windows into a grid of app groups. The most recently used app leads in its own row with larger thumbnails. The desktop dims first, then the windows fly, as in Mission Control. The dock itself transforms: pins that are not running and the Trash shrink away, the running apps slide together, their window counts appear, and the Radar tile lights up. App names under the icons are off by default. Closing plays this backwards and the strip lands on the dock. When the dock is hidden, the strip slides in at the dock's edge instead. Minimized windows and windows of hidden apps appear as chips inside their app's group. With Accessibility, larger thumbnails carry a second caption line: the folder of a document, the path of a Finder window, or the address of a web page. When even the smallest thumbnails do not fit, the grid scrolls.
 
@@ -514,32 +507,9 @@ Plugins let other apps add a tile and a panel to your dock. A plugin comes insid
 
 DOKK checks for newly installed plugins when it comes to the front and when you open the Plugins page.
 
-## Atmosphere
-
-**Settings → Atmosphere** adds optional ambient light to every drawable display. It starts off. Choose 69 for candles and hearts, Minimal for a subtle color
-wash, Focus for a soft glow, or Party for party décor and denser particles. Density controls
-particles. Light intensity scales the edge wash from a faint rim to a stronger glow
-without covering the desktop. Click corner décor to toggle its light; hold it to
-change its appearance.
-
-Choose one color source: Manual, Wallpaper, Focused app icon, or Mood. Wallpaper sampling
-refreshes every eight seconds and offers prominent-to-average, average-only, and corner
-colors. App colors update on activation. Mood uses the local Foundation Models model;
-Apply keeps Mood selected, while Edit as Manual copies its colors. Mood and the optional
-Image Playground system sheet appear only when available. Generated corner images are
-saved locally.
-
-Per display is the default layout. Panorama joins a contiguous horizontal row with matching
-vertical extents, keeps décor at the outer corners, and shares one palette across the row.
-Other arrangements fall back to per-display edges. Only while idle dims the effect until
-30 seconds pass without input. A window covering an entire display hides its overlays;
-this also treats borderless screen-filling apps conservatively as fullscreen. Reduce Motion
-keeps particles still. Sleep and inactive sessions release all Atmosphere panels.
-See [Atmosphere acceptance](ACCEPTANCE.md#dee-73-atmosphere) for runtime limitations.
-
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 
@@ -654,7 +624,7 @@ Inward means toward the desktop, adapting to each dock edge. Before and after fo
 
 Keyboard-selected entries show their label immediately. Pointer exit, dragging, menus, hiding, and error feedback clear labels and pending delays. Tooltips remain click-through, do not steal focus, and do not extend auto-hide retention. Showing one does not resize the dock. Section buttons use the chosen design for their localized action label.
 
-The gallery uses the same renderer as the dock. **Play Preview** demonstrates the selected delay and entrance on an inert sample. Reduce Motion substitutes short fades for movement and scale; Reduce Transparency uses opaque backgrounds. No preset runs a continuous animation.
+The gallery uses the same renderer as the dock. Hovering a card, or moving keyboard focus to it, hides its label and replays that preset's hover delay and entrance beside a sample icon in its placement; leaving the card restores the static label. **Play Preview** demonstrates the selected delay and entrance on an inert sample. Reduce Motion substitutes short fades for movement and scale; Reduce Transparency uses opaque backgrounds. No preset runs a continuous animation.
 
 Compilation is checked separately from hands-on appearance and interaction. See the [acceptance record](ACCEPTANCE.md) for the outstanding runtime scenarios.
 

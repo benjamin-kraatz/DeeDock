@@ -2,12 +2,11 @@ import Foundation
 
 /// DDock's own windows, offered next to apps so they can be found without the menu bar.
 nonisolated enum LauncherTool: String, CaseIterable, Identifiable, Sendable {
-    case clipboardMuseum, localHistory, fusion, systemSettingsClone
+    case localHistory, fusion, systemSettingsClone
     var id: String { rawValue }
 
     var title: LocalizedStringResource {
         switch self {
-        case .clipboardMuseum: .clipboardMuseumTitle
         case .localHistory: .timelineTitle
         case .fusion: .fusionTitle
         case .systemSettingsClone: .systemSettingsCloneTitle
@@ -16,7 +15,6 @@ nonisolated enum LauncherTool: String, CaseIterable, Identifiable, Sendable {
 
     var symbol: String {
         switch self {
-        case .clipboardMuseum: "building.columns"
         case .localHistory: "clock.arrow.circlepath"
         case .fusion: "square.on.square.intersection.dashed"
         case .systemSettingsClone: "gearshape.2"

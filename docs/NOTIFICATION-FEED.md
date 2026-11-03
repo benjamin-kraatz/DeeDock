@@ -149,7 +149,7 @@ The approved mockup is the spec for look, motion, and behaviour. Its defaults we
 
 ### Privacy
 
-This is the first DOKK feature that reads message text from other apps. Clipboard Museum reads clipboard contents, but only what the person copied. [Badge memory](BADGE_MEMORY.md) still captures no message text; the two features share no storage.
+This is the first DOKK feature that reads message text from other apps. [Badge memory](BADGE_MEMORY.md) still captures no message text; the two features share no storage.
 
 - Notification titles, subtitles, bodies, and app names never go to analytics. [Usage analytics](ANALYTICS.md) lists notification text under "What is never collected".
 - Analytics get `notification_feed_opened` (entry count, unread count, trigger), `notification_feed_closed` (entry count, duration, whether Clear All was used), and the setting toggles through `setting_changed`. Triage adds `notification_feed_row_opened` (trigger, how many entries left with the app), `notification_feed_row_removed` (method), `notification_feed_group_cleared` (method, count), `notification_feed_cleared_all` (source, count), and `notification_feed_auto_cleared` (count). Nothing is sent when a notification arrives or when **Clear when closed** removes entries, and no event names the app.
