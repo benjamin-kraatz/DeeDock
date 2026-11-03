@@ -754,6 +754,7 @@ final class DockCoordinator {
             && enabledDisplays.count > 1 && enabledDisplays.contains(where: \.isPrimary)
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
         notificationFeed.configure(enabled: settings.value.showNotificationFeed && !enabledDisplays.isEmpty)
+        notificationFeedPopover.configure(enabled: settings.value.showNotificationFeed && !enabledDisplays.isEmpty)
         if !settings.value.showNotificationFeed { notificationFeedPopover.close() }
         notificationFeedPopover.clearsOnClose = settings.value.notificationFeedClearsOnClose
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)

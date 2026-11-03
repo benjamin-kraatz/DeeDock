@@ -13,6 +13,11 @@ final class NotificationFeedPanelState {
     /// The keyboard selection: an item's identifier, which is a folded stack's front entry.
     /// Nil until the person presses an arrow key or clicks a stack.
     var selection: NotificationFeedEntry.ID?
+    /// The latest request to scroll an item into view. Set only by keyboard navigation through
+    /// ``revealSelection()``, never by a selection change itself: ``reconcile(from:to:)`` moves
+    /// the selection silently when banners arrive, and following it would pull a person who
+    /// scrolled away to read back to the selected row.
+    private(set) var scrollRequest: NotificationFeedScrollRequest?
     /// Identifiers of the groups the person unfolded.
     private(set) var expanded: Set<String> = []
     /// How entries about to leave animate. Staged a frame before they leave; see
@@ -109,6 +114,14 @@ final class NotificationFeedPanelState {
         selection = items[min(max(index + offset, 0), items.count - 1)].id
     }
 
+    /// Asks the panel to scroll the selected item into view. Called after keyboard navigation:
+    /// the arrow keys, unfolding or folding a stack with ←, →, or Return. Each call issues a new
+    /// request, so the same item can be revealed again after the person scrolled away.
+    func revealSelection() {
+        guard let selection else { return }
+        scrollRequest = NotificationFeedScrollRequest(target: selection, sequence: (scrollRequest?.sequence ?? 0) + 1)
+    }
+
     // MARK: - Reconciling
 
     /// Brings unfolded stacks and the selection in line with the feed after its entries changed,
@@ -149,4 +162,14 @@ final class NotificationFeedPanelState {
         let neighbors = (previousItems[(index + 1)...] + previousItems[..<index].reversed()).map(\.id)
         selection = (stackmates + neighbors).lazy.compactMap(visibleItem(for:)).first ?? currentItems.first?.id
     }
+}
+
+/// A one-time request to scroll an item of the open feed into view.
+///
+/// The sequence number makes each request distinct, so revealing the same item twice still
+/// scrolls the second time.
+struct NotificationFeedScrollRequest: Equatable {
+    /// The item to show: an entry, or a folded stack's front entry.
+    let target: NotificationFeedEntry.ID
+    let sequence: Int
 }

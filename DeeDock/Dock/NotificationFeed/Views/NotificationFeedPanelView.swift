@@ -66,9 +66,11 @@ struct NotificationFeedPanelView: View {
                     }
                 }
                 .scrollIndicators(.automatic)
-                .onChange(of: state.selection) { _, selection in
-                    guard let selection else { return }
-                    withAnimation(motion) { proxy.scrollTo(selection) }
+                // Scrolls only on an explicit request from keyboard navigation. Selection changes
+                // from arrivals and removals must not move the list under the person's pointer.
+                .onChange(of: state.scrollRequest) { _, request in
+                    guard let request else { return }
+                    withAnimation(motion) { proxy.scrollTo(request.target) }
                 }
             }
         }

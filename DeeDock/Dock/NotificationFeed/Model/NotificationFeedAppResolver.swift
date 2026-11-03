@@ -11,21 +11,32 @@ import AppKit
 ///   so a name shared by an installed copy still opens the one the person is using.
 /// - ``unambiguousApplication(named:)`` serves auto-clear, which removes entries without being
 ///   asked. It looks at running and installed apps together and resolves only when exactly one
-///   application carries the name.
+///   application carries the name. Until the installed apps have been scanned once it resolves
+///   nothing, because a missing second "Notes" would look like a unique match.
+///
+/// Cached matches are forgotten on ``invalidate()`` and whenever another installed-app scan
+/// completes.
 @MainActor
 final class NotificationFeedAppResolver {
     private let running: () -> [ApplicationReference]
     private let installed: () -> [ApplicationReference]
+    private let installedScans: () -> Int
+    /// The ``installedScans`` count the caches were filled against.
+    private var cachedScans: Int?
     private var cache: [String: ApplicationReference?] = [:]
     private var unambiguousCache: [String: ApplicationReference?] = [:]
     private var icons: [String: NSImage] = [:]
 
     /// - Parameters:
     ///   - running: Running regular applications, checked first because a sender is usually running.
-    ///   - installed: The installed applications the Launcher already indexed.
-    init(running: @escaping () -> [ApplicationReference], installed: @escaping () -> [ApplicationReference]) {
+    ///   - installed: The installed applications the Launcher library last scanned.
+    ///   - installedScans: How many installed-app scans have completed. Zero means `installed` is
+    ///     not an inventory yet; a change means its contents may have changed.
+    init(running: @escaping () -> [ApplicationReference], installed: @escaping () -> [ApplicationReference],
+         installedScans: @escaping () -> Int) {
         self.running = running
         self.installed = installed
+        self.installedScans = installedScans
     }
 
     /// The application a banner's name refers to for display and Open App, or nil when there is
@@ -36,6 +47,7 @@ final class NotificationFeedAppResolver {
     /// for. Only when no running app resolves are installed apps consulted.
     func application(named name: String?) -> ApplicationReference? {
         guard let name, !name.isEmpty else { return nil }
+        forgetStaleMatches()
         if let cached = cache[name] { return cached }
         let resolved = Self.unique(named: name, in: running()) ?? Self.unique(named: name, in: installed())
         cache[name] = resolved
@@ -48,8 +60,14 @@ final class NotificationFeedAppResolver {
     /// Running and installed apps are pooled and deduplicated by ``ApplicationReference/id``, so a
     /// running app and its own installed bundle count once, while two different apps named
     /// "Notes" stay ambiguous even when only one of them is running.
+    ///
+    /// Returns nil for every name until the installed apps have been scanned at least once.
     func unambiguousApplication(named name: String) -> ApplicationReference? {
         guard !name.isEmpty else { return nil }
+        forgetStaleMatches()
+        // Before the first scan the installed list is empty, not complete. Abstaining costs a
+        // missed auto-clear; guessing could clear another app's notifications.
+        guard let cachedScans, cachedScans > 0 else { return nil }
         if let cached = unambiguousCache[name] { return cached }
         let resolved = Self.unique(named: name, in: running() + installed())
         unambiguousCache[name] = resolved
@@ -68,6 +86,14 @@ final class NotificationFeedAppResolver {
     func invalidate() {
         cache.removeAll()
         unambiguousCache.removeAll()
+    }
+
+    /// Forgets cached matches when an installed-app scan completed since they were made.
+    private func forgetStaleMatches() {
+        let scans = installedScans()
+        guard scans != cachedScans else { return }
+        invalidate()
+        cachedScans = scans
     }
 
     /// The one application named `name` in `references`, matched case-insensitively.

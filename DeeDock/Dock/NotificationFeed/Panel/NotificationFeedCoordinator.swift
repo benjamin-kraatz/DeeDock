@@ -12,7 +12,9 @@ import SwiftUI
 ///   running-first resolution that picked the app to open.
 /// - Any other activation removes an app's entries only when their name belongs to that app
 ///   alone among running and installed apps, never guessed. System alerts are never cleared
-///   this way. ``applicationActivated(_:)`` receives every activation.
+///   this way. ``applicationActivated(_:)`` receives every activation. Until the installed apps
+///   have been scanned once, activations clear nothing; ``configure(enabled:)`` and opening the
+///   popover request that scan.
 /// - With **Clear when closed** on, closing the feed removes what was shown while it was open.
 ///
 /// Analytics receive counts and closed vocabularies only: never text, app names, or bundle
@@ -41,6 +43,8 @@ final class NotificationFeedCoordinator {
     var prepareSettings: (() -> Void)?
     /// Mirrors the **Clear when closed** setting. Set by the dock coordinator.
     var clearsOnClose = false
+    /// Mirrors whether the feed is collecting. See ``configure(enabled:)``.
+    private var isEnabled = false
     var isOpen: Bool { controller != nil }
 
     private struct PendingRemoval {
@@ -54,8 +58,27 @@ final class NotificationFeedCoordinator {
         self.catalog = catalog
         resolver = NotificationFeedAppResolver(
             running: { [catalog] in catalog.running },
-            installed: { [catalog] in catalog.launcherLibrary.applications.map(\.reference) })
+            installed: { [catalog] in catalog.launcherLibrary.applications.map(\.reference) },
+            installedScans: { [catalog] in catalog.launcherLibrary.completedScans })
         presenter.register(.notificationFeed) { [weak self] in self?.close() }
+    }
+
+    /// Follows the feed's on/off state. Turning it on, at launch or in Settings, requests an
+    /// installed-app scan so auto-clear has an inventory to check names against without waiting
+    /// for the Launcher to open. Repeated calls with the same value do nothing.
+    func configure(enabled: Bool) {
+        guard enabled != isEnabled else { return }
+        isEnabled = enabled
+        if enabled { refreshInstalledApplications() }
+    }
+
+    /// Asks the shared Launcher library for a background scan unless one is already running.
+    ///
+    /// Nothing watches the Applications folders, so the feed refreshes the inventory when it
+    /// starts and each time its popover opens, never per activation. The resolver forgets its
+    /// cached matches when the scan completes.
+    private func refreshInstalledApplications() {
+        catalog.launcherLibrary.requestRefresh()
     }
 
     private var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
@@ -74,6 +97,7 @@ final class NotificationFeedCoordinator {
         let unreadCount = store.unreadCount
         let state = NotificationFeedPanelState(unreadOnOpen: Set(store.entries.prefix(unreadCount).map(\.id)))
         resolver.invalidate()
+        refreshInstalledApplications()
         state.application = { [resolver] in resolver.application(named: $0.appName) }
         state.icon = { [resolver] in resolver.icon(for: $0) }
         state.open = { [weak self] in self?.open($0, trigger: Analytics.trigger()) }
@@ -151,6 +175,7 @@ final class NotificationFeedCoordinator {
     func stop() {
         close()
         flushSeenClear()
+        isEnabled = false
         keyboardDismissed = nil
         prepareSettings = nil
     }
@@ -371,18 +396,23 @@ final class NotificationFeedCoordinator {
             else { close(returnFocus: source?.store.keyboardFocus == true) }
         case 125:
             state.select(by: 1, in: items)
+            state.revealSelection()
         case 126:
             state.select(by: -1, in: items)
+            state.revealSelection()
         case 124:
             guard let current, current.isCollapsedStack else { return false }
             withAnimation(motion) { state.setExpanded(current.group, true) }
+            state.revealSelection()
         case 123:
             guard let current, current.isInExpandedGroup else { return false }
             withAnimation(motion) { state.setExpanded(current.group, false) }
+            state.revealSelection()
         case 36, 76:
             guard let current else { return false }
             if current.isCollapsedStack {
                 withAnimation(motion) { state.setExpanded(current.group, true) }
+                state.revealSelection()
             } else {
                 guard resolver.application(named: current.entry.appName) != nil else { return false }
                 open(current.entry, trigger: .keyboard)

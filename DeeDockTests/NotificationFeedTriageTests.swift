@@ -111,6 +111,34 @@ struct NotificationFeedTriageTests {
         #expect(state.selection == "o1")
     }
 
+    @Test("Arrivals move the selection without asking the list to scroll; keyboard navigation does")
+    func onlyNavigationScrolls() {
+        let store = NotificationFeedStore()
+        let state = NotificationFeedPanelState()
+        store.entriesDidChange = { state.reconcile(from: $0, to: $1) }
+        store.ingest([reading("m1", app: "Messages"), reading("m2", app: "Messages"), reading("c1", app: "Calendar")],
+                     at: start)
+        state.selection = "m1"
+
+        store.ingest([reading("m0", app: "Messages")], at: start)
+        #expect(state.selection == "m0")
+        #expect(state.scrollRequest == nil)
+
+        state.select(by: 1, in: state.items(in: store.entries))
+        state.revealSelection()
+        let first = state.scrollRequest
+        #expect(first?.target == "c1")
+
+        // Revealing the same item again, after the person scrolled away, is a new request.
+        state.revealSelection()
+        #expect(state.scrollRequest?.target == "c1")
+        #expect(state.scrollRequest != first)
+
+        // A later arrival leaves the last request alone.
+        store.ingest([reading("x1", app: "Mail")], at: start)
+        #expect(state.scrollRequest?.target == "c1")
+    }
+
     @Test("A removed selection moves to what is left of its stack, else to the next or previous item")
     func removalRepairsSelection() {
         let entries = [entry("m1", "Messages"), entry("m2", "Messages"), entry("c1", "Calendar"), entry("x1", "Mail")]
@@ -138,7 +166,8 @@ struct NotificationFeedTriageTests {
         let notesA = reference("com.example.notes", "Notes")
         let notesB = reference("org.other.notes", "Notes")
         let mail = reference("com.apple.mail", "Mail")
-        let resolver = NotificationFeedAppResolver(running: { [notesA, mail] }, installed: { [notesA, notesB, mail] })
+        let resolver = NotificationFeedAppResolver(running: { [notesA, mail] }, installed: { [notesA, notesB, mail] },
+                                                   installedScans: { 1 })
         let entries = [entry("1", "Notes"), entry("2", "Mail"), entry("3", "Notes")]
 
         #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesA.id, resolver: resolver).isEmpty)
@@ -146,6 +175,34 @@ struct NotificationFeedTriageTests {
         #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: mail.id, resolver: resolver) == ["2"])
         // Open App keeps preferring the running one, which is the app the person is using.
         #expect(resolver.application(named: "Notes")?.id == notesA.id)
+    }
+
+    @Test("Auto-clear abstains until installed apps were scanned, then follows each scan")
+    func autoClearWaitsForInstalledScan() {
+        let notesA = reference("com.example.notes", "Notes")
+        let notesB = reference("org.other.notes", "Notes")
+        var installed: [ApplicationReference] = []
+        var scans = 0
+        let resolver = NotificationFeedAppResolver(running: { [notesA] }, installed: { installed },
+                                                   installedScans: { scans })
+        let entries = [entry("1", "Notes"), entry("2", "Mail"), entry("3", "Notes")]
+
+        // Only one Notes is running and nothing is scanned yet. A second installed Notes may
+        // exist, so nothing clears.
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesA.id, resolver: resolver).isEmpty)
+        // Open App still resolves the running app before the scan.
+        #expect(resolver.application(named: "Notes")?.id == notesA.id)
+
+        // The first scan finds exactly one Notes. No explicit invalidate: the finished scan is enough.
+        installed = [notesA]
+        scans = 1
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesA.id, resolver: resolver) == ["1", "3"])
+
+        // A later scan finds a second app named Notes; the cached match is dropped.
+        installed = [notesA, notesB]
+        scans = 2
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesA.id, resolver: resolver).isEmpty)
+        #expect(NotificationFeedAutoClear.entryIDs(in: entries, activated: notesB.id, resolver: resolver).isEmpty)
     }
 
     @Test("An activated app clears only entries whose name resolves to exactly that app")
