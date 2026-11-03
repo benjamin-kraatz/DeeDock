@@ -215,8 +215,8 @@ drag, become one event. Configuration history is the sequence of these events.
 
 Preferences kept outside those models are reported with `area = features` and a key from
 `AnalyticsFeatureSetting`: `discovery_enabled`, `launcher_suggestions_enabled`,
-`launcher_suggestions_paused`, `launcher_suggestion_prompts_enabled`, `clipboard_redact_secrets`,
-`clipboard_curator_enabled`, `local_history_recording`, `local_history_replay`,
+`launcher_suggestions_paused`, `launcher_suggestion_prompts_enabled`,
+`local_history_recording`, `local_history_replay`,
 `peek_history_enabled`, `shelf_sort`, `shelf_presentation`,
 `shelf_compost_days` (0 is off), `system_dock_tuck` (only for a click in Settings or the tour,
 not for the restore at quit or the re-tuck at launch), and Lookout's `lookout_enabled`, `lookout_index_on_battery`
@@ -388,9 +388,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | Event | Properties |
 | --- | --- |
 | `app_melt` | `action`, `pair_count`, `outcome` |
-| `clipboard_museum` | `action`, `kind`, `item_count` |
-| `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`notificationFeed`, `islands`, `robi`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
 | `plugin_panel_opened` | `trigger`, `pinned_count` (plugin tiles in the dock) |
 | `plugin_panel_closed` | `duration`, `stopped` (the plugin had stopped by then) |
 | `plugin_stopped` | `panel_open`. A plugin process ended without DOKK asking, or never answered. |
@@ -569,7 +567,6 @@ prompt or answer contains:
 | Span | Content sent |
 | --- | --- |
 | `launcher_robi_selection`, `launcher_robi_review` | the typed task and the names of installed apps |
-| `clipboard_wall_label` | the copied text and the generated label |
 | `session_capsule_compose` | window titles, recognized window text, the generated summary |
 | `fusion_compose` | the instruction, window titles and text, the generated result |
 | `semantic_stack_organize` | file and folder names, the generated group titles |

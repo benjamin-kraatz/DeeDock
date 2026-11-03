@@ -133,7 +133,7 @@ Source lives in `DeeDock/Dock/NotificationFeed`: `Model` (entry, parser, store, 
 
 ### Privacy
 
-This is the first DOKK feature that reads message text from other apps. Clipboard Museum reads clipboard contents, but only what the person copied. [Badge memory](BADGE_MEMORY.md) still captures no message text; the two features share no storage.
+This is the first DOKK feature that reads message text from other apps. [Badge memory](BADGE_MEMORY.md) still captures no message text; the two features share no storage.
 
 - Notification titles, subtitles, bodies, and app names never go to analytics. [Usage analytics](ANALYTICS.md) lists notification text under "What is never collected".
 - Analytics get `notification_feed_opened` (entry count, unread count, trigger), `notification_feed_closed` (entry count, duration, whether Clear All was used), and the setting toggle through `setting_changed`. Nothing is sent when a notification arrives.

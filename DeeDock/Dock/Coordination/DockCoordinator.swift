@@ -6,7 +6,6 @@ import Observation
 @MainActor @Observable
 final class DockCoordinator {
     let localHistory = DockLocalHistoryStore()
-    let clipboardMuseum = ClipboardMuseumController()
     /// Collected notification banners, shared by every display's feed tile and Settings.
     let notificationFeed = NotificationFeedController()
     /// DOKK's plugins: discovery, pins, and one session per pinned plugin, shared by every dock and Settings.
@@ -216,11 +215,7 @@ final class DockCoordinator {
         actionTiles.start()
         fileDestinations.start()
         localHistory.start()
-        clipboardMuseum.start()
-        clipboardMuseum.didUse = { [weak self] in self?.discovery.markUsed(.clipboardMuseum) }
-        if clipboardMuseum.store.captureEnabled || !clipboardMuseum.store.exhibits.isEmpty {
-            discovery.markUsed(.clipboardMuseum)
-        }
+        ClipboardMuseumCleanup.runInBackground()
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
@@ -252,9 +247,6 @@ final class DockCoordinator {
         discovery.openDestination = { [weak self] destination in
             guard let self else { return .none }
             switch destination {
-            case .clipboardMuseum:
-                showClipboardMuseum()
-                return .none
             case .notificationFeed:
                 return enableNotificationFeedFromDiscovery()
             case .islands:
@@ -990,14 +982,6 @@ final class DockCoordinator {
         return .openSettings
     }
 
-    /// Called only from a menu command or Settings. Never opened by hover or a clipboard change.
-    func showClipboardMuseum() {
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        endFocus(restore: false)
-        clipboardMuseum.show(returningTo: lastExternalApplication)
-    }
-
     /// Reopens the uninstall sheet that was waiting for DOKK to relaunch with Full Disk Access.
     ///
     /// Waits a moment so the docks exist and the Hub can anchor to one.
@@ -1045,7 +1029,6 @@ final class DockCoordinator {
             guard let self else { return }
             hub.dismissAfterAction()
             switch tool {
-            case .clipboardMuseum: showClipboardMuseum()
             case .localHistory: browseLocalHistory()
             case .fusion: showFusion()
             // Needs a SwiftUI openWindow action, so the launcher view opens it directly.
@@ -1148,7 +1131,6 @@ final class DockCoordinator {
         hub.stop()
         systemDockTuck.stop()
         discovery.stop()
-        clipboardMuseum.didUse = nil
         atmosphere.stop()
         guard started else { return }
         started = false
@@ -1204,7 +1186,6 @@ final class DockCoordinator {
         notificationFeed.stop()
         robi.stop()
         badgeMemoryWindow.stop()
-        clipboardMuseum.stop()
         catalog.stop()
         volumeDock.stop()
         volumes.stop()

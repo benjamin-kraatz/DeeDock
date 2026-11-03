@@ -1,24 +1,24 @@
 # DDock Discovery
 
-Discovery suggests unused capabilities using local signals. **Settings → Features → DDock Discovery → Suggest useful features** disables the engine and closes its callout immediately. Discovery defaults to on. Museum capture remains a separate opt-in.
+Discovery suggests unused capabilities using local signals. **Settings → Features → DDock Discovery → Suggest useful features** disables the engine and closes its callout immediately. Discovery defaults to on.
 
 ## Catalog and scheduling
 
-`DiscoveryProposal.catalog` owns each recipe's signal, threshold, calm interval, localized copy, callout symbol, destination, and snooze interval. Three recipes ship:
+`DiscoveryProposal.catalog` owns each recipe's signal, threshold, calm interval, localized copy, callout symbol, destination, and snooze interval. Three recipes ship, all launch announcements:
 
-- Three observed clipboard changes followed by at least five seconds without another observed change suggest Clipboard Museum.
 - A launch announcement for the Notification Feed. Discovery records one `launched` signal when it starts, and the tip becomes eligible 60 seconds later. The first launch of a version with the feed therefore shows it once the native gates allow. **Tomorrow** and the timeout snooze it for 24 hours, and the signal is spent for that process, so it returns on the first launch after the snooze ends. Turning the feed on anywhere, including before the tip appears, records use and suppresses it for good. **Don't show again** does the same. The tip is not limited to updates: a new install sees it after onboarding, because onboarding windows block Discovery.
 - A launch announcement for DOKK Islands (DEE-85), eligible 90 seconds after launch so it queues behind the feed's tip. **Turn On** enables islands in the shared settings and needs no permission. Islands already on, anywhere, record use and suppress it; **Don't show again** does the same.
+- A launch announcement for Robi on the focused window, eligible 120 seconds after launch so it queues behind Islands. Robi already on, or used, records use and suppresses it.
 
 The queue is FIFO and deduplicated by proposal ID. `advance` presents the first entry that is past its snooze and whose calm interval has elapsed. A snoozed entry stays in the queue and becomes eligible again when the snooze ends. The first presentation can happen as soon as its calm window and native gates permit it. Each actual presentation starts a 69-second cadence. An advance that shows nothing leaves that cadence where it is. Presentation time restarts the cadence, so a late timer keeps the 69-second minimum and does not release a catch-up burst. These intervals are lower bounds, subject to main-run-loop delivery.
 
 There is one panel globally, with caps of two presentations per process session and three per local calendar day. Daily counts and the most recent presentation time persist across launches. The queue and signal counts do not persist. Disabling Discovery clears pending signals and the queue while retaining usage, dismissals, snoozes, and caps.
 
-**Tomorrow**, Escape, automatic timeout, and interruption snooze that proposal for 24 hours. Another three observed changes are required to qualify again. **Don't show again** suppresses it permanently. Opening Museum through any current entry point, or enabling collection, permanently records Museum use even with Discovery disabled. An existing collection or enabled capture also suppresses the tip on upgrade. An old Museum visit that left no collection and disabled capture cannot be reconstructed.
+**Tomorrow**, Escape, automatic timeout, and interruption snooze that proposal for 24 hours. **Don't show again** suppresses it permanently. Using the feature a tip announces records use even with Discovery disabled.
 
 ## Presentation and local signals
 
-The callout is a nonactivating AppKit panel with native SwiftUI buttons and English and German copy. It appears in the upper trailing corner of the usable frame of an enabled dock display, preferring the display under the pointer. It never activates DDock on presentation. An explicit click can give the panel keyboard focus. The Museum CTA opens the existing Museum window without enabling capture. The Notification Feed CTA, **Turn On**, is the explicit opt-in: it turns the feed on. It never triggers the macOS permission prompt. Without Accessibility access, or when settings cannot be saved, it opens Settings on the feed's page, where **Enable** asks macOS.
+The callout is a nonactivating AppKit panel with native SwiftUI buttons and English and German copy. It appears in the upper trailing corner of the usable frame of an enabled dock display, preferring the display under the pointer. It never activates DDock on presentation. An explicit click can give the panel keyboard focus. The Notification Feed CTA, **Turn On**, is the explicit opt-in: it turns the feed on. It never triggers the macOS permission prompt. Without Accessibility access, or when settings cannot be saved, it opens Settings on the feed's page, where **Enable** asks macOS.
 
 Discovery blocks presentation during DDock drag, menu, file-picker, popover, or keyboard Dock focus. It also blocks while DDock has an ordinary window or sheet open, while mouse buttons are held outside the callout, and until system input has been idle for two seconds. Sleep and inactive sessions stop metadata observation. Space changes, application activation, and drag events dismiss an existing callout. Visible callouts also recheck native gates each second.
 
@@ -26,7 +26,7 @@ Like Atmosphere, Discovery conservatively treats another process's layer-zero wi
 
 The panel has no motion. Reduce Transparency uses an opaque system background. After 20 seconds the callout snoozes unless the pointer is inside it, it owns keyboard focus, or VoiceOver is enabled.
 
-The reused `ClipboardMuseumWatcher` polls only `NSPasteboard.changeCount`, never clipboard contents. This works while Museum collection is off. AppKit has no public clipboard-change notification. Several writes between polls count as one observation, and metadata alone cannot distinguish a copy command from another clipboard write. Discovery stores no clipboard content or source application and makes no network requests. Observation stops when disabled, suspended, permanently dismissed, or Museum use is recorded.
+Discovery does not watch the clipboard. Its first recipe suggested Clipboard Museum after three observed clipboard changes, using a timer that compared `NSPasteboard.changeCount`. DEE-153 removed the Museum, and the recipe, the `clipboardChanged` signal, and that timer went with it. Discovery makes no network requests.
 
 Local preferences live in `discovery.state.v1`. Unreadable data disables Discovery without overwriting it. Explicitly changing the Discovery switch repairs that preference document.
 
@@ -36,8 +36,7 @@ File-drop tips for Throw or Window Peek, heavy-use Launcher tips, and long-unuse
 
 ## Acceptance still required
 
-- With an unused Museum and capture off, copy three separate items. Confirm no callout before five seconds after the last observed change. Confirm the CTA opens Museum without enabling capture.
-- Snooze, dismiss forever, open Museum independently, and toggle Discovery. Confirm persistence across relaunch and no stacked panels.
+- Snooze, dismiss forever, turn an announced feature on independently, and toggle Discovery. Confirm persistence across relaunch and no stacked panels.
 - With a second injected catalog recipe, confirm the first eligible tip shows, a snoozed tip keeps its queue place, a refused advance leaves the 69-second slot in place, and session and daily caps still hold. No second production recipe is enabled merely for validation.
 - Exercise drag, menus, sheets, file pickers, sleep, screen lock, Spaces, fullscreen windows, and monitor removal while a proposal is queued and visible.
 - Check German copy, keyboard access and Escape, VoiceOver, Reduce Transparency, and display layouts with negative origins. Confirm presentation does not steal focus.
