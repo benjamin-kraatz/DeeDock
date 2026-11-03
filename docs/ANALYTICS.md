@@ -232,7 +232,7 @@ launches, and reset when sent:
 
 | Counter | Counts |
 | --- | --- |
-| `tooltip_shown_hover`, `tooltip_shown_keyboard` | labels shown |
+| `tooltip_shown_hover`, `tooltip_shown_keyboard` | labels shown on a dock. Settings previews and the preset gallery are not counted. |
 | `auto_hide_reveal_<zone>_<edge>` | auto-hide reveals by activation zone and dock edge |
 | `spring_load_folder`, `spring_load_drive`, `spring_load_downloads` | spring-loaded opens |
 | `peek_enlarge` | Window Peek enlarge-on-hover |
