@@ -317,10 +317,11 @@ struct DockContextMenuBridge: NSViewRepresentable {
         /// Releases the dock's tracking hold only. The discovery session stays open until
         /// `present` calls `finishTracking()` after `popUpContextMenu` returns.
         ///
-        /// AppKit sends `menuDidClose` before it sends the chosen item's action. Finishing here
-        /// discarded the window handles while `selectedWindowToken` was still nil, so every
-        /// window row failed with `windowUnavailable` (DEE-152). By the time `popUpContextMenu`
-        /// returns, any action has run and set `selectedWindowToken`.
+        /// AppKit doesn't document the order of `menuDidClose` and the chosen item's action, and
+        /// in practice it called `menuDidClose` first: finishing here discarded the window handles
+        /// while `selectedWindowToken` was still nil, so every window row failed with
+        /// `windowUnavailable` (DEE-152). The action is sent during the tracking loop, so it has
+        /// run by the time `popUpContextMenu` returns, whichever order the delegate calls use.
         func menuDidClose(_ menu: NSMenu) { tracking?(false) }
 
         @objc private func showBadgeMemory() {

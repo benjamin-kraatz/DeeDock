@@ -141,8 +141,13 @@ final class ApplicationMenuController {
                     actionTasks[id] = nil
                     completion(.succeeded)
                 } catch is CancellationError {
+                    await windows.discard(sessionID: token.sessionID)
                     return
                 } catch {
+                    // The menu handed this session to the selection, so nobody else will release
+                    // it. An early failure (a window closed after discovery) would otherwise keep
+                    // the session's AX handles until the service stops.
+                    await windows.discard(sessionID: token.sessionID)
                     guard let self, !Task.isCancelled, generation == currentGeneration, actionTasks[id] != nil else { return }
                     actionTasks[id] = nil
                     completion(.failed(.applicationMenuActionFailed(
