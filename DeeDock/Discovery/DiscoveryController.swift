@@ -9,7 +9,6 @@ final class DiscoveryController {
     var targetScreen: () -> NSScreen? = { nil }
     /// Handles the callout's primary button. Returns what the callout must still do itself.
     var openDestination: (DiscoveryProposal.Destination) -> DiscoveryProposal.FollowUp = { _ in .none }
-    private let watcher = ClipboardMuseumWatcher(pasteboard: .general)
     private var timer: Timer?
     private var panel: DiscoveryPanel?
     private var shownAt: Date?
@@ -36,7 +35,6 @@ final class DiscoveryController {
 
     func start() {
         guard timer == nil else { return }
-        watcher.changed = { [weak self] in self?.engine.record(.clipboardChanged, at: .now) }
         let center = NSWorkspace.shared.notificationCenter
         for (name, reason) in [(NSWorkspace.willSleepNotification, "sleep"),
                                (NSWorkspace.screensDidSleepNotification, "screens"),
@@ -44,7 +42,7 @@ final class DiscoveryController {
             observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     self?.suspensionReasons.insert(reason)
-                    self?.watcher.stop(); self?.finish()
+                    self?.finish()
                 }
             })
         }
@@ -109,8 +107,7 @@ final class DiscoveryController {
             return
         }
         #endif
-        guard !suspended, engine.enabled else { watcher.stop(); closePanel(); return }
-        if engine.needsClipboardSignal { watcher.start() } else { watcher.stop() }
+        guard !suspended, engine.enabled else { closePanel(); return }
         guard engine.visible != nil || !engine.queue.isEmpty else { return }
         let now = Date.now
         let screen = targetScreen()
@@ -207,7 +204,6 @@ final class DiscoveryController {
 
     func stop() {
         finish()
-        watcher.stop(); watcher.changed = nil
         timer?.invalidate(); timer = nil
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()

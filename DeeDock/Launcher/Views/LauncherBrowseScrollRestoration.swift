@@ -33,5 +33,13 @@ struct LauncherBrowseScrollRestoration: ViewModifier {
                 guard state.isActive, !state.usesMixedResults, !state.usesFileActions else { return }
                 state.browseScroll = LauncherBrowseScroll(context: context, offset: offset)
             }
+            // Separate from the offset above: the Bool transform calls its action only when it
+            // flips, so the visit's scrolled flag costs nothing per scroll frame.
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentOffset.y > LauncherVisit.scrollThreshold
+            } action: { _, scrolled in
+                guard scrolled, !state.usesMixedResults, !state.usesFileActions else { return }
+                state.recordScrolled()
+            }
     }
 }

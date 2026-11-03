@@ -60,7 +60,9 @@ struct FeaturesPageContent: View {
             HarborSettingsCard(shortcut: source.binding(\.harborShortcutEnabled),
                                tile: source.binding(\.showHarborTile),
                                appNames: source.binding(\.harborShowsAppNames),
-                               shortcutAvailable: context.coordinator?.harbor.shortcutAvailable ?? true,
+                               unavailableShortcuts: context.coordinator.map {
+                                   Set(HarborShortcut.Combination.allCases).subtracting($0.harbor.heldShortcuts)
+                               } ?? [],
                                locked: locked)
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess, screenCapture: context.screenCapture,
                                            footnote: .harborPermissionsHelp)
@@ -94,11 +96,6 @@ struct FeaturesPageContent: View {
             if let coordinator = context.coordinator {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
-            }
-        case .clipboardMuseum:
-            if let coordinator = context.coordinator {
-                ClipboardMuseumSettingsCard(museum: coordinator.clipboardMuseum,
-                                            open: { coordinator.showClipboardMuseum() })
             }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// App-wide opt-out, independent of display profile settings and Museum capture consent.
+/// App-wide opt-out, independent of display profile settings.
 struct DiscoverySettingsCard: View {
     let discovery: DiscoveryController
 

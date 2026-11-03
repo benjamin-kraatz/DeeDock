@@ -109,7 +109,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .windowsFocus:
             [[.windowPeek, .harbor, .robi], [.permissions]]
         case .suggestionsHistory:
-            [[.appSuggestions, .discovery], [.localHistory, .clipboardMuseum]]
+            [[.appSuggestions, .discovery], [.localHistory]]
         case .lookout, .plugins:
             []
         }

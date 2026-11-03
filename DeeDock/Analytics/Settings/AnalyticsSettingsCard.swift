@@ -106,7 +106,7 @@ extension AnalyticsSettingsCard {
                 sort: .recency,
                 trigger: .click
             ).record,
-            AnalyticsEvent.focusDockCommand(.windowSearch).record,
+            AnalyticsEvent.focusDockCommand(.openFiles).record,
             AnalyticsEvent.peekOpened(
                 .hover,
                 cardCount: 3,

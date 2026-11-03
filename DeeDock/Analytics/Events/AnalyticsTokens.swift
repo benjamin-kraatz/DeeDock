@@ -26,10 +26,8 @@ extension LauncherSearchKind: AnalyticsToken {}
 extension LauncherFileSource: AnalyticsToken {}
 extension LauncherFileActionKind: AnalyticsToken {}
 extension LauncherTool: AnalyticsToken {}
-extension ClipboardExhibitKind: AnalyticsToken {}
 extension DiscoveryProposal.Destination: AnalyticsToken {}
 extension FusionOperation: AnalyticsToken {}
-extension WindowSearchScope: AnalyticsToken {}
 extension UpdatePhase: AnalyticsToken {}
 extension UpdateAction: AnalyticsToken {}
 extension UpdateOffer.Stage: AnalyticsToken {}

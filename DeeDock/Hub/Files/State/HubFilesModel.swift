@@ -191,7 +191,7 @@ final class HubFilesModel: HubTabModel {
         refreshActivation()
     }
 
-    func hubTabDidDisappear() {
+    func hubTabDidDisappear(_ exit: HubTabExit) {
         isVisible = false
         quickLook.close()
         cancelRenames()
