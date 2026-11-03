@@ -13,7 +13,7 @@ struct DockTooltipPresetCard: View {
     let reduceMotion: Bool
     let reduceTransparency: Bool
     let select: () -> Void
-    /// Called with true when hover or keyboard focus begins, and false once neither remains.
+    /// Called with true each time hover or keyboard focus arrives, and false once neither remains.
     let activeChanged: (Bool) -> Void
     @State private var hovering = false
     @FocusState private var focused: Bool
@@ -41,9 +41,16 @@ struct DockTooltipPresetCard: View {
         .buttonStyle(.plain)
         .focused($focused)
         .onHover { hovering = $0 }
-        .onChange(of: hovering || focused) { _, active in activeChanged(active) }
+        // Hover and focus are observed separately: a pointer that returns to a card that kept
+        // keyboard focus must still claim playback back from the card it just left.
+        .onChange(of: hovering) { _, now in arrivalOrDeparture(now) }
+        .onChange(of: focused) { _, now in arrivalOrDeparture(now) }
         .accessibilityLabel(Text(preset.title))
         .accessibilityHint(Text(preset.subtitle))
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    private func arrivalOrDeparture(_ arrived: Bool) {
+        if arrived { activeChanged(true) } else if !hovering && !focused { activeChanged(false) }
     }
 }
