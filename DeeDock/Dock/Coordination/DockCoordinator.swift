@@ -406,6 +406,8 @@ final class DockCoordinator {
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
+            // Same permanent suppression as at start-up: the Radar tip names a shortcut that is now off.
+            if self?.settings.value.harborShortcutEnabled == false { self?.discovery.markUsed(.harbor) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureHubGlass()
             self?.configureVolumeReads()
