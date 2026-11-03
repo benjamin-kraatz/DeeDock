@@ -67,8 +67,8 @@ struct DockSettings: Codable, Equatable {
     /// Off by default; reading banners needs Accessibility access. Shared across displays.
     var showNotificationFeed: Bool = false
     /// Whether each dock shows the Harbor tile. On for new installs. Installs from before that
-    /// keep it off: documents saved without this key decode as off, and a Mac with no saved
-    /// document that ran DOKK before gets ``earlierInstallDefaults``. Shared across displays.
+    /// keep it off: without an explicit value, the default is the install's recorded decision
+    /// (`DockSettingsRepository.harborTileDefault()`). Shared across displays.
     var showHarborTile: Bool = true
     /// Whether Harbor's global shortcuts, Option-Shift-Command-Space and Shift-Command-Space, open
     /// it from any app. One switch for both. Shared across displays.
@@ -168,14 +168,10 @@ struct DockSettings: Codable, Equatable {
 
     static let defaults = DockSettings()
 
-    /// Defaults for a Mac that ran DOKK before but never saved settings. Settings are saved only on
-    /// an edit, so such an install has no document, and a default that changed since must keep
-    /// the value that install had. Only Harbor's tile changed so far; it was off.
-    static let earlierInstallDefaults: DockSettings = {
-        var settings = DockSettings()
-        settings.showHarborTile = false
-        return settings
-    }()
+    /// Decoder `userInfo` entry holding the install's Harbor tile default as a `Bool`. A document
+    /// without `showHarborTile` decodes to that value; without the entry it decodes as off,
+    /// because such a document predates the tile defaulting on.
+    static let harborTileDefaultKey = CodingUserInfoKey(rawValue: "dock.harborTileDefault")!
 
     /// Rejects malformed persisted or transient input before it can enter geometry calculations.
     var isValid: Bool {
@@ -250,8 +246,10 @@ extension DockSettings {
         showAppBadgeCounts = try values.decodeIfPresent(Bool.self, forKey: .showAppBadgeCounts) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showNotificationFeed = try values.decodeIfPresent(Bool.self, forKey: .showNotificationFeed) ?? false
-        // A document without the key predates the tile, so it was off. New installs get it on.
-        showHarborTile = try values.decodeIfPresent(Bool.self, forKey: .showHarborTile) ?? false
+        // An untouched tile follows the install's recorded decision, which is off for documents
+        // saved before the tile defaulted on.
+        showHarborTile = try values.decodeIfPresent(Bool.self, forKey: .showHarborTile)
+            ?? (decoder.userInfo[Self.harborTileDefaultKey] as? Bool ?? false)
         harborShortcutEnabled = try values.decodeIfPresent(Bool.self, forKey: .harborShortcutEnabled) ?? true
         harborShowsAppNames = try values.decodeIfPresent(Bool.self, forKey: .harborShowsAppNames) ?? false
         hubGlassTint = try values.decodeIfPresent(Bool.self, forKey: .hubGlassTint) ?? true

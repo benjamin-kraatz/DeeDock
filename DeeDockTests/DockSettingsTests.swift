@@ -80,39 +80,71 @@ struct DockSettingsTests {
         #expect(DockSettingsOverrides().resolving(shown).harborShowsAppNames)
     }
 
-    @Test("Radar's tile is on for new installs and stays off in documents saved before that")
+    @Test("Radar's tile is on by default and stays off in documents saved before that")
     func harborTileBackwardDecode() throws {
         #expect(DockSettings.defaults.showHarborTile)
-        #expect(!DockSettings.earlierInstallDefaults.showHarborTile)
-        let encoded = try JSONEncoder().encode(DockSettings.defaults)
-        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
-        object.removeValue(forKey: "showHarborTile")
-        let decoded = try JSONDecoder().decode(DockSettings.self,
-            from: JSONSerialization.data(withJSONObject: object))
+        let decoded = try JSONDecoder().decode(DockSettings.self, from: documentWithoutHarborTile())
         #expect(!decoded.showHarborTile)
         var hidden = DockSettings.defaults
         hidden.showHarborTile = false
         #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(hidden)) == hidden)
     }
 
-    @Test("Without saved settings, only a first launch gets Radar's tile, and the store keeps that choice",
-          arguments: [nil, "dock.displays.v1", "onboarding.v1"])
-    func harborTileFirstLaunch(earlierLaunchKey: String?) throws {
-        let suite = "DeeDockSettingsTests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
-        if let earlierLaunchKey { defaults.set(Data("{}".utf8), forKey: earlierLaunchKey) }
-        let firstLaunch = earlierLaunchKey == nil
-        let repository = DockSettingsRepository(defaults: defaults)
-        #expect(try repository.load().showHarborTile == firstLaunch)
-        #expect(!repository.hasSavedDocument)
+    @Test("A first launch records Radar's tile as on and saves no settings document")
+    func harborTileFirstLaunch() throws {
+        try withIsolatedDefaults { defaults throws in
+            let store = DockSettingsStore(repository: DockSettingsRepository(defaults: defaults))
+            #expect(store.value.showHarborTile)
+            #expect(defaults.object(forKey: harborTileRecordKey) as? Bool == true)
+            // Only the tile decision is pinned. Every other setting keeps following the defaults.
+            #expect(defaults.object(forKey: "dock.settings.v1") == nil)
+        }
+    }
 
-        let store = DockSettingsStore(repository: repository)
-        #expect(store.value.showHarborTile == firstLaunch)
-        #expect(repository.hasSavedDocument)
-        // The next launch finds the evidence of this one and must still read the saved choice.
-        defaults.set(Data("{}".utf8), forKey: "dock.displays.v1")
-        #expect(DockSettingsStore(repository: repository).value.showHarborTile == firstLaunch)
+    @Test("An untouched new install keeps Radar's tile on its next launch")
+    func harborTileSecondLaunch() throws {
+        try withIsolatedDefaults { defaults throws in
+            #expect(try DockSettingsRepository(defaults: defaults).load().showHarborTile)
+            // The first launch wrote the display profiles document, which marks an earlier launch.
+            defaults.set(Data("{}".utf8), forKey: "dock.displays.v1")
+            #expect(DockSettingsStore(repository: DockSettingsRepository(defaults: defaults)).value.showHarborTile)
+            #expect(defaults.object(forKey: "dock.settings.v1") == nil)
+        }
+    }
+
+    @Test("An earlier install without saved settings records Radar's tile as off",
+          arguments: ["dock.displays.v1", "onboarding.v1"])
+    func harborTileEarlierInstall(earlierLaunchKey: String) throws {
+        try withIsolatedDefaults { defaults throws in
+            defaults.set(Data("{}".utf8), forKey: earlierLaunchKey)
+            #expect(try DockSettingsRepository(defaults: defaults).load().showHarborTile == false)
+            #expect(defaults.object(forKey: harborTileRecordKey) as? Bool == false)
+            #expect(defaults.object(forKey: "dock.settings.v1") == nil)
+        }
+    }
+
+    @Test("Settings saved without Radar's tile key keep the tile off")
+    func harborTileSavedWithoutKey() throws {
+        try withIsolatedDefaults { defaults throws in
+            let document = try documentWithoutHarborTile()
+            defaults.set(document, forKey: "dock.settings.v1")
+            #expect(try DockSettingsRepository(defaults: defaults).load().showHarborTile == false)
+            #expect(defaults.object(forKey: harborTileRecordKey) as? Bool == false)
+            #expect(defaults.data(forKey: "dock.settings.v1") == document)
+        }
+    }
+
+    @Test("An explicit Radar tile value wins over the recorded default", arguments: [false, true])
+    func harborTileExplicitValue(recordedDefault: Bool) throws {
+        try withIsolatedDefaults { defaults throws in
+            defaults.set(recordedDefault, forKey: harborTileRecordKey)
+            let store = DockSettingsStore(repository: DockSettingsRepository(defaults: defaults))
+            #expect(store.value.showHarborTile == recordedDefault)
+            store.update(\.showHarborTile, to: !recordedDefault)
+            let relaunched = DockSettingsStore(repository: DockSettingsRepository(defaults: defaults))
+            #expect(relaunched.value.showHarborTile == !recordedDefault)
+            #expect(defaults.object(forKey: harborTileRecordKey) as? Bool == recordedDefault)
+        }
     }
 
     @Test("Settings saved before the Hub glass tint switch get the tint")
@@ -224,5 +256,22 @@ struct DockSettingsTests {
         defaults.set("wrong type", forKey: "dock.settings.v1")
         #expect(throws: (any Error).self) { try repository.load() }
         #expect(defaults.string(forKey: "dock.settings.v1") == "wrong type")
+    }
+
+    private let harborTileRecordKey = "harbor.tileDefault.v1"
+
+    /// An encoded default settings document from before `showHarborTile` existed.
+    private func documentWithoutHarborTile() throws -> Data {
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "showHarborTile")
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    private func withIsolatedDefaults(_ body: (UserDefaults) throws -> Void) throws {
+        let suite = "DeeDockSettingsTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        try body(defaults)
     }
 }
