@@ -1,11 +1,20 @@
 import AppKit
 import Observation
 
-/// Shared installed-app snapshot, refreshed on deliberate launcher opens, not on pointer movement.
+/// Shared installed-app snapshot, refreshed on deliberate launcher opens and notification feed
+/// opens, not on pointer movement.
+///
+/// Nothing watches the Applications folders, so the snapshot is only as fresh as the last scan.
+/// It starts empty: an empty ``applications`` does not mean nothing is installed until
+/// ``completedScans`` is above zero.
 @MainActor @Observable
 final class LauncherLibrary {
     private(set) var applications: [LauncherApplication] = []
     private(set) var isLoading = false
+    /// How many scans finished since launch. Zero means ``applications`` is not an inventory yet.
+    /// Each finished scan increments it, even when the result is unchanged, so consumers that
+    /// cache lookups against ``applications`` can tell when to forget them.
+    private(set) var completedScans = 0
     private(set) var skippedDirectories = 0
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var generation = UUID()
@@ -45,6 +54,17 @@ final class LauncherLibrary {
         query.start()
     }
 
+    /// Starts a scan unless one is already running, for consumers that need the snapshot
+    /// current but must not restart the Launcher's own scan.
+    ///
+    /// The scan runs off the main actor (``LauncherDiscovery/scan(extraURLs:)``): it walks the
+    /// Applications folders without entering bundles and reads each bundle's Info.plist. It
+    /// reuses the extra locations the Launcher last found through Spotlight.
+    func requestRefresh() {
+        guard !isLoading else { return }
+        refresh()
+    }
+
     func refresh() {
         task?.cancel()
         let token = UUID(); generation = token
@@ -58,6 +78,7 @@ final class LauncherLibrary {
                 // assignment keeps observers from recomputing results and restarting tasks.
                 if applications != snapshot.applications { applications = snapshot.applications }
                 skippedDirectories = snapshot.skippedDirectories
+                completedScans += 1
                 isLoading = false
                 task = nil
             } catch {

@@ -163,6 +163,17 @@ enum AnalyticsEvent {
     case notificationFeedOpened(entryCount: Int, unreadCount: Int, trigger: AnalyticsTrigger)
     /// The notification feed closed, with how many entries it held then.
     case notificationFeedClosed(entryCount: Int, duration: Double, cleared: Bool)
+    /// An entry's app was opened from the feed. `clearedCount` counts the entries that left with
+    /// it. Never which app.
+    case notificationFeedRowOpened(trigger: AnalyticsTrigger, clearedCount: Int)
+    /// One entry was removed from the open feed, and by which gesture.
+    case notificationFeedRowRemoved(method: AnalyticsNotificationFeedRemoval)
+    /// One sender's stack was cleared, with how many entries it held. Never which sender.
+    case notificationFeedGroupCleared(method: AnalyticsNotificationFeedRemoval, count: Int)
+    /// The whole feed was emptied, and from where.
+    case notificationFeedClearedAll(source: AnalyticsNotificationFeedClearSource, count: Int)
+    /// An app came to the front from outside the feed and took its entries with it.
+    case notificationFeedAutoCleared(count: Int)
     /// Harbor opened. Counts only: never window titles or app names.
     case harborOpened(trigger: AnalyticsTrigger, windowCount: Int, appCount: Int, displayCount: Int,
                       access: AnalyticsHarborAccess)

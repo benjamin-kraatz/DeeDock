@@ -66,6 +66,9 @@ struct DockSettings: Codable, Equatable {
     /// Whether DOKK collects notification banners and shows the notification feed tile.
     /// Off by default; reading banners needs Accessibility access. Shared across displays.
     var showNotificationFeed: Bool = false
+    /// Whether closing the notification feed removes the entries that were shown while it was open.
+    /// Entries that arrive while it is closed stay. Off by default; shared across displays.
+    var notificationFeedClearsOnClose: Bool = false
     /// Whether each dock shows the Harbor tile. On for new installs. Installs from before that
     /// keep it off: without an explicit value, the default is the install's recorded decision
     /// (`DockSettingsRepository.harborTileDefault()`). Shared across displays.
@@ -213,7 +216,7 @@ extension DockSettings {
     private enum CodingKeys: String, CodingKey {
         case showBackground, backgroundOpacity, fadeWhenIdle, fadeTarget, idleOpacity, idleDelay, fadeOutDuration, restoreDuration
         case showAppBadges, showAppBadgeCounts
-        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
+        case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, notificationFeedClearsOnClose, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case hubGlassTint
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
         case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
@@ -246,6 +249,7 @@ extension DockSettings {
         showAppBadgeCounts = try values.decodeIfPresent(Bool.self, forKey: .showAppBadgeCounts) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showNotificationFeed = try values.decodeIfPresent(Bool.self, forKey: .showNotificationFeed) ?? false
+        notificationFeedClearsOnClose = try values.decodeIfPresent(Bool.self, forKey: .notificationFeedClearsOnClose) ?? false
         // An untouched tile follows the install's recorded decision, which is off for documents
         // saved before the tile defaulted on.
         showHarborTile = try values.decodeIfPresent(Bool.self, forKey: .showHarborTile)

@@ -1,12 +1,14 @@
 import SwiftUI
 
 /// Settings for the notification feed: the opt-in switch, Accessibility access, what the reader
-/// is doing, how DOKK handles notification text, and Clear.
+/// is doing, **Clear when closed**, how DOKK handles notification text, and Clear.
 ///
 /// Turning the switch on never prompts. macOS asks for Accessibility only after the explicit
 /// Enable click, the same flow App Badges use.
 struct NotificationFeedSettingsCard: View {
     @Binding var isOn: Bool
+    /// The shared **Clear when closed** setting.
+    @Binding var clearsOnClose: Bool
     let windowAccess: WindowAccessController
     /// Nil when Settings has no running dock, such as in previews of the whole page.
     let feed: NotificationFeedController?
@@ -15,6 +17,7 @@ struct NotificationFeedSettingsCard: View {
     var body: some View {
         NotificationFeedSettingsCardContent(
             isOn: $isOn,
+            clearsOnClose: $clearsOnClose,
             accessGranted: windowAccess.status == .enabled,
             status: feed?.state ?? .off,
             entryCount: feed?.store.entries.count ?? 0,
@@ -25,7 +28,10 @@ struct NotificationFeedSettingsCard: View {
                 feed?.refreshAccess()
             },
             openSystemSettings: windowAccess.openSystemSettings,
-            clear: { feed?.store.clear() })
+            clear: {
+                guard let count = feed?.store.clear(), count > 0 else { return }
+                Analytics.track(.notificationFeedClearedAll(source: .settings, count: count))
+            })
         .onAppear { windowAccess.refresh() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             windowAccess.refresh()
@@ -36,6 +42,7 @@ struct NotificationFeedSettingsCard: View {
 /// The card's rendering, driven by plain values so each state is previewable.
 struct NotificationFeedSettingsCardContent: View {
     @Binding var isOn: Bool
+    @Binding var clearsOnClose: Bool
     let accessGranted: Bool
     let status: NotificationFeedController.State
     let entryCount: Int
@@ -66,6 +73,11 @@ struct NotificationFeedSettingsCardContent: View {
                     EmptyView()
                 }
             }
+            if isOn {
+                SettingsToggleRow(title: .notificationFeedClearOnClose, subtitle: .notificationFeedClearOnCloseHelp,
+                                  isOn: $clearsOnClose)
+                    .disabled(locked)
+            }
             SettingsStackedRow {
                 Label { Text(.notificationFeedPrivacyNote) } icon: {
                     Image(systemName: "lock.shield").foregroundStyle(.secondary)
@@ -94,8 +106,9 @@ struct NotificationFeedSettingsCardContent: View {
 
 #if DEBUG
 private func notificationFeedCard(isOn: Bool, access: Bool, status: NotificationFeedController.State,
-                                  entries: Int = 0) -> some View {
-    NotificationFeedSettingsCardContent(isOn: .constant(isOn), accessGranted: access, status: status,
+                                  entries: Int = 0, clearsOnClose: Bool = false) -> some View {
+    NotificationFeedSettingsCardContent(isOn: .constant(isOn), clearsOnClose: .constant(clearsOnClose),
+                                        accessGranted: access, status: status,
                                         entryCount: entries, locked: false, requestAccess: {},
                                         checkAgain: {}, openSystemSettings: {}, clear: {})
         .padding(24)
@@ -111,7 +124,7 @@ private func notificationFeedCard(isOn: Bool, access: Bool, status: Notification
 }
 
 #Preview("Collecting, dark") {
-    notificationFeedCard(isOn: true, access: true, status: .listening, entries: 7)
+    notificationFeedCard(isOn: true, access: true, status: .listening, entries: 7, clearsOnClose: true)
         .preferredColorScheme(.dark)
 }
 

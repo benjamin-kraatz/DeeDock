@@ -437,6 +437,11 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `line_icon_coverage` | `installed_app_count`, `installed_line_icon_count`, `installed_coverage` (0 to 1), `pinned_app_count`, `pinned_line_icon_count`, `pinned_coverage` (0 to 1), `missing_public_count`, `missing_unlisted_count`, `missing_bundle_ids` (array), `missing_pinned_bundle_ids` (array). See [Line icon coverage](#line-icon-coverage). |
 | `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
+| `notification_feed_row_opened` | `trigger` (`click`, `keyboard`, `menu`, `voice_over`), `cleared_count` (entries that left with the opened app) |
+| `notification_feed_row_removed` | `method` (`hover_x`, `swipe`, `menu`, `keyboard`, `voice_over`) |
+| `notification_feed_group_cleared` | `method` (same values as `notification_feed_row_removed`), `count` (entries in the cleared stack) |
+| `notification_feed_cleared_all` | `source` (`header`, `keyboard`, `tile_menu`, `voice_over` for the tile's VoiceOver action, `settings`), `count` |
+| `notification_feed_auto_cleared` | `count` (entries removed because their app came to the front outside the feed) |
 | `harbor_opened` (Radar; Harbor is its internal name) | `trigger` (`hotkey` for ⌥⇧⌘Space, `hotkey_alternate` for ⇧⌘Space), `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
 | `harbor_closed` | `outcome` (`window`, `app`, `restored`, `dismissed`, `interrupted`), `duration`, `searched`, `filtered` (the strip's app filter was used), `closed_windows` |
 | `tool_opened` | `tool` (`local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
@@ -448,6 +453,9 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `robi_steps_run` | `step_count`, `completed_count` (steps that ran before one could not, or all of them), `menu_count`, `press_count`, `toggle_count`, `type_count` |
 
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
+**Clear when closed** is `setting_changed` with `key = notificationFeedClearsOnClose`. The feed's
+events never carry an app name, a bundle identifier, or notification text, and nothing is sent
+when a notification arrives or when **Clear when closed** removes entries.
 
 Robi's settings are reported through `setting_changed` with `area = robi`, by reflection over
 `RobiSettings`: `isEnabled`, `answerModel`, `claudeModel`, `claudeEffort`, `suggestQuestions`, `attachWindowPicture`, `shortcutEnabled`, and the number of

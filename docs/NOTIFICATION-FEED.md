@@ -1,6 +1,6 @@
 # Notification feed
 
-Implemented on `feat/notification-panel` for [DEE-115](https://linear.app/d-zwei/issue/DEE-115/collect-incoming-notification-banners-in-a-dokk-notification-feed). The user-facing name is **Notification Feed** (German: **Mitteilungsverlauf**). [The user guide](GUIDE.md#notification-feed) describes how it behaves.
+Implemented on `feat/notification-panel` for [DEE-115](https://linear.app/d-zwei/issue/DEE-115/collect-incoming-notification-banners-in-a-dokk-notification-feed). Triage (stacks, swipe to clear, auto-clear, **Clear when closed**) followed in DEE-155 on `codex/dee-155-notification-feed-triage`, built to the approved mockup in [`docs/mockups/notification-feed-triage.html`](mockups/notification-feed-triage.html). The user-facing name is **Notification Feed** (German: **Mitteilungsverlauf**). [The user guide](GUIDE.md#notification-feed) describes how it behaves.
 
 This page records why the feature was requested, what a prototype measured on 2026-10-06, and how the shipped feature is built. The measurements are facts about one Mac.
 
@@ -96,7 +96,7 @@ No public API lists other apps' notifications. The notification database that ma
 
 ## Design as built
 
-Source lives in `DeeDock/Dock/NotificationFeed`: `Model` (entry, parser, store, app resolver), `Reading` (reader and lifecycle controller), `Panel` (popover coordinator and state), and `Views` (tile, glyph, popover, settings card).
+Source lives in `DeeDock/Dock/NotificationFeed`: `Model` (entry, parser, store, app resolver, grouping, auto-clear matching), `Reading` (reader and lifecycle controller), `Panel` (popover coordinator, state, motion), `Swipe` (swipe physics, tracker, row probe, swipe container), and `Views` (tile, glyph, popover, groups, stack layout, rows, settings card).
 
 ### Reading
 
@@ -124,19 +124,35 @@ Source lives in `DeeDock/Dock/NotificationFeed`: `Model` (entry, parser, store, 
 
 `NotificationFeedStore` keeps entries in memory, newest first, deduplicated by banner UUID. It holds 100 entries and remembers 512 UUIDs, dropping the oldest of each first. Removing or clearing an entry keeps its UUID remembered, so a banner still on screen is not added again. Nothing is written to disk.
 
+Unread entries are always the newest, so the unread count is also a prefix length. Removing a set of entries lowers it by the unread entries removed, which keeps the tile's badge exact when an app is opened while the feed is closed. The store also remembers which entries were shown during the last viewing session, everything present at open plus arrivals while open, for **Clear when closed**.
+
 ### Interface
 
 - **Tile.** A movable utility tile, `notification-feed`, joins the end of the saved utility order. Its artwork is a brass `bell.fill` glyph, plus a Lucide bell in the Line icon style. A red count badge shows entries that arrived since the feed was last opened. The tile reads that count from the store, so an arrival redraws one badge without rebuilding the docks. The bell rings once per arrival unless Reduce Motion is on. The context menu offers Open, Clear, and Settings. VoiceOver gets the tile name, the unread count, and a Clear action.
 - **Popover.** Built on `DeeDock/Dock/Popover`, 380 × 480 points. Each row shows the app icon or a placeholder, the sender, relative arrival time, title, subtitle, and body. Rows unread at open carry an accent dot. Clicking a row opens the sending app through `ApplicationCatalog.open`, but only when the name matches exactly one running or installed app. Rows also offer Copy Text and Remove. Header **Clear All** empties the feed. The keyboard works once the panel has focus: arrows, Return, Delete, Command-C, Command-Delete, and Escape. Empty states explain listening, waiting, and missing access. Opening the popover marks everything read, and entries that arrive while it is open stay read.
-- **Settings.** **Settings → Features → Notification Feed**, in the same group as App badges. The card has the switch (off by default), the Accessibility row with **Enable**, a status line, a transparency note on how notification text is handled, and **Clear Notifications**. Turning the switch on never prompts.
+- **Settings.** **Settings → Features → Notification Feed**, in the same group as App badges. The card has the switch (off by default), the Accessibility row with **Enable**, a status line, **Clear when closed** (off by default, shown while the feed is on), a transparency note on how notification text is handled, and **Clear Notifications**. Turning the switch on never prompts.
 - **Discovery.** A launch-announced Discovery tip offers **Turn On**. See [Discovery](DISCOVERY.md).
+
+### Triage (DEE-155)
+
+The approved mockup is the spec for look, motion, and behaviour. Its defaults were approved as a set: three-card stacks, inline unfolding, a swipe that reveals a **Clear** label, an opened entry that drops toward the dock, the feed's existing spring (response 0.38, damping 0.82), a 72 pt snap-open, a commit at 40 % of the row width or a fast flick, and a rubber band to the right.
+
+- **Stacks.** `NotificationFeedGrouping` groups entries by the banner's display name, exactly as macOS spelled it; system alerts form one group. A group sits where its newest entry is. A single entry is a plain row. Several form a stack: the newest in front with a count capsule, each card behind it 4 pt lower and 8 pt narrower on each side, at most three cards. `NotificationFeedStackLayout` places the same row views either folded or unfolded, so toggling inside an animation slides rows out from under the front card and back. Peeking cards are the real rows with their text hidden and clipped to their bottom edge.
+- **Unfold.** A click on a stack, →, Return, or VoiceOver's Expand unfolds it in place under a header with the sender, the count, **Show Less**, and a ✕ that shows while the pointer is over the group. **Show Less**, ←, or VoiceOver's Show Less folds it, moving a selection inside the stack to its front card. The list scrolls to the selection only after keyboard navigation (arrows, ←, →, Return on a stack). When an arrival or removal moves the selection, the list stays where the person scrolled it.
+- **Clear a stack.** The stack's ✕, the header's ✕, Delete on a selected stack, the context menu's **Clear N Notifications**, and VoiceOver's Clear remove the sender's entries. An unfolded stack folds first, then the card fades.
+- **Swipe.** `NotificationFeedSwipeTracker` moves a row under a two-finger trackpad swipe or a mouse drag. Trackpad phases come from a local `.scrollWheel` monitor installed when the popover opens and removed when it closes; SwiftUI's gestures do not expose them. A gesture is claimed only after 6 pt of travel with horizontal movement at least 1.5 times the vertical, and only on a row; until then, and for every vertical gesture, events pass through so the list scrolls. A claimed gesture consumes its own momentum. Rows find themselves through `NotificationFeedSwipeProbe`, an invisible AppKit view that converts the event's window location into the row's own coordinates, clip view included. The mouse uses a `DragGesture` with the same thresholds. A collapsed stack swipes as a whole and its action reads **Clear All**. `NotificationFeedSwipePhysics` holds the thresholds and is unit-tested.
+- **Leaving animations.** A removed entry shrinks and fades, an opened one drops toward the dock edge the popover is attached to, and a swiped one has already flown out. SwiftUI reads a removed view's transition from its last render, so the coordinator stages the style on the panel and drops the entries a frame (about 20 ms) later. Staged removals finish at once when the popover closes.
+- **Auto-clear on open.** Opening an entry's app from the feed (click, Return, Open App) removes every entry whose name resolves to that app, then closes the popover about 210 ms later so the drop is visible. Any other activation, observed through `ApplicationCatalog`'s `NSWorkspace.didActivateApplicationNotification` observer, does the same through `NotificationFeedCoordinator.applicationActivated(_:)`: with the feed open the entries drop, with it closed only the badge changes. Matching uses `NotificationFeedAppResolver` in two ways. Open App, and the entries it takes along, use the running-first resolution, so a name an installed app shares opens the running one. Any other activation uses the strict resolution, which pools running and installed apps, counts an app and its own bundle once, and clears only when the name belongs to that app alone: with two installed apps named "Notes", activating either clears nothing. The installed list comes from the shared `LauncherLibrary`, which starts empty and watches no folders, so strict matching abstains until it has completed one scan. The feed requests a background scan when it turns on and each time the popover opens (`LauncherLibrary.requestRefresh()`, skipped while a scan runs), never per activation, and the resolver forgets its cached matches when a scan completes. Unknown names never match, and system alerts are never auto-cleared. DOKK's own activations are ignored. If the app fails to open, its entries are already gone and the dock shows the error.
+- **Clear when closed.** `DockSettings.notificationFeedClearsOnClose`, shared across displays like `showNotificationFeed`, off by default. On close, the coordinator waits 200 ms for the close animation (none under Reduce Motion), then removes what the store recorded as seen. Arrivals while closed stay and keep the unread dot on reopen. Reopening within the 200 ms applies the pending clear first.
+- **Reduce Motion.** Nothing slides: rows take new places at once, and every arrival, removal, and unfold is a 150 ms cross-fade. The swipe still follows the pointer and settles with a 150 ms curve. The bell does not swing, as before. **Reduce Transparency** keeps the opaque popover.
+- **Keyboard and VoiceOver.** ↑ and ↓ move through items, where a folded stack is one item. → unfolds, ← folds, Return unfolds a stack or opens a row's app, Delete removes a row or clears a stack, Command-C copies the selected entry (a stack's newest), Command-Delete clears everything, and Escape closes an open swipe before it closes the feed. A folded stack is one VoiceOver element labelled like "Mail, 3 notifications", with its newest banner as the value, a hint, and the actions Open App, Expand, Copy Text, and Clear. Rows in an unfolded stack add Show Less.
 
 ### Privacy
 
 This is the first DOKK feature that reads message text from other apps. [Badge memory](BADGE_MEMORY.md) still captures no message text; the two features share no storage.
 
 - Notification titles, subtitles, bodies, and app names never go to analytics. [Usage analytics](ANALYTICS.md) lists notification text under "What is never collected".
-- Analytics get `notification_feed_opened` (entry count, unread count, trigger), `notification_feed_closed` (entry count, duration, whether Clear All was used), and the setting toggle through `setting_changed`. Nothing is sent when a notification arrives.
+- Analytics get `notification_feed_opened` (entry count, unread count, trigger), `notification_feed_closed` (entry count, duration, whether Clear All was used), and the setting toggles through `setting_changed`. Triage adds `notification_feed_row_opened` (trigger, how many entries left with the app), `notification_feed_row_removed` (method), `notification_feed_group_cleared` (method, count), `notification_feed_cleared_all` (source, count), and `notification_feed_auto_cleared` (count). Nothing is sent when a notification arrives or when **Clear when closed** removes entries, and no event names the app.
 - The README's permissions table lists the feature under Accessibility.
 - The settings card, popover footer, and Discovery tip say that the text stays on this Mac. The copy explains how DOKK handles the text. It does not warn people away from the feature.
 
@@ -148,6 +164,9 @@ This is the first DOKK feature that reads message text from other apps. [Badge m
 4. An entry opens the sending app only when its name resolves to exactly one app.
 5. Name: Notification Feed.
 6. The screen locking does not clear the feed. Clearing it would lose exactly the banners this feature exists to keep. While the screen is locked, macOS does not show banners anyway.
+7. DEE-155: grouping is always on; the mockup's grouping switch was a demo control, not a setting.
+8. DEE-155: an app that comes to the front takes its entries with it, wherever it was opened from. Only exact single-app matches count; system alerts stay.
+9. DEE-155: **Clear when closed** is off by default and shared across displays.
 
 ## Acceptance still required
 
@@ -163,3 +182,4 @@ This is the first DOKK feature that reads message text from other apps. [Badge m
 - On the first launch of this version, confirm that the Discovery tip appears about a minute after launch, that **Turn On** enables the feed, and that it opens Settings on the feed page when access is missing. Confirm that an already-enabled feed suppresses the tip.
 - Confirm that the tile's badge and bell ring on arrival, that the ring is skipped with Reduce Motion, and that an arrival does not reset the dock's idle fade.
 - Check that the analytics events carry counts only: `notification_feed_opened`, `notification_feed_closed`, and `setting_changed` for `showNotificationFeed`, and nothing on arrival.
+- DEE-155 triage: see the checklist under [DEE-155 in the acceptance record](ACCEPTANCE.md#dee-155-notification-feed-triage).
