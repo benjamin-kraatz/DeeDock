@@ -15,8 +15,13 @@ final class DockSettingsStore {
     /// A nil repository provides isolated, in-memory state for previews.
     init(repository: DockSettingsRepository?) {
         self.repository = repository
-        do { value = try repository?.load() ?? .defaults }
-        catch {
+        do {
+            value = try repository?.load() ?? .defaults
+            // Save the defaults this install started with, so a later change to a default cannot
+            // reach it and a new install keeps its defaults on the next launch. Without this, the
+            // second launch of an unchanged new install would look like an earlier install.
+            if let repository, !repository.hasSavedDocument { try? repository.save(value) }
+        } catch {
             requiresReset = true
             errorMessage = .settingsLoadError
         }

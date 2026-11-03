@@ -80,6 +80,41 @@ struct DockSettingsTests {
         #expect(DockSettingsOverrides().resolving(shown).harborShowsAppNames)
     }
 
+    @Test("Radar's tile is on for new installs and stays off in documents saved before that")
+    func harborTileBackwardDecode() throws {
+        #expect(DockSettings.defaults.showHarborTile)
+        #expect(!DockSettings.earlierInstallDefaults.showHarborTile)
+        let encoded = try JSONEncoder().encode(DockSettings.defaults)
+        var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "showHarborTile")
+        let decoded = try JSONDecoder().decode(DockSettings.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        #expect(!decoded.showHarborTile)
+        var hidden = DockSettings.defaults
+        hidden.showHarborTile = false
+        #expect(try JSONDecoder().decode(DockSettings.self, from: JSONEncoder().encode(hidden)) == hidden)
+    }
+
+    @Test("Without saved settings, only a first launch gets Radar's tile, and the store keeps that choice",
+          arguments: [nil, "dock.displays.v1", "onboarding.v1"])
+    func harborTileFirstLaunch(earlierLaunchKey: String?) throws {
+        let suite = "DeeDockSettingsTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        if let earlierLaunchKey { defaults.set(Data("{}".utf8), forKey: earlierLaunchKey) }
+        let firstLaunch = earlierLaunchKey == nil
+        let repository = DockSettingsRepository(defaults: defaults)
+        #expect(try repository.load().showHarborTile == firstLaunch)
+        #expect(!repository.hasSavedDocument)
+
+        let store = DockSettingsStore(repository: repository)
+        #expect(store.value.showHarborTile == firstLaunch)
+        #expect(repository.hasSavedDocument)
+        // The next launch finds the evidence of this one and must still read the saved choice.
+        defaults.set(Data("{}".utf8), forKey: "dock.displays.v1")
+        #expect(DockSettingsStore(repository: repository).value.showHarborTile == firstLaunch)
+    }
+
     @Test("Settings saved before the Hub glass tint switch get the tint")
     func hubGlassTintBackwardDecode() throws {
         let encoded = try JSONEncoder().encode(DockSettings.defaults)

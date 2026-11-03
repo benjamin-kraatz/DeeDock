@@ -66,10 +66,12 @@ struct DockSettings: Codable, Equatable {
     /// Whether DOKK collects notification banners and shows the notification feed tile.
     /// Off by default; reading banners needs Accessibility access. Shared across displays.
     var showNotificationFeed: Bool = false
-    /// Whether each dock shows the Harbor tile. Off by default; the shortcut and the menu open
-    /// Harbor without it. Shared across displays.
-    var showHarborTile: Bool = false
-    /// Whether Option-Shift-Command-Space opens Harbor from any app. Shared across displays.
+    /// Whether each dock shows the Harbor tile. On for new installs. Installs from before that
+    /// keep it off: documents saved without this key decode as off, and a Mac with no saved
+    /// document that ran DOKK before gets ``earlierInstallDefaults``. Shared across displays.
+    var showHarborTile: Bool = true
+    /// Whether Harbor's global shortcuts, Option-Shift-Command-Space and Shift-Command-Space, open
+    /// it from any app. One switch for both. Shared across displays.
     var harborShortcutEnabled: Bool = true
     /// Whether Harbor's running-apps strip shows each app's name under its icon. Off by default;
     /// the strip is then shallower. Shared across displays.
@@ -166,6 +168,15 @@ struct DockSettings: Codable, Equatable {
 
     static let defaults = DockSettings()
 
+    /// Defaults for a Mac that ran DOKK before but never saved settings. Settings are saved only on
+    /// an edit, so such an install has no document, and a default that changed since must keep
+    /// the value that install had. Only Harbor's tile changed so far; it was off.
+    static let earlierInstallDefaults: DockSettings = {
+        var settings = DockSettings()
+        settings.showHarborTile = false
+        return settings
+    }()
+
     /// Rejects malformed persisted or transient input before it can enter geometry calculations.
     var isValid: Bool {
         (0...100).contains(backgroundOpacity) && (0...100).contains(idleOpacity)
@@ -239,6 +250,7 @@ extension DockSettings {
         showAppBadgeCounts = try values.decodeIfPresent(Bool.self, forKey: .showAppBadgeCounts) ?? false
         showShelf = try values.decodeIfPresent(Bool.self, forKey: .showShelf) ?? true
         showNotificationFeed = try values.decodeIfPresent(Bool.self, forKey: .showNotificationFeed) ?? false
+        // A document without the key predates the tile, so it was off. New installs get it on.
         showHarborTile = try values.decodeIfPresent(Bool.self, forKey: .showHarborTile) ?? false
         harborShortcutEnabled = try values.decodeIfPresent(Bool.self, forKey: .harborShortcutEnabled) ?? true
         harborShowsAppNames = try values.decodeIfPresent(Bool.self, forKey: .harborShowsAppNames) ?? false
