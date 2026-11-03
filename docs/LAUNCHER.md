@@ -176,8 +176,7 @@ window results offer metadata refresh.
 | Group | None, application category, or first letter |
 
 Those controls live in the options menu at the end of the controls row. The menu also holds
-**Result type**, **Show Nested Apps**, **Reset to Defaults**, **Choose Files**, **Capture & image
-search…**, **Refresh apps**, **Clear launch history…**, and **Settings…**. **Show Nested Apps**
+**Result type**, **Show Nested Apps**, **Reset to Defaults**, **Choose Files**, **Refresh apps**, **Clear launch history…**, and **Settings…**. **Show Nested Apps**
 also lists apps stored in a subfolder next to another app, such as an editor's build templates.
 **Refresh apps** rescans apps and window titles. **Settings…** opens DOKK's Settings, which closes
 an anchored Hub because focus leaves it. With a non-app result type selected, the app filter,

@@ -2,8 +2,8 @@ import SwiftUI
 
 /// The slim row above the app grid (mockup `.sect` with chips): a title, the Robi chip or Ask Robi,
 /// "Recently used" / "A–Z" sort chips, and the options menu that carries the remaining launcher
-/// controls (result type, filters, location, grouping, layout, Choose Files, Capture & image
-/// search, refresh, clear history, Settings).
+/// controls (result type, filters, location, grouping, layout, Choose Files, refresh,
+/// clear history, Settings).
 ///
 /// The header search field belongs to the Hub shell; this row replaces the rest of the old
 /// launcher search bar.

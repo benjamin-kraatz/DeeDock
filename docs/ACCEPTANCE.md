@@ -2421,6 +2421,8 @@ of this correction remains pending. Further subagent review was stopped at the u
 
 ## DEE-27: explicit window focus
 
+Historical record. Window Search (Find a Window) was removed in DEE-156; its mentions below describe the build at the time.
+
 Settings commands now share one presentation path, including menu-bar and app commands, dock
 context menus, Window Peek, Window Search, and onboarding. The scene registers its
 actual native window. Existing windows are reused and deminiaturized. Presentation leaves menu
