@@ -68,14 +68,25 @@ enum AnalyticsEvent {
 
     // Launcher (the Hub's Apps tab). Opening is reported as `hubOpened`.
     case launcherSearched(queryLength: Int, resultCount: Int, kind: LauncherSearchKind)
-    case launcherResultActivated(LauncherSearchKind, reveal: Bool, trigger: AnalyticsTrigger)
+    /// An app or search result was opened or shown in Finder. `position` is 0-based in the order
+    /// `source` drew its items; `scrolled` is whether those results were away from the top.
+    case launcherResultActivated(LauncherSearchKind, reveal: Bool, trigger: AnalyticsTrigger,
+                                 source: AnalyticsLauncherSource, position: Int?, scrolled: Bool)
     case launcherSuggestionAccepted(trigger: AnalyticsTrigger)
     case launcherToolOpened(LauncherTool)
     case launcherFileAction(LauncherFileActionKind, inputCount: Int, source: LauncherFileSource,
                             fileType: AnalyticsFileType?, status: AnalyticsFileOperationStatus)
     case launcherAssistantAsked(queryLength: Int, resultCount: Int, outcome: AnalyticsOutcome)
-    /// The Launcher closed. `hadQuery` is whether search text was present at that moment.
-    case launcherClosed(duration: Double, hadQuery: Bool)
+    /// The Apps tab was hidden. `hadQuery` is whether search text was present at that moment; the
+    /// rest summarizes the visit (see ``LauncherVisit``).
+    case launcherClosed(duration: Double, hadQuery: Bool, outcome: AnalyticsLauncherOutcome, actionCount: Int,
+                        optionCount: Int, scrolled: Bool)
+    /// A browse option was chosen in the Apps tab's options menu or sort chips.
+    case launcherOptionChanged(AnalyticsLauncherOption)
+    /// An app was added to (`true`) or removed from the Apps tab's Favorites. Never which app.
+    case launcherFavoriteChanged(favorite: Bool)
+    /// Launch history was cleared from the Apps tab's options menu.
+    case launcherHistoryCleared
     case launcherSuggestionsShown(count: Int)
     case launcherSuggestionFeedback(AnalyticsSuggestionFeedback)
     case launcherSuggestionPromptAnswered(AnalyticsSuggestionPromptAnswer)

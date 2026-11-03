@@ -64,7 +64,7 @@ struct LauncherSuggestionActions: View {
         Button { state.suggestionFeedback(application, kind: .notNow) } label: {
             Label { Text(.launcherSuggestionsNotNow) } icon: { Image(systemName: "hand.thumbsdown") }
         }
-        Button { state.catalog.suggestions.exclude(appID: application.id) } label: {
+        Button { state.excludeSuggestion(application) } label: {
             Label { Text(.launcherSuggestionsExclude) } icon: { Image(systemName: "nosign") }
         }
     }
