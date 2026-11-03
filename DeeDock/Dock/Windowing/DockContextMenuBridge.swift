@@ -314,7 +314,14 @@ struct DockContextMenuBridge: NSViewRepresentable {
         }
 
         func menuWillOpen(_ menu: NSMenu) { tracking?(true) }
-        func menuDidClose(_ menu: NSMenu) { finishTracking() }
+        /// Releases the dock's tracking hold only. The discovery session stays open until
+        /// `present` calls `finishTracking()` after `popUpContextMenu` returns.
+        ///
+        /// AppKit sends `menuDidClose` before it sends the chosen item's action. Finishing here
+        /// discarded the window handles while `selectedWindowToken` was still nil, so every
+        /// window row failed with `windowUnavailable` (DEE-152). By the time `popUpContextMenu`
+        /// returns, any action has run and set `selectedWindowToken`.
+        func menuDidClose(_ menu: NSMenu) { tracking?(false) }
 
         @objc private func showBadgeMemory() {
             guard let item else { return }
@@ -379,6 +386,9 @@ struct DockContextMenuBridge: NSViewRepresentable {
         }
         @objc private func resetIslands() { Analytics.performing(.menu) { interaction?.resetIslands?() } }
 
+        /// Ends the menu presentation. A chosen window row keeps its discovery session alive,
+        /// because the selection still needs that session's handles; the service drops them
+        /// once it consumes the token.
         private func finishTracking() {
             if selectedWindowToken == nil, let discoveryID {
                 interaction?.cancelApplicationWindowDiscovery?(discoveryID)
