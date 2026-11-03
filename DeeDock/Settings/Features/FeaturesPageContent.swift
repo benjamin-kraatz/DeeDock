@@ -97,11 +97,6 @@ struct FeaturesPageContent: View {
                 DockTimelineSettingsCard(history: coordinator.localHistory,
                                          browse: { coordinator.browseLocalHistory() })
             }
-        case .clipboardMuseum:
-            if let coordinator = context.coordinator {
-                ClipboardMuseumSettingsCard(museum: coordinator.clipboardMuseum,
-                                            open: { coordinator.showClipboardMuseum() })
-            }
         case .permissions:
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess,
                                            screenCapture: context.screenCapture)

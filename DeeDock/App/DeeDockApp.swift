@@ -52,7 +52,6 @@ struct DeeDockApp: App {
                 HarborMenuButton(harbor: delegate.coordinator.harbor) { delegate.coordinator.showHarbor() }
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
-                Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
             } header: { Text(.menuSectionFind) }
             Section {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
@@ -93,7 +92,6 @@ struct DeeDockApp: App {
                 .disabled(!delegate.coordinator.canFocus)
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
-                Button(.actionClipboardMuseum) { delegate.coordinator.showClipboardMuseum() }
                 OpenSystemSettingsCloneButton()
             }
         }

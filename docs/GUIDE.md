@@ -523,7 +523,7 @@ See [Atmosphere acceptance](ACCEPTANCE.md#dee-73-atmosphere) for runtime limitat
 
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 

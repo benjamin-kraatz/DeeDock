@@ -16,13 +16,13 @@ struct DiscoveryEngineTests {
         let engine = DiscoveryEngine(defaults: defaults, catalog: [early, middle, tail])
         let start = Date(timeIntervalSinceReferenceDate: 20_000)
 
-        engine.record(.clipboardChanged, at: start)
+        engine.record(.launched, at: start)
         #expect(engine.advance(at: start, canPresent: true)?.id == "early")
         engine.finish(forever: false, at: start)
 
-        engine.record(.clipboardChanged, at: start)
-        engine.record(.clipboardChanged, at: start.addingTimeInterval(1))
-        engine.record(.clipboardChanged, at: start.addingTimeInterval(2))
+        engine.record(.launched, at: start)
+        engine.record(.launched, at: start.addingTimeInterval(1))
+        engine.record(.launched, at: start.addingTimeInterval(2))
         #expect(engine.queue == ["early", "middle", "tail"])
 
         let due = start.addingTimeInterval(DiscoveryEngine.spacing)
@@ -32,7 +32,7 @@ struct DiscoveryEngineTests {
         // The queue and the session cap stay in memory. The snooze is what relaunch restores.
         let resumed = DiscoveryEngine(defaults: defaults, catalog: [early, middle, tail])
         let ready = start.addingTimeInterval(200)
-        resumed.record(.clipboardChanged, at: ready)
+        resumed.record(.launched, at: ready)
         #expect(resumed.advance(at: ready, canPresent: true)?.id == "early")
     }
 
@@ -46,10 +46,10 @@ struct DiscoveryEngineTests {
         let engine = DiscoveryEngine(defaults: defaults, catalog: [early, later])
         let start = Date(timeIntervalSinceReferenceDate: 30_000)
 
-        engine.record(.clipboardChanged, at: start)
+        engine.record(.launched, at: start)
         #expect(engine.advance(at: start, canPresent: true)?.id == "early")
         engine.finish(forever: false, at: start)
-        engine.record(.clipboardChanged, at: start)
+        engine.record(.launched, at: start)
         #expect(engine.queue == ["early"])
 
         let due = start.addingTimeInterval(DiscoveryEngine.spacing)
@@ -57,7 +57,7 @@ struct DiscoveryEngineTests {
         #expect(engine.queue == ["early"])
 
         let stillThisSlot = due.addingTimeInterval(1)
-        engine.record(.clipboardChanged, at: stillThisSlot)
+        engine.record(.launched, at: stillThisSlot)
         #expect(engine.advance(at: stillThisSlot, canPresent: true)?.id == "later")
     }
 
@@ -70,7 +70,7 @@ struct DiscoveryEngineTests {
         let engine = DiscoveryEngine(defaults: defaults, catalog: [first, second])
         let start = Date(timeIntervalSinceReferenceDate: 40_000)
 
-        engine.record(.clipboardChanged, at: start)
+        engine.record(.launched, at: start)
         #expect(engine.queue == ["first", "second"])
         #expect(engine.advance(at: start, canPresent: true)?.id == "first")
         engine.finish(forever: true, at: start)
@@ -93,13 +93,13 @@ struct DiscoveryEngineTests {
         let engine = DiscoveryEngine(defaults: defaults, catalog: [shown, waiting])
         let start = Date(timeIntervalSinceReferenceDate: 50_000)
 
-        engine.record(.clipboardChanged, at: start)
+        engine.record(.launched, at: start)
         #expect(engine.advance(at: start, canPresent: true)?.id == "shown")
         engine.finish(forever: true, at: start)
         #expect(engine.queue == ["waiting"])
 
         let due = start.addingTimeInterval(DiscoveryEngine.spacing)
-        engine.record(.clipboardChanged, at: due)
+        engine.record(.launched, at: due)
         #expect(engine.advance(at: due, canPresent: true) == nil)
         #expect(engine.queue == ["waiting"])
         #expect(engine.advance(at: due.addingTimeInterval(5), canPresent: true)?.id == "waiting")
@@ -224,13 +224,13 @@ struct DiscoveryEngineTests {
     ) -> DiscoveryProposal {
         DiscoveryProposal(
             id: id,
-            signal: .clipboardChanged,
+            signal: .launched,
             threshold: threshold,
             calmInterval: calmInterval,
-            title: .discoveryMuseumTitle,
-            message: .discoveryMuseumMessage,
-            action: .discoveryMuseumOpen,
-            destination: .clipboardMuseum,
+            title: .discoveryIslandsTitle,
+            message: .discoveryIslandsMessage,
+            action: .discoveryIslandsTurnOn,
+            destination: .islands,
             snoozeInterval: snoozeInterval
         )
     }

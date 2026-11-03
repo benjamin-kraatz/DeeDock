@@ -72,8 +72,6 @@ extension AnalyticsEvent {
         case .shortcutRun: "shortcut_run"
         case .shortcutTile: "shortcut_tile"
         case .appMelt: "app_melt"
-        case .clipboardMuseum: "clipboard_museum"
-        case .clipboardCaptureEnabled: "clipboard_capture_enabled"
         case .notificationFeedOpened: "notification_feed_opened"
         case .notificationFeedClosed: "notification_feed_closed"
         case .harborOpened: "harbor_opened"
@@ -261,8 +259,6 @@ extension AnalyticsEvent {
             ["action": .init(action), "tile_count": .init(tileCount)]
         case let .appMelt(action, pairCount, outcome):
             ["action": .init(action), "pair_count": .init(pairCount), "outcome": .init(outcome)]
-        case let .clipboardMuseum(action, kind, itemCount):
-            ["action": .init(action), "kind": kind.map(AnalyticsValue.init), "item_count": itemCount.map(AnalyticsValue.init)]
         case let .notificationFeedOpened(entryCount, unreadCount, trigger):
             ["entry_count": .init(entryCount), "unread_count": .init(unreadCount), "trigger": .init(trigger)]
         case let .notificationFeedClosed(entryCount, duration, cleared):
@@ -314,7 +310,7 @@ extension AnalyticsEvent {
              "missing_pinned_bundle_ids": .init(coverage.missingPinned)]
         case let .toolOpened(tool, trigger):
             ["tool": .init(tool), "trigger": .init(trigger)]
-        case .onboardingCompleted, .clipboardCaptureEnabled, .launcherHistoryCleared:
+        case .onboardingCompleted, .launcherHistoryCleared:
             [:]
         case let .focusDockEntered(trigger):
             ["trigger": .init(trigger)]

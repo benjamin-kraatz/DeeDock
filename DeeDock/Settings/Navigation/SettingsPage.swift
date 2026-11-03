@@ -42,7 +42,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
     case permissions
     case appSuggestions
     case localHistory
-    case clipboardMuseum
     case discovery
     case soapBubbles
     case appHealth
@@ -63,7 +62,7 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .about, .softwareUpdate, .menuBar, .startup, .privacy: .general
         case .islands, .shelfAndTrash, .drives, .hub, .capsules, .badges, .notificationFeed, .windowPeek, .harbor, .robi,
              .actionTiles, .multipleDisplays, .permissions,
-             .appSuggestions, .localHistory, .clipboardMuseum, .soapBubbles, .discovery, .appHealth: .features
+             .appSuggestions, .localHistory, .soapBubbles, .discovery, .appHealth: .features
         }
     }
 
@@ -104,7 +103,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .secondaryDockTitle
         case .appSuggestions: .launcherSuggestionsSettingsTitle
         case .localHistory: .timelineTitle
-        case .clipboardMuseum: .clipboardMuseumTitle
         case .discovery: .discoveryTitle
         case .soapBubbles: .soapBubblesTitle
         case .permissions: .windowPeekPermissionsTitle
@@ -139,7 +137,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .settingsFeatureDisplaysSubtitle
         case .appSuggestions: .launcherSuggestionsSettingsSubtitle
         case .localHistory: .settingsFeatureTimelineSubtitle
-        case .clipboardMuseum: .settingsFeatureClipboardMuseumSubtitle
         case .discovery: .discoverySettingsHelp
         case .soapBubbles: .settingsFeatureSoapBubblesSubtitle
         case .permissions: .settingsFeaturePermissionsSubtitle
@@ -176,7 +173,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: .symbol("display.2")
         case .appSuggestions: .symbol("sparkles")
         case .localHistory: .symbol("clock.arrow.circlepath")
-        case .clipboardMuseum: .symbol("building.columns.fill")
         case .discovery: .symbol("lightbulb.fill")
         case .soapBubbles: .symbol("circle.dotted")
         case .permissions: .symbol("lock.fill")
@@ -211,7 +207,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: Color(red: 0.30, green: 0.56, blue: 0.72)
         case .appSuggestions: .indigo
         case .localHistory: Color(red: 0.22, green: 0.48, blue: 0.72)
-        case .clipboardMuseum: Color(red: 0.66, green: 0.52, blue: 0.30)
         case .discovery: .teal
         case .soapBubbles: Color(red: 0.38, green: 0.72, blue: 0.88)
         case .permissions: Color(red: 0.90, green: 0.68, blue: 0.10)
@@ -246,7 +241,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         case .multipleDisplays: [Color(red: 0.50, green: 0.72, blue: 0.86), Color(red: 0.20, green: 0.42, blue: 0.60)]
         case .appSuggestions: [.indigo, .purple]
         case .localHistory: [Color(red: 0.46, green: 0.72, blue: 0.92), Color(red: 0.12, green: 0.36, blue: 0.62)]
-        case .clipboardMuseum: [Color(red: 0.90, green: 0.78, blue: 0.52), Color(red: 0.56, green: 0.42, blue: 0.22)]
         case .discovery: [.mint, .teal]
         case .soapBubbles: [Color(red: 0.72, green: 0.94, blue: 1.0), Color(red: 0.78, green: 0.52, blue: 0.96)]
         case .permissions: [Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.90, green: 0.58, blue: 0.05)]
@@ -260,7 +254,6 @@ enum SettingsPage: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .appSuggestions: .launcherSuggestionsSettingsKeywords
         case .localHistory: .timelineSettingsKeywords
-        case .clipboardMuseum: .clipboardMuseumSettingsKeywords
         case .discovery: .discoverySettingsHelp
         case .notificationFeed: .notificationFeedSettingsKeywords
         case .islands: .islandsSettingsKeywords

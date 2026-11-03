@@ -92,8 +92,6 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case launcherSuggestionsEnabled = "launcher_suggestions_enabled"
     case launcherSuggestionsPaused = "launcher_suggestions_paused"
     case launcherSuggestionPromptsEnabled = "launcher_suggestion_prompts_enabled"
-    case clipboardRedactSecrets = "clipboard_redact_secrets"
-    case clipboardCuratorEnabled = "clipboard_curator_enabled"
     case localHistoryRecording = "local_history_recording"
     case localHistoryReplay = "local_history_replay"
     case peekHistoryEnabled = "peek_history_enabled"

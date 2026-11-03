@@ -400,6 +400,42 @@ Implemented on `feat/notification-panel`. An opt-in Notification Feed reads Noti
 
 Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
 
+## DEE-153 Clipboard Museum removed
+
+Clipboard Museum is gone, with no replacement. Its window, slideshow, Settings → Features →
+Clipboard Museum page, the **Clipboard Museum…** items in the menu-bar menu and app menu, the
+Hub Apps tool tile, the Discovery tip, the on-device curator labels and image analysis, and the
+`clipboard_museum` and `clipboard_capture_enabled` events, the `clipboard_redact_secrets` and
+`clipboard_curator_enabled` feature settings, the `clipboardMuseum` value of
+`launcher_tool_opened` and `discovery_callout`, and the `clipboard_wall_label` AI span are
+removed. 115 String Catalog keys went with it.
+
+Dependent behavior changes:
+
+- Discovery loses its only clipboard recipe, so it no longer polls `NSPasteboard.changeCount`.
+  The `clipboardChanged` signal and the watcher timer are removed. The Notification Feed,
+  Islands, Robi, and Radar announcements are unchanged. A stored `discovery.state.v1` that names
+  `clipboardMuseum` as used or dismissed still decodes; the entry matches nothing.
+- The Hub Apps tool row lists Local History, App Compare, and System Settings Clone.
+- Shelf keeps its own clipboard paste (`Application Support/<bundle id>/Clipboard`), which never
+  shared code or storage with the Museum.
+
+The Museum kept clipboard copies on disk. `ClipboardMuseumCleanup` runs once at launch, off the
+main actor. It deletes `Application Support/<bundle id>/ClipboardMuseum` (`collection.json`,
+`Images/*.png`, `Vault/*.sealed`), then sets `cleanup.clipboard-museum.v1`. The Museum wrote no
+UserDefaults keys. Nothing outside that folder is touched, and when Application Support or the
+bundle identifier can't be resolved the cleanup skips rather than fall back to another folder. A
+folder that cannot be deleted is logged and retried at the next launch.
+
+The vault key (login keychain, generic password "DOKK Clipboard Museum", service
+`<bundle id>.clipboard-museum`, account `vault-key`) is deliberately left. Deleting from the
+file-based keychain can show a password or access prompt at launch, and there's no reliable way to
+suppress it. With the sealed files gone the key decrypts nothing; anyone who wants it gone can
+delete it in Keychain Access.
+
+`ClipboardMuseumCleanupTests` covers the deletion, a neighbouring folder surviving, a second run,
+a Mac that never used the Museum, a failed deletion retried, and an unresolvable folder skipped.
+
 ## DEE-152 window list removed from app menus
 
 An app tile's context menu no longer lists the app's windows. **Loading Windows…**, the window
@@ -751,7 +787,7 @@ placement, or relaunch.
 
 ## DEE-74 DDock Discovery
 
-Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
+Implemented on `feature/dee-74`: local recipe catalog, FIFO queue, 69-second presentation cadence, session and daily caps, durable dismissal and usage suppression, and a nonactivating English/German callout. Settings → Features → DDock Discovery provides the global switch. The first recipe suggests Clipboard Museum after three observed clipboard changes and five calm seconds. Capture remains opt-in. DEE-153 removed that recipe with the Museum. See [Discovery](DISCOVERY.md) for policy, platform limits, and pending acceptance.
 
 Validation on 2026-09-11: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dee-74-build CODE_SIGNING_ALLOWED=NO build` succeeded with the macOS 27 SDK, Swift 5, and MainActor default isolation. Generated string symbols and new source target membership compiled. The final build reported only the App Intents metadata warning. Automated tests, previews, and native interaction checks were not run. Compilation does not establish native acceptance.
 
@@ -2700,6 +2736,9 @@ Pending native acceptance:
   window, input interception, timer, or particle timeline behind.
 
 ## DEE-41 Clipboard Museum
+
+DEE-153 removed Clipboard Museum and deletes its stored data at launch. See
+[DEE-153 Clipboard Museum removed](#dee-153-clipboard-museum-removed). The notes below are kept as history.
 
 Settings → Features → Clipboard Museum turns collecting on. It is off by default, and the
 menu-bar item and app menu gain **Clipboard Museum…**. The window groups exhibits by day in a

@@ -29,9 +29,6 @@ final class DiscoveryEngine {
     private var sessionCount = 0
     private var nextSlot: Date?
     var enabled: Bool { saved.enabled && !unreadable }
-    var needsClipboardSignal: Bool {
-        enabled && catalog.contains { $0.signal == .clipboardChanged && !suppressed($0) }
-    }
 
     init(defaults: UserDefaults = .standard, catalog: [DiscoveryProposal]? = nil) {
         self.defaults = defaults
