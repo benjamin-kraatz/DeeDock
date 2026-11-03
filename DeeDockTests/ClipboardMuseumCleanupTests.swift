@@ -61,6 +61,16 @@ struct ClipboardMuseumCleanupTests {
         }
     }
 
+    @Test("The production folder is the Museum's own, never the Shelf's clipboard folder")
+    func productionDirectory() throws {
+        let directory = try #require(ClipboardMuseumCleanup.defaultDirectory)
+        let support = try #require(FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
+        let bundleID = try #require(Bundle.main.bundleIdentifier)
+        #expect(directory.standardizedFileURL == support.appendingPathComponent(bundleID, isDirectory: true)
+            .appendingPathComponent("ClipboardMuseum", isDirectory: true).standardizedFileURL)
+        #expect(directory.lastPathComponent != "Clipboard")
+    }
+
     @Test("An unresolvable folder skips without deleting anything and retries later")
     func unresolvedDirectorySkips() throws {
         try withSandbox { defaults, _ in
