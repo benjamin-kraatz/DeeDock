@@ -51,6 +51,9 @@ struct NotificationFeedRow: View {
     let isNew: Bool
     let isSelected: Bool
     var placement: NotificationFeedRowPlacement = .single
+    /// Swaps the text fade of a folding or unfolding card for the 150 ms cross-fade. Passed down
+    /// from the panel rather than read here, so previews can force it.
+    var reduceMotion = false
     let actions: NotificationFeedRowActions
 
     @Environment(\.locale) private var locale
@@ -71,7 +74,7 @@ struct NotificationFeedRow: View {
                     }
                     if placement.isStackFront {
                         NotificationFeedCountCapsule(count: placement.count)
-                            .transition(.opacity.animation(NotificationFeedMotion.contentFade))
+                            .transition(.opacity.animation(NotificationFeedMotion.contentFade(reduceMotion: reduceMotion)))
                     }
                     Spacer(minLength: 4)
                     Text(verbatim: arrival(.abbreviated))
@@ -96,7 +99,7 @@ struct NotificationFeedRow: View {
         // A peeking card shows no text, only its edge; the text fades in as the stack unfolds.
         // Its own curve, so it also fades under Reduce Motion, where the layout does not animate.
         .opacity(placement.isPeek ? 0 : 1)
-        .animation(NotificationFeedMotion.contentFade, value: placement.isPeek)
+        .animation(NotificationFeedMotion.contentFade(reduceMotion: reduceMotion), value: placement.isPeek)
         // Fill whatever height the stack proposes, so a peeking card matches the front card.
         .frame(maxHeight: .infinity, alignment: .top)
         .background { background }
@@ -221,7 +224,8 @@ struct NotificationFeedRow: View {
             shape.fill(Color.accentColor.opacity(hovered ? 0.22 : 0.18))
                 .overlay { shape.strokeBorder(Color.accentColor.opacity(0.7), lineWidth: 1.5) }
         } else if placement.isPeek {
-            shape.fill(.primary.opacity(placement.depth == 1 ? 0.065 : 0.042))
+            // The mockup's peek fills: the nearer card a touch brighter than the one behind it.
+            shape.fill(.primary.opacity(placement.depth == 1 ? 0.07 : 0.045))
                 .overlay { shape.strokeBorder(.primary.opacity(0.085), lineWidth: 0.5) }
         } else {
             shape.fill(.primary.opacity(hovered ? 0.08 : 0.04))

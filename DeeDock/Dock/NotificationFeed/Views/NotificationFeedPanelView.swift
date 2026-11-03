@@ -110,6 +110,24 @@ private struct NotificationFeedFooter: View {
         .frame(width: 380, height: 480)
 }
 
+#Preview("Expanded stack, dark, German") {
+    let state = NotificationFeedPreviewData.state()
+    if let messages = NotificationFeedGrouping.groups(NotificationFeedPreviewData.entries).first(where: { $0.appName == "Messages" }) {
+        state.setExpanded(messages, true)
+    }
+    return NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening, state: state)
+        .frame(width: 380, height: 480)
+        .preferredColorScheme(.dark)
+        .environment(\.locale, Locale(identifier: "de"))
+}
+
+#Preview("Grouped, opaque, dark") {
+    NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening,
+                              state: NotificationFeedPreviewData.state(), forceOpaqueBackground: true)
+        .frame(width: 380, height: 480)
+        .preferredColorScheme(.dark)
+}
+
 #Preview("Mid-swipe, light") {
     let state = NotificationFeedPreviewData.state()
     state.swipe.previewReveal(NotificationFeedPreviewData.entries[1].id, by: 96)

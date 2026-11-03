@@ -22,8 +22,15 @@ enum NotificationFeedMotion {
         reduceMotion ? nil : spring
     }
 
-    /// Text fading in as a peeking card becomes a row, and out as it folds back.
-    static let contentFade = Animation.easeOut(duration: 0.2)
+    /// Text fading in as a peeking card becomes a row, and out as it folds back. Under Reduce
+    /// Motion it is the 150 ms cross-fade, the only thing that moves when a stack unfolds.
+    static func contentFade(reduceMotion: Bool) -> Animation {
+        reduceMotion ? reduced : .easeOut(duration: 0.2)
+    }
+
+    /// The fade of a leaving row. It runs on its own ease-in instead of the spring, which would
+    /// overshoot opacity and read as a flicker; the mockup fades every ghost this way.
+    static let leaveFade = Animation.easeIn(duration: 0.32)
 
     /// How long an opened entry drops before the popover closes, so the drop reads before the
     /// panel fades. Matches the mockup's `min(260 ms, settle × 0.55)`.
@@ -31,9 +38,12 @@ enum NotificationFeedMotion {
         reduceMotion ? .milliseconds(120) : .milliseconds(210)
     }
 
-    /// How long a group takes to fold its rows into the front card before the card fades.
+    /// How long a cleared group folds its rows before the front card starts to fade. The spring
+    /// has the rows about 80 % tucked in by then, and ``leaveFade`` starts slowly, so the fold's
+    /// tail and the fade overlap as they do in the mockup, where the rows converge and fade
+    /// together.
     static func foldDelay(reduceMotion: Bool) -> Duration {
-        reduceMotion ? .zero : .milliseconds(220)
+        reduceMotion ? .zero : .milliseconds(160)
     }
 
     /// Distance an opened entry travels toward the dock while it fades.
@@ -67,9 +77,9 @@ extension NotificationFeedLeaveStyle {
         let removal: AnyTransition
         switch self {
         case .shrink:
-            removal = .scale(scale: 0.92).combined(with: .opacity)
+            removal = AnyTransition.scale(scale: 0.92)
+                .combined(with: AnyTransition.opacity.animation(NotificationFeedMotion.leaveFade))
         case .drop:
-            // The fade runs on its own, quicker curve so a bouncy spring never overshoots opacity.
             let distance = NotificationFeedMotion.dropDistance
             let offset: CGSize = switch edge {
             case .bottom: CGSize(width: 0, height: distance)
@@ -78,7 +88,7 @@ extension NotificationFeedLeaveStyle {
             case .right: CGSize(width: distance, height: 0)
             }
             removal = AnyTransition.offset(offset).combined(with: .scale(scale: 0.86))
-                .combined(with: AnyTransition.opacity.animation(.easeIn(duration: 0.28)))
+                .combined(with: AnyTransition.opacity.animation(NotificationFeedMotion.leaveFade))
         case .swiped:
             removal = .opacity.animation(.linear(duration: 0.01))
         }

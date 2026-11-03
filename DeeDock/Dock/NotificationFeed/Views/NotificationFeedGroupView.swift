@@ -25,7 +25,7 @@ struct NotificationFeedGroupView: View {
                     showsClear: hovered,
                     showLess: { withAnimation(motion) { state.setExpanded(group, false) } },
                     clear: { state.clearGroup?(group, .hoverX) })
-                .transition(.opacity.animation(.easeOut(duration: reduceMotion ? 0.15 : 0.22)))
+                .transition(headerTransition)
             }
             NotificationFeedStackLayout(isExpanded: isExpanded || !group.isStack) {
                 ForEach(Array(group.entries.enumerated()), id: \.element.id) { index, entry in
@@ -40,6 +40,14 @@ struct NotificationFeedGroupView: View {
         .onHover { hovered = $0 }
     }
 
+    /// The header fades in over 220 ms as the rows slide out, and out a little quicker, over
+    /// 160 ms, so it is gone before the rows finish tucking back in.
+    private var headerTransition: AnyTransition {
+        if reduceMotion { return .opacity.animation(NotificationFeedMotion.reduced) }
+        return .asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.22)),
+                           removal: .opacity.animation(.easeOut(duration: 0.16)))
+    }
+
     private func row(_ entry: NotificationFeedEntry, at index: Int) -> some View {
         let placement = NotificationFeedRowPlacement(index: index, count: group.entries.count,
                                                      isFolded: group.isStack && !isExpanded)
@@ -52,6 +60,7 @@ struct NotificationFeedGroupView: View {
                                 isNew: state.unreadOnOpen.contains(entry.id),
                                 isSelected: state.selection == entry.id,
                                 placement: placement,
+                                reduceMotion: reduceMotion,
                                 actions: actions(for: entry, placement: placement, canOpen: application != nil))
         }
     }
@@ -83,3 +92,49 @@ struct NotificationFeedGroupView: View {
                 ? { withAnimation(motion) { state.setExpanded(group, false) } } : nil)
     }
 }
+
+#if DEBUG
+/// Every placement at once: Messages unfolded under its header, Mail folded with two cards
+/// peeking out, and the single rows between them.
+private struct NotificationFeedGroupPreview: View {
+    let reduceMotion: Bool
+    private let groups = NotificationFeedGrouping.groups(NotificationFeedPreviewData.entries)
+    private let state: NotificationFeedPanelState
+
+    init(reduceMotion: Bool) {
+        self.reduceMotion = reduceMotion
+        state = NotificationFeedPreviewData.state()
+        if let messages = groups.first(where: { $0.appName == "Messages" }) {
+            state.setExpanded(messages, true)
+        }
+        state.selection = groups.first(where: { $0.appName == "Mail" })?.front.id
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ForEach(groups) { group in
+                NotificationFeedGroupView(group: group, now: NotificationFeedPreviewData.now, state: state,
+                                          reduceMotion: reduceMotion)
+            }
+        }
+        .padding(10)
+        .frame(width: 380)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+#Preview("Stacks, light") {
+    NotificationFeedGroupPreview(reduceMotion: false)
+        .preferredColorScheme(.light)
+}
+
+#Preview("Stacks, dark, German") {
+    NotificationFeedGroupPreview(reduceMotion: false)
+        .preferredColorScheme(.dark)
+        .environment(\.locale, Locale(identifier: "de"))
+}
+
+#Preview("Stacks, Reduce Motion") {
+    NotificationFeedGroupPreview(reduceMotion: true)
+}
+#endif
