@@ -34,7 +34,7 @@ struct LauncherResultButton: View {
 
     var body: some View {
         Button {
-            if let searchResult { state.search.activate(searchResult) } else { state.open(application) }
+            if let searchResult { state.search.activate(searchResult) } else { state.launch(application) }
         } label: {
             Group {
                 if state.layout == .grid { gridLabel } else { listLabel }

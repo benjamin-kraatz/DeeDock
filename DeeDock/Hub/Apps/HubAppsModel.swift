@@ -16,8 +16,9 @@ import Observation
 ///
 /// ## Lifecycle
 /// ``hubTabDidAppear(shell:)`` begins a launcher presentation (window discovery, a fresh
-/// suggestion prediction, app discovery) and ``hubTabDidDisappear()`` ends it, cancelling all of
-/// that work. The query and browse options survive tab switches.
+/// suggestion prediction, app discovery) and ``hubTabDidDisappear(_:)`` ends it, cancelling all of
+/// that work and reporting the visit (`launcher_closed`). The query and browse options survive tab
+/// switches.
 @MainActor @Observable
 final class HubAppsModel: HubTabModel {
     /// The launcher state this tab presents.
@@ -103,12 +104,12 @@ final class HubAppsModel: HubTabModel {
         uninstaller.tabDidAppear()
     }
 
-    func hubTabDidDisappear() {
+    func hubTabDidDisappear(_ exit: HubTabExit) {
         uninstaller.tabDidDisappear()
         removeMenuObservers()
         if let display { scrollByDisplay[display.displayID] = launcher.browseScroll }
         // Ending cancels an open file chooser, which reports `false` through `choosingChanged`.
-        launcher.end()
+        launcher.end(exit == .switchedTab ? .switchedTab : .closed)
         launcher.fileActions.choosingChanged = nil
         for hold in holds { shell?.endHold(hold.reason) }
         holds = []
@@ -137,7 +138,7 @@ final class HubAppsModel: HubTabModel {
             if launcher.keyboardNavigationActive { clearKeyboardSelection(); return true }
             return false
         case KeyCode.return, KeyCode.keypadEnter:
-            if modifiers.isEmpty { launcher.openSelection(); return true }
+            if modifiers.isEmpty { Analytics.performing(.keyboard) { launcher.openSelection() }; return true }
             if modifiers == .command { toggleRobi(); return true }
             return false
         case KeyCode.down where modifiers.isEmpty:

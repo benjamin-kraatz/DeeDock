@@ -140,7 +140,15 @@ extension LauncherState {
     func suggestionFeedback(_ application: LauncherApplication, kind: LauncherSuggestionFeedback.Kind) {
         guard let snapshot = suggestions.snapshot,
               suggestedApplications.contains(where: { $0.id == application.id }) else { return }
+        recordVisit(.feedback)
         catalog.suggestions.feedback(appID: application.id, kind: kind, snapshot: snapshot)
+    }
+
+    /// Never suggests the app again (a card's context menu). Reported as feedback `excluded`.
+    func excludeSuggestion(_ application: LauncherApplication) {
+        recordVisit(.feedback)
+        Analytics.track(.launcherSuggestionFeedback(.excluded))
+        catalog.suggestions.exclude(appID: application.id)
     }
 
     /// Recheck at deliberate activation so a removed bundle cannot keep a stale selectable tile.
@@ -151,6 +159,7 @@ extension LauncherState {
             return
         }
         Analytics.track(.launcherSuggestionAccepted(trigger: Analytics.trigger()))
+        reportBrowseActivation(application, suggested: true, reveal: false)
         open(application)
     }
 

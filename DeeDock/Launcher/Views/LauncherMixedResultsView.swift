@@ -65,6 +65,15 @@ struct LauncherMixedResultsView<Header: View>: View {
                     .onChange(of: state.results.map(\.id), initial: true) {
                         if let id = state.selectedID { proxy.scrollTo(id, anchor: .center) }
                     }
+                    // A new results list starts at the top. The Bool transform calls the action
+                    // only when it flips, so scrolling does no analytics work per frame.
+                    .onAppear { state.scrolled = false }
+                    .onScrollGeometryChange(for: Bool.self) { geometry in
+                        geometry.contentOffset.y > LauncherVisit.scrollThreshold
+                    } action: { _, scrolled in
+                        state.scrolled = scrolled
+                        if scrolled { launcher.recordScrolled() }
+                    }
                 }
             }
         }
@@ -164,14 +173,14 @@ struct LauncherMixedResultMenu: View {
                 .disabled(launcher.search.actionBusy || launcher.search.ranking)
         } else {
             Button {
-                launcher.search.activate(result)
+                Analytics.performing(.menu) { launcher.search.activate(result) }
             } label: {
                 Text(result.action)
             }
             .disabled(result.unavailable || launcher.search.actionBusy)
             if case .shelf = result.id {
                 Button {
-                    launcher.search.activate(result, reveal: true)
+                    Analytics.performing(.menu) { launcher.search.activate(result, reveal: true) }
                 } label: {
                     Text(.unifiedRevealFile)
                 }

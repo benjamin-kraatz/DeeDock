@@ -324,21 +324,60 @@ from App Melt.
 
 | Event | Properties |
 | --- | --- |
-| `launcher_closed` | Sent when the Hub's Apps tab is hidden: another tab is selected or the Hub closes. `duration` (seconds since the tab appeared), `had_query` (search text present when it was hidden) |
+| `launcher_closed` | Sent when the Hub's Apps tab is hidden: another tab is selected or the Hub closes. One per visit. `duration` (seconds since the tab appeared), `had_query` (search text present when it was hidden), `outcome` (see below), `action_count` (actions in the visit), `option_count` (`launcher_option_changed` events in the visit), `scrolled` (the grid, list, or search results were more than 4 pt from the top at some point in the visit) |
 | `launcher_searched` | `query_length`, `result_count`, `kind`. Never the text. |
-| `launcher_result_activated` | `kind`, `reveal`, `trigger` |
-| `launcher_suggestion_accepted` | `trigger` |
+| `launcher_result_activated` | One per app or search result opened or shown in Finder from the tab. `kind` (`application`, `window`, `capsule`, `shelf`, `shortcut`), `reveal` (Show in Finder rather than open), `trigger` (`click`, `keyboard` for Return, `menu` for the context menu or the options menu, `voice_over` for a Suggested card's VoiceOver action), `source` (`search` for results of typed text, `browse` for the grid or list without text, a chosen result type with no text included, `suggestion` for a Suggested card, `robi` for Robi's picks), `position` (0-based, see below), `scrolled` (those results were more than 4 pt from the top when it was chosen) |
+| `launcher_suggestion_accepted` | `trigger`. A Suggested card also sends `launcher_result_activated` with `source = suggestion`. |
 | `launcher_tool_opened` | `tool` |
 | `launcher_file_action` | `action`, `input_count`, `source`, `file_type`, `status` |
 | `launcher_assistant_asked` | `query_length`, `result_count`, `outcome` |
 | `launcher_suggestions_shown` | `count`. Once per suggestion set, when it is first seen. |
-| `launcher_suggestion_feedback` | `feedback` (`useful`, `not_now`). Never which app. |
+| `launcher_suggestion_feedback` | `feedback` (`useful`, `not_now`, `excluded` for "Never suggest this app"). Never which app. |
 | `launcher_suggestion_prompt_answered` | `answer` (`useful`, `not_useful`, `no_answer`) |
+| `launcher_option_changed` | A browse option chosen in the options menu or with the sort chips. `option` (`result_type`, `filter`, `location`, `nested_apps`, `sort`, `grouping`, `layout`, `reset`), `value` (the chosen case: `result_type` as `kind` above; `filter` `all`, `running`, `pinned`, `recent`, `favorites`; `location` `all`, `applications_folders`, `standard_mac_locations`; `nested_apps` a Bool; `sort` `name`, `recent`, `frequent`; `grouping` `none`, `category`, `letter`; `layout` `grid`, `list`; absent for `reset`). Choosing the current value sends nothing. |
+| `launcher_favorite_changed` | `favorite` (`true` when added, `false` when removed). Never which app. |
+| `launcher_history_cleared` | No properties. Launch history was cleared after the confirmation. |
 
 `launcher_tool_opened` now also fires for the System Settings clone. The Launcher now lives in the
 DOKK Hub's Apps tab, so its events describe that tab. `launcher_opened` and the `dock_launcher_style`
 context property were retired with the Compact and Full Launcher styles; `hub_opened` replaces
 `launcher_opened`.
+
+**Visit outcome.** `launcher_closed.outcome` is the strongest action of the visit, in this order,
+or how the tab was left when there was none:
+
+| `outcome` | Action |
+| --- | --- |
+| `launched` | An app opened: grid, list, search, Suggested card, or Robi's picks, by click, Return, or the context menu |
+| `opened_result` | A window, capsule, Shelf file, or Shortcut from search |
+| `file_action` | A file action started, Find Similar included |
+| `tool` | A DOKK tool, Create Capsule on an app, Capture & image search, or Settings… in the options menu |
+| `revealed` | Show in Finder, for an app or a Shelf file |
+| `managed` | Favorite added or removed, Pin or Unpin, Pin on Display, Uninstall… opened, or launch history cleared |
+| `feedback` | Useful suggestion, Not useful right now, or Never suggest this app on a Suggested card |
+| `robi` | Robi was asked (by the button or ⌘↩) |
+| `switched_tab` | No action; another Hub tab was selected |
+| `none` | No action; the Hub closed |
+
+`action_count` counts every action in the table, so a visit with two launches has `action_count = 2`.
+Actions are counted when they are accepted, before macOS reports whether an open worked. Typing,
+arrow keys, hover, scrolling, choosing options, Choose Files…, Refresh, and the suggestions survey
+are not actions. Moving the Hub to another display closes and reopens it, which ends the visit.
+
+**Positions.** `launcher_result_activated.position` is 0-based in the order the source drew its
+items: for `suggestion`, among the Suggested cards; for `browse` and `robi` in the grid or list,
+among the apps section by section (Suggested cards and DOKK's tools are not counted); for search
+results, among the visible results with app sections first and other kinds after them, as drawn.
+Matching DOKK tools above search results are not counted. It is absent when the item was no longer
+among the visible results.
+
+Changes in DEE-154: `launcher_result_activated` was sent for search results only and reported every
+Return as `click`. It now covers grid, list, Suggested-card, and Robi launches and Show in Finder
+from them, and adds `source`, `position`, and `scrolled`; `kind`, `reveal`, and `trigger` keep
+their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they apply.
+`launcher_closed` gained `outcome`, `action_count`, `option_count`, and `scrolled`.
+`launcher_option_changed`, `launcher_favorite_changed`, `launcher_history_cleared`, and
+`launcher_suggestion_feedback = excluded` are new.
 
 ### DOKK Hub
 

@@ -82,7 +82,9 @@ private struct HubAppsSortChips: View {
     }
 
     private func chip(_ sort: LauncherSort, title: LocalizedStringResource) -> some View {
-        HubAppsChip(title: title, isOn: launcher.sort == sort) { launcher.sort = sort }
+        HubAppsChip(title: title, isOn: launcher.sort == sort) {
+            launcher.choose(\.sort, sort, as: AnalyticsLauncherOption.sort)
+        }
     }
 }
 
