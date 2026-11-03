@@ -54,8 +54,11 @@ private struct NotificationFeedSwipeAction: View {
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                        .fixedSize()
-                        .frame(minWidth: NotificationFeedSwipePhysics.actionWidth)
+                        // Longer labels ("Alle löschen" on a stack) shrink a little instead of
+                        // running into the action's rounded edges.
+                        .minimumScaleFactor(0.75)
+                        .padding(.horizontal, 6)
+                        .frame(width: NotificationFeedSwipePhysics.actionWidth)
                         .opacity(width > NotificationFeedSwipePhysics.labelThreshold ? 1 : 0)
                         .animation(.easeOut(duration: 0.12), value: width > NotificationFeedSwipePhysics.labelThreshold)
                 }
