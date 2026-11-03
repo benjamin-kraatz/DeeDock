@@ -308,12 +308,10 @@ the 865 MB download takes and why it fails. The first pass's file names, which o
 | `markup` | `action`, `has_marks` |
 | `file_handoff` | `action` (`shown`, `activated`, `copied`, `opened`), `file_count`, `exact_window`, `outcome`. `shown` fails when the dropped files cannot be routed. `opened` is `partial` when only some files opened. |
 
-### Window Search and Fusion
+### Fusion
 
 | Event | Properties |
 | --- | --- |
-| `window_search_activated` | `evidence` (`metadata`, `text`, `capsule`, `historical_ocr`, `image`), `scope` (`live`, `captured`, `saved`), `query_length`, `result_count`, `outcome` |
-| `window_search_closed` | `scope`, `query_length`, `result_count`, `activated`, `duration` |
 | `fusion` | `step` (`capture`, `generate`, `save`), `outcome`, `failure` (`model_unavailable`, `context_limit`, `refused`, `invalid_output`, `timeout`, `capture_denied`, `capture_failed`, `save_failed`), `operation` (`compare`, `differences`, `checklist`) for `generate`, `duration` |
 
 Cancelled Fusion work sends nothing. Opening Fusion from Window Peek or an App Melt pair is
@@ -403,7 +401,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
 | `harbor_opened` (Radar; Harbor is its internal name) | `trigger`, `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
 | `harbor_closed` | `outcome` (`window`, `app`, `restored`, `dismissed`, `interrupted`), `duration`, `searched`, `filtered` (the strip's app filter was used), `closed_windows` |
-| `tool_opened` | `tool` (`window_search`, `local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
+| `tool_opened` | `tool` (`local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
 | `focus_dock_entered` | `trigger` |
 | `focus_dock_command` | `command` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
@@ -573,7 +571,6 @@ prompt or answer contains:
 | `session_capsule_compose` | window titles, recognized window text, the generated summary |
 | `fusion_compose` | the instruction, window titles and text, the generated result |
 | `semantic_stack_organize` | file and folder names, the generated group titles |
-| `window_search_image_match` | the search phrase and the model's description of the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
 | `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu overview and any menu pages the model asked for, and the answer, on this Mac or from Claude |
 | `robi_suggest_questions` | Robi's instructions, what the person picked, and the suggested questions |

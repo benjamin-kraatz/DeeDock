@@ -19,7 +19,6 @@ final class LauncherSearchState {
     var capsules: SessionCapsuleController?
     var actions: ActionTilesController?
     @ObservationIgnored var dispatch: ((LauncherSearchResult, Bool) -> Void)?
-    @ObservationIgnored var explicitSearch: (() -> Void)?
     @ObservationIgnored private var service: WindowSearchService?
     @ObservationIgnored private var sources: [WindowSearchSource] = []
     @ObservationIgnored private var discovery: Task<Void, Never>?

@@ -49,11 +49,6 @@ struct DeeDockApp: App {
                     .disabled(!delegate.coordinator.canFocus)
             } header: { Text(.menuSectionDock) }
             Section {
-                // The hint shows the shortcut that works from any app, when it could be registered.
-                Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
-                    .keyboardShortcut(delegate.coordinator.searchShortcutAvailable
-                        ? KeyboardShortcut(.space, modifiers: [.command, .shift])
-                        : KeyboardShortcut("f", modifiers: [.command, .shift]))
                 HarborMenuButton(harbor: delegate.coordinator.harbor) { delegate.coordinator.showHarbor() }
                 Button(.actionBrowseLocalHistory) { delegate.coordinator.browseLocalHistory() }
                     .disabled(!delegate.coordinator.canBrowseLocalHistory)
@@ -93,8 +88,6 @@ struct DeeDockApp: App {
                 CheckForUpdatesButton(updater: delegate.updater, source: .appMenu)
                 Button(.onboardingShowWelcome) { delegate.onboarding.present() }
 
-                Button(.windowSearchTitle) { delegate.coordinator.searchWindows() }
-                    .keyboardShortcut("f", modifiers: [.command, .shift])
                 Button(.harborShow) { delegate.coordinator.showHarbor() }
                 Button(.actionFocusDock) { delegate.coordinator.focusDock() }
                 .disabled(!delegate.coordinator.canFocus)

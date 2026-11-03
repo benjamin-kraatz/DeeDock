@@ -62,11 +62,7 @@ enum AnalyticsEvent {
     case markup(AnalyticsMarkupAction, hasMarks: Bool?)
     case fileHandoff(AnalyticsFileHandoffAction, fileCount: Int, exactWindow: Bool, outcome: AnalyticsOutcome)
 
-    // Window Search and Fusion
-    case windowSearchActivated(AnalyticsWindowSearchEvidence, scope: WindowSearchScope, queryLength: Int,
-                               resultCount: Int, outcome: AnalyticsOutcome)
-    case windowSearchClosed(scope: WindowSearchScope, queryLength: Int, resultCount: Int, activated: Bool,
-                            duration: Double)
+    // Fusion
     case fusion(AnalyticsFusionStep, outcome: AnalyticsOutcome, failure: AnalyticsFusionFailure?,
                 operation: FusionOperation?, duration: Double)
 

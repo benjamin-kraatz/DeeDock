@@ -163,9 +163,7 @@ Unreadable stores show a notice without removing other providers' results or rew
 
 Right-click a row for its actions, or use Tab to reach **Result actions** for the keyboard-selected
 row. App results retain their full existing menu. Shelf files also offer **Show in Finder**;
-window results offer metadata refresh. **Capture & image search…** opens the existing explicit
-window-search flow with its capture chooser, OCR, and separately labeled model suggestions.
-The existing **Find a Window** entry points and keyboard shortcut keep their existing controls.
+window results offer metadata refresh.
 
 ## Views and history
 

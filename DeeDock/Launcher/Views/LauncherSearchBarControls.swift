@@ -49,9 +49,6 @@ struct LauncherSearchBarOverflowMenu: View {
                 Divider()
             }
             chooseFiles
-            if !state.usesFileActions {
-                capture
-            }
             Divider()
             maintenance
         } label: {
@@ -191,18 +188,6 @@ struct LauncherSearchBarOverflowMenu: View {
                 Text(.launcherFileChooseFiles)
             } icon: {
                 Image(systemName: "doc.badge.plus")
-            }
-        }
-    }
-
-    private var capture: some View {
-        Button {
-            state.search.explicitSearch?()
-        } label: {
-            Label {
-                Text(.unifiedCaptureRoute)
-            } icon: {
-                Image(systemName: "camera.viewfinder")
             }
         }
     }

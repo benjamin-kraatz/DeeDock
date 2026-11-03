@@ -59,7 +59,7 @@ final class HubAppsModel: HubTabModel {
     ///
     /// The Hub owner creates the launcher once with `LauncherState(catalog: catalog)` and wires the
     /// app-wide hooks the dock coordinator used to set per panel: `search` (`shelf`, `capsules`,
-    /// `actions`, `dispatch`, `explicitSearch`), `fileActions.configure(...)`,
+    /// `actions`, `dispatch`), `fileActions.configure(...)`,
     /// `createCapsule`, and `openTool`. This model owns `close`, `didOpen`,
     /// `dockStore`, `usesLineIcons`, `lineIconMotion`, and `suggestionVisibility`; do not set
     /// those elsewhere.
