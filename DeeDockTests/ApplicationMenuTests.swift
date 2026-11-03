@@ -29,7 +29,7 @@ struct ApplicationMenuTests {
             window("  \n", sessionID: sessionID),
         ]
 
-        #expect(ApplicationContextMenuProjection.windowTitles(windows, untitled: "Untitled") == [
+        #expect(windows.map { ApplicationContextMenuProjection.windowTitle($0, untitled: "Untitled") } == [
             " Report ", "Report", "Untitled", "Untitled",
         ])
         #expect(Set(windows.map(\.token)).count == windows.count)

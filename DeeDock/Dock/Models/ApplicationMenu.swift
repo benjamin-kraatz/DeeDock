@@ -45,7 +45,7 @@ nonisolated enum ApplicationWindowDiscoveryFailure: Equatable, Sendable {
     case unknown
 }
 
-/// Window section shown by an application's native context menu.
+/// Progress of the window discovery behind Window Peek and a tile's VoiceOver window actions.
 nonisolated enum ApplicationWindowMenuState: Equatable, Sendable {
     case hidden
     case loading
@@ -113,10 +113,6 @@ nonisolated enum ApplicationContextMenuProjection {
             actions.append(.stopRunningInBackground)
         }
         return actions
-    }
-
-    static func windowTitles(_ windows: [ApplicationWindowSummary], untitled: String) -> [String] {
-        windows.map { windowTitle($0, untitled: untitled) }
     }
 
     static func windowTitle(_ window: ApplicationWindowSummary, untitled: String) -> String {
