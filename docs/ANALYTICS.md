@@ -198,7 +198,8 @@ a code change.
 ## Events
 
 Every feature event carries a `trigger` where the entry point can tell: `click`, `keyboard`,
-`voice_over`, `menu`, `drag`, `spring_load`, `hover`, `hotkey`, `automatic`, `launcher`.
+`voice_over`, `menu`, `drag`, `spring_load`, `hover`, `hotkey`, `hotkey_alternate`, `automatic`, `launcher`.
+`hotkey_alternate` is a feature's second global shortcut; only Radar has one (⇧⌘Space).
 Entry points that do not mark themselves report `click`.
 
 ### Settings and periodic
@@ -427,7 +428,7 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `app_melt` | `action`, `pair_count`, `outcome` |
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`, `harbor` for Radar), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
 | `plugin_panel_opened` | `trigger`, `pinned_count` (plugin tiles in the dock) |
 | `plugin_panel_closed` | `duration`, `stopped` (the plugin had stopped by then) |
 | `plugin_stopped` | `panel_open`. A plugin process ended without DOKK asking, or never answered. |
@@ -438,7 +439,7 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `line_icon_coverage` | `installed_app_count`, `installed_line_icon_count`, `installed_coverage` (0 to 1), `pinned_app_count`, `pinned_line_icon_count`, `pinned_coverage` (0 to 1), `missing_public_count`, `missing_unlisted_count`, `missing_bundle_ids` (array), `missing_pinned_bundle_ids` (array). See [Line icon coverage](#line-icon-coverage). |
 | `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
-| `harbor_opened` (Radar; Harbor is its internal name) | `trigger`, `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
+| `harbor_opened` (Radar; Harbor is its internal name) | `trigger` (`hotkey` for ⌥⇧⌘Space, `hotkey_alternate` for ⇧⌘Space), `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
 | `harbor_closed` | `outcome` (`window`, `app`, `restored`, `dismissed`, `interrupted`), `duration`, `searched`, `filtered` (the strip's app filter was used), `closed_windows` |
 | `tool_opened` | `tool` (`local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
 | `focus_dock_entered` | `trigger` |

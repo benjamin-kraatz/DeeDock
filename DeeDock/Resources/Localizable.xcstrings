@@ -3205,6 +3205,60 @@
         }
       }
     },
+    "discoveryHarborMessage" : {
+      "comment" : "Discovery callout text announcing Radar. Find a Window was the removed window search; use its former German name „Fenster suchen“.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar ersetzt „Fenster suchen“ und zeigt alle Fenster in diesem Space, nach App gruppiert. Klick auf eins, um es nach vorn zu holen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar replaces Find a Window and shows every window in this Space, grouped by app. Click one to bring it forward."
+          }
+        }
+      }
+    },
+    "discoveryHarborOpen" : {
+      "comment" : "Discovery callout button that opens Radar right away.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Radar"
+          }
+        }
+      }
+    },
+    "discoveryHarborTitle" : {
+      "comment" : "Discovery callout title announcing that Shift-Command-Space (⇧⌘Space) opens Radar, DOKK's window overview. Radar is a feature name; keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⇧⌘Leertaste öffnet jetzt Radar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⇧⌘Space now opens Radar"
+          }
+        }
+      }
+    },
     "discoveryIslandsMessage" : {
       "comment" : "Discovery callout message announcing DOKK Islands.",
       "extractionState" : "manual",
@@ -20002,37 +20056,73 @@
       }
     },
     "harborShortcutConflict" : {
-      "comment" : "Settings status when Radar's shortcut could not be registered. The symbols are Option, Shift, Command, and the Space bar.",
+      "comment" : "Settings status when neither of Radar's shortcuts could be registered. ⇧⌘Space is Shift-Command-Space; ⌥⇧⌘Space is Option-Shift-Command-Space.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine andere App verwendet bereits ⌥⇧⌘Leertaste. Radar bleibt über die Menüleiste und die Dock-Kachel erreichbar."
+            "value" : "⇧⌘Leertaste und ⌥⇧⌘Leertaste sind beide schon von anderen Apps belegt. Radar bleibt über die Menüleiste und die Dock-Kachel erreichbar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Another app already uses ⌥⇧⌘Space. Radar stays available from the menu bar and the dock tile."
+            "value" : "⇧⌘Space and ⌥⇧⌘Space are both taken by other apps. Radar stays available from the menu bar and the dock tile."
+          }
+        }
+      }
+    },
+    "harborShortcutConflictAlternate" : {
+      "comment" : "Settings status when another app holds Shift-Command-Space (⇧⌘Space) but Radar's Option-Shift-Command-Space (⌥⇧⌘Space) works.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet bereits ⇧⌘Leertaste. Radar öffnet sich weiter mit ⌥⇧⌘Leertaste."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app already uses ⇧⌘Space. Radar still opens with ⌥⇧⌘Space."
+          }
+        }
+      }
+    },
+    "harborShortcutConflictPrimary" : {
+      "comment" : "Settings status when another app holds Option-Shift-Command-Space (⌥⇧⌘Space) but Radar's Shift-Command-Space (⇧⌘Space) works.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet bereits ⌥⇧⌘Leertaste. Radar öffnet sich weiter mit ⇧⌘Leertaste."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app already uses ⌥⇧⌘Space. Radar still opens with ⇧⌘Space."
           }
         }
       }
     },
     "harborShortcutToggle" : {
-      "comment" : "Settings switch for Radar's global keyboard shortcut. The symbols are Option, Shift, Command, and the Space bar.",
+      "comment" : "Settings switch for both of Radar's global keyboard shortcuts. ⇧⌘Space is Shift-Command-Space; ⌥⇧⌘Space is Option-Shift-Command-Space.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mit ⌥⇧⌘Leertaste öffnen"
+            "value" : "Mit ⇧⌘Leertaste oder ⌥⇧⌘Leertaste öffnen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open with ⌥⇧⌘Space"
+            "value" : "Open with ⇧⌘Space or ⌥⇧⌘Space"
           }
         }
       }
@@ -20134,13 +20224,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standardmäßig aus. Fügt neben der Ablage eine Radar-Kachel hinzu."
+            "value" : "Fügt neben der Ablage eine Radar-Kachel hinzu."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Off by default. Adds a Radar tile next to the Shelf."
+            "value" : "Adds a Radar tile next to the Shelf."
           }
         }
       }

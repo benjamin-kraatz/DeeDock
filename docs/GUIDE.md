@@ -224,7 +224,7 @@ See [App Compare](APP_FUSION.md) for input lifetime, save recovery, and storage 
 
 ### Radar
 
-Radar shows every window in the current Space at once, grouped by app. Press Option-Shift-Command-Space from any app, choose **Show Radar** from the DOKK menu, or click the Radar tile. The tile is off by default; turn it on in **Settings → Windows & Focus → Radar**, where you can also turn off the shortcut and show app names in the strip. When another app already uses the shortcut, Settings says so and the menu stops showing it.
+Radar shows every window in the current Space at once, grouped by app. It replaces Find a Window. Press Shift-Command-Space or Option-Shift-Command-Space from any app, choose **Show Radar** from the DOKK menu, or click the Radar tile. The tile is on for new installs; on a Mac that ran an earlier DOKK it stays as it was, which is off unless you turned it on. Change it in **Settings → Windows & Focus → Radar**, where one switch also turns off both shortcuts, and you can show app names in the strip. Each shortcut works on its own: when another app already uses one, Settings names it and says which one still opens Radar, and the menu shows the one DOKK holds. A DOKK Discovery tip announces Shift-Command-Space until you open Radar; its **Open Radar** button opens it.
 
 Radar covers each display with its blurred wallpaper and flies the windows into a grid of app groups. The most recently used app leads in its own row with larger thumbnails. The desktop dims first, then the windows fly, as in Mission Control. The dock itself transforms: pins that are not running and the Trash shrink away, the running apps slide together, their window counts appear, and the Radar tile lights up. App names under the icons are off by default. Closing plays this backwards and the strip lands on the dock. When the dock is hidden, the strip slides in at the dock's edge instead. Minimized windows and windows of hidden apps appear as chips inside their app's group. With Accessibility, larger thumbnails carry a second caption line: the folder of a document, the path of a Finder window, or the address of a web page. When even the smallest thumbnails do not fit, the grid scrolls.
 
@@ -523,7 +523,7 @@ See [Atmosphere acceptance](ACCEPTANCE.md#dee-73-atmosphere) for runtime limitat
 
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. Three observed clipboard changes followed by five calm seconds can suggest Clipboard Museum. Museum collection stays opt-in. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 

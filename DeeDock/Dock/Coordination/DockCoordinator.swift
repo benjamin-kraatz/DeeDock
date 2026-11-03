@@ -222,6 +222,8 @@ final class DockCoordinator {
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
         if robi.store.settings.isEnabled { discovery.markUsed(.robi) }
+        // Someone who turned Radar's shortcuts off has been to its settings, and the tip names a shortcut.
+        if !settings.value.harborShortcutEnabled { discovery.markUsed(.harbor) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configurePlugins()
         configureHarbor()
@@ -259,6 +261,9 @@ final class DockCoordinator {
                 return .none
             case .robi:
                 return enableRobiFromDiscovery()
+            case .harbor:
+                harbor.open()
+                return .none
             }
         }
         discovery.start()
@@ -401,6 +406,8 @@ final class DockCoordinator {
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
+            // Same permanent suppression as at start-up: the Radar tip names a shortcut that is now off.
+            if self?.settings.value.harborShortcutEnabled == false { self?.discovery.markUsed(.harbor) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureHubGlass()
             self?.configureVolumeReads()
@@ -908,6 +915,7 @@ final class DockCoordinator {
         }
         harbor.previousApplication = { [weak self] in self?.lastExternalApplication }
         harbor.prepareSettingsRoute = { [weak self] in self?.settingsHarborRequest = true }
+        harbor.didOpen = { [weak self] in self?.discovery.markUsed(.harbor) }
         harbor.configureShortcut(enabled: settings.value.harborShortcutEnabled)
     }
 
