@@ -420,8 +420,8 @@ final class LauncherState {
 
     /// Records an action for this visit's `launcher_closed`. Ignored outside a presentation.
     ///
-    /// Views call this for actions whose work happens outside the launcher: DOKK tools, Capture &
-    /// image search, and Settings (``LauncherVisit/Action/tool``).
+    /// Views call this for actions whose work happens outside the launcher: DOKK tools and
+    /// Settings (``LauncherVisit/Action/tool``).
     func recordVisit(_ action: LauncherVisit.Action) {
         guard isActive else { return }
         visit.record(action)

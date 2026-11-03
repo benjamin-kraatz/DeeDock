@@ -29,8 +29,6 @@ extension AnalyticsEvent {
         case .peekWindowAction: "peek_window_action"
         case .markup: "markup"
         case .fileHandoff: "file_handoff"
-        case .windowSearchActivated: "window_search_activated"
-        case .windowSearchClosed: "window_search_closed"
         case .fusion: "fusion"
         case .launcherSearched: "launcher_searched"
         case .launcherResultActivated: "launcher_result_activated"
@@ -160,12 +158,6 @@ extension AnalyticsEvent {
         case let .fileHandoff(action, fileCount, exactWindow, outcome):
             ["action": .init(action), "file_count": .init(fileCount), "exact_window": .init(exactWindow),
              "outcome": .init(outcome)]
-        case let .windowSearchActivated(evidence, scope, queryLength, resultCount, outcome):
-            ["evidence": .init(evidence), "scope": .init(scope), "query_length": .init(queryLength),
-             "result_count": .init(resultCount), "outcome": .init(outcome)]
-        case let .windowSearchClosed(scope, queryLength, resultCount, activated, duration):
-            ["scope": .init(scope), "query_length": .init(queryLength), "result_count": .init(resultCount),
-             "activated": .init(activated), "duration": .init(duration)]
         case let .fusion(step, outcome, failure, operation, duration):
             ["step": .init(step), "outcome": .init(outcome), "failure": failure.map(AnalyticsValue.init),
              "operation": operation.map(AnalyticsValue.init), "duration": .init(duration)]

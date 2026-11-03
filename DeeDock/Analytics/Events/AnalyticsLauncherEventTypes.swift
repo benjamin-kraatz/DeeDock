@@ -23,7 +23,7 @@ nonisolated enum AnalyticsLauncherOutcome: String, AnalyticsToken {
     case openedResult = "opened_result"
     /// A file action ran, Find Similar included.
     case fileAction = "file_action"
-    /// A DOKK tool, a capsule from an app, Capture & image search, or DOKK Settings opened.
+    /// A DOKK tool, a capsule from an app, or DOKK Settings opened.
     case tool
     /// Show in Finder.
     case revealed

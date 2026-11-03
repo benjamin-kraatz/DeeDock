@@ -25,7 +25,6 @@ final class LauncherSearchState {
     /// Whether the mixed results are scrolled away from the top, for `launcher_result_activated`.
     /// Written by the results view when that changes, never per scroll frame.
     @ObservationIgnored var scrolled = false
-    @ObservationIgnored var explicitSearch: (() -> Void)?
     @ObservationIgnored private var service: WindowSearchService?
     @ObservationIgnored private var sources: [WindowSearchSource] = []
     @ObservationIgnored private var discovery: Task<Void, Never>?

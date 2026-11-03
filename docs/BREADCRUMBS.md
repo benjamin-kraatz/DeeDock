@@ -67,9 +67,9 @@ All items below remain untested. Use a signed installed build for TCC and sandbo
 
 A GPT 5.6 Luna review at Extra High confirmed four lifecycle issues, now fixed: outside clicks in the document picker could dismiss the draft; foreground source actions could strand other cards in Checking; cancelled Resume could activate its fallback app; and queued AX selections could mutate windows after cancellation. It found no additional confirmed P1/P2 issue. Source navigation also now uses the coordinator's injected window service.
 
-The subsequent merge includes DEE-15 Window Search. Its saved-capsule index includes manual breadcrumb next steps. Opening a breadcrumb from search shows the next step, separate model interpretation, and the same dated source previews and actions as the capsule panel. Existing ordinary-capsule search presentation remains available.
+The subsequent merge included DEE-15 Window Search, whose Saved Capsules tab opened breadcrumbs with their next step and source previews. DEE-156 removed Find a Window. The Hub's Apps-tab search still matches manual breadcrumb next steps through the same saved-capsule index, and opening the result shows the capsule panel.
 
-Additional acceptance remains manual: find a next-step-only breadcrumb through Saved Capsules search, open it, inspect the complete recap, and use its source actions. The review and compilation do not replace runtime acceptance.
+Additional acceptance remains manual: find a next-step-only breadcrumb through the Hub search, open it, inspect the complete recap, and use its source actions. The review and compilation do not replace runtime acceptance.
 
 ## Compilation and delivery
 

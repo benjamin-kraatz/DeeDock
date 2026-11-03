@@ -1,6 +1,6 @@
 import AppKit
 
-/// Owns search-only AX sessions. Discovery reads metadata, never screenshots or window text.
+/// Owns the Hub search's AX sessions. Discovery reads metadata, never screenshots or window text.
 actor WindowSearchService {
     private let windows: any ApplicationWindowServicing = AccessibilityApplicationWindowService(maximumWindows: WindowSearchMatcher.maximumSources)
     private let thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService()

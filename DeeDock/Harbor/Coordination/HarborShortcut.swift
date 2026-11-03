@@ -5,8 +5,8 @@ import Carbon
 ///
 /// Carbon hot keys need no event-monitor permission. Registration fails when another app owns the
 /// combination; Settings then reports the conflict and Harbor stays available from the menu and
-/// the dock tile. The handler shares the application event target with Find a Window's shortcut
-/// and passes on events with any other ID.
+/// the dock tile. The handler shares the application event target with Robi's shortcut and passes
+/// on events with any other ID.
 @MainActor
 final class HarborShortcut {
     static let keyCode = UInt32(kVK_Space)
