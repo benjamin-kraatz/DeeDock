@@ -1,12 +1,11 @@
 import Foundation
-import Security
 import Testing
 @testable import DeeDock
 
 /// The retired Museum's clipboard copies are deleted once, and nothing beside them is touched.
 @MainActor
 struct ClipboardMuseumCleanupTests {
-    @Test("Deletes the Museum folder and vault key, leaves its neighbours, and runs once")
+    @Test("Deletes the Museum folder, leaves its neighbours, and runs once")
     func deletesOnlyTheMuseum() throws {
         try withSandbox { defaults, support in
             let museum = support.appendingPathComponent("ClipboardMuseum", isDirectory: true)
@@ -18,23 +17,17 @@ struct ClipboardMuseumCleanupTests {
             try write("shelf", to: shelf)
             defaults.set(true, forKey: "unrelated.key")
 
-            var keyDeletions = 0
-            let cleanup = ClipboardMuseumCleanup(defaults: defaults, directory: museum) {
-                keyDeletions += 1
-                return errSecSuccess
-            }
+            let cleanup = ClipboardMuseumCleanup(defaults: defaults, directory: museum)
 
             #expect(cleanup.run())
             #expect(!FileManager.default.fileExists(atPath: museum.path))
             #expect(FileManager.default.fileExists(atPath: shelf.path))
             #expect(defaults.bool(forKey: "unrelated.key"))
             #expect(defaults.bool(forKey: ClipboardMuseumCleanup.completedKey))
-            #expect(keyDeletions == 1)
 
             // A Museum folder that reappears, say from a restored backup, is left for the person.
             try write("{}", to: museum.appendingPathComponent("collection.json"))
             #expect(cleanup.run())
-            #expect(keyDeletions == 1)
             #expect(FileManager.default.fileExists(atPath: museum.path))
         }
     }
@@ -43,9 +36,7 @@ struct ClipboardMuseumCleanupTests {
     func nothingToDelete() throws {
         try withSandbox { defaults, support in
             let cleanup = ClipboardMuseumCleanup(defaults: defaults,
-                                                 directory: support.appendingPathComponent("ClipboardMuseum")) {
-                errSecItemNotFound
-            }
+                                                 directory: support.appendingPathComponent("ClipboardMuseum"))
             #expect(cleanup.run())
             #expect(defaults.bool(forKey: ClipboardMuseumCleanup.completedKey))
         }
@@ -60,31 +51,22 @@ struct ClipboardMuseumCleanupTests {
             try FileManager.default.setAttributes([.posixPermissions: 0o500], ofItemAtPath: support.path)
             defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: support.path) }
 
-            var keyDeletions = 0
-            let cleanup = ClipboardMuseumCleanup(defaults: defaults, directory: museum) {
-                keyDeletions += 1
-                return errSecSuccess
-            }
+            let cleanup = ClipboardMuseumCleanup(defaults: defaults, directory: museum)
             #expect(!cleanup.run())
             #expect(!defaults.bool(forKey: ClipboardMuseumCleanup.completedKey))
-            #expect(keyDeletions == 0)
 
             try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: support.path)
             #expect(cleanup.run())
             #expect(!FileManager.default.fileExists(atPath: museum.path))
-            #expect(keyDeletions == 1)
         }
     }
 
-    @Test("A keychain failure is logged and does not block completion")
-    func keychainFailureCompletes() throws {
-        try withSandbox { defaults, support in
-            let cleanup = ClipboardMuseumCleanup(defaults: defaults,
-                                                 directory: support.appendingPathComponent("ClipboardMuseum")) {
-                errSecAuthFailed
-            }
-            #expect(cleanup.run())
-            #expect(defaults.bool(forKey: ClipboardMuseumCleanup.completedKey))
+    @Test("An unresolvable folder skips without deleting anything and retries later")
+    func unresolvedDirectorySkips() throws {
+        try withSandbox { defaults, _ in
+            let cleanup = ClipboardMuseumCleanup(defaults: defaults, directory: nil)
+            #expect(!cleanup.run())
+            #expect(!defaults.bool(forKey: ClipboardMuseumCleanup.completedKey))
         }
     }
 

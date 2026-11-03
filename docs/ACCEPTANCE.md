@@ -422,13 +422,19 @@ Dependent behavior changes:
 
 The Museum kept clipboard copies on disk. `ClipboardMuseumCleanup` runs once at launch, off the
 main actor. It deletes `Application Support/<bundle id>/ClipboardMuseum` (`collection.json`,
-`Images/*.png`, `Vault/*.sealed`) and the login-keychain generic password with service
-`<bundle id>.clipboard-museum` and account `vault-key`, then sets `cleanup.clipboard-museum.v1`.
-The Museum wrote no UserDefaults keys. Nothing outside that folder and that keychain item is
-touched. A folder that cannot be deleted is logged and retried at the next launch. A keychain
-failure is logged and not retried, because the key opens nothing once the sealed files are gone.
+`Images/*.png`, `Vault/*.sealed`), then sets `cleanup.clipboard-museum.v1`. The Museum wrote no
+UserDefaults keys. Nothing outside that folder is touched, and when Application Support or the
+bundle identifier can't be resolved the cleanup skips rather than fall back to another folder. A
+folder that cannot be deleted is logged and retried at the next launch.
+
+The vault key (login keychain, generic password "DOKK Clipboard Museum", service
+`<bundle id>.clipboard-museum`, account `vault-key`) is deliberately left. Deleting from the
+file-based keychain can show a password or access prompt at launch, and there's no reliable way to
+suppress it. With the sealed files gone the key decrypts nothing; anyone who wants it gone can
+delete it in Keychain Access.
+
 `ClipboardMuseumCleanupTests` covers the deletion, a neighbouring folder surviving, a second run,
-a Mac that never used the Museum, a failed deletion retried, and a keychain failure.
+a Mac that never used the Museum, a failed deletion retried, and an unresolvable folder skipped.
 
 ## DEE-150 Dock Modes removed
 
