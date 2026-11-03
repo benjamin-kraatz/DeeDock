@@ -91,6 +91,7 @@ private struct LauncherMixedResultRow: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var appIcon: NSImage?
     @State private var hovered = false
+    private var blocked: Bool { result.unavailable || state.actionBusy || shortcutStatus?.busy == true }
     private var shortcutStatus: ActionTileStatus? {
         guard case .shortcut(let id) = result.id else { return nil }
         return state.actions?.statuses[id]
@@ -150,15 +151,17 @@ private struct LauncherMixedResultRow: View {
         .task(id: result.application?.reference.url) {
             appIcon = result.application.map { launcher.icon(for: $0) }
         }
-        .disabled(
-            result.unavailable || state.actionBusy
-                || shortcutStatus?.busy == true
-        )
+        .disabled(blocked)
         .contextMenu {
             LauncherMixedResultMenu(result: result, launcher: launcher)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isSelected] : [])
+        // Without this, VoiceOver's default action reports a click (see LauncherResultButton).
+        .accessibilityAction {
+            guard !blocked else { return }
+            Analytics.performing(.voiceOver) { state.activate(result) }
+        }
         .help(result.source)
     }
 }

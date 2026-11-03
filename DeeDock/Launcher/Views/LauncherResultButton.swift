@@ -32,10 +32,12 @@ struct LauncherResultButton: View {
     }
     private var displayName: String { application.reference.name.replacingOccurrences(of: "\u{00ad}", with: "") }
 
+    private func activate() {
+        if let searchResult { state.search.activate(searchResult) } else { state.launch(application) }
+    }
+
     var body: some View {
-        Button {
-            if let searchResult { state.search.activate(searchResult) } else { state.launch(application) }
-        } label: {
+        Button { activate() } label: {
             Group {
                 if state.layout == .grid { gridLabel } else { listLabel }
             }
@@ -66,6 +68,12 @@ struct LauncherResultButton: View {
         .accessibilityValue(LauncherApplicationStatus.text(favorite: favorite, pinned: pinned, running: running))
         .accessibilityHint(Text(.launcherOpenHint))
         .accessibilityAddTraits(selected ? [.isSelected] : [])
+        // VoiceOver's default action would reach the Button's closure with no ambient trigger
+        // and report a click. Mirrors the Suggested card. The guard matches `.disabled` above.
+        .accessibilityAction {
+            guard !interactionBlocked else { return }
+            Analytics.performing(.voiceOver) { activate() }
+        }
         // The outer Button owns the native tooltip, so nested badge help cannot override it.
         .help(hoverHelp)
     }
