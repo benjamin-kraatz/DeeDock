@@ -5,6 +5,8 @@ nonisolated enum AnalyticsTrigger: String, AnalyticsToken {
     case click, keyboard, voiceOver = "voice_over", menu, drag, springLoad = "spring_load", hover
     /// A global shortcut pressed outside the dock.
     case hotkey
+    /// A feature's second global shortcut, where it has one: Shift-Command-Space for Radar.
+    case hotkeyAlternate = "hotkey_alternate"
     /// The action followed from another DOKK feature rather than a direct gesture.
     case automatic
     /// The action was taken inside the Launcher.

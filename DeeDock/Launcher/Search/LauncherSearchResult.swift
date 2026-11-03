@@ -45,6 +45,24 @@ nonisolated struct LauncherSearchResult: Identifiable, Sendable {
     var group = ""
 }
 
+extension LauncherSearchResult {
+    /// App results' groups in the order mixed search draws them: each group where its first app
+    /// result ranks. ``LauncherSearchAppSections`` draws these sections.
+    static func applicationGroups(_ results: [LauncherSearchResult]) -> [String] {
+        var seen: Set<String> = []
+        return results.filter { $0.application != nil }.compactMap { seen.insert($0.group).inserted ? $0.group : nil }
+    }
+
+    /// `results` in the order mixed search draws them: app results section by section, then every
+    /// other result in ranking order. `launcher_result_activated` reports positions in this order.
+    static func displayOrder(_ results: [LauncherSearchResult]) -> [LauncherSearchResult] {
+        let applications = applicationGroups(results).flatMap { group in
+            results.filter { $0.application != nil && $0.group == group }
+        }
+        return applications + results.filter { $0.application == nil }
+    }
+}
+
 nonisolated struct LauncherSearchInput: Equatable, Sendable {
     var query: String
     var kind: LauncherSearchKind

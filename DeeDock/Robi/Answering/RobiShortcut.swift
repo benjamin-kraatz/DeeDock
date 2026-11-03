@@ -3,7 +3,7 @@ import Carbon
 
 /// The global Option-Shift-Command-R shortcut that wakes Robi on the focused window.
 ///
-/// Same mechanism as Radar's and Find a Window's shortcuts: a Carbon hot key on the application
+/// Same mechanism as Radar's shortcut: a Carbon hot key on the application
 /// event target, which needs no event-monitor permission. Registration fails when another app owns
 /// the combination; Settings then reports the conflict and clicking Robi still works. The handler
 /// passes on events with any other ID so the shortcuts sharing the target keep working.

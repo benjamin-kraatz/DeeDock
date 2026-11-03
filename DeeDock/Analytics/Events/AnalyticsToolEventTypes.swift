@@ -1,6 +1,6 @@
 import Foundation
 
-// Closed vocabularies for tool events: Shortcut tiles, Window Search, Fusion, the file handoff
+// Closed vocabularies for tool events: Shortcut tiles, Fusion, the file handoff
 // panel, and Launcher suggestions. Every value is a compile-time constant.
 
 /// Where a pinned Shortcut was run from.
@@ -21,21 +21,6 @@ nonisolated enum AnalyticsShortcutSource: String, AnalyticsToken {
 
 nonisolated enum AnalyticsShortcutTileAction: String, AnalyticsToken {
     case pinned, unpinned, moved, acceptsFilesOn = "accepts_files_on", acceptsFilesOff = "accepts_files_off", reset
-}
-
-/// Why a Window Search result matched.
-nonisolated enum AnalyticsWindowSearchEvidence: String, AnalyticsToken {
-    case metadata, text, capsule, historicalOCR = "historical_ocr", image
-
-    init(_ evidence: WindowSearchEvidence) {
-        switch evidence {
-        case .metadata: self = .metadata
-        case .text: self = .text
-        case .capsule: self = .capsule
-        case .historicalOCR: self = .historicalOCR
-        case .image: self = .image
-        }
-    }
 }
 
 /// One step of a Fusion run.
@@ -76,6 +61,8 @@ nonisolated enum AnalyticsFileHandoffAction: String, AnalyticsToken {
 
 nonisolated enum AnalyticsSuggestionFeedback: String, AnalyticsToken {
     case useful, notNow = "not_now"
+    /// "Never suggest this app" on a Suggested card.
+    case excluded
 
     init(_ kind: LauncherSuggestionFeedback.Kind) {
         switch kind {

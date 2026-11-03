@@ -41,7 +41,6 @@ final class DockPanelController {
     var resignedFocus: (() -> Void)?
     var escape: (() -> Void)?
     var exclusiveInteractionBegan: (() -> Void)?
-    var windowSearchRequested: (() -> Void)?
     var timelineRequested: (() -> Void)?
     var isMenuTracking: Bool { menuHeld }
 
@@ -779,11 +778,6 @@ final class DockPanelController {
     }
     func handleKey(_ event: NSEvent) -> Bool {
         guard store.keyboardFocus else { return false }
-        if event.modifierFlags.intersection([.command, .shift, .option, .control]).isEmpty,
-           event.charactersIgnoringModifiers == "/" {
-            Analytics.track(.focusDockCommand(.windowSearch))
-            windowSearchRequested?(); return true
-        }
         if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
            event.charactersIgnoringModifiers?.lowercased() == "o" {
             if let item = store.entries.compactMap(\.item).first(where: { $0.id == store.selectedID }), item.isAvailable {
@@ -885,7 +879,6 @@ final class DockPanelController {
         panel.resignedKey = nil; panel.keyboardHandler = nil; resignedFocus = nil; escape = nil; exclusiveInteractionBegan = nil
         timelineRequested = nil
         interaction.timeline = nil
-        windowSearchRequested = nil
         accessibilityIDs.removeAll(); mouseHeld = false; menuHeld = false; dragHeld = false; popoverHeld = false; windowPeekHeld = false; volumeCardHeld = false; hubHeld = false
         store.stop(); panel.close(); panel.contentView = nil
     }

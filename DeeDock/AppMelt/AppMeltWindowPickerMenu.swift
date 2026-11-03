@@ -5,7 +5,6 @@ import AppKit
 @MainActor final class AppMeltWindowPickerMenu: NSObject, NSMenuDelegate {
     let state: AppMeltWindowPickerState
     let menu = NSMenu()
-    private(set) var isTracking = false
     private(set) var setupRequested = false
     private var started = false
     private(set) var selection: ApplicationWindowSummary?
@@ -25,11 +24,8 @@ import AppKit
     }
 
     func menuWillOpen(_ menu: NSMenu) {
-        isTracking = true
         if !started { started = true; state.refresh() }
     }
-
-    func menuDidClose(_ menu: NSMenu) { isTracking = false }
 
     private func addSetupAction() {
         menu.addItem(.separator())

@@ -198,7 +198,8 @@ a code change.
 ## Events
 
 Every feature event carries a `trigger` where the entry point can tell: `click`, `keyboard`,
-`voice_over`, `menu`, `drag`, `spring_load`, `hover`, `hotkey`, `automatic`, `launcher`.
+`voice_over`, `menu`, `drag`, `spring_load`, `hover`, `hotkey`, `hotkey_alternate`, `automatic`, `launcher`.
+`hotkey_alternate` is a feature's second global shortcut; only Radar has one (⇧⌘Space).
 Entry points that do not mark themselves report `click`.
 
 ### Settings and periodic
@@ -308,12 +309,10 @@ the 865 MB download takes and why it fails. The first pass's file names, which o
 | `markup` | `action`, `has_marks` |
 | `file_handoff` | `action` (`shown`, `activated`, `copied`, `opened`), `file_count`, `exact_window`, `outcome`. `shown` fails when the dropped files cannot be routed. `opened` is `partial` when only some files opened. |
 
-### Window Search and Fusion
+### Fusion
 
 | Event | Properties |
 | --- | --- |
-| `window_search_activated` | `evidence` (`metadata`, `text`, `capsule`, `historical_ocr`, `image`), `scope` (`live`, `captured`, `saved`), `query_length`, `result_count`, `outcome` |
-| `window_search_closed` | `scope`, `query_length`, `result_count`, `activated`, `duration` |
 | `fusion` | `step` (`capture`, `generate`, `save`), `outcome`, `failure` (`model_unavailable`, `context_limit`, `refused`, `invalid_output`, `timeout`, `capture_denied`, `capture_failed`, `save_failed`), `operation` (`compare`, `differences`, `checklist`) for `generate`, `duration` |
 
 Cancelled Fusion work sends nothing. Opening Fusion from Window Peek or an App Melt pair is
@@ -324,21 +323,60 @@ from App Melt.
 
 | Event | Properties |
 | --- | --- |
-| `launcher_closed` | Sent when the Hub's Apps tab is hidden: another tab is selected or the Hub closes. `duration` (seconds since the tab appeared), `had_query` (search text present when it was hidden) |
+| `launcher_closed` | Sent when the Hub's Apps tab is hidden: another tab is selected or the Hub closes. One per visit. `duration` (seconds since the tab appeared), `had_query` (search text present when it was hidden), `outcome` (see below), `action_count` (actions in the visit), `option_count` (`launcher_option_changed` events in the visit), `scrolled` (the grid, list, or search results were more than 4 pt from the top at some point in the visit) |
 | `launcher_searched` | `query_length`, `result_count`, `kind`. Never the text. |
-| `launcher_result_activated` | `kind`, `reveal`, `trigger` |
-| `launcher_suggestion_accepted` | `trigger` |
+| `launcher_result_activated` | One per app or search result opened or shown in Finder from the tab. `kind` (`application`, `window`, `capsule`, `shelf`, `shortcut`), `reveal` (Show in Finder rather than open), `trigger` (`click`, `keyboard` for Return, `menu` for the context menu or the options menu, `voice_over` for a Suggested card's VoiceOver action), `source` (`search` for results of typed text, `browse` for the grid or list without text, a chosen result type with no text included, `suggestion` for a Suggested card, `robi` for Robi's picks), `position` (0-based, see below), `scrolled` (those results were more than 4 pt from the top when it was chosen) |
+| `launcher_suggestion_accepted` | `trigger`. A Suggested card also sends `launcher_result_activated` with `source = suggestion`. |
 | `launcher_tool_opened` | `tool` |
 | `launcher_file_action` | `action`, `input_count`, `source`, `file_type`, `status` |
 | `launcher_assistant_asked` | `query_length`, `result_count`, `outcome` |
 | `launcher_suggestions_shown` | `count`. Once per suggestion set, when it is first seen. |
-| `launcher_suggestion_feedback` | `feedback` (`useful`, `not_now`). Never which app. |
+| `launcher_suggestion_feedback` | `feedback` (`useful`, `not_now`, `excluded` for "Never suggest this app"). Never which app. |
 | `launcher_suggestion_prompt_answered` | `answer` (`useful`, `not_useful`, `no_answer`) |
+| `launcher_option_changed` | A browse option chosen in the options menu or with the sort chips. `option` (`result_type`, `filter`, `location`, `nested_apps`, `sort`, `grouping`, `layout`, `reset`), `value` (the chosen case: `result_type` as `kind` above; `filter` `all`, `running`, `pinned`, `recent`, `favorites`; `location` `all`, `applications_folders`, `standard_mac_locations`; `nested_apps` a Bool; `sort` `name`, `recent`, `frequent`; `grouping` `none`, `category`, `letter`; `layout` `grid`, `list`; absent for `reset`). Choosing the current value sends nothing. |
+| `launcher_favorite_changed` | `favorite` (`true` when added, `false` when removed). Never which app. |
+| `launcher_history_cleared` | No properties. Launch history was cleared after the confirmation. |
 
 `launcher_tool_opened` now also fires for the System Settings clone. The Launcher now lives in the
 DOKK Hub's Apps tab, so its events describe that tab. `launcher_opened` and the `dock_launcher_style`
 context property were retired with the Compact and Full Launcher styles; `hub_opened` replaces
 `launcher_opened`.
+
+**Visit outcome.** `launcher_closed.outcome` is the strongest action of the visit, in this order,
+or how the tab was left when there was none:
+
+| `outcome` | Action |
+| --- | --- |
+| `launched` | An app opened: grid, list, search, Suggested card, or Robi's picks, by click, Return, or the context menu |
+| `opened_result` | A window, capsule, Shelf file, or Shortcut from search |
+| `file_action` | A file action started, Find Similar included |
+| `tool` | A DOKK tool, Create Capsule on an app, or Settings… in the options menu |
+| `revealed` | Show in Finder, for an app or a Shelf file |
+| `managed` | Favorite added or removed, Pin or Unpin, Pin on Display, Uninstall… opened, or launch history cleared |
+| `feedback` | Useful suggestion, Not useful right now, or Never suggest this app on a Suggested card |
+| `robi` | Robi was asked (by the button or ⌘↩) |
+| `switched_tab` | No action; another Hub tab was selected |
+| `none` | No action; the Hub closed |
+
+`action_count` counts every action in the table, so a visit with two launches has `action_count = 2`.
+Actions are counted when they are accepted, before macOS reports whether an open worked. Typing,
+arrow keys, hover, scrolling, choosing options, Choose Files…, Refresh, and the suggestions survey
+are not actions. Moving the Hub to another display closes and reopens it, which ends the visit.
+
+**Positions.** `launcher_result_activated.position` is 0-based in the order the source drew its
+items: for `suggestion`, among the Suggested cards; for `browse` and `robi` in the grid or list,
+among the apps section by section (Suggested cards and DOKK's tools are not counted); for search
+results, among the visible results with app sections first and other kinds after them, as drawn.
+Matching DOKK tools above search results are not counted. It is absent when the item was no longer
+among the visible results.
+
+Changes in DEE-154: `launcher_result_activated` was sent for search results only and reported every
+Return as `click`. It now covers grid, list, Suggested-card, and Robi launches and Show in Finder
+from them, and adds `source`, `position`, and `scrolled`; `kind`, `reveal`, and `trigger` keep
+their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they apply.
+`launcher_closed` gained `outcome`, `action_count`, `option_count`, and `scrolled`.
+`launcher_option_changed`, `launcher_favorite_changed`, `launcher_history_cleared`, and
+`launcher_suggestion_feedback = excluded` are new.
 
 ### DOKK Hub
 
@@ -377,7 +415,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 
 | Event | Properties |
 | --- | --- |
-| `app_menu_action` | `action` (`show_in_finder`, `hide`, `show`, `bring_all_to_front`, `quit`, `select_window`, `stop_running_in_background`), `outcome`, `trigger` (`menu`, `voice_over`). `stop_running_in_background` is `succeeded` when DOKK asked the app's leftover processes to end and `failed` when the app was no longer running in background; neither shows a message. |
+| `app_menu_action` | `action` (`show_in_finder`, `hide`, `show`, `bring_all_to_front`, `quit`, `select_window`, `stop_running_in_background`), `outcome`, `trigger` (`menu`, `voice_over`). `select_window` comes only from a tile's VoiceOver window actions, with `trigger` `voice_over`; the context menu no longer lists windows, and Window Peek reports `peek_window_chosen` instead. `stop_running_in_background` is `succeeded` when DOKK asked the app's leftover processes to end and `failed` when the app was no longer running in background; neither shows a message. |
 | `background_apps_unavailable` | `reason` (`unsupported_system`, `missing_interface`, `unexpected_result`). DOKK could not read which apps macOS 27 runs in background and shows them as it did before. Sent at most once per launch. Never which app. |
 | `documents_opened` | `source` (`drop`, `picker`), `file_count`, `file_type`, `outcome`. A cancelled Open Files… picker is `outcome = canceled` with `file_count = 0`. |
 | `shortcut_run` | `source` (`tile`, `keyboard`, `drop`, `launcher`, `launcher_files`, `settings`), `file_count`, `outcome` (`succeeded`, `failed`, `canceled`), `duration` |
@@ -390,7 +428,7 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `app_melt` | `action`, `pair_count`, `outcome` |
 | `clipboard_museum` | `action`, `kind`, `item_count` |
 | `clipboard_capture_enabled` | none |
-| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
+| `discovery_callout` | `callout` (`clipboardMuseum`, `notificationFeed`, `islands`, `robi`, `harbor` for Radar), `action` (`shown`, `opened`, `snoozed`, `dismissed`) |
 | `plugin_panel_opened` | `trigger`, `pinned_count` (plugin tiles in the dock) |
 | `plugin_panel_closed` | `duration`, `stopped` (the plugin had stopped by then) |
 | `plugin_stopped` | `panel_open`. A plugin process ended without DOKK asking, or never answered. |
@@ -401,9 +439,9 @@ context property were retired with the Compact and Full Launcher styles; `hub_op
 | `line_icon_coverage` | `installed_app_count`, `installed_line_icon_count`, `installed_coverage` (0 to 1), `pinned_app_count`, `pinned_line_icon_count`, `pinned_coverage` (0 to 1), `missing_public_count`, `missing_unlisted_count`, `missing_bundle_ids` (array), `missing_pinned_bundle_ids` (array). See [Line icon coverage](#line-icon-coverage). |
 | `notification_feed_opened` | `entry_count` (entries in the feed), `unread_count` (entries that arrived since it was last opened), `trigger` |
 | `notification_feed_closed` | `entry_count` (entries left when it closed), `duration`, `cleared` (Clear All was used while it was open) |
-| `harbor_opened` (Radar; Harbor is its internal name) | `trigger`, `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
+| `harbor_opened` (Radar; Harbor is its internal name) | `trigger` (`hotkey` for ⌥⇧⌘Space, `hotkey_alternate` for ⇧⌘Space), `window_count` (windows and chips across displays), `app_count`, `display_count`, `access` (`full`, `accessibility_only`, `screen_recording_only`, `none`) |
 | `harbor_closed` | `outcome` (`window`, `app`, `restored`, `dismissed`, `interrupted`), `duration`, `searched`, `filtered` (the strip's app filter was used), `closed_windows` |
-| `tool_opened` | `tool` (`window_search`, `local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
+| `tool_opened` | `tool` (`local_history`, `fusion`, `badge_memory`, `system_settings_clone`, `settings`), `trigger` |
 | `focus_dock_entered` | `trigger` |
 | `focus_dock_command` | `command` |
 | `robi_opened` | `trigger` (`click` on Robi's face, `hotkey` for ⌥⇧⌘R), `context` (`selection`, `region`, `window`) |
@@ -573,7 +611,6 @@ prompt or answer contains:
 | `session_capsule_compose` | window titles, recognized window text, the generated summary |
 | `fusion_compose` | the instruction, window titles and text, the generated result |
 | `semantic_stack_organize` | file and folder names, the generated group titles |
-| `window_search_image_match` | the search phrase and the model's description of the window |
 | `atmosphere_mood_palette` | the typed mood and the generated colors |
 | `robi_answer` | Robi's instructions, the question, what the person picked (selected text, or the window's or region's text with landmark numbers and positions), the app's menu overview and any menu pages the model asked for, and the answer, on this Mac or from Claude |
 | `robi_suggest_questions` | Robi's instructions, what the person picked, and the suggested questions |

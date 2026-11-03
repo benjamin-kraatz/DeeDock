@@ -133,7 +133,7 @@ The card is not kept on screen for the background window. Robi's panel floats ab
 - For typing, the panel becomes key without activating DOKK. The spike confirmed that keystrokes reach the field while the app stays frontmost and keeps the menu bar.
 - Dismissing resigns key, so the keyboard goes back to the app.
 - **Paste into** puts the answer on the clipboard, posts ⌘V to the app's process, and restores the person's clipboard 0.9 s later, unless they copied something new in the meantime.
-- The ⌥⇧⌘R shortcut is a Carbon hot key with ID 17 under the signature Radar and Find a Window use. If another app owns the combination, Settings says so and clicking Robi still works.
+- The ⌥⇧⌘R shortcut is a Carbon hot key with ID 17 under the signature Radar uses. If another app owns the combination, Settings says so and clicking Robi still works.
 
 ## Settings, analytics, and Discovery
 

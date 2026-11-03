@@ -1,10 +1,17 @@
 import Foundation
 
+/// Matches live window metadata or saved capsules for the Hub's Apps-tab search.
 nonisolated enum WindowSearchIndex {
-    /// No persistent index: closing the presentation releases every document and result.
+    /// Ranks one scope's matches, best first. Nothing is persisted: the caller owns every source and result.
+    ///
+    /// - Parameters:
+    ///   - query: The user's query. Every substantive word must occur in a result.
+    ///   - scope: `.live` searches `sources`; `.saved` searches `saved`.
+    ///   - sources: Window metadata copied when the Hub search opened.
+    ///   - saved: Saved Session Capsules. "Yesterday" in the query limits them to yesterday's capsules
+    ///     and yields no live results.
     @concurrent static func results(query: String, scope: WindowSearchScope, sources: [WindowSearchSource],
-        snapshots: [WindowContextSnapshot], owners: [UInt32: WindowSearchSource], date: Date?,
-        saved: [SessionCapsule], images: [WindowSearchResult]) async -> [WindowSearchResult] {
+        saved: [SessionCapsule]) async -> [WindowSearchResult] {
         let yesterday = WindowSearchMatcher.wantsYesterday(query)
         if yesterday && scope != .saved { return [] }
         var results: [WindowSearchResult] = []
@@ -17,20 +24,6 @@ nonisolated enum WindowSearchIndex {
                     evidence: .metadata, excerpt: WindowSearchMatcher.excerpt(text, query: query), score: score,
                     date: nil, source: source, capsuleID: nil)
             }
-        case .captured:
-            results = snapshots.compactMap { snapshot in
-                guard let source = owners[snapshot.candidate.id] else { return nil }
-                let metadata = String(source.title.prefix(1_000)) + "\n" + source.applicationName
-                let metadataScore = WindowSearchMatcher.score(query, in: metadata)
-                let combined = metadata + "\n" + snapshot.recognizedText
-                guard let score = metadataScore ?? WindowSearchMatcher.score(query, in: combined) else { return nil }
-                return WindowSearchResult(id: source.id, title: source.title, applicationName: source.applicationName,
-                    evidence: metadataScore == nil ? .text : .metadata,
-                    excerpt: WindowSearchMatcher.excerpt(metadataScore == nil ? snapshot.recognizedText : metadata, query: query),
-                    score: score + (metadataScore == nil ? 0 : 20), date: date, source: source, capsuleID: nil)
-            }
-            let literalIDs = Set(results.map(\.id))
-            results += images.filter { !literalIDs.contains($0.id) }
         case .saved:
             results = saved.compactMap { capsule in
                 if yesterday && !Calendar.current.isDateInYesterday(capsule.createdAt) { return nil }
