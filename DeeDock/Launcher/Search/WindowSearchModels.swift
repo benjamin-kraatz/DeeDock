@@ -1,16 +1,8 @@
 import AppKit
 
 /// Search scopes are explicit. Saved capsules never become evidence about a current window.
-nonisolated enum WindowSearchScope: String, CaseIterable, Identifiable {
-    case live, captured, saved
-    var id: Self { self }
-    var title: LocalizedStringResource {
-        switch self {
-        case .live: .windowSearchLive
-        case .captured: .windowSearchCaptured
-        case .saved: .windowSearchSaved
-        }
-    }
+nonisolated enum WindowSearchScope: Sendable {
+    case live, saved
 }
 
 /// Immutable metadata copied at search opening. AX tokens belong to the search service alone.
@@ -24,20 +16,19 @@ nonisolated struct WindowSearchSource: Identifiable, Sendable {
     var title: String { window?.title ?? candidate?.title ?? applicationName }
 }
 
-/// Literal evidence is separate from image-model suggestions, including their sort priority.
+/// Why a result matched. Saved-capsule OCR is historical and never describes a current window.
 nonisolated enum WindowSearchEvidence: Sendable {
-    case metadata, text, capsule, historicalOCR, image
+    case metadata, capsule, historicalOCR
     var label: LocalizedStringResource {
         switch self {
         case .metadata: .windowSearchMetadataEvidence
-        case .text: .windowSearchTextEvidence
         case .capsule: .windowSearchCapsuleEvidence
         case .historicalOCR: .unifiedSavedOCR
-        case .image: .windowSearchImageEvidence
         }
     }
 }
 
+/// One ranked match. Live results carry their `source`; saved results carry their `capsuleID`.
 nonisolated struct WindowSearchResult: Identifiable, Sendable {
     let id: UUID
     let title: String
@@ -50,11 +41,9 @@ nonisolated struct WindowSearchResult: Identifiable, Sendable {
     let capsuleID: UUID?
 }
 
-/// A bounded literal matcher. It never derives a color or other image attribute from OCR.
+/// A bounded literal matcher over window metadata and saved capsule text.
 nonisolated enum WindowSearchMatcher {
     static let maximumQuery = 200
-    static let maximumText = 6_000
-    static let maximumCaptures = 4
     static let maximumSources = 200
 
     static func wantsYesterday(_ query: String) -> Bool {

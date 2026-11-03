@@ -60,7 +60,9 @@ struct FeaturesPageContent: View {
             HarborSettingsCard(shortcut: source.binding(\.harborShortcutEnabled),
                                tile: source.binding(\.showHarborTile),
                                appNames: source.binding(\.harborShowsAppNames),
-                               shortcutAvailable: context.coordinator?.harbor.shortcutAvailable ?? true,
+                               unavailableShortcuts: context.coordinator.map {
+                                   Set(HarborShortcut.Combination.allCases).subtracting($0.harbor.heldShortcuts)
+                               } ?? [],
                                locked: locked)
             PreviewPermissionsSettingsCard(windowAccess: context.windowAccess, screenCapture: context.screenCapture,
                                            footnote: .harborPermissionsHelp)

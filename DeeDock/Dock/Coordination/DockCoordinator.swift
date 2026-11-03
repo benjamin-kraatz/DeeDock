@@ -120,9 +120,6 @@ final class DockCoordinator {
     let islandPlans = DockIslandPlanStore()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
-    @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
-    private(set) var searchShortcutAvailable = false
-    @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     let peekHistory = PeekHistoryStore.live()
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
@@ -220,6 +217,8 @@ final class DockCoordinator {
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }
         if robi.store.settings.isEnabled { discovery.markUsed(.robi) }
+        // Someone who turned Radar's shortcuts off has been to its settings, and the tip names a shortcut.
+        if !settings.value.harborShortcutEnabled { discovery.markUsed(.harbor) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configurePlugins()
         configureHarbor()
@@ -254,6 +253,9 @@ final class DockCoordinator {
                 return .none
             case .robi:
                 return enableRobiFromDiscovery()
+            case .harbor:
+                harbor.open()
+                return .none
             }
         }
         discovery.start()
@@ -378,7 +380,6 @@ final class DockCoordinator {
         }
         capsules.didChange = { [weak self] in
             self?.sessionCapsules.reload()
-            self?.windowSearch.reloadCapsules()
             self?.refreshPanels()
         }
         catalog.activated = { [weak self] app in
@@ -397,6 +398,8 @@ final class DockCoordinator {
         settings.settingsDidChange = { [weak self] in
             if self?.settings.value.showNotificationFeed == true { self?.discovery.markUsed(.notificationFeed) }
             if self?.settings.value.islands.isEnabled == true { self?.discovery.markUsed(.islands) }
+            // Same permanent suppression as at start-up: the Radar tip names a shortcut that is now off.
+            if self?.settings.value.harborShortcutEnabled == false { self?.discovery.markUsed(.harbor) }
             self?.harbor.configureShortcut(enabled: self?.settings.value.harborShortcutEnabled ?? false)
             self?.configureHubGlass()
             self?.configureVolumeReads()
@@ -417,7 +420,6 @@ final class DockCoordinator {
         configureVolumeReads()
         volumes.start()
         capsules.start()
-        searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
         displayService.start()
         // After the first reconcile, so the macOS Dock is placed away from the real dock.
@@ -535,7 +537,6 @@ final class DockCoordinator {
                 // A context menu or drag replaces the plain card; a question or refusal stays.
                 if volumeDock.cards.isOpen, volumeDock.cards.isShowingInfo { volumeDock.cards.close() }
             }
-            panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
             panel.timelineRequested = { [weak self] in self?.browseLocalHistory() }
             panel.escape = { [weak self] in
                 guard let self else { return }
@@ -906,19 +907,8 @@ final class DockCoordinator {
         }
         harbor.previousApplication = { [weak self] in self?.lastExternalApplication }
         harbor.prepareSettingsRoute = { [weak self] in self?.settingsHarborRequest = true }
+        harbor.didOpen = { [weak self] in self?.discovery.markUsed(.harbor) }
         harbor.configureShortcut(enabled: settings.value.harborShortcutEnabled)
-    }
-
-    /// Opens metadata search only after a menu or keyboard action.
-    func searchWindows() {
-        harbor.close(raising: nil, outcome: .interrupted, animated: false)
-        hub.dismissAnchored()
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        timeline.end()
-        endFocus(restore: false)
-        Analytics.track(.toolOpened(.windowSearch, trigger: Analytics.trigger()))
-        windowSearch.show(returningTo: lastExternalApplication)
     }
 
     func focusDock() {
@@ -1077,10 +1067,6 @@ final class DockCoordinator {
     private func configureLauncherSearch(_ launcher: LauncherState) {
         let search = launcher.search
         search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles
-        search.explicitSearch = { [weak self] in
-            self?.hub.dismissAfterAction()
-            self?.searchWindows()
-        }
         search.dispatch = { [weak self, weak launcher] result, reveal in
             guard let self, let launcher else { return }
             let search = launcher.search
@@ -1167,8 +1153,6 @@ final class DockCoordinator {
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
-        searchShortcut.stop()
-        windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()
         applicationMenus.stop()

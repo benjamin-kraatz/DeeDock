@@ -57,8 +57,8 @@ import Foundation
     sources = [
         "DeeDock/Dock/Models/ApplicationReference.swift", "DeeDock/Dock/Models/ApplicationMenu.swift",
         "DeeDock/Dock/Capsules/SessionCapsuleModels.swift", "DeeDock/Dock/Shelf/ShelfItem.swift",
-        "DeeDock/Dock/Actions/ActionTile.swift", "DeeDock/Dock/Search/WindowSearchModels.swift",
-        "DeeDock/Dock/Search/WindowSearchIndex.swift", "DeeDock/Launcher/Models/LauncherApplication.swift",
+        "DeeDock/Dock/Actions/ActionTile.swift", "DeeDock/Launcher/Search/WindowSearchModels.swift",
+        "DeeDock/Launcher/Search/WindowSearchIndex.swift", "DeeDock/Launcher/Models/LauncherApplication.swift",
         "DeeDock/Launcher/Models/LauncherOptions.swift", "DeeDock/Launcher/Search/LauncherSearchResult.swift", "DeeDock/Launcher/Search/LauncherSearchIndex.swift",
     ]
     binary = work / "benchmark"

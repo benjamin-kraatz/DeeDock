@@ -4,17 +4,17 @@ import SwiftUI
 ///
 /// File-action mode keeps Choose Files and hides browse-only items. A discrete result type
 /// replaces the app filter and location, sort, group, and layout pickers with result actions.
+/// Choices go through ``LauncherState/choose(_:_:as:)``, which reports `launcher_option_changed`.
 struct LauncherSearchBarOverflowMenu: View {
-    @Bindable var state: LauncherState
+    let state: LauncherState
     /// Asks the owner to confirm clearing launch history.
     var requestClearHistory: () -> Void = {}
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        @Bindable var search = state.search
         Menu {
             if !state.usesFileActions {
-                Picker(selection: $search.kind) {
+                Picker(selection: option(\.search.kind, AnalyticsLauncherOption.resultType)) {
                     ForEach(LauncherSearchKind.allCases) { kind in
                         Label {
                             Text(kind.title)
@@ -49,9 +49,6 @@ struct LauncherSearchBarOverflowMenu: View {
                 Divider()
             }
             chooseFiles
-            if !state.usesFileActions {
-                capture
-            }
             Divider()
             maintenance
         } label: {
@@ -65,13 +62,19 @@ struct LauncherSearchBarOverflowMenu: View {
         .accessibilityLabel(Text(.launcherSearchOverflow))
         .accessibilityValue(activeSummary)
         .help(customized ? Text(.launcherSearchOverflowCustomizedHelp) : Text(.launcherSearchOverflowHelp))
-        .onChange(of: search.kind) {
+        .onChange(of: state.search.kind) {
             state.cancelRobi()
             state.keyboardNavigationActive = false
         }
     }
 
     private var customized: Bool { !state.usesFileActions && state.hasCustomBrowseOptions }
+
+    /// A picker binding that sets the option through ``LauncherState/choose(_:_:as:)``.
+    private func option<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<LauncherState, Value>,
+                                          _ report: @escaping (Value) -> AnalyticsLauncherOption) -> Binding<Value> {
+        Binding { state[keyPath: keyPath] } set: { state.choose(keyPath, $0, as: report) }
+    }
 
     /// The narrowest active choice names the button: app filter, then result type, then a
     /// generic filter glyph for location, sort, or grouping. Defaults keep the ellipsis.
@@ -99,7 +102,7 @@ struct LauncherSearchBarOverflowMenu: View {
     }
 
     private var appsFilter: some View {
-        Picker(selection: $state.filter) {
+        Picker(selection: option(\.filter, AnalyticsLauncherOption.filter)) {
             ForEach(LauncherFilter.allCases) { filter in
                 Label {
                     Text(filter.title)
@@ -114,21 +117,21 @@ struct LauncherSearchBarOverflowMenu: View {
     }
 
     @ViewBuilder private var locationSortGroup: some View {
-        Picker(selection: $state.locationFilter) {
+        Picker(selection: option(\.locationFilter, AnalyticsLauncherOption.location)) {
             ForEach(LauncherLocationFilter.allCases) { location in
                 Text(location.title).tag(location)
             }
         } label: {
             Text(.launcherLocation)
         }
-        Picker(selection: $state.sort) {
+        Picker(selection: option(\.sort, AnalyticsLauncherOption.sort)) {
             ForEach(LauncherSort.allCases) { sort in
                 Text(sort.title).tag(sort)
             }
         } label: {
             Text(.launcherSort)
         }
-        Picker(selection: $state.grouping) {
+        Picker(selection: option(\.grouping, AnalyticsLauncherOption.grouping)) {
             ForEach(LauncherGrouping.allCases) { group in
                 Text(group.title).tag(group)
             }
@@ -138,14 +141,14 @@ struct LauncherSearchBarOverflowMenu: View {
     }
 
     private var nestedApps: some View {
-        Toggle(isOn: $state.showsNestedApplications) {
+        Toggle(isOn: option(\.showsNestedApplications, AnalyticsLauncherOption.nestedApps)) {
             Text(.launcherShowNestedApps)
         }
         .help(Text(.launcherShowNestedAppsHelp))
     }
 
     private var layout: some View {
-        Picker(selection: $state.layout) {
+        Picker(selection: option(\.layout, AnalyticsLauncherOption.layout)) {
             ForEach(LauncherLayout.allCases) { layout in
                 Label {
                     Text(layout.title)
@@ -178,7 +181,10 @@ struct LauncherSearchBarOverflowMenu: View {
             Label { Text(.launcherClearHistory) } icon: { Image(systemName: "clock.arrow.circlepath") }
         }
         // Opening Settings deliberately activates DOKK; an anchored Hub closes as focus leaves it.
-        Button { openWindow.openDockSettings() } label: {
+        Button {
+            state.recordVisit(.tool)
+            openWindow.openDockSettings()
+        } label: {
             Label { Text(.launcherOpenSettings) } icon: { Image(systemName: "gearshape") }
         }
     }
@@ -191,18 +197,6 @@ struct LauncherSearchBarOverflowMenu: View {
                 Text(.launcherFileChooseFiles)
             } icon: {
                 Image(systemName: "doc.badge.plus")
-            }
-        }
-    }
-
-    private var capture: some View {
-        Button {
-            state.search.explicitSearch?()
-        } label: {
-            Label {
-                Text(.unifiedCaptureRoute)
-            } icon: {
-                Image(systemName: "camera.viewfinder")
             }
         }
     }

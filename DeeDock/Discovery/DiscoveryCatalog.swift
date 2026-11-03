@@ -7,7 +7,7 @@ struct DiscoveryProposal: Identifiable {
         /// it, and again on later launches until it is used, dismissed, or still snoozed.
         case launched
     }
-    enum Destination: String { case notificationFeed, islands, robi }
+    enum Destination: String { case notificationFeed, islands, robi, harbor }
     /// What the callout still has to do after its destination handled the click.
     enum FollowUp { case none, openSettings }
     let id: String
@@ -38,5 +38,11 @@ struct DiscoveryProposal: Identifiable {
              title: .discoveryRobiTitle, message: .discoveryRobiMessage,
              action: .discoveryRobiTurnOn, destination: .robi, snoozeInterval: 86_400,
              symbol: "face.smiling.inverse"),
+        // Announces that Shift-Command-Space opens Radar now that Find a Window is gone. Queued
+        // behind Robi. Opening Radar any way records use, so people who already found it never see this.
+        Self(id: "harbor", signal: .launched, threshold: 1, calmInterval: 150,
+             title: .discoveryHarborTitle, message: .discoveryHarborMessage,
+             action: .discoveryHarborOpen, destination: .harbor, snoozeInterval: 86_400,
+             symbol: "rectangle.3.group.fill"),
     ]
 }

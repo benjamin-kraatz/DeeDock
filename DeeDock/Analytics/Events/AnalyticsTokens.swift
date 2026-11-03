@@ -28,7 +28,6 @@ extension LauncherFileActionKind: AnalyticsToken {}
 extension LauncherTool: AnalyticsToken {}
 extension DiscoveryProposal.Destination: AnalyticsToken {}
 extension FusionOperation: AnalyticsToken {}
-extension WindowSearchScope: AnalyticsToken {}
 extension UpdatePhase: AnalyticsToken {}
 extension UpdateAction: AnalyticsToken {}
 extension UpdateOffer.Stage: AnalyticsToken {}

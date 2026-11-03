@@ -29,8 +29,6 @@ extension AnalyticsEvent {
         case .peekWindowAction: "peek_window_action"
         case .markup: "markup"
         case .fileHandoff: "file_handoff"
-        case .windowSearchActivated: "window_search_activated"
-        case .windowSearchClosed: "window_search_closed"
         case .fusion: "fusion"
         case .launcherSearched: "launcher_searched"
         case .launcherResultActivated: "launcher_result_activated"
@@ -42,6 +40,9 @@ extension AnalyticsEvent {
         case .launcherSuggestionsShown: "launcher_suggestions_shown"
         case .launcherSuggestionFeedback: "launcher_suggestion_feedback"
         case .launcherSuggestionPromptAnswered: "launcher_suggestion_prompt_answered"
+        case .launcherOptionChanged: "launcher_option_changed"
+        case .launcherFavoriteChanged: "launcher_favorite_changed"
+        case .launcherHistoryCleared: "launcher_history_cleared"
         case .hubOpened: "hub_opened"
         case .hubTabSelected: "hub_tab_selected"
         case .hubDetachChanged: "hub_detach_changed"
@@ -155,19 +156,14 @@ extension AnalyticsEvent {
         case let .fileHandoff(action, fileCount, exactWindow, outcome):
             ["action": .init(action), "file_count": .init(fileCount), "exact_window": .init(exactWindow),
              "outcome": .init(outcome)]
-        case let .windowSearchActivated(evidence, scope, queryLength, resultCount, outcome):
-            ["evidence": .init(evidence), "scope": .init(scope), "query_length": .init(queryLength),
-             "result_count": .init(resultCount), "outcome": .init(outcome)]
-        case let .windowSearchClosed(scope, queryLength, resultCount, activated, duration):
-            ["scope": .init(scope), "query_length": .init(queryLength), "result_count": .init(resultCount),
-             "activated": .init(activated), "duration": .init(duration)]
         case let .fusion(step, outcome, failure, operation, duration):
             ["step": .init(step), "outcome": .init(outcome), "failure": failure.map(AnalyticsValue.init),
              "operation": operation.map(AnalyticsValue.init), "duration": .init(duration)]
         case let .launcherSearched(queryLength, resultCount, kind):
             ["query_length": .init(queryLength), "result_count": .init(resultCount), "kind": .init(kind)]
-        case let .launcherResultActivated(kind, reveal, trigger):
-            ["kind": .init(kind), "reveal": .init(reveal), "trigger": .init(trigger)]
+        case let .launcherResultActivated(kind, reveal, trigger, source, position, scrolled):
+            ["kind": .init(kind), "reveal": .init(reveal), "trigger": .init(trigger), "source": .init(source),
+             "position": position.map(AnalyticsValue.init), "scrolled": .init(scrolled)]
         case let .launcherSuggestionAccepted(trigger):
             ["trigger": .init(trigger)]
         case let .launcherToolOpened(tool):
@@ -177,8 +173,13 @@ extension AnalyticsEvent {
              "file_type": fileType.map(AnalyticsValue.init), "status": .init(status)]
         case let .launcherAssistantAsked(queryLength, resultCount, outcome):
             ["query_length": .init(queryLength), "result_count": .init(resultCount), "outcome": .init(outcome)]
-        case let .launcherClosed(duration, hadQuery):
-            ["duration": .init(duration), "had_query": .init(hadQuery)]
+        case let .launcherClosed(duration, hadQuery, outcome, actionCount, optionCount, scrolled):
+            ["duration": .init(duration), "had_query": .init(hadQuery), "outcome": .init(outcome),
+             "action_count": .init(actionCount), "option_count": .init(optionCount), "scrolled": .init(scrolled)]
+        case let .launcherOptionChanged(option):
+            ["option": .init(option.name), "value": option.value]
+        case let .launcherFavoriteChanged(favorite):
+            ["favorite": .init(favorite)]
         case let .launcherSuggestionsShown(count):
             ["count": .init(count)]
         case let .launcherSuggestionFeedback(feedback):
@@ -309,7 +310,7 @@ extension AnalyticsEvent {
              "missing_pinned_bundle_ids": .init(coverage.missingPinned)]
         case let .toolOpened(tool, trigger):
             ["tool": .init(tool), "trigger": .init(trigger)]
-        case .onboardingCompleted:
+        case .onboardingCompleted, .launcherHistoryCleared:
             [:]
         case let .focusDockEntered(trigger):
             ["trigger": .init(trigger)]

@@ -19,7 +19,7 @@ struct HubOpenContext {
 /// app's lifetime and supplies ``resolveContext`` and the other hooks.
 ///
 /// Tab models hear about visibility only from here: ``HubTabModel/hubTabDidAppear(shell:)`` when a
-/// tab becomes visible in an open Hub (on open or switch) and ``HubTabModel/hubTabDidDisappear()``
+/// tab becomes visible in an open Hub (on open or switch) and ``HubTabModel/hubTabDidDisappear(_:)``
 /// when it is hidden or the Hub closes. Calls always come in pairs.
 @MainActor @Observable
 final class HubCoordinator {
@@ -279,7 +279,7 @@ final class HubCoordinator {
     private func close(restoreFocus: Bool, animated: Bool = true, clearsSearch: Bool = true) {
         guard let panel, isOpen else { return }
         lookoutSetup.hubDidClose()
-        hideVisibleTab()
+        hideVisibleTab(.closed)
         // Cleared after the visible tab hid, so Files leaves search mode without reactivating its
         // panes and Apps ends its session before its query resets.
         if clearsSearch { clearSearchText() }
@@ -322,7 +322,7 @@ final class HubCoordinator {
     /// - Parameter via: How the person switched, for analytics; nil for a switch a tab requested.
     func selectTab(_ tab: HubTab, via: AnalyticsHubTabSwitch?) {
         guard tab != state.tab else { return }
-        hideVisibleTab()
+        hideVisibleTab(.switchedTab)
         withAnimation(state.reduceMotion ? nil : HubStyle.motion) { state.select(tab) }
         if isOpen { showVisibleTab() }
         preferences.lastTab = tab
@@ -346,10 +346,10 @@ final class HubCoordinator {
         model(for: state.tab).hubTabDidAppear(shell: self)
     }
 
-    private func hideVisibleTab() {
+    private func hideVisibleTab(_ exit: HubTabExit) {
         guard let tab = visibleTab else { return }
         visibleTab = nil
-        model(for: tab).hubTabDidDisappear()
+        model(for: tab).hubTabDidDisappear(exit)
     }
 
     /// Files opens with focus in its listing, the other tabs in the search field, as in the mockup.

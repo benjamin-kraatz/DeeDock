@@ -414,7 +414,7 @@ Dependent behavior changes:
 
 - Discovery loses its only clipboard recipe, so it no longer polls `NSPasteboard.changeCount`.
   The `clipboardChanged` signal and the watcher timer are removed. The Notification Feed,
-  Islands, and Robi announcements are unchanged. A stored `discovery.state.v1` that names
+  Islands, Robi, and Radar announcements are unchanged. A stored `discovery.state.v1` that names
   `clipboardMuseum` as used or dismissed still decodes; the entry matches nothing.
 - The Hub Apps tool row lists Local History, App Compare, and System Settings Clone.
 - Shelf keeps its own clipboard paste (`Application Support/<bundle id>/Clipboard`), which never
@@ -435,6 +435,33 @@ delete it in Keychain Access.
 
 `ClipboardMuseumCleanupTests` covers the deletion, a neighbouring folder surviving, a second run,
 a Mac that never used the Museum, a failed deletion retried, and an unresolvable folder skipped.
+
+## DEE-156 Find a Window removed
+
+Find a Window is gone, with no replacement. The **Find a Window** item in the DOKK menu and the
+app menu, the global Command-Shift-Space hot key, the Focus Dock `/` key, the Hub's
+**Capture & image search…** menu item, and the window itself are removed: live title search,
+**Choose Windows…** and **Capture Selected** (OCR of up to four windows), **Search Images with
+AI**, and the Saved Capsules tab with its capsule detail and delete. So are the
+`window_search_activated` and `window_search_closed` events, the `window_search` values of
+`tool_opened` and `focus_dock_command`, the `window_search_image_match` AI trace, 53 String
+Catalog keys, and `WINDOW_SEARCH.md`.
+
+The Hub's Apps-tab search kept what it used. `WindowSearchService` (metadata-only window
+discovery and exact-window activation), `WindowSearchSource`, `WindowSearchResult`,
+`WindowSearchMatcher`, and `WindowSearchIndex` moved from `Dock/Search` to `Launcher/Search`.
+The index keeps only the live and saved scopes; its captured scope and image results are gone.
+Matching, ranking, and the "yesterday" rule are unchanged, so Hub window and Capsule results
+are the same as before. Session Capsules, Breadcrumbs, the window-context capture service,
+Radar, Window Peek, and the app context menu's window list are untouched.
+
+Find a Window kept captures in memory only and stored no preferences, so there is nothing to
+clean up at launch. Radar's and Robi's Carbon hot keys share the old signature under their own
+IDs and are unaffected.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination platform=macOS -derivedDataPath /private/tmp/claude-501/dee156-DerivedData CODE_SIGNING_ALLOWED=NO build`
+and `build-for-testing` both succeeded, compiling the app and test targets. No tests were run, and the app was not launched.
 
 ## DEE-150 Dock Modes removed
 
@@ -2218,11 +2245,12 @@ Window Watch (DEE-11, DEE-25) and window portals (DEE-14, DEE-23) were removed i
 used either feature, so the code, settings, strings, analytics events, and acceptance notes went
 with them.
 
-## DEE-15: window search
+## DEE-15: window search, removed
 
-Implemented on `feature/dee-15`. Find a Window searches live titles/app names, explicitly captured text, and saved capsule history in separate scopes. Image search is an explicit on-device model action and labels its output as inferred. Captured context stays in memory and supports clear, expiry, and close cleanup. Global/app shortcuts and Focus Dock `/` open the search window.
-
-See [Window search](WINDOW_SEARCH.md) for evidence rules, resource bounds, SDK investigation, model/state cases, and the manual acceptance checklist. Focused unsigned Debug app builds passed. Tests, previews, automated visual checks, runtime capture/model inference, and native acceptance were not executed. Visual-attribute accuracy, focus/accessibility, stale navigation, permissions, and multi-display/Space behavior remain unverified. This issue is not Done based on compilation.
+Find a Window (DEE-15) was removed in DEE-156. Its window, shortcuts, capture and image search,
+strings, analytics events, and reference document went with it. The live-window and
+saved-capsule matching it shared with the Hub search remains; see
+[DEE-156](#dee-156-find-a-window-removed).
 
 ## DEE-12: files through Window Peek
 
@@ -2428,6 +2456,8 @@ kind-neutral empty title and result count in English and German. Native visual v
 of this correction remains pending. Further subagent review was stopped at the user's request.
 
 ## DEE-27: explicit window focus
+
+Historical record. Window Search (Find a Window) was removed in DEE-156; its mentions below describe the build at the time.
 
 Settings commands now share one presentation path, including menu-bar and app commands, dock
 context menus, Window Peek, Window Search, and onboarding. The scene registers its
