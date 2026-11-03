@@ -122,7 +122,7 @@ nonisolated enum AnalyticsDiscoveryAction: String, AnalyticsToken {
 
 /// Keys the dock handles while it has keyboard focus.
 nonisolated enum AnalyticsFocusCommand: String, AnalyticsToken {
-    case windowSearch = "window_search", openFiles = "open_files"
+    case openFiles = "open_files"
     case badgeMemory = "badge_memory", history, navigate, movePin = "move_pin", open, windowPeek = "window_peek", exit
 }
 
@@ -170,6 +170,6 @@ nonisolated enum AnalyticsDisplayRole: String, AnalyticsToken {
 
 /// A tool window opened from the menu bar or a dock shortcut.
 nonisolated enum AnalyticsTool: String, AnalyticsToken {
-    case windowSearch = "window_search", localHistory = "local_history", fusion, badgeMemory = "badge_memory"
+    case localHistory = "local_history", fusion, badgeMemory = "badge_memory"
     case systemSettingsClone = "system_settings_clone", settings
 }

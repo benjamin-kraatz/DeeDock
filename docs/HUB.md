@@ -57,7 +57,7 @@ is moved onto a display that still exists.
   See [Escape order](#escape-order).
 - A click outside the Hub, or another app taking focus, closes it without reactivating anything.
 - Opening an app, a window, a file, a capsule, or a DOKK tool closes it.
-- Opening a folder stack, the Shelf, Radar, Find a Window, Focus Dock, or Local History closes it.
+- Opening a folder stack, the Shelf, Radar, Focus Dock, or Local History closes it.
 - Sleep, switching to another user, and a display change close it at once, whatever holds it open.
 
 A detached Hub ignores outside clicks and focus loss. Escape only clears its search. The close

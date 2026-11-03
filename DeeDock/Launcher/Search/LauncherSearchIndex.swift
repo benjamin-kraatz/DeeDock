@@ -27,8 +27,7 @@ nonisolated enum LauncherSearchIndex {
             }
         }
         if !appOnly && (input.kind == .all || input.kind == .window) {
-            let matches = await WindowSearchIndex.results(query: query, scope: .live, sources: windows,
-                snapshots: [], owners: [:], date: nil, saved: [], images: [])
+            let matches = await WindowSearchIndex.results(query: query, scope: .live, sources: windows, saved: [])
             for match in matches {
                 guard let source = match.source, source.window != nil || source.candidate != nil else { continue }
                 results.append(LauncherSearchResult(id: .window(match.id), kind: .window,
@@ -39,8 +38,7 @@ nonisolated enum LauncherSearchIndex {
             }
         }
         if !appOnly && (input.kind == .all || input.kind == .capsule) {
-            let matches = await WindowSearchIndex.results(query: query, scope: .saved, sources: [],
-                snapshots: [], owners: [:], date: nil, saved: input.capsules, images: [])
+            let matches = await WindowSearchIndex.results(query: query, scope: .saved, sources: [], saved: input.capsules)
             results += matches.map { match in
                 LauncherSearchResult(id: .capsule(match.id), kind: .capsule, title: match.title,
                     source: String(localized: match.evidence.label) + " · " + match.excerpt,

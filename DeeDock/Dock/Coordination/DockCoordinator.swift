@@ -121,9 +121,6 @@ final class DockCoordinator {
     let islandPlans = DockIslandPlanStore()
     @ObservationIgnored private let volumeDock: VolumeDockCoordinator
     @ObservationIgnored private let capsules = SessionCapsuleController()
-    @ObservationIgnored private let searchShortcut = WindowSearchShortcut()
-    private(set) var searchShortcutAvailable = false
-    @ObservationIgnored private lazy var windowSearch = WindowSearchController(capsules: capsules)
     @ObservationIgnored private let applicationMenus: ApplicationMenuController
     let peekHistory = PeekHistoryStore.live()
     @ObservationIgnored private let windowPeeks: WindowPeekCoordinator
@@ -386,7 +383,6 @@ final class DockCoordinator {
         }
         capsules.didChange = { [weak self] in
             self?.sessionCapsules.reload()
-            self?.windowSearch.reloadCapsules()
             self?.refreshPanels()
         }
         catalog.activated = { [weak self] app in
@@ -425,7 +421,6 @@ final class DockCoordinator {
         configureVolumeReads()
         volumes.start()
         capsules.start()
-        searchShortcutAvailable = searchShortcut.start { [weak self] in self?.searchWindows() }
         scheduleShelfSemanticWarmup()
         displayService.start()
         // After the first reconcile, so the macOS Dock is placed away from the real dock.
@@ -543,7 +538,6 @@ final class DockCoordinator {
                 // A context menu or drag replaces the plain card; a question or refusal stays.
                 if volumeDock.cards.isOpen, volumeDock.cards.isShowingInfo { volumeDock.cards.close() }
             }
-            panel.windowSearchRequested = { [weak self] in self?.searchWindows() }
             panel.timelineRequested = { [weak self] in self?.browseLocalHistory() }
             panel.escape = { [weak self] in
                 guard let self else { return }
@@ -917,18 +911,6 @@ final class DockCoordinator {
         harbor.configureShortcut(enabled: settings.value.harborShortcutEnabled)
     }
 
-    /// Opens metadata search only after a menu or keyboard action.
-    func searchWindows() {
-        harbor.close(raising: nil, outcome: .interrupted, animated: false)
-        hub.dismissAnchored()
-        popovers.closeAll()
-        windowPeeks.close(returnFocus: false)
-        timeline.end()
-        endFocus(restore: false)
-        Analytics.track(.toolOpened(.windowSearch, trigger: Analytics.trigger()))
-        windowSearch.show(returningTo: lastExternalApplication)
-    }
-
     func focusDock() {
         guard let id = DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation), let panel = panels[id] else { return }
         hub.dismissAnchored()
@@ -1094,10 +1076,6 @@ final class DockCoordinator {
     private func configureLauncherSearch(_ launcher: LauncherState) {
         let search = launcher.search
         search.shelf = shelf; search.capsules = capsules; search.actions = actionTiles
-        search.explicitSearch = { [weak self] in
-            self?.hub.dismissAfterAction()
-            self?.searchWindows()
-        }
         search.dispatch = { [weak self, weak launcher] result, reveal in
             guard let self, let launcher else { return }
             let search = launcher.search
@@ -1185,8 +1163,6 @@ final class DockCoordinator {
         shelfSemanticWarmup.stop()
         popovers.stop()
         shelf.stop()
-        searchShortcut.stop()
-        windowSearch.stop()
         capsules.stop()
         windowPeeks.stop()
         applicationMenus.stop()

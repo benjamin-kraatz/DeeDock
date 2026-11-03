@@ -72,6 +72,7 @@ private struct LauncherToolButton: View {
 
     private func open() {
         Analytics.track(.launcherToolOpened(tool))
+        state.recordVisit(.tool)
         if tool == .systemSettingsClone {
             // Opening a DOKK window hands focus away, so an anchored Hub dismisses.
             state.close?()

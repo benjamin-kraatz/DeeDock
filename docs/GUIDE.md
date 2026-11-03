@@ -32,7 +32,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 
 ## Get started
 
-DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Window Search, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK. [Tuck away the macOS Dock](#tuck-away-the-macos-dock) moves it out of the way with one click.
+DOKK starts as a menu-bar app without an icon in the macOS system Dock. DOKK appears in its own running-app section while Settings, Welcome, Badge Memory, or an update window is open, including minimized windows. Closing the last of these windows removes the running entry; dock panels and hover previews do not count. Clicking DOKK's icon brings an existing window forward. Your running-section visibility settings still apply. By default, each dock is centered above its display’s usable bottom edge, leaving room for the system Dock when macOS reserves that space. If the system Dock auto-hides, its transient reveal can overlap DOKK. [Tuck away the macOS Dock](#tuck-away-the-macos-dock) moves it out of the way with one click.
 
 ### BIG DIKK
 
@@ -221,12 +221,6 @@ Choose **Add to Compare** on a Window Peek card, then select a second window fro
 Capture the selected windows, review or correct their visible text, and choose Compare, Summarize differences, or Create checklist. Apple Intelligence generates an editable draft from the reviewed text only. Save explicitly to create a native text artifact in Shelf with source attribution, capture times, and limitations. Errors retain reviewed input or the draft where practical; unavailable AI never produces a substitute result. This is a partial visible-context analysis, not a complete document comparison.
 
 See [App Compare](APP_FUSION.md) for input lifetime, save recovery, and storage behavior. Compilation is separate from [pending native acceptance](ACCEPTANCE.md#app-compare-dee-16).
-
-### Find a window
-
-Choose **Find a Window** from the DOKK menu, press Command-Shift-Space globally, or press `/` in Focus Dock. Search live window titles and app names without AI. Use **Choose Windows…** and **Capture Selected** to search visible text from up to four selected windows. **Search Images with AI** separately checks those screenshots and labels matches as model suggestions. Captures stay in memory for at most ten minutes and are cleared when search closes.
-
-**Saved Capsules** searches historical checkpoints and supports deletion. “Yesterday” requires a capsule saved yesterday; DOKK does not collect a continuous screen history. See the [window search reference](WINDOW_SEARCH.md) for limits, keyboard controls, and pending acceptance.
 
 ### Radar
 
