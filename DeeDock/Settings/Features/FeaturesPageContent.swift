@@ -54,6 +54,7 @@ struct FeaturesPageContent: View {
             }
         case .notificationFeed:
             NotificationFeedSettingsCard(isOn: source.binding(\.showNotificationFeed),
+                                         clearsOnClose: source.binding(\.notificationFeedClearsOnClose),
                                          windowAccess: context.windowAccess,
                                          feed: context.coordinator?.notificationFeed, locked: locked)
         case .harbor:

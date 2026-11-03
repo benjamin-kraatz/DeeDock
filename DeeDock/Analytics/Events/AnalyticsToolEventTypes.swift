@@ -129,6 +129,34 @@ nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case appHealthLabelling = "app_health_labelling"
 }
 
+/// How an entry or a stack left the notification feed. Never which entry or app.
+nonisolated enum AnalyticsNotificationFeedRemoval: String, AnalyticsToken, CaseIterable {
+    /// The ✕ that appears on hover, on a row, a stack, or an unfolded group's header.
+    case hoverX = "hover_x"
+    /// A trackpad or mouse swipe, or the Clear action it revealed.
+    case swipe
+    /// The row's context menu.
+    case menu
+    /// Delete while the row or stack is selected.
+    case keyboard
+    /// A VoiceOver action.
+    case voiceOver = "voice_over"
+}
+
+/// Where the whole notification feed was emptied.
+nonisolated enum AnalyticsNotificationFeedClearSource: String, AnalyticsToken, CaseIterable {
+    /// Clear All in the popover's header.
+    case header
+    /// Command-Delete in the open popover.
+    case keyboard
+    /// Clear Notifications in the tile's context menu.
+    case tileMenu = "tile_menu"
+    /// The Clear action VoiceOver offers on the tile.
+    case voiceOver = "voice_over"
+    /// Clear Notifications in Settings.
+    case settings
+}
+
 /// Which window permissions Harbor had when it opened.
 nonisolated enum AnalyticsHarborAccess: String, AnalyticsToken {
     case full, accessibilityOnly = "accessibility_only", screenRecordingOnly = "screen_recording_only", none

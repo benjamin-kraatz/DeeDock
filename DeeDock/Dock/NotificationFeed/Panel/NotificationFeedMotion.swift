@@ -1,0 +1,87 @@
+import SwiftUI
+
+/// The feed's shared timing, from the approved DEE-155 mockup.
+///
+/// One spring moves every row, stack, and fold. Under Reduce Motion nothing slides: rows take
+/// their new places at once and every arrival, removal, and unfold is a 150 ms cross-fade, which
+/// each transition carries itself. The swipe gesture still follows the pointer, because that
+/// motion is the person's own, and settles with the 150 ms curve.
+enum NotificationFeedMotion {
+    /// Response 0.38 s, damping 0.82: settles in about 400 ms with a small overshoot.
+    static let spring = Animation.spring(response: 0.38, dampingFraction: 0.82)
+    static let reducedDuration = 0.15
+    static let reduced = Animation.easeInOut(duration: reducedDuration)
+
+    /// For a swipe settling open, closed, or back.
+    static func standard(reduceMotion: Bool) -> Animation {
+        reduceMotion ? reduced : spring
+    }
+
+    /// For rows moving to new places: nil under Reduce Motion, so they move without sliding.
+    static func layout(reduceMotion: Bool) -> Animation? {
+        reduceMotion ? nil : spring
+    }
+
+    /// Text fading in as a peeking card becomes a row, and out as it folds back.
+    static let contentFade = Animation.easeOut(duration: 0.2)
+
+    /// How long an opened entry drops before the popover closes, so the drop reads before the
+    /// panel fades. Matches the mockup's `min(260 ms, settle × 0.55)`.
+    static func closeDelay(reduceMotion: Bool) -> Duration {
+        reduceMotion ? .milliseconds(120) : .milliseconds(210)
+    }
+
+    /// How long a group takes to fold its rows into the front card before the card fades.
+    static func foldDelay(reduceMotion: Bool) -> Duration {
+        reduceMotion ? .zero : .milliseconds(220)
+    }
+
+    /// Distance an opened entry travels toward the dock while it fades.
+    static let dropDistance: CGFloat = 26
+    /// Distance an arriving entry slides in from above.
+    static let arrivalDistance: CGFloat = 22
+}
+
+/// How an entry leaves the feed. Chosen by the action that removed it.
+///
+/// SwiftUI takes a removed view's transition from its last rendered state, so the style is
+/// staged on the panel a frame before the store drops the entry. See
+/// `NotificationFeedCoordinator.removeAnimated(_:style:after:)`.
+nonisolated enum NotificationFeedLeaveStyle: Equatable, Sendable {
+    /// Shrinks to 92 % and fades. Remove, Clear All, and a cleared group after it folds.
+    case shrink
+    /// Drops toward the dock while it shrinks and fades: the app was opened.
+    case drop
+    /// Already flown out by a swipe; only the space it held closes.
+    case swiped
+}
+
+extension NotificationFeedLeaveStyle {
+    /// The transition for an entry or group leaving with this style.
+    /// - Parameters:
+    ///   - edge: The dock edge the popover is attached to; `drop` moves toward it.
+    ///   - reduceMotion: Replaces every movement with a 150 ms cross-fade.
+    func transition(edge: DockEdge, reduceMotion: Bool) -> AnyTransition {
+        let arrival = AnyTransition.offset(y: -NotificationFeedMotion.arrivalDistance).combined(with: .opacity)
+        if reduceMotion { return .opacity.animation(NotificationFeedMotion.reduced) }
+        let removal: AnyTransition
+        switch self {
+        case .shrink:
+            removal = .scale(scale: 0.92).combined(with: .opacity)
+        case .drop:
+            // The fade runs on its own, quicker curve so a bouncy spring never overshoots opacity.
+            let distance = NotificationFeedMotion.dropDistance
+            let offset: CGSize = switch edge {
+            case .bottom: CGSize(width: 0, height: distance)
+            case .top: CGSize(width: 0, height: -distance)
+            case .left: CGSize(width: -distance, height: 0)
+            case .right: CGSize(width: distance, height: 0)
+            }
+            removal = AnyTransition.offset(offset).combined(with: .scale(scale: 0.86))
+                .combined(with: AnyTransition.opacity.animation(.easeIn(duration: 0.28)))
+        case .swiped:
+            removal = .opacity.animation(.linear(duration: 0.01))
+        }
+        return .asymmetric(insertion: arrival, removal: removal)
+    }
+}

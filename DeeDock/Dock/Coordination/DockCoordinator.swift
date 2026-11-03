@@ -396,6 +396,8 @@ final class DockCoordinator {
             self?.occupancy.invalidate()
             self?.windowPeeks.close(returnFocus: false)
             self?.endFocus(restore: false)
+            // DEE-155: an app brought forward from anywhere takes its feed entries with it.
+            self?.notificationFeedPopover.applicationActivated(app)
         }
         profiles.didChange = { [weak self] in
             guard let self else { return }
@@ -684,7 +686,7 @@ final class DockCoordinator {
                 guard let self, let panel, panels[display.id] === panel else { return }
                 notificationFeedPopover.toggle(on: panel, keyboard: false)
             }
-            panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clear() }
+            panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clearFromTile() }
             connectPlugins(store: store, panel: panel, displayID: display.id)
             store.openHarbor = { [weak self] in Analytics.performing(.keyboard) { self?.harbor.toggle() } }
             panel.interaction.openHarbor = { [weak self] in self?.harbor.toggle() }
@@ -753,6 +755,7 @@ final class DockCoordinator {
         badges.configure(enabled: settings.value.showAppBadges && !enabledDisplays.isEmpty)
         notificationFeed.configure(enabled: settings.value.showNotificationFeed && !enabledDisplays.isEmpty)
         if !settings.value.showNotificationFeed { notificationFeedPopover.close() }
+        notificationFeedPopover.clearsOnClose = settings.value.notificationFeedClearsOnClose
         occupancy.configure(enabled: satelliteMode && !occupancySuspended)
         for display in enabledDisplays {
             guard let panel = panels[display.id] else { continue }

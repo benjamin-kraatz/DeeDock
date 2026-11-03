@@ -34888,6 +34888,24 @@
         }
       }
     },
+    "notificationFeedClearAction" : {
+      "comment" : "Short action that clears a notification, or a sender's whole stack of notifications. Shown on the red button a swipe reveals and as a VoiceOver action on a stack.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        }
+      }
+    },
     "notificationFeedClearAll" : {
       "comment" : "Short button in the popover header that removes every collected notification.",
       "extractionState" : "manual",
@@ -34902,6 +34920,84 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear All"
+          }
+        }
+      }
+    },
+    "notificationFeedClearGroup" : {
+      "comment" : "Context menu item, tooltip, and VoiceOver label that clear every notification from one app in the feed. The number is how many notifications that app has.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Mitteilung löschen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Mitteilungen löschen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Clear %lld Notification"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Clear %lld Notifications"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "notificationFeedClearOnClose" : {
+      "comment" : "Settings switch: when on, notifications the person saw are removed when the notification feed closes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Schließen löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear when closed"
+          }
+        }
+      }
+    },
+    "notificationFeedClearOnCloseHelp" : {
+      "comment" : "Subtitle of the 'Clear when closed' switch. Explains that only notifications seen while the feed was open are removed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesehene Mitteilungen verschwinden, wenn sich der Verlauf schließt. Neue, die währenddessen eintreffen, bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications you saw leave the feed when it closes. New ones that arrive while it’s closed stay."
           }
         }
       }
@@ -34998,6 +35094,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "notificationFeedExpand" : {
+      "comment" : "VoiceOver action on a stack of notifications from one app that unfolds it to show every notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufklappen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expand"
           }
         }
       }
@@ -35297,13 +35411,49 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mitteilungen, Banner, Hinweise, verpasst, Verlauf, Mitteilungszentrale"
+            "value" : "Mitteilungen, Banner, Hinweise, verpasst, Verlauf, Mitteilungszentrale, beim Schließen löschen, Stapel, wischen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "notifications, banners, alerts, missed, history, notification center"
+            "value" : "notifications, banners, alerts, missed, history, notification center, clear when closed, stacks, swipe"
+          }
+        }
+      }
+    },
+    "notificationFeedShowLess" : {
+      "comment" : "Button above an unfolded stack of notifications from one app that folds it back into a stack. Keep it short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weniger"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Less"
+          }
+        }
+      }
+    },
+    "notificationFeedStackHint" : {
+      "comment" : "VoiceOver hint and tooltip for a folded stack of notifications from one app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt alle Mitteilungen dieser App."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows every notification from this app."
           }
         }
       }

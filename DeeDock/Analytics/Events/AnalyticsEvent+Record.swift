@@ -75,6 +75,11 @@ extension AnalyticsEvent {
         case .clipboardCaptureEnabled: "clipboard_capture_enabled"
         case .notificationFeedOpened: "notification_feed_opened"
         case .notificationFeedClosed: "notification_feed_closed"
+        case .notificationFeedRowOpened: "notification_feed_row_opened"
+        case .notificationFeedRowRemoved: "notification_feed_row_removed"
+        case .notificationFeedGroupCleared: "notification_feed_group_cleared"
+        case .notificationFeedClearedAll: "notification_feed_cleared_all"
+        case .notificationFeedAutoCleared: "notification_feed_auto_cleared"
         case .harborOpened: "harbor_opened"
         case .harborClosed: "harbor_closed"
         case .pluginPanelOpened: "plugin_panel_opened"
@@ -266,6 +271,16 @@ extension AnalyticsEvent {
             ["entry_count": .init(entryCount), "unread_count": .init(unreadCount), "trigger": .init(trigger)]
         case let .notificationFeedClosed(entryCount, duration, cleared):
             ["entry_count": .init(entryCount), "duration": .init(duration), "cleared": .init(cleared)]
+        case let .notificationFeedRowOpened(trigger, clearedCount):
+            ["trigger": .init(trigger), "cleared_count": .init(clearedCount)]
+        case let .notificationFeedRowRemoved(method):
+            ["method": .init(method)]
+        case let .notificationFeedGroupCleared(method, count):
+            ["method": .init(method), "count": .init(count)]
+        case let .notificationFeedClearedAll(source, count):
+            ["source": .init(source), "count": .init(count)]
+        case let .notificationFeedAutoCleared(count):
+            ["count": .init(count)]
         case let .harborOpened(trigger, windowCount, appCount, displayCount, access):
             ["trigger": .init(trigger), "window_count": .init(windowCount), "app_count": .init(appCount),
              "display_count": .init(displayCount), "access": .init(access)]

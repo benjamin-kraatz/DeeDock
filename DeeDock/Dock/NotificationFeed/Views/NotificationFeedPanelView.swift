@@ -1,29 +1,32 @@
 import SwiftUI
 
-/// The notification feed popover: a header with the count and Clear, then the collected banners,
-/// newest first.
+/// The notification feed popover: a header with the count and Clear All, then the collected
+/// banners grouped by sender, newest first.
 ///
-/// Rows slide in from the top as banners arrive and fold away when removed or cleared. Reduce
-/// Motion swaps the movement for a cross-fade; Reduce Transparency draws an opaque panel.
+/// Rows slide in from the top as banners arrive. Leaving rows animate by what removed them:
+/// they shrink away, drop toward the dock when their app opened, or fly out under a swipe; the
+/// rest spring into place. Reduce Motion swaps every movement for a 150 ms cross-fade; Reduce
+/// Transparency draws an opaque panel.
 struct NotificationFeedPanelView: View {
     let entries: [NotificationFeedEntry]
     let status: NotificationFeedController.State
     let state: NotificationFeedPanelState
     var forceOpaqueBackground = false
+    /// Exercises the Reduce Motion path in previews, which cannot set the system preference.
+    var forceReduceMotion = false
 
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     /// Stable start for the relative-time refresh. Recreating it from `.now` would skip ticks.
     @State private var timelineAnchor = Date()
 
-    private var motion: Animation? {
-        reduceMotion ? .easeInOut(duration: 0.15) : .spring(response: 0.38, dampingFraction: 0.82)
-    }
+    private var reduceMotion: Bool { systemReduceMotion || forceReduceMotion }
+    private var motion: Animation? { NotificationFeedMotion.layout(reduceMotion: reduceMotion) }
 
     var body: some View {
         VStack(spacing: 0) {
-            NotificationFeedHeader(count: entries.count, clear: { withAnimation(motion) { state.clearAll?() } })
+            NotificationFeedHeader(count: entries.count, clear: { state.clearAll?() })
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
                 .padding(.bottom, 10)
@@ -36,6 +39,7 @@ struct NotificationFeedPanelView: View {
         }
         .animation(motion, value: entries.map(\.id))
         .animation(motion, value: state.selection)
+        .animation(motion, value: state.expanded)
         .dockPopoverChrome(state.chrome, opaque: reduceTransparency || forceOpaqueBackground)
     }
 
@@ -45,16 +49,17 @@ struct NotificationFeedPanelView: View {
                 state.prepareSettings?()
                 openWindow.openDockSettings()
             })
-            .transition(.opacity)
+            .transition(.opacity.animation(.easeOut(duration: reduceMotion ? 0.15 : 0.25)))
         } else {
             ScrollViewReader { proxy in
                 ScrollView {
                     TimelineView(.periodic(from: timelineAnchor, by: 30)) { context in
                         VStack(spacing: 6) {
-                            ForEach(entries) { entry in
-                                row(entry, now: context.date)
-                                    .id(entry.id)
-                                    .transition(rowTransition)
+                            ForEach(NotificationFeedGrouping.groups(entries)) { group in
+                                NotificationFeedGroupView(group: group, now: context.date, state: state,
+                                                          reduceMotion: reduceMotion)
+                                    .transition(state.leaveStyle(for: group.front.id)
+                                        .transition(edge: state.chrome.edge, reduceMotion: reduceMotion))
                             }
                         }
                         .padding(10)
@@ -67,26 +72,6 @@ struct NotificationFeedPanelView: View {
                 }
             }
         }
-    }
-
-    private var rowTransition: AnyTransition {
-        reduceMotion ? .opacity
-            : .asymmetric(insertion: .move(edge: .top).combined(with: .opacity),
-                          removal: .scale(scale: 0.92).combined(with: .opacity))
-    }
-
-    private func row(_ entry: NotificationFeedEntry, now: Date) -> some View {
-        let application = state.application?(entry)
-        return NotificationFeedRow(
-            entry: entry,
-            icon: application.flatMap { state.icon?($0) },
-            now: now,
-            isNew: state.unreadOnOpen.contains(entry.id),
-            isSelected: state.selection == entry.id,
-            canOpen: application != nil,
-            open: { state.open?(entry) },
-            copy: { state.copy?(entry) },
-            remove: { withAnimation(motion) { state.remove?(entry.id) } })
     }
 }
 
@@ -102,30 +87,67 @@ private struct NotificationFeedFooter: View {
 }
 
 #if DEBUG
-#Preview("Feed with entries") {
+#Preview("Grouped") {
     NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening,
                               state: NotificationFeedPreviewData.state())
         .frame(width: 380, height: 480)
 }
 
-#Preview("Feed, selection, dark") {
+#Preview("Grouped, dark, selection") {
     let state = NotificationFeedPreviewData.state()
-    state.selection = NotificationFeedPreviewData.entries[1].id
+    state.selection = NotificationFeedPreviewData.entries[3].id
     return NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening, state: state)
         .frame(width: 380, height: 480)
         .preferredColorScheme(.dark)
 }
 
-#Preview("Feed, opaque, German") {
-    NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening,
+#Preview("Expanded stack") {
+    let state = NotificationFeedPreviewData.state()
+    if let mail = NotificationFeedGrouping.groups(NotificationFeedPreviewData.entries).first(where: { $0.appName == "Mail" }) {
+        state.setExpanded(mail, true)
+    }
+    return NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening, state: state)
+        .frame(width: 380, height: 480)
+}
+
+#Preview("Mid-swipe, light") {
+    let state = NotificationFeedPreviewData.state()
+    state.swipe.previewReveal(NotificationFeedPreviewData.entries[1].id, by: 96)
+    return NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening, state: state)
+        .frame(width: 380, height: 480)
+        .preferredColorScheme(.light)
+}
+
+#Preview("Stack swipe, dark") {
+    let state = NotificationFeedPreviewData.state()
+    state.swipe.previewReveal(NotificationFeedPreviewData.entries[3].id, by: NotificationFeedSwipePhysics.actionWidth)
+    return NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening, state: state)
+        .frame(width: 380, height: 480)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Ungrouped, opaque, German") {
+    NotificationFeedPanelView(entries: NotificationFeedPreviewData.singleEntries, status: .listening,
                               state: NotificationFeedPreviewData.state(), forceOpaqueBackground: true)
         .frame(width: 380, height: 480)
         .environment(\.locale, Locale(identifier: "de"))
 }
 
+#Preview("Reduce Motion") {
+    NotificationFeedPanelView(entries: NotificationFeedPreviewData.entries, status: .listening,
+                              state: NotificationFeedPreviewData.state(), forceReduceMotion: true)
+        .frame(width: 380, height: 480)
+}
+
 #Preview("Empty") {
     NotificationFeedPanelView(entries: [], status: .listening, state: NotificationFeedPreviewData.state())
         .frame(width: 380, height: 480)
+}
+
+#Preview("Empty, dark") {
+    NotificationFeedPanelView(entries: [], status: .listening, state: NotificationFeedPreviewData.state())
+        .frame(width: 380, height: 480)
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Needs access") {
