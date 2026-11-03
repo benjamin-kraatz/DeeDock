@@ -420,7 +420,7 @@ Notifications from the same app stack, newest in front, with a count beside the 
 
 To clear a notification with a gesture, swipe left on it with two fingers on the trackpad, or drag it left with the mouse. A short swipe uncovers a red **Clear** button; a longer or quicker one clears it straight away. Swiping a stack clears the whole stack. Scrolling up and down is not affected.
 
-Opening an app clears its notifications from the feed, whether you open it from the feed, its dock tile, Command-Tab, or anywhere else. This only happens when the notification's app name matches exactly one app; system alerts stay until you remove them. With the feed closed, you see this as a smaller badge.
+Opening an app clears its notifications from the feed. Open one from the feed, and DOKK clears every notification with that sender, picking the running app if several share the name. Open the app anywhere else (its dock tile, Command-Tab, Spotlight), and its notifications clear only when the sender's name matches exactly one app. System alerts stay until you remove them. With the feed closed, you see this as a smaller badge.
 
 Turn on **Clear when closed** in the feed's Settings card to empty the feed of everything you saw each time you close it. Notifications that arrive while it is closed stay, marked as new.
 
