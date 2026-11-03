@@ -638,7 +638,7 @@ Inward means toward the desktop, adapting to each dock edge. Before and after fo
 
 Keyboard-selected entries show their label immediately. Pointer exit, dragging, menus, hiding, and error feedback clear labels and pending delays. Tooltips remain click-through, do not steal focus, and do not extend auto-hide retention. Showing one does not resize the dock. Section buttons use the chosen design for their localized action label.
 
-The gallery uses the same renderer as the dock. **Play Preview** demonstrates the selected delay and entrance on an inert sample. Reduce Motion substitutes short fades for movement and scale; Reduce Transparency uses opaque backgrounds. No preset runs a continuous animation.
+The gallery uses the same renderer as the dock. Hovering a card, or moving keyboard focus to it, hides its label and replays that preset's hover delay and entrance beside a sample icon in its placement; leaving the card restores the static label. **Play Preview** demonstrates the selected delay and entrance on an inert sample. Reduce Motion substitutes short fades for movement and scale; Reduce Transparency uses opaque backgrounds. No preset runs a continuous animation.
 
 Compilation is checked separately from hands-on appearance and interaction. See the [acceptance record](ACCEPTANCE.md) for the outstanding runtime scenarios.
 

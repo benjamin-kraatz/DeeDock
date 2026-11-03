@@ -6,7 +6,7 @@ struct DockTooltipPreview: View {
     let edge: DockEdge
     let reduceMotion: Bool
     let reduceTransparency: Bool
-    @State private var controller = DockTooltipController()
+    @State private var controller = DockTooltipController(countsReveals: false)
     @State private var playing = false
     @State private var dismissal: DockScheduledAction?
     @State private var measured = CGSize(width: 130, height: 30)

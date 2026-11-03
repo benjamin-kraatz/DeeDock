@@ -13,7 +13,7 @@ struct DockTooltipSettingsPane: View {
                                    reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
             }
             DockTooltipPicker(selection: source.binding(\.tooltipPreset), edge: source.value.edge,
-                              reduceTransparency: reduceTransparency)
+                              reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
                 .settingsOverride(source.context, field: .tooltipPreset)
         }
     }
