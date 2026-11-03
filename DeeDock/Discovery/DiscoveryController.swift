@@ -76,7 +76,7 @@ final class DiscoveryController {
                                                   object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.finish() }
         })
-        // Native idle/fullscreen state has no unified public notification, as in Atmosphere.
+        // Native idle/fullscreen state has no unified public notification, so a low-frequency timer checks it.
         let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
         }
@@ -138,7 +138,7 @@ final class DiscoveryController {
         }) { return true }
         guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements],
                                                        kCGNullWindowID) as? [[String: Any]] else { return true }
-        let quartz = AtmosphereDisplayLayout.quartzFrame(screen.frame,
+        let quartz = DisplayQuartzFrame.quartzFrame(screen.frame,
                             primaryTop: NSScreen.screens.first?.frame.maxY ?? 0)
         return windows.contains { info in
             guard (info[kCGWindowOwnerPID as String] as? Int32) != ProcessInfo.processInfo.processIdentifier,

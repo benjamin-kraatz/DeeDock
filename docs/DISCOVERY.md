@@ -22,7 +22,7 @@ The callout is a nonactivating AppKit panel with native SwiftUI buttons and Engl
 
 Discovery blocks presentation during DDock drag, menu, file-picker, popover, or keyboard Dock focus. It also blocks while DDock has an ordinary window or sheet open, while mouse buttons are held outside the callout, and until system input has been idle for two seconds. Sleep and inactive sessions stop metadata observation. Space changes, application activation, and drag events dismiss an existing callout. Visible callouts also recheck native gates each second.
 
-Like Atmosphere, Discovery conservatively treats another process's layer-zero window covering the target display as fullscreen. This uses public Quartz bounds with the AppKit-to-Quartz coordinate conversion. Missing window-list data blocks presentation. No Accessibility permission is requested. Public window bounds cannot reliably identify another application's modal sheets, and v0 does not claim to detect those. DDock has no general system Focus/DND preference to reuse.
+Discovery conservatively treats another process's layer-zero window covering the target display as fullscreen. This uses public Quartz bounds with the AppKit-to-Quartz coordinate conversion. Missing window-list data blocks presentation. No Accessibility permission is requested. Public window bounds cannot reliably identify another application's modal sheets, and v0 does not claim to detect those. DDock has no general system Focus/DND preference to reuse.
 
 The panel has no motion. Reduce Transparency uses an opaque system background. After 20 seconds the callout snoozes unless the pointer is inside it, it owns keyboard focus, or VoiceOver is enabled.
 

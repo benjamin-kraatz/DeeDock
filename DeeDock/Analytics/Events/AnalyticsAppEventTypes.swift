@@ -5,14 +5,13 @@ import Foundation
 
 /// A Settings sidebar section. Displays are reported by role, never by name or identifier.
 nonisolated enum AnalyticsSettingsSection: String, AnalyticsToken {
-    case general, dock, atmosphere, extras, windowsFocus = "windows_focus"
+    case general, dock, extras, windowsFocus = "windows_focus"
     case suggestionsHistory = "suggestions_history", display, lookout, plugins
 
     init(_ section: SettingsSection) {
         switch section {
         case .general: self = .general
         case .dock: self = .dock
-        case .atmosphere: self = .atmosphere
         case .extras: self = .extras
         case .windowsFocus: self = .windowsFocus
         case .suggestionsHistory: self = .suggestionsHistory

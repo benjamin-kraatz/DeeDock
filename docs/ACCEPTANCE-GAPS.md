@@ -57,7 +57,7 @@ These groups remain open. Passing model tests closes only the matching automated
 | Launcher | Other browse layouts and groupings, favorites, Escape and outside-click dismissal, keyboard selection after reopening, independent offsets on two displays, suggestions, and file-action delivery. |
 | Window integrations | Exact-window actions, permission loss, stale captures, file handoff, window search, OCR history, and App Fusion. |
 | Files and local history | Shelf and Compost restoration, folder details and cloud placeholders, Clipboard Museum, Capsules, timeline replay, badge history, and Shortcut actions. |
-| Appearance and accessibility | VoiceOver operation, Reduce Motion and Reduce Transparency in native windows, light/dark contrast, magnification, launch animations, indicators, and Atmosphere. |
+| Appearance and accessibility | VoiceOver operation, Reduce Motion and Reduce Transparency in native windows, light/dark contrast, magnification, launch animations, and indicators. |
 | Onboarding and updates | First-launch paths, login-item behavior, update discovery, idle-install gates, and relaunch. Release publishing remains Esi's responsibility. |
 | macOS Dock tuck-away | The user's manual `defaults` probe passed before implementation. The built switch still needs Settings and tour use, quit/relaunch, update relaunch, logout/login, force quit, edge following, and badge recovery after Dock restarts. See [checklist](ACCEPTANCE.md#tuck-away-hands-on-acceptance). |
 | Apps' own Dock menu items | Pressing rows and submenu rows through the built menu, apps with recents and no windows, and Finder with windows open. Fullscreen and plain auto-hide without the tuck remain unmeasured. See [checklist](ACCEPTANCE.md#apps-own-dock-menu-items). |

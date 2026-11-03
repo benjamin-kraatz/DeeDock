@@ -16,7 +16,6 @@ final class DockCoordinator {
     let fileDestinations = LauncherFileDestinationsStore()
     let settings: DockSettingsStore
     let profiles: DisplayProfilesStore
-    let atmosphere = AtmosphereController()
     let discovery = DiscoveryController()
     let zonePreview = DockZonePreviewController()
     let displayIndicator = DisplaySelectionIndicatorController()
@@ -207,7 +206,7 @@ final class DockCoordinator {
     func start() {
         guard !started else { return }
         started = true
-        atmosphere.start()
+        AtmosphereCleanup.runInBackground()
         robi.prepareSettingsRoute = { [weak self] in self?.settingsRobiRequest = true }
         robi.didUse = { [weak self] in self?.discovery.markUsed(.robi) }
         robi.start()
@@ -493,7 +492,6 @@ final class DockCoordinator {
         let knownProfiles = Set(profiles.document.profiles.keys)
         profiles.synchronize(displays) { catalog.service.defaultFavorites() }
         reportDisplayChange(displays, knownProfiles: knownProfiles)
-        atmosphere.update(displays: displays)
         enabledDisplays = DisplayPolicy.enabled(displays) { profiles.document.profiles[$0]?.enabled == true }
         let desired = Set(enabledDisplays.map(\.id))
         for id in Array(panels.keys) where !desired.contains(id) {
@@ -1149,7 +1147,6 @@ final class DockCoordinator {
         systemDockTuck.stop()
         discovery.stop()
         clipboardMuseum.didUse = nil
-        atmosphere.stop()
         guard started else { return }
         started = false
         occupancy.stop()

@@ -98,8 +98,8 @@ nonisolated enum AnalyticsSuggestionPromptAnswer: String, AnalyticsToken {
     }
 }
 
-/// App-wide feature preferences that live outside the dock, atmosphere, menu-bar, and update
-/// settings models. Each is reported through `setting_changed` with `area = features`.
+/// App-wide feature preferences that live outside the dock, menu-bar, and update settings
+/// models. Each is reported through `setting_changed` with `area = features`.
 nonisolated enum AnalyticsFeatureSetting: String, AnalyticsToken {
     case discoveryEnabled = "discovery_enabled"
     case launcherSuggestionsEnabled = "launcher_suggestions_enabled"
