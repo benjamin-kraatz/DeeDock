@@ -25,7 +25,6 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Robi on your windows](#robi-on-your-windows)
 - [App Health](#app-health)
 - [Plugins](#plugins)
-- [Atmosphere](#atmosphere)
 - [DOKK Discovery](#dokk-discovery)
 - [Settings](#settings)
 - [App updates](#app-updates)
@@ -497,29 +496,6 @@ Plugins let other apps add a tile and a panel to your dock. A plugin comes insid
 **Settings → Plugins** lists every plugin you turned on, with the app it comes from and whether it is running. Use the **Pinned** switch to show or hide a plugin's tile. An unpinned plugin stays installed but does not run. Turning a plugin off completely happens in **Manage Plugins…**.
 
 DOKK checks for newly installed plugins when it comes to the front and when you open the Plugins page.
-
-## Atmosphere
-
-**Settings → Atmosphere** adds optional ambient light to every drawable display. It starts off. Choose 69 for candles and hearts, Minimal for a subtle color
-wash, Focus for a soft glow, or Party for party décor and denser particles. Density controls
-particles. Light intensity scales the edge wash from a faint rim to a stronger glow
-without covering the desktop. Click corner décor to toggle its light; hold it to
-change its appearance.
-
-Choose one color source: Manual, Wallpaper, Focused app icon, or Mood. Wallpaper sampling
-refreshes every eight seconds and offers prominent-to-average, average-only, and corner
-colors. App colors update on activation. Mood uses the local Foundation Models model;
-Apply keeps Mood selected, while Edit as Manual copies its colors. Mood and the optional
-Image Playground system sheet appear only when available. Generated corner images are
-saved locally.
-
-Per display is the default layout. Panorama joins a contiguous horizontal row with matching
-vertical extents, keeps décor at the outer corners, and shares one palette across the row.
-Other arrangements fall back to per-display edges. Only while idle dims the effect until
-30 seconds pass without input. A window covering an entire display hides its overlays;
-this also treats borderless screen-filling apps conservatively as fullscreen. Reduce Motion
-keeps particles still. Sleep and inactive sessions release all Atmosphere panels.
-See [Atmosphere acceptance](ACCEPTANCE.md#dee-73-atmosphere) for runtime limitations.
 
 ## DOKK Discovery
 

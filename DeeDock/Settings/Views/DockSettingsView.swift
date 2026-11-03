@@ -140,10 +140,6 @@ struct DockSettingsView: View {
                 SettingsOverviewView(section: selection, isAvailable: isAvailable, status: status, open: open)
                     .id(selection)
             }
-        case .atmosphere:
-            if let atmosphere = coordinator?.atmosphere {
-                AtmosphereSettingsPane(store: atmosphere.store)
-            }
         case .lookout:
             if let hub = coordinator?.hub {
                 LookoutSettingsPane(model: hub.lookoutSettings)

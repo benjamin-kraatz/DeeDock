@@ -400,6 +400,39 @@ Implemented on `feat/notification-panel`. An opt-in Notification Feed reads Noti
 
 Validation on 2026-10-06: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -destination 'platform=macOS' -derivedDataPath /tmp/dokk-build/DerivedData CODE_SIGNING_ALLOWED=NO build` succeeded. New unit tests in `NotificationFeedTests.swift` and `DiscoveryEngineTests.swift` were compiled with `build-for-testing` and not run. The app was not launched. No banner was read through the shipped code, and previews were not rendered. Compilation does not establish native acceptance.
 
+## DEE-157 Atmosphere removed
+
+Atmosphere is gone, with no replacement. Settings → Atmosphere and its sidebar entry and search
+keywords, the ambient and corner-décor panels on every display, the focused-window light, wallpaper
+and app-icon color sampling, the Foundation Models Mood palette, the Image Playground corner
+image, the `atmosphere` value of `setting_changed` `area` and of `settings_viewed` `section`, and
+the `atmosphere_mood_palette` AI span are removed. Atmosphere had no Discovery tip, no menu
+items, and no events of its own. 58 String Catalog keys went with it. Nothing that Atmosphere
+started is left running: its two-second gate timer, sleep/wake/Space/activation observers,
+wallpaper reads, focused-window Accessibility subscriptions, window captures, and model sessions
+all belonged to `AtmosphereController` and its parts, which are deleted.
+
+Dependent behavior changes:
+
+- Discovery's fullscreen check converts the target screen to Quartz coordinates with
+  `DisplayQuartzFrame.quartzFrame`, a move of the old `AtmosphereDisplayLayout.quartzFrame`
+  with the same formula. Discovery's own window-coverage test and timer are unchanged.
+- The Settings sidebar's first group lists General and Dock.
+
+Atmosphere kept its data in two keys of DOKK's standard UserDefaults: `atmosphere.settings.v1`
+(the settings document, window light included) and `atmosphere.decor.v1` (the generated corner
+image as PNG data). It wrote no files; Image Playground's temporary file belongs to the system.
+`AtmosphereCleanup` runs once at launch, off the main actor. It removes those two keys, then sets
+`cleanup.atmosphere.v1`. No other key is touched.
+
+`AtmosphereCleanupTests` covers removing both keys while neighbouring keys survive, a second run
+leaving restored keys alone, and a Mac that never used Atmosphere.
+
+On 2026-11-03, `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug
+-destination 'platform=macOS' -derivedDataPath /private/tmp/claude-501/dee157-DerivedData
+CODE_SIGNING_ALLOWED=NO build` and the same command with `build-for-testing` succeeded, with no
+new warnings in the changed files. No tests were run, and the app was not launched.
+
 ## DEE-153 Clipboard Museum removed
 
 Clipboard Museum is gone, with no replacement. Its window, slideshow, Settings → Features →
@@ -2667,6 +2700,9 @@ compilation alone.
 
 ## DEE-73 Atmosphere
 
+DEE-157 removed Atmosphere and deletes its stored preferences at launch. See
+[DEE-157 Atmosphere removed](#dee-157-atmosphere-removed). The notes below are kept as history.
+
 Atmosphere replaces the internal DEE-71 skin. Mode-owned fields, setters, controls, menu
 commands, and both old renderers are removed. Existing mode documents ignore the retired
 fields; no preferences migrate. The new app-wide settings document defaults to disabled.
@@ -2970,6 +3006,9 @@ Validation on 2026-09-13:
   persistence. Also check that another display shares favorites while retaining its own pins.
 
 ## Atmosphere ambient light
+
+DEE-157 removed this with the rest of Atmosphere. See
+[DEE-157 Atmosphere removed](#dee-157-atmosphere-removed). The notes below are kept as history.
 
 Settings → Features → Atmosphere now includes an opt-in halo around the focused window.
 It has five color modes: average window color, dominant window color, random, daylight,
