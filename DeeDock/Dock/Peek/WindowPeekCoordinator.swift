@@ -24,6 +24,8 @@ final class WindowPeekCoordinator {
     /// The hover label flying into the open Peek's notice strip, while it is in the air.
     private var noticeFlight: WindowPeekNoticeFlight?
     private var enlarge: WindowPeekEnlargeController?
+    /// Live CPU and memory for the open Peek. Idle, and holding no samples, unless that readout is on.
+    private let resources = WindowPeekResourceMonitor()
     private let markups: WindowMarkupController
     /// Collisions outside Peek (dock drags, App Fusion gestures) that suspend the enlarged preview.
     var enlargeBlocked: (() -> Bool)?
@@ -169,6 +171,7 @@ final class WindowPeekCoordinator {
     func close(returnFocus: Bool) {
         windowActionTask?.cancel()
         windowActionTask = nil
+        resources.stop()
         actionMenu.cancel()
         generation = UUID()
         dwellTask?.cancel()
@@ -221,6 +224,10 @@ final class WindowPeekCoordinator {
         let next = WindowPeekPanelController(item: item, anchor: context.anchor,
                                              settings: context.settings, keyboard: keyboard)
         controller = next
+        if context.settings.windowPeekResourcesEnabled {
+            resources.onReading = { [weak next] reading in next?.state.resources = reading }
+            resources.start(reference: item.reference)
+        }
         unreportedTrigger = fileDocuments != nil || fileDrag ? .fileDrag : keyboard ? .keyboard : .hover
         // Read before the hold below clears the dock's label: Peek takes over the badge detail
         // the label was showing, and the label itself when it was on screen.

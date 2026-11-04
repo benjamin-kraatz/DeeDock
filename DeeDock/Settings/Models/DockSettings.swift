@@ -110,6 +110,9 @@ struct DockSettings: Codable, Equatable {
     var windowPeekSplitEnabled: Bool = false
     /// Stages an enlarged, captured image of a card the pointer dwells on. Shared across displays and opt-in.
     var windowPeekEnlargeEnabled: Bool = false
+    /// Shows the hovered app's current CPU, memory, and network in Window Peek. Shared across displays and opt-in.
+    /// Nothing is stored. Network is read from a private interface only while a Peek is open.
+    var windowPeekResourcesEnabled: Bool = false
     var windowPeekSize: WindowPeekSize = .medium
     var windowPeekLayout: WindowPeekLayout = .grid
     var windowPeekStyle: WindowPeekStyle = .glass
@@ -219,7 +222,8 @@ extension DockSettings {
         case launcherPosition, appVisibility, secondaryDisplayAppsOnly, showShelf, showNotificationFeed, notificationFeedClearsOnClose, showHarborTile, harborShortcutEnabled, harborShowsAppNames, showSessionCapsules, showTrash, confirmBeforeEmptyingTrash, tooltipPreset
         case hubGlassTint
         case showVolumes, showDiskImages, showNetworkVolumes, showTimeMachineVolumes, confirmBeforeEjectingDisks
-        case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekSize, windowPeekLayout, windowPeekStyle
+        case windowPeekEnabled, windowPeekSplitEnabled, windowPeekEnlargeEnabled, windowPeekResourcesEnabled
+        case windowPeekSize, windowPeekLayout, windowPeekStyle
         case windowPeekIncludeMinimized, windowPeekIncludeUntitled, windowPeekHoverDelay
         case windowMarkupFormat, windowMarkupSearchEngine, windowMarkupFolder
         case iconSize, magnification, itemSpacing, cornerRadius, runningIndicatorStyle, iconStyle, launcherLineIcons, lineIconMotion, animateIndicators, launchAnimation, soapBubbleEffects, edge, alignment, positionReference, behavior
@@ -272,6 +276,7 @@ extension DockSettings {
         windowPeekEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnabled) ?? true
         windowPeekSplitEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekSplitEnabled) ?? false
         windowPeekEnlargeEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekEnlargeEnabled) ?? false
+        windowPeekResourcesEnabled = try values.decodeIfPresent(Bool.self, forKey: .windowPeekResourcesEnabled) ?? false
         windowPeekSize = try values.decodeIfPresent(WindowPeekSize.self, forKey: .windowPeekSize) ?? .medium
         windowPeekLayout = try values.decodeIfPresent(WindowPeekLayout.self, forKey: .windowPeekLayout) ?? .grid
         windowPeekStyle = try values.decodeIfPresent(WindowPeekStyle.self, forKey: .windowPeekStyle) ?? .glass

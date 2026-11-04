@@ -7,6 +7,9 @@ nonisolated struct AppHealthSamplerResult: Sendable {
     let interval: Double?
     /// Per bundle identifier. An app with no attributable process this pass is absent.
     let usage: [String: AppHealthAppUsage]
+    /// Process identifiers attributed to each bundle this pass, main process and helpers.
+    /// Empty when a caller does not need them.
+    var pids: [String: Set<pid_t>] = [:]
     /// Thread CPU time the pass spent, in milliseconds.
     let costMilliseconds: Double
 }
@@ -75,6 +78,7 @@ actor AppHealthProcessSampler: AppHealthSampling {
         let parents = table.mapValues(\.parent)
 
         var usage: [String: AppHealthAppUsage] = [:]
+        var pids: [String: Set<pid_t>] = [:]
         var current: [ProcessKey: AppHealthProcessCounters] = [:]
         for (pid, entry) in table {
             let owner: AppHealthAttribution.Owner
@@ -96,6 +100,7 @@ actor AppHealthProcessSampler: AppHealthSampling {
             usage[owner.app, default: AppHealthAppUsage()]
                 .add(delta, footprint: rusage.ri_phys_footprint, reportsEnergy: counters.energy > 0,
                      isMain: owner.role == .main)
+            pids[owner.app, default: []].insert(pid)
         }
 
         let live = Set(table.values.map(\.identity))
@@ -105,7 +110,7 @@ actor AppHealthProcessSampler: AppHealthSampling {
         previous = current
         previousTickAt = now
         let cost = Double(clock_gettime_nsec_np(CLOCK_THREAD_CPUTIME_ID) &- costStart) / 1_000_000
-        return AppHealthSamplerResult(interval: interval, usage: usage, costMilliseconds: cost)
+        return AppHealthSamplerResult(interval: interval, usage: usage, pids: pids, costMilliseconds: cost)
     }
 
     /// Keeps the bundle list current and drops path-based owners when it changes, since an app launching or

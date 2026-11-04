@@ -47082,6 +47082,168 @@
         }
       }
     },
+    "windowPeekResourcesAccessibilityLabel" : {
+      "comment" : "VoiceOver label for the live CPU, memory, and network figures in Window Peek. The value is a spoken sentence that names each figure, such as CPU, memory, and receiving and sending, rather than the icons.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Nutzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current use"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesBelowAmount" : {
+      "comment" : "Window Peek network figure for a trickle under one kilobyte per second. amount is '1 kB'. Keep it short; it sits beside a down or up arrow.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< %(amount)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< %(amount)@"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesEnabled" : {
+      "comment" : "Opt-in switch for live CPU, memory, and network numbers in Window Peek. Off by default and shared by all displays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CPU, Speicher und Netzwerk anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show CPU, memory, and network"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesHelp" : {
+      "comment" : "Explains the live Window Peek readout: current numbers only, not saved. Network uses a private interface and can be missing. Window Peek is a feature name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solange Window Peek offen ist, zeigt es die aktuelle Prozessor- und Speichernutzung dieser App und ihren Netzwerkdurchsatz. Die Zahlen aktualisieren sich etwa einmal pro Sekunde und werden nicht gespeichert. Das Netzwerk kommt über eine private Systemschnittstelle und entfällt, wenn sie fehlt. Helfer, die macOS außerhalb der App startet, etwa Safaris WebContent-Prozesse, zählen nicht mit."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "While Window Peek is open, it shows that app's processor use, memory, and network throughput. The numbers update about once a second and are not saved. Network comes from a private system interface and is left out when that interface is unavailable. Helpers macOS starts outside the app, such as Safari's WebContent processes, are not included."
+          }
+        }
+      }
+    },
+    "windowPeekResourcesRate" : {
+      "comment" : "Visible network rate in Window Peek, next to a down or up arrow. amount is a size such as '1.2 MB'. Keep the per-second suffix short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(amount)@/s"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(amount)@/s"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesSpokenCPU" : {
+      "comment" : "VoiceOver and tooltip text for the processor figure in Window Peek. cpu is a percentage such as '14 %', where 100 % is one core fully busy.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CPU %(cpu)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CPU %(cpu)@"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesSpokenMemory" : {
+      "comment" : "VoiceOver and tooltip text for the memory figure in Window Peek. memory is a size such as '1.4 GB'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speicher %(memory)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory %(memory)@"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesSpokenNetwork" : {
+      "comment" : "VoiceOver and tooltip text for the network figures in Window Peek. down and up are sizes such as '1.2 MB' or '< 1 kB'; the sentence adds per second.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfängt %(down)@ pro Sekunde, sendet %(up)@ pro Sekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receiving %(down)@ per second, sending %(up)@ per second"
+          }
+        }
+      }
+    },
+    "windowPeekResourcesTitle" : {
+      "comment" : "Title for the Window Peek settings card that turns on the live CPU, memory, and network figures.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CPU, Speicher und Netzwerk"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CPU, memory, and network"
+          }
+        }
+      }
+    },
     "windowPeekSandboxFallback" : {
       "comment" : "Window Peek fallback when App Sandbox blocks cross-process Accessibility calls despite a TCC grant.",
       "extractionState" : "manual",

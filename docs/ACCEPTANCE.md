@@ -1826,6 +1826,32 @@ The final focused Xcode app build succeeded with no reported diagnostics. The si
 - Exercise Focus Dock with Space, arrow navigation, Return, and Escape, plus VoiceOver, Reduce Motion, Reduce Transparency, and foreground-focus preservation.
 - Measure idle and visible-Peek CPU, GPU, and memory use. Confirm capture stops and images are released when Peek closes.
 
+### Live CPU, memory, and network
+
+**Settings → Features → Window Peek → CPU, memory, and network** is an app-wide opt-in, off for
+new and existing settings. Display profiles inherit it, and presets leave it unchanged. While a
+Peek is open and the switch is on, figures under the title show the app's current processor use,
+memory, and down/up rate: a symbol and a number each. The first pass reports memory only; CPU and
+the network rate appear after about a second. A narrow panel moves the network figures to a second
+line. Rates under 1 kB/s read "< 1 kB/s". CPU and memory use `AppHealthProcessSampler`. Network
+uses NetworkStatistics, the private interface behind Activity Monitor, resolved with `dlsym` and
+gated to macOS 27 after a probe on 27.2 (`NStatManagerCreate`, TCP and UDP subscription, pid and
+byte-count dictionaries, `NStatManagerDestroy`). Closing Peek cancels the pass and drops the flow
+table. A missing symbol omits the network figures only.
+
+Validation on 2026-11-04: `./scripts/build-and-test.sh` reported **TEST SUCCEEDED**, including
+`WindowPeekResourceTests` for the absent-key default, preset inheritance, helper totals, spoken
+names, the kilobyte floor, a backwards counter, and a description that arrives before counts.
+That description is not a baseline, so the first real counters are not reported as one interval. The readout was rendered from the preview
+states: memory only (803 MB), CPU and memory (9% and 4.16 GB), the German screenshot numbers at
+360 pt and wrapped at 210 pt (`< 1 kB/s`, comma decimals), and a busy row (142%, 11.49 GB,
+988 kB/s down, 48.3 MB/s up). The running Peek was not compared with Activity Monitor.
+
+Pending hands-on acceptance: turn the switch on, open Peek on a busy app and a quiet one, and
+compare the line with Activity Monitor for that app's own processes, including down and up.
+Confirm the line is absent when the switch is off and disappears when Peek closes. Check a browser,
+whose WebContent processes stay uncounted, and an app that quits while Peek is open.
+
 ## DEE-54: Split-peek
 
 **Settings → Features → Window Peek → Split-peek** contains the app-wide opt-in. It is off

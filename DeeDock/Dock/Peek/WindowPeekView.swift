@@ -52,6 +52,13 @@ struct WindowPeekView: View {
                             .disabled(state.actionBusy)
                     }
                 }
+                if let resources = state.resources {
+                    // A subtitle to the app name: indented past the 24 pt icon and its 8 pt gap so
+                    // the figures start under the name's first letter.
+                    WindowPeekResourceReadout(reading: resources)
+                        .padding(.leading, 32)
+                        .padding(.top, 2)
+                }
                 if edge == .top { noticeSlot }
             }
             if state.routingFiles {
@@ -417,6 +424,15 @@ private func windowPeekPreviewImage(index: Int) -> CGImage? {
 #Preview("No windows match") {
     WindowPeekView(state: windowPeekPreviewState(phase: .noMatch), keyboard: false)
         .frame(width: 400, height: 190)
+}
+#Preview("Live CPU, memory, and network") {
+    let state = windowPeekPreviewState()
+    state.resources = WindowPeekResourceReading(
+        cpuPercent: 14, memoryBytes: 1_480_000_000,
+        network: WindowPeekNetworkRate(receivedPerSecond: 1_240_000, sentPerSecond: 286))
+    return WindowPeekView(state: state, keyboard: false)
+        .frame(width: 790, height: 560)
+        .environment(\.locale, Locale(identifier: "de_DE"))
 }
 #Preview("Reduce Transparency") {
     WindowPeekView(state: windowPeekPreviewState(), keyboard: false, reduceTransparencyOverride: true)

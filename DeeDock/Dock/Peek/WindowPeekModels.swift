@@ -111,6 +111,10 @@ final class WindowPeekState {
     /// Whether cards report hover and artwork frames for the enlarged preview.
     var enlargesCards: Bool { settings.windowPeekEnlargeEnabled && !routingFiles }
 
+    /// The hovered app's latest CPU, memory, and network, while the live readout is on. Nil until the
+    /// first sample, and nil again when the app has no readable process. Never a history.
+    var resources: WindowPeekResourceReading?
+
     init(item: DockItem, settings: DockSettings) {
         appName = item.reference.name
         appIcon = item.icon

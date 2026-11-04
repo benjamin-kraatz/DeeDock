@@ -390,6 +390,14 @@ counters `app_health_prompt_answered`, `app_health_prompt_ignored`, `app_health_
   unavailable.
 - System-owned helpers that launchd starts on an app's behalf from `/System/…`, such as Safari's
   WebKit `WebContent` processes, are not attributed to the app.
+- Per-app network bytes are not in `proc_pid_rusage` (current through `rusage_info_v6`) or any other
+  public API. Activity Monitor and `nettop` read them from the private NetworkStatistics framework.
+  Window Peek does the same, and only while a Peek is open with **Show CPU, memory, and network**
+  on. The calls are resolved with `dlsym` and gated to macOS 27, the same way Robi's SkyLight
+  calls and the background-app Launch Services reader are. A missing symbol leaves the network
+  figure out; CPU and memory still show. The framework reports every flow's process id and byte
+  counts into memory for that Peek so a rate can be computed. Only the peeked app's sum is shown,
+  addresses are not read, and the table is released when Peek closes. Nothing is written.
 - Responsiveness checks need Accessibility to be allowed already; without it, `hang` is never set
   and `ax` is false.
 - A crash report means an unexpected termination. No crash report after heavy use reads as "quit
