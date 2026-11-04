@@ -71,17 +71,6 @@ struct WindowPeekResourceTests {
         #expect(!WindowPeekResourceText.rate(286, locale: Locale(identifier: "de_DE")).contains("Byte"))
     }
 
-    @Test("A network rate is the difference over the interval, and a backwards counter is not a rate")
-    func networkRate() {
-        let previous = WindowPeekNetworkTotals(received: 1_000, sent: 200)
-        let current = WindowPeekNetworkTotals(received: 3_000, sent: 200)
-        let rate = WindowPeekNetworkRate.make(current: current, previous: previous, interval: 2)
-        #expect(rate?.receivedPerSecond == 1_000)
-        #expect(rate?.sentPerSecond == 0)
-        #expect(WindowPeekNetworkRate.make(current: previous, previous: current, interval: 2) == nil)
-        #expect(WindowPeekNetworkRate.make(current: current, previous: previous, interval: 0) == nil)
-    }
-
     @Test("A description without counts is not a baseline, so earlier traffic is not one interval")
     func networkBaseline() {
         var ledger = WindowPeekNetworkLedger()

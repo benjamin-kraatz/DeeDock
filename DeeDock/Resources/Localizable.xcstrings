@@ -47083,7 +47083,7 @@
       }
     },
     "windowPeekResourcesAccessibilityLabel" : {
-      "comment" : "VoiceOver label for the live CPU, memory, and network line in Window Peek. The value is the numbers themselves.",
+      "comment" : "VoiceOver label for the live CPU, memory, and network figures in Window Peek. The value is a spoken sentence that names each figure, such as CPU, memory, and receiving and sending, rather than the icons.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -47119,7 +47119,7 @@
       }
     },
     "windowPeekResourcesEnabled" : {
-      "comment" : "Opt-in switch for live CPU and memory numbers in Window Peek. Off by default and shared by all displays.",
+      "comment" : "Opt-in switch for live CPU, memory, and network numbers in Window Peek. Off by default and shared by all displays.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -47227,7 +47227,7 @@
       }
     },
     "windowPeekResourcesTitle" : {
-      "comment" : "Title for the Window Peek settings card that turns on the live CPU and memory line.",
+      "comment" : "Title for the Window Peek settings card that turns on the live CPU, memory, and network figures.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {

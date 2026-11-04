@@ -2,24 +2,16 @@ import Darwin
 import Foundation
 import os
 
-/// Down and up byte totals for one set of processes, cumulative since this reader started.
+/// Down and up bytes for one set of processes since the previous read.
 nonisolated struct WindowPeekNetworkTotals: Equatable, Sendable {
     var received: UInt64
     var sent: UInt64
 }
 
-/// Bytes per second in each direction. Nil when the counters moved backwards, which means the
-/// private interface changed shape or a flow was counted twice.
+/// Bytes per second in each direction for one sampling interval.
 nonisolated struct WindowPeekNetworkRate: Equatable, Sendable {
     var receivedPerSecond: Double
     var sentPerSecond: Double
-
-    static func make(current: WindowPeekNetworkTotals, previous: WindowPeekNetworkTotals,
-                     interval: Double) -> WindowPeekNetworkRate? {
-        guard interval > 0, current.received >= previous.received, current.sent >= previous.sent else { return nil }
-        return WindowPeekNetworkRate(receivedPerSecond: Double(current.received - previous.received) / interval,
-                                     sentPerSecond: Double(current.sent - previous.sent) / interval)
-    }
 }
 
 /// Byte accounting for one Peek, independent of the private framework.
