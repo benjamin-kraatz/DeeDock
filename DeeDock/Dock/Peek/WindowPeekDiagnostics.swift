@@ -32,7 +32,7 @@ final class WindowPeekDiagnostics {
         lines.append("Scroll bars: \(NSScroller.preferredScrollerStyle == .legacy ? "legacy (always shown)" : "overlay")")
         lines.append("Peek: size=\(settings.windowPeekSize.rawValue) layout=\(settings.windowPeekLayout.rawValue) "
                      + "style=\(settings.windowPeekStyle.rawValue) split=\(settings.windowPeekSplitEnabled) "
-                     + "enlarge=\(settings.windowPeekEnlargeEnabled)")
+                     + "enlarge=\(settings.windowPeekEnlargeEnabled) resources=\(settings.windowPeekResourcesEnabled)")
         if let screen {
             lines.append("Screen: frame \(Self.text(screen.frame)) visible \(Self.text(screen.visibleFrame)) "
                          + "scale \(Self.text(screen.backingScaleFactor))")
