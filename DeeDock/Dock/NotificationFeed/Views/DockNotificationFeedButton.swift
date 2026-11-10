@@ -116,6 +116,7 @@ private struct NotificationFeedContextMenuBridge: NSViewRepresentable {
             add(.notificationFeedOpen, action: #selector(open), symbol: "bell", to: menu)
             add(.notificationFeedClear, action: #selector(clear), symbol: "xmark.circle", to: menu,
                 enabled: hasEntries)
+            interaction?.arrangementMenu.addItems(to: menu)
             menu.addItem(.separator())
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             trackedMenu = menu

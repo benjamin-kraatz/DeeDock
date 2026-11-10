@@ -265,6 +265,7 @@ private struct ShelfContextMenuBridge: NSViewRepresentable {
                 to: menu,
                 enabled: item?.isEmpty == false
             )
+            interaction?.arrangementMenu.addItems(to: menu)
             menu.addItem(.separator())
             add(
                 .actionSettings,

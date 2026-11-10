@@ -121,6 +121,7 @@ private struct TrashContextMenuBridge: NSViewRepresentable {
                 enabled: item?.state != .unavailable)
             add(.trashEmptyAction, action: #selector(empty), symbol: "trash.slash", to: menu,
                 enabled: item?.state == .full)
+            interaction?.arrangementMenu.addItems(to: menu)
             menu.addItem(.separator())
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             trackedMenu = menu

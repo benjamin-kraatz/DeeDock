@@ -189,6 +189,7 @@ struct DockContextMenuBridge: NSViewRepresentable {
                 menu.addItem(parent)
             }
 
+            interaction?.arrangementMenu.addItems(to: menu)
             menu.addItem(.separator())
             addItem(.actionSettings, symbol: "gear", action: #selector(showSettings), to: menu)
         }

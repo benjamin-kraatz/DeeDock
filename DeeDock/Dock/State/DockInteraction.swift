@@ -23,6 +23,8 @@ final class DockInteraction {
     var updateAwareness: UpdateAwarenessStore?
     /// Optional soap-bubble bursts for pin click and drop. Owned per panel.
     let soapBubbles = DockSoapBubbleController()
+    /// The **Auto-Hide** and **Position** group that tile menus add above **Settings…**.
+    let arrangementMenu = DockArrangementMenu()
     @ObservationIgnored var openBadgeMemory: ((DockItem) -> Void)?
     let tooltips = DockTooltipController()
     var tooltipPreset: DockTooltipPreset = .classic

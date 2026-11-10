@@ -204,6 +204,16 @@ final class DockStore {
         profiles.updateInheritedSource(displayID, keyPath: \.launcherPosition, to: position)
     }
 
+    /// Turns auto-hide on or off where this display's value comes from, as the launcher position does.
+    func setAutoHide(_ enabled: Bool) {
+        profiles.updateInheritedSource(displayID, keyPath: \.behavior.autoHide, to: enabled)
+    }
+
+    /// Moves the dock along its edge, writing where this display's alignment comes from.
+    func setAlignment(_ alignment: DockSettings.Alignment) {
+        profiles.updateInheritedSource(displayID, keyPath: \.alignment, to: alignment)
+    }
+
     private func refreshEntries() {
         let pairs = appMelt?.pairs ?? []
         let pairedIDs = Set(pairs.flatMap(\.applicationIDs))

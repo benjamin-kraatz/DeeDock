@@ -60,6 +60,7 @@ struct FolderContextMenuBridge: NSViewRepresentable {
                 parent.submenu = submenu; menu.addItem(parent)
             }
             if !item.isDownloads { add(.actionUnpin, action: #selector(unpin), symbol: "pin.slash", to: menu) }
+            interaction?.arrangementMenu.addItems(to: menu)
             menu.addItem(.separator())
             add(.actionSettings, action: #selector(settings), symbol: "gear", to: menu)
             menu.autoenablesItems = false
