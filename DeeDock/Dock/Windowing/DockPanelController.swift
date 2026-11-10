@@ -72,6 +72,8 @@ final class DockPanelController {
         interaction.islandTint = { [weak store] id in store?.island(containingPin: id)?.tint }
         interaction.setIslandTint = { [weak store] id, tint in store?.setIslandTint(tint, containingPin: id) }
         interaction.resetIslands = { [weak store] in store?.resetIslands() }
+        interaction.arrangementMenu.setAutoHide = { [weak store] in store?.setAutoHide($0) }
+        interaction.arrangementMenu.setAlignment = { [weak store] in store?.setAlignment($0) }
         interaction.setFolderPresentation = { [weak store] id, value in _ = store?.setFolderPresentation(value, for: id) }
         interaction.openTrash = { [weak store] in store?.openTrash() }
         interaction.emptyTrash = { [weak store] in store?.emptyTrash() }
@@ -134,6 +136,9 @@ final class DockPanelController {
         store.configureTrash(settings.showTrash)
         store.configureVolumes(VolumeVisibility(settings: settings))
         interaction.confirmsTrashEmpty = settings.confirmBeforeEmptyingTrash
+        interaction.arrangementMenu.autoHide = settings.behavior.autoHide
+        interaction.arrangementMenu.alignment = settings.alignment
+        interaction.arrangementMenu.edge = settings.edge
         interaction.tooltipPreset = settings.tooltipPreset
         let exposedIDs = Set(store.entries.compactMap(\.target).map(\.hitID))
         interaction.retainHitRegions(exposedIDs)

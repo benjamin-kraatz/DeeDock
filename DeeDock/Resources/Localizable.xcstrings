@@ -13185,6 +13185,42 @@
       }
     },
     "Downloading" : {},
+    "dockMenuAutoHide" : {
+      "comment" : "Checkable dock tile context-menu item that turns automatic hiding on or off for this display's dock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch verstecken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Hide"
+          }
+        }
+      }
+    },
+    "dockMenuPosition" : {
+      "comment" : "Dock tile context-menu submenu that moves the dock along its screen edge. Choices are Left, Center, and Right on top and bottom docks, and Top, Center, and Bottom on side docks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        }
+      }
+    },
     "downloadsName" : {
       "comment" : "Built-in Downloads folder tile in the trailing dock section.",
       "extractionState" : "manual",
