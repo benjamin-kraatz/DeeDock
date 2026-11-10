@@ -18,7 +18,9 @@ final class DockArrangementMenu: NSObject {
     var alignment = DockSettings.defaults.alignment
     /// This display's edge. Side docks name the choices Top, Center, and Bottom.
     var edge = DockSettings.defaults.edge
+    /// Saves the new auto-hide preference. Called on the main queue after the menu closes.
     var setAutoHide: ((Bool) -> Void)?
+    /// Saves the chosen alignment. Called on the main queue after the menu closes, and only for a new value.
     var setAlignment: ((DockSettings.Alignment) -> Void)?
 
     /// Appends a separator and the group. Adds nothing when no setter is wired, as in previews.
