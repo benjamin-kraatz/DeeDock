@@ -973,7 +973,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands, App Fusion folder navigation and synchronization, and to show Vapor which caches are in the open Finder folder.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1026,7 +1026,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = DOKK;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands, App Fusion folder navigation and synchronization, and to show Vapor which caches are in the open Finder folder.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1200,7 +1200,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "DOKK Dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands and App Fusion folder navigation and synchronization.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Use Finder for your Trash commands, App Fusion folder navigation and synchronization, and to show Vapor which caches are in the open Finder folder.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

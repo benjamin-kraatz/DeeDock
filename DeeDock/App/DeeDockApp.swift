@@ -56,6 +56,7 @@ struct DeeDockApp: App {
             Section {
                 AppMeltMenu(controller: delegate.coordinator.appMelt)
                 Button(.fusionTitle) { delegate.coordinator.showFusion() }
+                VaporMenuToggle(vapor: delegate.coordinator.vapor)
                 OpenSystemSettingsCloneButton()
                 AppHealthMenuButton(controller: delegate.appHealth) { delegate.appHealthLabelling.showPicker() }
             } header: { Text(.menuSectionTools) }

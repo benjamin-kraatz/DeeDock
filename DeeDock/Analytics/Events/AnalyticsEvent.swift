@@ -208,6 +208,17 @@ enum AnalyticsEvent {
     /// The person ran the steps Robi proposed: how many of each kind, and how many ran before one
     /// could not. Never a menu path, an element's label, or typed text.
     case robiStepsRun(AnalyticsRobiStepCounts, completed: Int)
+
+    // MARK: Vapor
+
+    /// Vapor was turned on or off, from the menu bar toggle or the orb's Hide Vapor.
+    case vaporToggled(enabled: Bool)
+    /// Folders went into the orb. Never which folders, their names, or their paths.
+    case vaporFoldersAdded(source: AnalyticsVaporSource, count: Int)
+    /// Folders were deleted (staged; Undo is still possible). The total size travels as a bucket.
+    case vaporDeleted(count: Int, size: AnalyticsVaporSizeBucket)
+    /// Undo put folders back. `count` is how many were restored.
+    case vaporUndo(count: Int)
     case discoveryCallout(DiscoveryProposal.Destination, action: AnalyticsDiscoveryAction)
     /// How many installed and pinned apps have a Line glyph, with the bundle IDs of public apps
     /// that have none. Sent shortly after launch, at most every six hours.

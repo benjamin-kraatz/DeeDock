@@ -45462,6 +45462,1578 @@
         }
       }
     },
+    "vaporAccessibilityJoined" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): joins two pieces of a VoiceOver value, like '3 folders' and '1.8 GB'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "vaporActionDeleteAll" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver action on the orb that deletes every folder at once.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All"
+          }
+        }
+      }
+    },
+    "vaporAdd" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): button that adds one suggested folder to the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        }
+      }
+    },
+    "vaporAddAll" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): button that adds every suggested folder to the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add All"
+          }
+        }
+      }
+    },
+    "vaporAddSuggestion" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver label of a suggestion bubble. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ zu Vapor hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add %@ to Vapor"
+          }
+        }
+      }
+    },
+    "vaporCacheCount" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): how many cache folders Finder's open folder holds, in the suggestion capsule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Cache"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Caches"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld cache"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caches"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporCachesIn" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): suggestion capsule, like '4 caches in dokk-web'. First argument is the count text, second the Finder folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ in %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ in %2$@"
+          }
+        }
+      }
+    },
+    "vaporCalculating" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): size placeholder in the tooltip and header while folders are still being measured.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wird berechnet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "calculating…"
+          }
+        }
+      }
+    },
+    "vaporClear" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel header button that takes every folder out without deleting it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leeren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        }
+      }
+    },
+    "vaporDismissSuggestions" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): help and VoiceOver label for × on the suggestion capsule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge für diesen Ordner ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide suggestions for this folder"
+          }
+        }
+      }
+    },
+    "vaporDropMore" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): drop zone at the bottom of the panel's folder list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Ordner hier ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop more folders here"
+          }
+        }
+      }
+    },
+    "vaporEmpty" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver value of the orb when no folders are in it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty"
+          }
+        }
+      }
+    },
+    "vaporEmptyDetail" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel text under the empty-state title. 'Delete' is the hold button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelöscht wird erst, wenn du „Löschen“ gedrückt hältst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing is deleted until you hold Delete."
+          }
+        }
+      }
+    },
+    "vaporEmptyTitle" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel text when the orb is empty.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build-Ordner und Caches hier ablegen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop build folders and caches here."
+          }
+        }
+      }
+    },
+    "vaporFailureMissing" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row whose folder disappeared before it could be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ordner ist nicht mehr da."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder is gone."
+          }
+        }
+      }
+    },
+    "vaporFailureOther" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row that could not be deleted for another reason.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Ordner konnte nicht gelöscht werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t delete this folder."
+          }
+        }
+      }
+    },
+    "vaporFailurePermission" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row that could not be deleted because macOS refused.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK darf diesen Ordner nicht bewegen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK isn’t allowed to move this folder."
+          }
+        }
+      }
+    },
+    "vaporFailureVolume" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row whose disk can't rename it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Laufwerk geht das Löschen so nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This disk doesn’t support deleting it this way."
+          }
+        }
+      }
+    },
+    "vaporFileCount" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): how many files the folders hold, in the footer total and row details.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporFinderAccessPrompt" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): one-line offer in the panel to read the folder open in Finder. Needs Automation permission.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caches aus dem geöffneten Finder-Ordner zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show caches from the open Finder folder"
+          }
+        }
+      }
+    },
+    "vaporFolderCount" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): how many folders are in the orb. Used in the tooltip, header and accessibility value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporFoundIn" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel section header for Finder suggestions. The argument is the Finder folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gefunden in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Found in %@"
+          }
+        }
+      }
+    },
+    "vaporHoldHint" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver hint on the delete button. VoiceOver activation deletes at once instead of holding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löscht sofort. Du kannst 5 Sekunden lang widerrufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletes right away. You can undo for 5 seconds."
+          }
+        }
+      }
+    },
+    "vaporHoldToDelete" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): the delete button. It has to be held down for a moment.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Halten, um %lld Ordner zu löschen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Halten, um %lld Ordner zu löschen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Hold to Delete %lld Folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Hold to Delete %lld Folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporJoined" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): joins two short pieces, like '3 folders' and '1.8 GB', or a folder name and its kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "vaporMenuClear" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): orb context menu item that takes every folder out without deleting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leeren, ohne zu löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Without Deleting"
+          }
+        }
+      }
+    },
+    "vaporMenuDeleteAll" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): orb context menu item that opens the panel and points at the delete button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle löschen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All…"
+          }
+        }
+      }
+    },
+    "vaporMenuHide" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): orb context menu item that turns Vapor off. The menu bar toggle turns it back on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Vapor"
+          }
+        }
+      }
+    },
+    "vaporMenuOpen" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): orb context menu item and VoiceOver action that opens the panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "vaporMoreSuggestions" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): suggestion capsule: how many more suggestions there are than bubbles.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weiterer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weitere"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld more"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporRefusalAlreadyAdded" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when a dropped folder is already in the orb. The argument is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist schon in Vapor."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is already in Vapor."
+          }
+        }
+      }
+    },
+    "vaporRefusalHome" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when the home folder is dropped on the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK löscht deinen Benutzerordner nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DOKK won’t delete your home folder."
+          }
+        }
+      }
+    },
+    "vaporRefusalMissing" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when a dropped item no longer exists. The argument is its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ gibt es nicht mehr."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no longer exists."
+          }
+        }
+      }
+    },
+    "vaporRefusalNotAFolder" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when a file is dropped on the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor nimmt Ordner, keine Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor takes folders, not files."
+          }
+        }
+      }
+    },
+    "vaporRefusalPackage" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when an app or other package is dropped on the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor nimmt Ordner, keine Pakete."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor takes folders, not packages."
+          }
+        }
+      }
+    },
+    "vaporRefusalStandard" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when Desktop, Documents or another standard folder is dropped. The argument is its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist ein Standardordner von macOS. DOKK löscht ihn nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is a standard macOS folder. DOKK won’t delete it."
+          }
+        }
+      }
+    },
+    "vaporRefusalSystem" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when a system folder such as /System or /usr, or something inside one, is dropped. The argument is its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ gehört zu macOS. DOKK löscht es nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ belongs to macOS. DOKK won’t delete it."
+          }
+        }
+      }
+    },
+    "vaporRefusalVolume" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): message when a whole disk is dropped. The argument is the disk's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ist ein ganzes Laufwerk. DOKK löscht es nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is a whole disk. DOKK won’t delete it."
+          }
+        }
+      }
+    },
+    "vaporRemove" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): takes one folder out of the orb without deleting it. Button help and VoiceOver action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "vaporRowAccessibility" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver label of a folder row: folder name, its kind, and the folder it is in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@, in %3$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@, in %3$@"
+          }
+        }
+      }
+    },
+    "vaporRowCalculating" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): size placeholder on a folder row while it is being measured.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird berechnet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating…"
+          }
+        }
+      }
+    },
+    "vaporSizeUnavailable" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): VoiceOver value for a folder whose size couldn't be read (shown as a dash).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size unavailable"
+          }
+        }
+      }
+    },
+    "vaporSkipsTrashNote" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): note under the delete button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Papierkorb. Du kannst 5 Sekunden lang widerrufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skips the Trash. You can undo for 5 seconds."
+          }
+        }
+      }
+    },
+    "vaporStatusDeleted" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule above the orb right after deleting, next to Undo.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner gelöscht"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner gelöscht"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Deleted %lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Deleted %lld folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporStatusFailed" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule when no folder could be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner konnte nicht gelöscht werden"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner konnten nicht gelöscht werden"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Couldn’t delete %lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Couldn’t delete %lld folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporStatusFreed" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule after the undo window ends. The argument is a size like '1.8 GB'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ freigegeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freed %@"
+          }
+        }
+      }
+    },
+    "vaporStatusNotRestored" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule after Undo when something now sits where a folder was, so it stays deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner konnte nicht wiederhergestellt werden. Sein Platz ist belegt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner konnten nicht wiederhergestellt werden. Ihr Platz ist belegt."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder couldn’t be restored. Its place is taken."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders couldn’t be restored. Their places are taken."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporStatusSomeFailed" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): added to the capsule when some folders could not be deleted and stayed in the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld konnte nicht gelöscht werden"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld konnten nicht gelöscht werden"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld couldn’t be deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporTagBuildOutput" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build-Ausgabe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build output"
+          }
+        }
+      }
+    },
+    "vaporTagCargoBuild" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargo-Build"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargo build"
+          }
+        }
+      }
+    },
+    "vaporTagCocoaPods" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CocoaPods"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CocoaPods"
+          }
+        }
+      }
+    },
+    "vaporTagGradleCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradle-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradle cache"
+          }
+        }
+      }
+    },
+    "vaporTagNextBuild" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next.js-Build"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next.js build"
+          }
+        }
+      }
+    },
+    "vaporTagNpmPackages" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "npm-Pakete"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "npm packages"
+          }
+        }
+      }
+    },
+    "vaporTagNuxtBuild" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuxt-Build"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuxt build"
+          }
+        }
+      }
+    },
+    "vaporTagParcelCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parcel-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parcel cache"
+          }
+        }
+      }
+    },
+    "vaporTagPythonCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python cache"
+          }
+        }
+      }
+    },
+    "vaporTagSvelteKitBuild" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SvelteKit-Build"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SvelteKit build"
+          }
+        }
+      }
+    },
+    "vaporTagSwiftPMBuild" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftPM-Build"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftPM build"
+          }
+        }
+      }
+    },
+    "vaporTagSwiftPMCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftPM-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SwiftPM cache"
+          }
+        }
+      }
+    },
+    "vaporTagTestCoverage" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testabdeckung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test coverage"
+          }
+        }
+      }
+    },
+    "vaporTagTurborepoCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turborepo-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turborepo cache"
+          }
+        }
+      }
+    },
+    "vaporTagXcodeBuildCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode-Build-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode build cache"
+          }
+        }
+      }
+    },
+    "vaporTagXcodeBuildData" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode-Build-Daten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode build data"
+          }
+        }
+      }
+    },
+    "vaporTagXcodeModuleCache" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): chip naming what kind of cache or build folder this is. Tool names stay untranslated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode-Modul-Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xcode module cache"
+          }
+        }
+      }
+    },
+    "vaporTitle" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): the feature's name. Menu bar Tools toggle, panel header, and the orb's accessibility label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapor"
+          }
+        }
+      }
+    },
+    "vaporTooltipDropToAdd" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): tooltip while a dragged folder is over the orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Hinzufügen loslassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop to add"
+          }
+        }
+      }
+    },
+    "vaporTooltipEmpty" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): tooltip on the empty orb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner hier ablegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop folders here"
+          }
+        }
+      }
+    },
+    "vaporTotal" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel footer. First argument is a size like '1.8 GB', second a file count like '104,226 files'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt %1$@ · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "vaporTotalPending" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): panel footer while folder sizes are still being measured.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt wird berechnet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total calculating…"
+          }
+        }
+      }
+    },
+    "vaporTurnOn" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): button that asks macOS for permission to read Finder's open folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einschalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn On"
+          }
+        }
+      }
+    },
+    "vaporUndo" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule button that puts the deleted folders back. Also a VoiceOver action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "vaporUnknownNote" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): warning under the delete button when some folders match no known cache rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner ist kein bekannter Cache. Prüfe ihn vor dem Löschen."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner sind keine bekannten Caches. Prüfe sie vor dem Löschen."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder isn’t a known cache. Check before you delete."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders aren’t known caches. Check before you delete."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vaporUnknownTag" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): orange chip on a folder that matches no known cache rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein bekannter Cache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not a known cache"
+          }
+        }
+      }
+    },
     "visibilityCollapsePinned" : {
       "comment" : "Replace pinned apps with an expand button.",
       "extractionState" : "manual",
