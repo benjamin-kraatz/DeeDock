@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// The system folder icon, rasterized once at 2× for drawing many small copies in a canvas.
+/// The system folder icon, rasterized once at 2×, for the panel's rows.
 /// Uses the generic folder icon, never a folder's custom icon, so no live workspace state is read.
 enum VaporFolderSprite {
     static let image: Image = {
@@ -51,7 +51,7 @@ struct VaporOrbPileCanvas: View {
                              palette: VaporOrbPalette) {
         let center = CGPoint(x: size.width / 2, y: size.height / 2)
         if !world.bodies.isEmpty {
-            let icon = context.resolve(VaporFolderSprite.image)
+            let icon = context.resolve(VaporFolderGlyph.image)
             let glass = world.innerRadius + 1
             context.drawLayer { layer in
                 layer.clip(to: Path(ellipseIn: CGRect(x: center.x - glass, y: center.y - glass,
@@ -62,8 +62,7 @@ struct VaporOrbPileCanvas: View {
                     copy.translateBy(x: center.x + body.position.x, y: center.y + body.position.y)
                     copy.rotate(by: .radians(body.angle))
                     copy.scaleBy(x: body.scale, y: body.scale)
-                    let edge = VaporPileSizing.iconEdge(radius: body.radius)
-                    copy.draw(icon, in: CGRect(x: -edge / 2, y: -edge / 2, width: edge, height: edge))
+                    copy.draw(icon, in: VaporFolderGlyph.rect(artWidth: VaporPileSizing.iconWidth(radius: body.radius)))
                 }
             }
         }

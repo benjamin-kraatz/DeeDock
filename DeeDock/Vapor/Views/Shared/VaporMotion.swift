@@ -30,13 +30,31 @@ nonisolated enum VaporMotion {
     /// Bubbles springing out of the orb; staggered per bubble.
     static let bubbleEnter = Animation.spring(response: 0.55, dampingFraction: 0.62)
     static let bubbleStagger: Double = 0.055
-    /// A clicked bubble flying into the orb, and when its folder is added.
-    static let bubbleEat = Animation.timingCurve(0.5, 0, 0.75, 0.2, duration: 0.32)
-    static let bubbleEatDelay: Double = 0.28
+    /// Bubbles and their capsule gliding to new places when the arc changes.
+    static let bubbleGlide = Animation.spring(response: 0.42, dampingFraction: 0.78)
+    /// A clicked bubble diving into the orb (slow start, fast finish), and when its folder is
+    /// added: just before the bubble vanishes behind the glass, so the folder drops out of it.
+    static let bubbleEat = Animation.timingCurve(0.5, 0, 0.75, 0.2, duration: 0.34)
+    static let bubbleEatDelay: Double = 0.3
     /// Add All eats the bubbles one after another.
     static let addAllStagger: Double = 0.09
     /// A size counting up once it's measured.
     static let countUp = Animation.timingCurve(0.33, 1, 0.68, 1, duration: 0.65)
     /// Capsules popping in above the orb.
     static let capsuleEnter = Animation.spring(response: 0.35, dampingFraction: 0.68)
+
+    /// The orb condensing when Vapor turns on: a scale spring that overshoots a little.
+    static let orbEnter = Animation.spring(response: 0.42, dampingFraction: 0.58)
+    /// The small swell before the orb shrinks away, and the shrink itself.
+    static let orbExitSwell: Double = 0.08
+    static let orbExitShrink: Double = 0.24
+    /// The plain fade that replaces both under Reduce Motion.
+    static let orbFade: Double = 0.2
+    /// How long the particles take to gather into the orb.
+    static let orbCondense: Double = 0.65
+
+    /// How long the orb takes to leave, so its windows can be closed afterwards.
+    static func orbExitDuration(reduceMotion: Bool) -> Double {
+        reduceMotion ? orbFade : orbExitSwell + orbExitShrink
+    }
 }

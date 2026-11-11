@@ -3,6 +3,8 @@ import SwiftUI
 
 /// Vapor's four windows: the orb, the panel, the suggestion bubbles and the callout capsule.
 ///
+/// The panel's and the bubbles' windows both cover the orb and sit behind the orb's window.
+///
 /// Each is a separate ``VaporPanel`` placed from the orb's centre and the visible frame of the
 /// orb's display, in AppKit global coordinates. This object only shows, hides and places them;
 /// what they show comes from ``VaporController``, and when comes from ``VaporCoordinator``.
@@ -59,6 +61,8 @@ final class VaporWindows {
     /// Rows are flying into the orb; the panel stays until the task closes it.
     private var pullTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
+    /// What the suggestions view was last built for; it is rebuilt only when the orb moves.
+    private var suggestionsPlacement: (orbCenter: CGPoint, visibleFrame: CGRect)?
     /// The capsule stays hidden until this moment, so it follows the delete animation.
     private var calloutHeldUntil: Date?
     private var calloutTask: Task<Void, Never>?
@@ -78,8 +82,8 @@ final class VaporWindows {
         panelDrop.addSubview(panelHost)
         panel.contentView = panelDrop
 
-        let emptyLayout = VaporSatelliteLayout(windowFrame: .zero, bubbleCenters: [], capsuleCenter: .zero, orbCenter: .zero)
-        suggestionsHost = VaporHostingView(rootView: VaporSuggestionsView(controller: controller, layout: emptyLayout))
+        suggestionsHost = VaporHostingView(rootView: VaporSuggestionsView(controller: controller, orbCenter: .zero,
+                                                                          visibleFrame: .zero))
         suggestionsPanel.contentView = suggestionsHost
 
         calloutHost = VaporHostingView(rootView: VaporCalloutView(controller: controller))
@@ -221,14 +225,21 @@ final class VaporWindows {
             if suggestionsPanel.isVisible { fadeOut(suggestionsPanel) }
             return
         }
-        let layout = VaporGeometry.satelliteLayout(orbCenter: orbCenter, count: bubbles.count,
-                                                   capsuleSize: VaporSuggestionsView.capsuleSize, visibleFrame: visibleFrame)
-        suggestionsHost.rootView = VaporSuggestionsView(controller: controller, layout: layout)
-        suggestionsPanel.setFrame(layout.windowFrame, display: true)
+        // The frame depends only on where the orb is, so it stays put while bubbles come and go
+        // and they can glide inside it. The view lays its bubbles out itself.
+        let frame = VaporSuggestionsView.layout(orbCenter: orbCenter, count: bubbles.count, visibleFrame: visibleFrame).windowFrame
+        if suggestionsPlacement?.orbCenter != orbCenter || suggestionsPlacement?.visibleFrame != visibleFrame {
+            suggestionsPlacement = (orbCenter, visibleFrame)
+            suggestionsHost.rootView = VaporSuggestionsView(controller: controller, orbCenter: orbCenter, visibleFrame: visibleFrame)
+        }
+        if suggestionsPanel.frame != frame { suggestionsPanel.setFrame(frame, display: true) }
         if !suggestionsPanel.isVisible || suggestionsPanel.alphaValue < 1 {
             // The bubbles spring out of the orb themselves; the window only needs to be there.
             suggestionsPanel.alphaValue = 1
             suggestionsPanel.orderFrontRegardless()
+            // This window covers the orb so bubbles can fly into it. The orb stays in front: it
+            // keeps its clicks and drops, and bubbles pass behind the glass.
+            orbPanel.orderFrontRegardless()
         }
     }
 

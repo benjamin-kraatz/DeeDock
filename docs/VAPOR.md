@@ -11,6 +11,7 @@ The Trash is slow for folders like `node_modules` or DerivedData, because they h
 - The DOKK menu bar extra gets a **Vapor** toggle in its Tools section, shown with a checkmark when on. That toggle is the only switch: there is no keyboard shortcut and no Dock tile item.
 - The on/off state, the orb's position and the folders in the orb survive relaunch.
 - Turning Vapor off hides the orb and keeps its folders. Turning it on again brings them back.
+- Turned on, the orb condenses: particles gather into it while it grows with a small overshoot. Turned off, it swells slightly, then shrinks away. At launch it is simply there.
 
 ### The orb
 
@@ -113,7 +114,7 @@ Escape, or a click outside, closes the panel. The panel can't take focus, so Esc
    - a soft flash plays inside the glass
 2. At the same moment every folder is **staged**: renamed into the staging location on its own volume. Finder shows it gone right away.
 3. A capsule appears above the orb: "Deleted 3 folders", a 5-second countdown ring, and **Undo**.
-   - **Undo** renames the folders back, and they drop into the orb again.
+   - **Undo** renames the folders back, and they drop into the orb again. The capsule changes to "Put back 3 folders" for a moment.
    - If the original path is taken by then, that folder stays staged and the capsule says it couldn't be restored.
 4. After 5 seconds the capsule turns into "✓ Freed 1.8 GB", and a background task removes the staged files.
 5. If a folder can't be staged (permission denied, a volume that doesn't support renames, the folder is gone), it stays in the orb. Its row shows the reason, and the capsule mentions the failures.
@@ -124,9 +125,10 @@ While Vapor is on, the orb is visible and Finder is the frontmost app, Vapor rea
 
 - It lists that folder's direct children and keeps those that match a **suggested** rule above, minus anything already in the orb or staged.
 - Up to five bubbles float beside the orb, on the side facing the screen centre.
-- A capsule next to them reads "4 caches in dokk-web", with **Add All** and ×.
+- A capsule just beyond them reads "4 caches in dokk-web", with **Add All** and ×. It keeps 10 pt clear of the bubbles, whatever its text.
   - Hovering a bubble changes the capsule to "node_modules · npm packages".
-  - Clicking a bubble flies it into the orb.
+  - Clicking a bubble flies it into the orb: it dives behind the glass, and its folder drops into the pile as it lands.
+  - When a bubble comes or goes, the others and the capsule glide to their new places.
   - × hides suggestions for that folder until Finder shows a different folder.
 - While the panel is open, the bubbles hide and the suggestions appear as the panel's **Found in *folder*** section instead.
 - Nothing is ever added automatically.
@@ -158,6 +160,7 @@ All code lives in `DeeDock/Vapor/`, with tests in `DeeDockTests/Vapor/`. The pro
 
 - **Orb:** an `NSPanel` with `[.borderless, .nonactivatingPanel]`, at level `.floating`, with collection behaviour `[.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]`. It is never key or main.
 - **Panel and suggestions:** separate panels with the same flags. Each is placed from the orb's frame and the visible frame of the orb's display, in AppKit global coordinates. Negative origins and non-primary displays must work.
+- **Suggestions window:** covers the orb, the whole bubble arc and every place the capsule can take, so its frame depends only on where the orb is. Bubbles glide inside it and fly into the orb without being clipped. The orb's window stays in front of it.
 - **Drops:** an AppKit `NSDraggingDestination` registered for `.fileURL` on the orb and the panel. It reports hover proximity to the orb view for the lean and glow.
 - **Orb canvas:** the orb's window is the 112 pt orb plus a 48 pt transparent margin on every side, for the badge, the squash, the drop lean and swell, and steam rising out of the glass. Only the sphere takes clicks.
 - **Panel window:** larger than the panel. It also covers the orb, so the panel can grow out of the orb and rows can fly into it without being clipped. The orb's window stays in front of it. Drops count only over the panel itself.
@@ -168,6 +171,8 @@ All code lives in `DeeDock/Vapor/`, with tests in `DeeDockTests/Vapor/`. The pro
 - **Physics:** `VaporPhysicsWorld` is a value type stepped in fixed 1/180 s substeps: gravity, circle collisions, the glass as a circular wall, spin from sliding contact, slosh from the orb's drag acceleration, and fit-to-orb shrinking. It is seeded, so tests and snapshots repeat.
 - **Idle cost:** the world sleeps once the pile rests (or after 3 s without input). The orb's `TimelineView` is paused while it sleeps, so a settled orb draws nothing.
 - **Delete sequence:** the rows fly into the orb one after another, the panel shrinks back into it, then the orb evaporates and the capsule appears. `VaporMotion` holds the shared timings.
+- **Folder drawing:** the pile and the bubbles use Vapor's own small folder (`VaporFolderGlyph`), because the system icon reads as a plain tile at those sizes. Panel rows use the system folder icon.
+- **Turning off:** the coordinator keeps the windows for the orb's exit (about a third of a second), then tears everything down.
 
 ### Snapshots
 
@@ -189,6 +194,8 @@ Offscreen rendering can't draw Liquid Glass, so panels and capsules use a flat t
   - no slosh, lean or squash
   - the panel fades instead of springing
   - evaporate becomes a fade
+  - the orb fades in and out instead of condensing and shrinking
+  - bubbles fade in place and don't glide
 - **Reduce Transparency:** opaque fills instead of glass.
 
 ### Analytics

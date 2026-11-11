@@ -52,7 +52,7 @@ private struct VaporFooterNote: View {
                     .foregroundStyle(VaporStyle.warning)
             } else {
                 Text(.vaporSkipsTrashNote)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(VaporStyle.faint)
             }
         }
         .font(.system(size: 11.5))

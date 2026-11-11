@@ -6,7 +6,8 @@ import Observation
 /// ``start()``, ``stop()`` and ``updateDisplays(_:)``.
 ///
 /// While Vapor is off, only launch recovery runs: no windows, monitors or observers exist.
-/// Turning it on builds them; turning it off or quitting tears every one down.
+/// Turning it on builds them; turning it off or quitting tears every one down (turning it off
+/// waits for the orb's short exit animation first).
 @MainActor @Observable
 final class VaporCoordinator {
     let store: VaporStore
@@ -28,6 +29,8 @@ final class VaporCoordinator {
     @ObservationIgnored private var accessibilityObserver: NSObjectProtocol?
     @ObservationIgnored private var finderTask: Task<Void, Never>?
     @ObservationIgnored private var recoveryTask: Task<Void, Never>?
+    /// Vapor was turned off and the orb is shrinking away; everything is dismantled when it ends.
+    @ObservationIgnored private var hideTask: Task<Void, Never>?
     @ObservationIgnored private var started = false
     @ObservationIgnored private var presenting = false
     /// Bumped on every teardown so a stale observation callback does nothing.
@@ -61,7 +64,7 @@ final class VaporCoordinator {
         let deleter = deleter
         recoveryTask = Task(priority: .utility) { await deleter.recover() }
         controller.requestFinderAccess = { [weak self] in self?.requestFinderAccess() }
-        if store.isEnabled { present() }
+        if store.isEnabled { present(animated: false) }
     }
 
     func stop() {
@@ -71,13 +74,14 @@ final class VaporCoordinator {
         controller.requestFinderAccess = nil
     }
 
-    /// Turns Vapor on or off. Off hides the orb and keeps its folders.
+    /// Turns Vapor on or off. On condenses the orb out of particles; off shrinks it away and
+    /// keeps its folders. Under Reduce Motion both are a plain fade.
     func setEnabled(_ enabled: Bool) {
         guard enabled != store.isEnabled else { return }
         store.setEnabled(enabled)
         Analytics.track(.vaporToggled(enabled: enabled))
         guard started else { return }
-        enabled ? present() : dismantle()
+        enabled ? present(animated: true) : hide()
     }
 
     /// The display arrangement changed, or the Mac woke. Re-places the orb and its windows.
@@ -91,11 +95,21 @@ final class VaporCoordinator {
 
     // MARK: Presenting
 
-    private func present() {
-        guard !presenting else { return }
+    /// Builds the windows, monitors and observers and shows the orb.
+    /// - Parameter animated: Plays the orb's entrance (turned on from the menu); false at launch.
+    private func present(animated: Bool) {
+        if presenting {
+            // Turned on again while the orb was still shrinking away: bring it back.
+            guard hideTask != nil else { return }
+            hideTask?.cancel()
+            hideTask = nil
+            controller.showOrb(animated: true)
+            return
+        }
         presenting = true
         controller.start()
         readAccessibilityOptions()
+        controller.showOrb(animated: animated)
         let windows = VaporWindows(controller: controller)
         self.windows = windows
         windows.orbClicked = { [weak self] in self?.controller.togglePanel() }
@@ -122,7 +136,22 @@ final class VaporCoordinator {
         refreshPermission()
     }
 
+    /// Plays the orb's exit, then dismantles. The panel, bubbles and capsule go at once.
+    private func hide() {
+        guard presenting, hideTask == nil else { return }
+        controller.hideOrb()
+        let wait = VaporMotion.orbExitDuration(reduceMotion: controller.reduceMotion) + 0.03
+        hideTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(wait))
+            guard !Task.isCancelled, let self else { return }
+            self.hideTask = nil
+            self.dismantle()
+        }
+    }
+
     private func dismantle() {
+        hideTask?.cancel()
+        hideTask = nil
         guard presenting else { return }
         presenting = false
         generation &+= 1

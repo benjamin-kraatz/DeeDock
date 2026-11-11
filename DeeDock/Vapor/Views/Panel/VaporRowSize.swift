@@ -33,7 +33,7 @@ struct VaporRowSize: View {
                     String(localized: .vaporFileCount(Int($0.rounded())))
                 }
                 .font(.system(size: 11).monospacedDigit())
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(VaporStyle.faint)
             }
         }
         .lineLimit(1)
@@ -81,7 +81,7 @@ struct VaporShimmerText: View {
 
     var body: some View {
         text
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(VaporStyle.faint)
             .overlay {
                 if !reduceMotion {
                     GeometryReader { proxy in

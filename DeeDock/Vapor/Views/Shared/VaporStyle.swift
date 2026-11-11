@@ -9,6 +9,9 @@ enum VaporStyle {
     static let line = Color.primary.opacity(0.08)
     /// Edges of capsules, cards and the dashed drop zone.
     static let line2 = Color.primary.opacity(0.15)
+    /// The faintest text: paths, file counts, footnotes and the empty glyph. A little stronger
+    /// than the system's tertiary label, which gets lost on glass over a busy desktop.
+    static let faint = Color.primary.opacity(0.4)
     /// A hovered row.
     static let selection = Color.primary.opacity(0.06)
     /// The accent's light fill (Undo, the targeted drop zone).
@@ -41,7 +44,7 @@ private struct VaporPillButtonBody: View {
             .font(.system(size: 12, weight: prominent ? .semibold : .medium))
             .foregroundStyle(prominent ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
             .padding(.horizontal, 10)
-            .padding(.vertical, 4.5)
+            .padding(.vertical, prominent ? 4 : 5)
             .background(fill, in: .rect(cornerRadius: prominent ? 9 : 8, style: .continuous))
             .opacity(isEnabled ? (configuration.isPressed ? 0.75 : 1) : 0.4)
             .onHover { hovered = $0 && isEnabled }

@@ -13,10 +13,14 @@ nonisolated struct VaporStatus: Equatable, Sendable {
         case failed(count: Int)
         /// Undo couldn't put some folders back because something now sits at their path.
         case notRestored(count: Int)
+        /// "Put back 3 folders", shown briefly after Undo.
+        case restored(count: Int)
     }
 
     var kind: Kind
-    /// Changes with every new capsule, so a view can restart its transition.
+    /// Changes with every new capsule, so a view can restart its transition. The capsules
+    /// that follow "Deleted…" (freed, put back, not restored) keep its token: the same capsule
+    /// changes its text in place.
     var token = UUID()
 }
 
@@ -29,6 +33,18 @@ nonisolated struct VaporEvent<Payload: Equatable & Sendable>: Equatable, Sendabl
         self.payload = payload
         token = UUID()
     }
+}
+
+/// Whether the orb is on screen, and the show or hide animation it plays.
+nonisolated struct VaporOrbPresence: Equatable, Sendable {
+    /// False while the orb shrinks away after Vapor was turned off.
+    var isShown = true
+    /// Set when the change should animate: the orb condenses out of particles when shown and
+    /// shrinks away when hidden. Nil shows the orb as it is (launch).
+    var token: UUID?
+
+    /// The orb is about to condense: it starts out invisible.
+    var isEntering: Bool { isShown && token != nil }
 }
 
 /// Where folders came from, for analytics and for the pop-in animation.

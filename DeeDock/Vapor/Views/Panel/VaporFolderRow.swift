@@ -24,7 +24,7 @@ struct VaporFolderRow: View {
                 }
                 Text(verbatim: folder.parentPath(home: home))
                     .font(.system(size: 11).monospaced())
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(VaporStyle.faint)
                     .lineLimit(1)
                     .truncationMode(.head)
                 if let failure = folder.failure {

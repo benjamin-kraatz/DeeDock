@@ -113,6 +113,31 @@ struct VaporGeometryTests {
         #expect(VaporGeometry.badgeCorner(orbCenter: CGPoint(x: -2400, y: 300), visibleFrame: left.visibleFrame) == .topLeading)
     }
 
+    @Test(arguments: [CGPoint(x: 1400, y: 300), CGPoint(x: 120, y: 820), CGPoint(x: 760, y: 120), CGPoint(x: 700, y: 880)],
+          1...5)
+    func capsuleSitsJustBeyondTheBubbles(orb: CGPoint, count: Int) {
+        let size = CGSize(width: 320, height: 34)
+        let layout = VaporGeometry.satelliteLayout(orbCenter: orb, count: count, capsuleSize: size,
+                                                   visibleFrame: primary.visibleFrame)
+        let capsule = CGRect(x: layout.capsuleCenter.x - size.width / 2, y: layout.capsuleCenter.y - size.height / 2,
+                             width: size.width, height: size.height)
+        func gap(_ center: CGPoint, radius: CGFloat) -> CGFloat {
+            let dx = max(capsule.minX - center.x, 0, center.x - capsule.maxX)
+            let dy = max(capsule.minY - center.y, 0, center.y - capsule.maxY)
+            return hypot(dx, dy) - radius
+        }
+        let gaps = layout.bubbleCenters.map { gap($0, radius: VaporGeometry.bubbleDiameter / 2) }
+        // Clear of every bubble and the orb, and no farther from the nearest bubble than it has to be.
+        #expect(gaps.allSatisfy { $0 >= VaporGeometry.capsuleGap - 0.01 })
+        #expect(gap(layout.orbCenter, radius: VaporGeometry.orbDiameter / 2) >= VaporGeometry.capsuleGap - 0.01)
+        #expect((gaps.min() ?? 0) < VaporGeometry.capsuleGap + 2)
+        // The window is the same however many bubbles there are, so they can glide inside it.
+        for other in 0...5 {
+            #expect(VaporGeometry.satelliteLayout(orbCenter: orb, count: other, capsuleSize: size,
+                                                  visibleFrame: primary.visibleFrame).windowFrame == layout.windowFrame)
+        }
+    }
+
     @Test func satellitesArcTowardTheCentreAndStayOnScreen() throws {
         let orb = CGPoint(x: 1400, y: 300)
         let layout = VaporGeometry.satelliteLayout(orbCenter: orb, count: 7, capsuleSize: CGSize(width: 260, height: 34),
@@ -135,6 +160,8 @@ struct VaporGeometryTests {
         #expect(approx(layout.orbCenter.x, orb.x - window.minX) && approx(layout.orbCenter.y, window.maxY - orb.y))
         let capsule = CGPoint(x: window.minX + layout.capsuleCenter.x, y: window.maxY - layout.capsuleCenter.y)
         #expect(primary.visibleFrame.contains(capsule))
+        // The window covers the orb, so bubbles can fly into it.
+        #expect(window.contains(orb))
         #expect(VaporGeometry.satelliteLayout(orbCenter: orb, count: 0, capsuleSize: .zero,
                                               visibleFrame: primary.visibleFrame).bubbleCenters.isEmpty)
     }

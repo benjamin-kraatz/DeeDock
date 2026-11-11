@@ -37,11 +37,9 @@ private extension VaporCallout {
     var identity: String {
         switch self {
         case .refusal: "refusal"
-        case .status(let status):
-            switch status.kind {
-            case .deleted: "deleted-\(status.token)"
-            default: "status-\(status.token)"
-            }
+        // "Freed…" and "Put back…" keep the token of the "Deleted…" capsule they follow, so
+        // its text changes in place.
+        case .status(let status): "status-\(status.token)"
         case .dropToAdd: "drop"
         case .tooltip: "tooltip"
         }
@@ -91,7 +89,7 @@ private struct VaporCalloutContent: View {
 }
 
 /// The delete status: "Deleted 3 folders" with the countdown ring and Undo, then
-/// "✓ Freed 1.8 GB", or a failure.
+/// "✓ Freed 1.8 GB", "Put back 3 folders" after Undo, or a failure.
 private struct VaporStatusCapsule: View {
     let kind: VaporStatus.Kind
     let reduceTransparency: Bool
@@ -107,6 +105,9 @@ private struct VaporStatusCapsule: View {
                     .buttonStyle(VaporUndoButtonStyle())
             case .freed:
                 VaporStatusIcon(kind: .done)
+                Text(verbatim: VaporCopy.status(kind))
+                    .padding(.trailing, 6)
+            case .restored:
                 Text(verbatim: VaporCopy.status(kind))
                     .padding(.trailing, 6)
             case .failed, .notRestored:
@@ -250,6 +251,11 @@ private struct VaporCountdownRing: View {
     let controller = VaporPreviewData.controller(VaporPreviewData.mixed)
     controller.isOrbHovered = true
     return VaporCalloutView(controller: controller)
+        .background(VaporPreviewBackdrop())
+}
+
+#Preview("Put back") {
+    VaporCalloutView(controller: VaporPreviewData.controller(status: VaporStatus(kind: .restored(count: 3))))
         .background(VaporPreviewBackdrop())
 }
 

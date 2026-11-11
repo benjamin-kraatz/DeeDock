@@ -40,10 +40,11 @@ struct VaporHoldButton: View {
                         }
                     }
                 }
-                .overlay(alignment: .top) {
-                    // The glossy top edge from the mockup.
-                    shape.strokeBorder(LinearGradient(colors: [.white.opacity(0.25), .clear], startPoint: .top, endPoint: .center),
-                                       lineWidth: 1)
+                .overlay {
+                    // The mockup's glossy top edge: a 1 pt highlight that is gone by the corners' end.
+                    shape.strokeBorder(LinearGradient(stops: [.init(color: .white.opacity(0.3), location: 0),
+                                                              .init(color: .white.opacity(0), location: 0.22)],
+                                                      startPoint: .top, endPoint: .bottom), lineWidth: 1)
                 }
                 .clipShape(shape)
         }
@@ -76,6 +77,8 @@ struct VaporHoldButton: View {
             content.scaleEffect(reduceMotion ? 1 : scale)
         } keyframes: { _ in
             KeyframeTrack {
+                // Wait for the panel to finish growing out of the orb, so the nudge is seen.
+                LinearKeyframe(1, duration: 0.3)
                 CubicKeyframe(1.04, duration: 0.15)
                 CubicKeyframe(0.98, duration: 0.15)
                 CubicKeyframe(1, duration: 0.2)

@@ -90,6 +90,8 @@ enum VaporCopy {
             return String(localized: .vaporStatusFailed(count))
         case .notRestored(let count):
             return String(localized: .vaporStatusNotRestored(count))
+        case .restored(let count):
+            return String(localized: .vaporStatusRestored(count))
         }
     }
 

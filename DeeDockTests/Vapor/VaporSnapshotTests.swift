@@ -101,6 +101,37 @@ struct VaporSnapshotTests {
         }
     }
 
+    /// The entrance about a quarter of a second in: the orb part grown, particles on their way.
+    @Test func orbCondensing() throws {
+        let controller = VaporPreviewData.controller(Array(VaporPreviewData.pile.prefix(3)), opensLeft: true)
+        try snapshot("orb-condensing", .dark) {
+            ZStack {
+                Canvas { context, size in
+                    VaporOrbCondense.draw(elapsed: 0.25, in: &context, size: size,
+                                          color: VaporOrbPalette(colorScheme: .dark, reduceTransparency: false).steam)
+                }
+                VaporOrbView(controller: controller, pile: VaporPreviewData.settledPile(for: controller))
+                    .scaleEffect(0.6)
+                    .opacity(0.85)
+            }
+        }
+    }
+
+    /// The folder drawing used in the pile and on bubbles, at their sizes and overlapping.
+    @Test(arguments: [ColorScheme.dark, .light])
+    func folderGlyph(_ scheme: ColorScheme) throws {
+        try snapshot("folder-glyph", scheme, size: CGSize(width: 320, height: 110)) {
+            HStack(spacing: 14) {
+                ForEach([18.0, 20, 26, 36], id: \.self) { VaporFolderGlyphView(width: $0) }
+                ZStack {
+                    VaporFolderGlyphView(width: 30).rotationEffect(.degrees(-28)).offset(x: -9, y: 4)
+                    VaporFolderGlyphView(width: 30).rotationEffect(.degrees(17)).offset(x: 10, y: -3)
+                }
+                .frame(width: 70)
+            }
+        }
+    }
+
     // MARK: Panel
 
     @Test(arguments: [ColorScheme.dark, .light])
@@ -157,6 +188,12 @@ struct VaporSnapshotTests {
         try snapshot("callout-freed", .dark, size: CGSize(width: 320, height: 90)) { VaporCalloutView(controller: controller) }
     }
 
+    @Test(arguments: [ColorScheme.dark, .light])
+    func calloutPutBack(_ scheme: ColorScheme) throws {
+        let controller = VaporPreviewData.controller(status: VaporStatus(kind: .restored(count: 3)))
+        try snapshot("callout-put-back", scheme, size: CGSize(width: 320, height: 90)) { VaporCalloutView(controller: controller) }
+    }
+
     @Test func calloutRefusal() throws {
         let controller = VaporPreviewData.controller(refusal: .standardFolder(name: "Documents"))
         try snapshot("callout-refusal", .dark, size: CGSize(width: 460, height: 90)) { VaporCalloutView(controller: controller) }
@@ -184,15 +221,57 @@ struct VaporSnapshotTests {
         controller.hoveredSuggestionID = nil
         let pile = VaporPreviewData.settledPile(for: controller)
         let center = Lamp.upperLeft.orbCenter
-        let layout = VaporGeometry.satelliteLayout(orbCenter: center, count: controller.bubbleSuggestions.count,
-                                                   capsuleSize: VaporSuggestionsView.capsuleSize,
-                                                   visibleFrame: VaporPreviewData.visibleFrame)
+        let frame = VaporSuggestionsView.layout(orbCenter: center, count: controller.bubbleSuggestions.count,
+                                                visibleFrame: VaporPreviewData.visibleFrame).windowFrame
         try snapshot("scene-suggestions", scheme, size: CGSize(width: 640, height: 400)) {
             VaporSnapshotScene(orbCenter: center, size: CGSize(width: 640, height: 400), orbOffsetX: 170) { scene in
+                // The bubbles' window sits behind the orb's, as on screen.
+                VaporSuggestionsView(controller: controller, orbCenter: center, visibleFrame: VaporPreviewData.visibleFrame,
+                                     animatesEntrance: false)
+                    .scenePlaced(scene, frame: frame)
                 VaporOrbView(controller: controller, pile: pile)
                     .scenePlaced(scene, frame: VaporGeometry.orbWindowFrame(center: center))
-                VaporSuggestionsView(controller: controller, layout: layout, animatesEntrance: false)
-                    .scenePlaced(scene, frame: layout.windowFrame)
+            }
+        }
+    }
+
+    /// Six suggestions beside an orb on the left: five bubbles, "· 1 more", mirrored layout.
+    @Test(arguments: [ColorScheme.dark, .light])
+    func sceneSuggestionsFiveOnTheLeft(_ scheme: ColorScheme) throws {
+        let folder = VaporPreviewData.finderFolder
+        let suggestions = VaporPreviewData.suggestions + [
+            VaporSuggestion(url: folder.appendingPathComponent(".parcel-cache"), tag: .parcelCache),
+            VaporSuggestion(url: folder.appendingPathComponent(".svelte-kit"), tag: .svelteKitBuild),
+        ]
+        let controller = VaporPreviewData.controller(suggestions: suggestions, opensLeft: false, lamp: .upperRight)
+        let center = Lamp.upperRight.orbCenter
+        let frame = VaporSuggestionsView.layout(orbCenter: center, count: controller.bubbleSuggestions.count,
+                                                visibleFrame: VaporPreviewData.visibleFrame).windowFrame
+        try snapshot("scene-suggestions-five-left", scheme, size: CGSize(width: 640, height: 400)) {
+            VaporSnapshotScene(orbCenter: center, size: CGSize(width: 640, height: 400), orbOffsetX: -190) { scene in
+                VaporSuggestionsView(controller: controller, orbCenter: center, visibleFrame: VaporPreviewData.visibleFrame,
+                                     animatesEntrance: false)
+                    .scenePlaced(scene, frame: frame)
+                VaporOrbView(controller: controller)
+                    .scenePlaced(scene, frame: VaporGeometry.orbWindowFrame(center: center))
+            }
+        }
+    }
+
+    /// The capsule while a bubble is hovered: the folder's name and tag, flush with the bubbles.
+    @Test func sceneSuggestionsHovered() throws {
+        let controller = VaporPreviewData.controller(suggestions: VaporPreviewData.suggestions, opensLeft: true)
+        controller.hoveredSuggestionID = VaporPreviewData.suggestions[3].id
+        let center = Lamp.upperLeft.orbCenter
+        let frame = VaporSuggestionsView.layout(orbCenter: center, count: controller.bubbleSuggestions.count,
+                                                visibleFrame: VaporPreviewData.visibleFrame).windowFrame
+        try snapshot("scene-suggestions-hovered", .dark, size: CGSize(width: 640, height: 400)) {
+            VaporSnapshotScene(orbCenter: center, size: CGSize(width: 640, height: 400), orbOffsetX: 170) { scene in
+                VaporSuggestionsView(controller: controller, orbCenter: center, visibleFrame: VaporPreviewData.visibleFrame,
+                                     animatesEntrance: false)
+                    .scenePlaced(scene, frame: frame)
+                VaporOrbView(controller: controller)
+                    .scenePlaced(scene, frame: VaporGeometry.orbWindowFrame(center: center))
             }
         }
     }

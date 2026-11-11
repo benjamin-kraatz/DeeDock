@@ -21,16 +21,21 @@ struct VaporSuggestionCapsule: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
                 if extra > 0 {
-                    Text(.vaporMoreSuggestions(extra))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    // "· 2 more": the dot is a separator, not copy.
+                    HStack(spacing: 4) {
+                        Text(verbatim: "·")
+                        Text(.vaporMoreSuggestions(extra))
+                    }
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .layoutPriority(1)
                 }
             }
             .font(.system(size: 12, weight: .medium))
             .contentTransition(.opacity)
-            .animation(.easeOut(duration: 0.15), value: text)
             Button(.vaporAddAll, action: addAll)
                 .buttonStyle(VaporPillButtonStyle(prominent: true))
+                .fixedSize()
             VaporCloseButton(diameter: 22, redOnHover: false, label: .vaporDismissSuggestions, action: dismiss)
         }
         .padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 5))

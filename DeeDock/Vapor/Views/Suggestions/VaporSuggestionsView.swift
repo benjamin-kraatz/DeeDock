@@ -1,24 +1,32 @@
 import SwiftUI
 
 /// Finder suggestions beside the orb: up to five bubbles on an arc facing the screen centre and
-/// a capsule beyond them. Positions come from ``VaporGeometry/satelliteLayout(orbCenter:count:capsuleSize:visibleFrame:)``,
-/// already converted to this window's coordinates.
+/// a capsule just beyond them. The view works out its own layout
+/// (``VaporGeometry/satelliteLayout(orbCenter:count:capsuleSize:visibleFrame:)``) from the
+/// bubbles it is showing, so positions always match the count; the window it sits in depends
+/// only on where the orb is.
 ///
 /// Bubbles spring out of the orb one after another and bob gently. Hovering one switches the
 /// capsule to that folder's name and tag; clicking flies it into the orb, and the folder is
-/// added as it lands. Add All does the same for every bubble in turn. Under Reduce Motion the
-/// bubbles fade in and out in place and folders are added at once.
-///
-/// The window is rebuilt with a new layout when the bubbles change; the root view's identity
-/// stays the same, so bubbles keep their state.
+/// added as it lands, so the orb's own drop-in and squash continue the motion. Add All does the
+/// same for every bubble in turn. When a bubble comes or goes, the others and the capsule glide
+/// to their new places. Under Reduce Motion the bubbles fade in and out in place, nothing
+/// glides, and folders are added at once.
 struct VaporSuggestionsView: View {
     let controller: VaporController
-    let layout: VaporSatelliteLayout
+    /// The orb's centre and its display's visible frame, in AppKit global coordinates.
+    let orbCenter: CGPoint
+    let visibleFrame: CGRect
     /// False renders bubbles already in place, for snapshots.
     var animatesEntrance = true
 
-    /// The capsule size the geometry reserves room for.
-    static let capsuleSize = CGSize(width: 260, height: 34)
+    /// The most room the capsule takes. A shorter capsule sits flush with the side facing the orb.
+    static let capsuleSize = CGSize(width: 320, height: 34)
+
+    /// The layout for `count` bubbles around an orb at `orbCenter`.
+    static func layout(orbCenter: CGPoint, count: Int, visibleFrame: CGRect) -> VaporSatelliteLayout {
+        VaporGeometry.satelliteLayout(orbCenter: orbCenter, count: count, capsuleSize: capsuleSize, visibleFrame: visibleFrame)
+    }
 
     @State private var eaten: Set<String> = []
     @Environment(\.colorScheme) private var colorScheme
@@ -28,31 +36,43 @@ struct VaporSuggestionsView: View {
         let all = controller.suggestions
         let hovered = all.first { $0.id == controller.hoveredSuggestionID }
         let palette = VaporOrbPalette(colorScheme: colorScheme, reduceTransparency: controller.reduceTransparency)
+        let reduceMotion = controller.reduceMotion
+        let layout = Self.layout(orbCenter: orbCenter, count: bubbles.count, visibleFrame: visibleFrame)
+        let text = VaporCopy.suggestionCapsule(count: all.count, folder: controller.finderFolder, hovered: hovered)
         ZStack(alignment: .topLeading) {
             ForEach(Array(zip(bubbles, layout.bubbleCenters).enumerated()), id: \.element.0.id) { index, pair in
                 let (suggestion, center) = pair
                 VaporSuggestionBubble(suggestion: suggestion, index: index, target: center, orb: layout.orbCenter,
                                       lighting: controller.lighting, palette: palette,
                                       isEaten: eaten.contains(suggestion.id), animatesEntrance: animatesEntrance,
-                                      reduceMotion: controller.reduceMotion) { isHovered in
+                                      reduceMotion: reduceMotion) { isHovered in
                     hover(suggestion, isHovered)
                 } add: {
                     eat([suggestion]) { controller.addSuggestion(suggestion) }
                 }
+                .transition(.asymmetric(insertion: .identity, removal: .opacity))
             }
-            if !all.isEmpty {
+            if !bubbles.isEmpty {
                 VaporSuggestionCapsule(
-                    text: VaporCopy.suggestionCapsule(count: all.count, folder: controller.finderFolder, hovered: hovered),
-                    extra: hovered == nil ? max(all.count - bubbles.count, 0) : 0,
-                    reduceTransparency: controller.reduceTransparency, reduceMotion: controller.reduceMotion,
+                    text: text, extra: hovered == nil ? max(all.count - bubbles.count, 0) : 0,
+                    reduceTransparency: controller.reduceTransparency, reduceMotion: reduceMotion,
                     animatesEntrance: animatesEntrance,
                     addAll: { eat(bubbles, then: controller.addAllSuggestions) },
                     dismiss: controller.dismissSuggestions)
-                    .frame(maxWidth: Self.capsuleSize.width)
+                    // Flush with the side of the reserved room that faces the orb: `dx` -1 puts
+                    // all the slack on the left.
+                    .alignmentGuide(.vaporCapsuleSide) { size in
+                        -(Self.capsuleSize.width - size.width) * (1 - layout.capsuleLean.dx) / 2
+                    }
+                    .frame(width: Self.capsuleSize.width, height: Self.capsuleSize.height,
+                           alignment: Alignment(horizontal: .vaporCapsuleSide, vertical: .center))
                     .position(layout.capsuleCenter)
+                    .animation(reduceMotion ? nil : VaporMotion.bubbleGlide, value: layout.capsuleCenter)
+                    .animation(.easeOut(duration: 0.18), value: text)
             }
         }
         .frame(width: layout.windowFrame.width, height: layout.windowFrame.height, alignment: .topLeading)
+        .animation(.easeOut(duration: 0.2), value: bubbles.map(\.id))
         .onChange(of: bubbles.map(\.id)) { _, ids in
             eaten.formIntersection(ids)
         }
@@ -89,24 +109,28 @@ struct VaporSuggestionsView: View {
     }
 }
 
+private extension HorizontalAlignment {
+    /// Places the capsule inside its reserved room. A guide of its own, not `.leading`: an
+    /// explicit `.leading` would travel up to the bubbles' stack and shift them.
+    static let vaporCapsuleSide = HorizontalAlignment(VaporCapsuleSide.self)
+
+    private enum VaporCapsuleSide: AlignmentID {
+        static func defaultValue(in context: ViewDimensions) -> CGFloat { context[.leading] }
+    }
+}
+
 #if DEBUG
 #Preview("Suggestions, dark") {
-    let layout = VaporGeometry.satelliteLayout(orbCenter: VaporPreviewData.Lamp.upperLeft.orbCenter, count: 4,
-                                               capsuleSize: VaporSuggestionsView.capsuleSize,
-                                               visibleFrame: VaporPreviewData.visibleFrame)
     VaporSuggestionsView(controller: VaporPreviewData.controller(suggestions: VaporPreviewData.suggestions, opensLeft: true),
-                         layout: layout)
+                         orbCenter: VaporPreviewData.Lamp.upperLeft.orbCenter, visibleFrame: VaporPreviewData.visibleFrame)
         .background(VaporPreviewBackdrop())
         .preferredColorScheme(.dark)
 }
 
 #Preview("Suggestions, light, Reduce Motion") {
-    let layout = VaporGeometry.satelliteLayout(orbCenter: VaporPreviewData.Lamp.upperRight.orbCenter, count: 3,
-                                               capsuleSize: VaporSuggestionsView.capsuleSize,
-                                               visibleFrame: VaporPreviewData.visibleFrame)
     VaporSuggestionsView(controller: VaporPreviewData.controller(suggestions: Array(VaporPreviewData.suggestions.prefix(3)),
                                                                  reduceMotion: true, lamp: .upperRight),
-                         layout: layout)
+                         orbCenter: VaporPreviewData.Lamp.upperRight.orbCenter, visibleFrame: VaporPreviewData.visibleFrame)
         .background(VaporPreviewBackdrop())
         .preferredColorScheme(.light)
 }

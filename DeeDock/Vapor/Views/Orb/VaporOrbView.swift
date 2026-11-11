@@ -4,6 +4,9 @@ import SwiftUI
 /// count badge and a drop glow. Fills its window: the orb plus ``VaporGeometry/orbCanvasInset``
 /// on each side, which leaves room for the lean, the squash, the badge and escaping steam.
 ///
+/// When Vapor is turned on the orb condenses out of particles, and it shrinks away when turned
+/// off (``VaporOrbPresenceEffect``).
+///
 /// Purely visual: the window's AppKit view handles clicks, dragging and drops, and the
 /// accessibility element is declared here. Reactions come from the controller's event tokens
 /// (``VaporController/addition``, ``VaporController/refusal``, ``VaporController/deletion``)
@@ -56,6 +59,9 @@ struct VaporOrbView: View {
         .offset(reduceMotion ? .zero : proximity.lean)
         .animation(.spring(response: 0.22, dampingFraction: 0.62), value: proximity)
         .animation(.easeOut(duration: 0.15), value: isDragging)
+        .modifier(VaporOrbPresenceEffect(presence: controller.orbPresence, reduceMotion: reduceMotion))
+        // Outside the entrance's scale, so the particles really travel in from around the orb.
+        .background(VaporOrbCondense(presence: controller.orbPresence, reduceMotion: reduceMotion, color: palette.steam))
         .frame(width: VaporGeometry.orbWindowSize.width, height: VaporGeometry.orbWindowSize.height)
         .onChange(of: VaporPileInputs(controller), initial: true) {
             pile.sync(folders: controller.folders, addition: controller.addition, deletion: controller.deletion,

@@ -198,11 +198,23 @@ nonisolated enum VaporGeometry {
         CGPoint(x: visibleFrame.midX, y: visibleFrame.minY + visibleFrame.height * 0.58)
     }
 
-    /// Bubbles on an arc beside the orb, facing the screen centre, and the capsule beyond them.
+    /// Space kept between the capsule and the bubbles (and the orb).
+    static let capsuleGap: CGFloat = 10
+
+    /// Bubbles on an arc beside the orb, facing the screen centre, and the capsule just beyond them.
+    ///
+    /// The capsule sits on the ray from the orb toward the screen centre, with the edge or corner
+    /// that faces the orb on that ray, as close as it can get while keeping ``capsuleGap`` clear
+    /// of every bubble. A capsule narrower than `capsuleSize` is aligned inside it toward the
+    /// orb (``VaporSatelliteLayout/capsuleLean``), so the gap stays the same whatever its text.
+    ///
+    /// The window does not depend on `count`: it covers the orb, the whole arc and every place
+    /// the capsule can take. So bubbles glide to new places inside a window that stays put, and a
+    /// clicked bubble can fly into the orb without being clipped.
     ///
     /// - Parameters:
     ///   - count: Bubbles to place; at most ``maxBubbles`` are used.
-    ///   - capsuleSize: The capsule's expected size; the window leaves room for it.
+    ///   - capsuleSize: The largest size the capsule takes; the window leaves room for it.
     static func satelliteLayout(orbCenter: CGPoint, count: Int, capsuleSize: CGSize,
                                 visibleFrame: CGRect) -> VaporSatelliteLayout {
         let target = suggestionTarget(in: visibleFrame)
@@ -211,28 +223,47 @@ nonisolated enum VaporGeometry {
         let dir = CGVector(dx: tx / length, dy: ty / length)
         let phi = atan2(Double(dir.dy), Double(dir.dx))
         let rho = Double(orbDiameter / 2 + 32)
-        let shown = min(count, maxBubbles)
-        let bubbles = (0..<shown).map { index -> CGPoint in
-            let angle = phi + (Double(index) - Double(shown - 1) / 2) * bubbleStep
-            return CGPoint(x: orbCenter.x + CGFloat(cos(angle) * rho), y: orbCenter.y + CGFloat(sin(angle) * rho))
+        func arc(_ shown: Int) -> [CGPoint] {
+            (0..<shown).map { index in
+                let angle = phi + (Double(index) - Double(shown - 1) / 2) * bubbleStep
+                return CGPoint(x: orbCenter.x + CGFloat(cos(angle) * rho), y: orbCenter.y + CGFloat(sin(angle) * rho))
+            }
         }
-        let reach = CGFloat(rho) + bubbleDiameter / 2 + 14 + abs(dir.dx) * capsuleSize.width / 2
-            + abs(dir.dy) * capsuleSize.height / 2
+        // The direction stretched onto the unit square: which edge or corner of the capsule
+        // faces the orb. (-1, 0) is the middle of its right edge, (-1, 1) its lower right corner.
+        let stretch = max(abs(dir.dx), abs(dir.dy), 0.001)
+        let lean = CGVector(dx: dir.dx / stretch, dy: dir.dy / stretch)
         let margin: CGFloat = 10
-        let capsule = CGPoint(
-            x: min(max(orbCenter.x + dir.dx * reach, visibleFrame.minX + capsuleSize.width / 2 + margin),
-                   visibleFrame.maxX - capsuleSize.width / 2 - margin),
-            y: min(max(orbCenter.y + dir.dy * reach, visibleFrame.minY + capsuleSize.height / 2 + margin),
-                   visibleFrame.maxY - capsuleSize.height / 2 - margin))
-        var bounds = CGRect(x: capsule.x - capsuleSize.width / 2, y: capsule.y - capsuleSize.height / 2,
-                            width: capsuleSize.width, height: capsuleSize.height)
-        for bubble in bubbles {
-            bounds = bounds.union(CGRect(x: bubble.x - bubbleDiameter / 2, y: bubble.y - bubbleDiameter / 2,
-                                         width: bubbleDiameter, height: bubbleDiameter))
+        func capsuleRect(beyond bubbles: [CGPoint]) -> CGRect {
+            var distance = orbDiameter / 2
+            var rect = CGRect.zero
+            // Walk outward a point at a time; six circles at most, so this stays cheap.
+            for _ in 0..<400 {
+                let center = CGPoint(x: orbCenter.x + dir.dx * distance + lean.dx * capsuleSize.width / 2,
+                                     y: orbCenter.y + dir.dy * distance + lean.dy * capsuleSize.height / 2)
+                rect = CGRect(x: center.x - capsuleSize.width / 2, y: center.y - capsuleSize.height / 2,
+                              width: capsuleSize.width, height: capsuleSize.height)
+                let clear = self.distance(from: orbCenter, to: rect) >= orbDiameter / 2 + capsuleGap
+                    && bubbles.allSatisfy { self.distance(from: $0, to: rect) >= bubbleDiameter / 2 + capsuleGap }
+                if clear { break }
+                distance += 1
+            }
+            let x = min(max(rect.minX, visibleFrame.minX + margin), visibleFrame.maxX - margin - rect.width)
+            let y = min(max(rect.minY, visibleFrame.minY + margin), visibleFrame.maxY - margin - rect.height)
+            return CGRect(x: x, y: y, width: rect.width, height: rect.height)
         }
-        let window = bounds.insetBy(dx: -12, dy: -12).integral
+        let bubbles = arc(min(max(count, 0), maxBubbles))
+        let capsule = capsuleRect(beyond: bubbles)
+        let reach = CGFloat(rho) + bubbleDiameter / 2
+        // Every count's capsule, not just the nearest and farthest: an even count leaves the ray
+        // itself free, so its capsule can sit closer than a single bubble's.
+        let bounds = (1...maxBubbles).reduce(
+            CGRect(x: orbCenter.x - reach, y: orbCenter.y - reach, width: reach * 2, height: reach * 2)
+        ) { $0.union(capsuleRect(beyond: arc($1))) }
+        let window = bounds.insetBy(dx: -14, dy: -14).integral
         func local(_ point: CGPoint) -> CGPoint { CGPoint(x: point.x - window.minX, y: window.maxY - point.y) }
         return VaporSatelliteLayout(windowFrame: window, bubbleCenters: bubbles.map(local),
-                                    capsuleCenter: local(capsule), orbCenter: local(orbCenter))
+                                    capsuleCenter: local(CGPoint(x: capsule.midX, y: capsule.midY)),
+                                    capsuleLean: CGVector(dx: lean.dx, dy: -lean.dy), orbCenter: local(orbCenter))
     }
 }

@@ -51,7 +51,7 @@ struct VaporDropZone: View {
         let shape = RoundedRectangle(cornerRadius: 13, style: .continuous)
         Text(.vaporDropMore)
             .font(.system(size: 12, weight: isTargeted ? .medium : .regular))
-            .foregroundStyle(isTargeted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.tertiary))
+            .foregroundStyle(isTargeted ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(VaporStyle.faint))
             .frame(maxWidth: .infinity)
             .frame(height: isTargeted ? 52 : 42)
             .background(isTargeted ? VaporStyle.accentSoft : .clear, in: shape)

@@ -41,7 +41,7 @@ struct VaporOrbBadge: View {
 struct VaporOrbEmptyGlyph: View {
     var body: some View {
         VaporDropGlyphShape()
-            .stroke(.tertiary, style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
+            .stroke(VaporStyle.faint, style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
             .opacity(0.75)
             .frame(width: VaporGeometry.orbDiameter * 0.34, height: VaporGeometry.orbDiameter * 0.34)
             .allowsHitTesting(false)

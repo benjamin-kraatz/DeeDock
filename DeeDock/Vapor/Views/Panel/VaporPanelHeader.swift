@@ -11,6 +11,7 @@ struct VaporPanelHeader: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(.vaporTitle)
                     .font(.system(size: 15, weight: .bold))
+                    .tracking(-0.15)
                 Text(verbatim: VaporCopy.summary(totals))
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)

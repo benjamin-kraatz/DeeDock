@@ -3,8 +3,8 @@ import CoreGraphics
 /// Sizes for the folder icons inside the orb: bigger folders get bigger icons on a log scale,
 /// and every icon shrinks together when the pile would overflow the sphere.
 ///
-/// The physics treats each icon as a circle of ``radius(bytes:)``; the drawn icon is
-/// ``iconEdge(radius:)`` wide, a little wider than that circle, so neighbours overlap slightly
+/// The physics treats each icon as a circle of ``radius(bytes:)``; the drawn folder is
+/// ``iconWidth(radius:)`` wide, a little wider than that circle, so neighbours overlap slightly
 /// the way stacked folders do.
 nonisolated enum VaporPileSizing {
     /// The radius used while a folder is still being measured.
@@ -30,7 +30,6 @@ nonisolated enum VaporPileSizing {
         return min(1, (0.52 * innerRadius * innerRadius / area).squareRoot())
     }
 
-    /// The edge of the square system folder icon drawn for a body. The folder artwork fills
-    /// about 88 % of the icon's width, so this makes the folder itself about 2.3 radii wide.
-    static func iconEdge(radius: Double) -> Double { radius * 2.6 }
+    /// The width of the folder drawn for a body: 2.3 radii, as in the mockup.
+    static func iconWidth(radius: Double) -> Double { radius * 2.3 }
 }

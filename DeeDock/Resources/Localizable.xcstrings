@@ -46500,6 +46500,48 @@
         }
       }
     },
+    "vaporStatusRestored" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): capsule above the orb right after Undo put the deleted folders back where they were.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner zurückgelegt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Ordner zurückgelegt"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Put back %lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Put back %lld folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "vaporStatusSomeFailed" : {
       "comment" : "Vapor (the glass orb that deletes cache folders): added to the capsule when some folders could not be deleted and stayed in the orb.",
       "extractionState" : "manual",

@@ -158,19 +158,26 @@ struct VaporControllerTests {
         let id = (try #require(fixture.controller.folders.first)).id
         await fixture.controller.deleteAll()?.value
         #expect(!fixture.temp.exists(a))
+        let deleted = try #require(fixture.controller.status)
         await fixture.controller.undo()?.value
         #expect(fixture.temp.exists(a.appendingPathComponent("a/file.bin")))
         #expect(fixture.controller.folders.map(\.id) == [id])
         #expect((try #require(fixture.controller.folders.first)).measurement == .measured(bytes: 1_000, files: 3))
-        #expect(fixture.controller.status == nil)
+        // "Put back 1 folder" replaces "Deleted 1 folder" in the same capsule.
+        #expect(fixture.controller.status?.kind == .restored(count: 1))
+        #expect(fixture.controller.status?.token == deleted.token)
         #expect(fixture.controller.addition?.payload.source == .restore)
         #expect(fixture.recorder.events.last == .undone(count: 1))
         #expect(await fixture.engine.ledgerEntries().isEmpty)
         // The undo window's timer no longer does anything.
         fixture.sleeper.fire(VaporController.undoWindow)
         await Task.yield()
-        #expect(fixture.controller.status == nil)
+        #expect(fixture.controller.status?.kind == .restored(count: 1))
         #expect(fixture.controller.undo() == nil)
+        await vaporSettle { fixture.sleeper.pending.contains(VaporController.restoredDuration) }
+        fixture.sleeper.fire(VaporController.restoredDuration)
+        await vaporSettle { fixture.controller.status == nil }
+        #expect(fixture.controller.status == nil)
     }
 
     @Test func undoLeavesAFolderStagedWhenItsPlaceIsTaken() async throws {
@@ -225,6 +232,30 @@ struct VaporControllerTests {
         await fixture.controller.undo()?.value
         #expect(paths(fixture.controller) == [b.path])
         #expect(!fixture.temp.exists(a))
+    }
+
+    @Test func hidingTheOrbClosesThePanelAndHidesBubblesUntilShownAgain() throws {
+        let fixture = try Fixture()
+        let project = try fixture.folder("dev/web")
+        let next = try fixture.folder("dev/web/.next")
+        let controller = fixture.controller
+        controller.setFinderFolder(project, items: [VaporSuggestion(url: next, tag: .nextBuild)])
+        controller.isOrbHovered = true
+        controller.openPanel()
+        controller.closePanel()
+        #expect(controller.bubbleSuggestions.count == 1 && controller.callout != nil)
+        #expect(!controller.orbPresence.isEntering)
+
+        controller.openPanel()
+        controller.hideOrb()
+        #expect(!controller.isPanelOpen && !controller.orbPresence.isShown && controller.orbPresence.token != nil)
+        #expect(controller.bubbleSuggestions.isEmpty && controller.callout == nil)
+        controller.openPanel()
+        #expect(!controller.isPanelOpen)
+
+        controller.showOrb(animated: true)
+        #expect(controller.orbPresence.isEntering)
+        #expect(controller.bubbleSuggestions.count == 1)
     }
 
     @Test func stoppingCommitsAPendingDeleteAndKeepsFolders() async throws {

@@ -34,16 +34,23 @@ nonisolated enum VaporBadgeCorner: Equatable, Sendable {
     case topLeading, topTrailing
 }
 
-/// Where the suggestion bubbles and their capsule go, inside the suggestions window.
+/// Where the suggestion bubbles and their capsule go, inside the suggestions window. The
+/// window's frame depends only on where the orb is, not on how many bubbles there are.
 nonisolated struct VaporSatelliteLayout: Equatable, Sendable {
     /// The suggestions window's frame in AppKit global coordinates.
     var windowFrame: CGRect
     /// Bubble centres, in the window's SwiftUI coordinates (origin top-left, y down).
     var bubbleCenters: [CGPoint]
-    /// The capsule's centre, in the window's SwiftUI coordinates.
+    /// The centre of the room reserved for the capsule, in the window's SwiftUI coordinates.
     var capsuleCenter: CGPoint
-    /// The orb's centre in the same coordinates, possibly outside the window. Bubbles fly to it.
+    /// Which side of that room faces the orb, each component in -1…1 (SwiftUI axes): `dx` -1
+    /// means the orb is to the capsule's right, so a narrower capsule sits flush right.
+    var capsuleLean: CGVector
+    /// The orb's centre in the same coordinates. Bubbles spring out of it and fly back into it.
     var orbCenter: CGPoint
+
+    static let empty = VaporSatelliteLayout(windowFrame: .zero, bubbleCenters: [], capsuleCenter: .zero,
+                                            capsuleLean: .zero, orbCenter: .zero)
 }
 
 /// How close an in-flight file drag is to the orb, for the lean and glow.

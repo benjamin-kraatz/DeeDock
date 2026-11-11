@@ -37,6 +37,8 @@ final class VaporController {
     static let undoWindow: Duration = .seconds(5)
     /// How long "Freed …" stays before the capsule goes away.
     static let freedDuration: Duration = .seconds(2.2)
+    /// How long "Put back …" stays after Undo.
+    static let restoredDuration: Duration = .seconds(1.6)
     /// How long a failure or "couldn't be restored" capsule stays.
     static let noticeDuration: Duration = .seconds(4)
     /// How long a refusal message stays above the orb.
@@ -89,6 +91,9 @@ final class VaporController {
     var opensLeft = false
     var reduceMotion = false
     var reduceTransparency = false
+    /// Whether the orb is on screen and which show or hide animation it plays. While it is
+    /// leaving, the bubbles and the capsule are hidden and the panel can't open.
+    private(set) var orbPresence = VaporOrbPresence()
 
     // MARK: Callbacks
 
@@ -140,7 +145,7 @@ final class VaporController {
 
     /// The bubbles beside the orb: up to five suggestions, hidden while the panel is open.
     var bubbleSuggestions: [VaporSuggestion] {
-        isPanelOpen ? [] : Array(suggestions.prefix(VaporGeometry.maxBubbles))
+        isPanelOpen || !orbPresence.isShown ? [] : Array(suggestions.prefix(VaporGeometry.maxBubbles))
     }
 
     /// The panel's "Show caches from the open Finder folder · Turn On" line is visible.
@@ -149,6 +154,7 @@ final class VaporController {
     /// What the small capsule above the orb shows, in priority order: a refusal, the delete
     /// status, "Drop to add" while a drag is over the orb, then the hover tooltip.
     var callout: VaporCallout? {
+        guard orbPresence.isShown else { return nil }
         if let refusal { return .refusal(refusal.payload) }
         if let status { return .status(status) }
         if dropHover.proximity.isOverOrb { return .dropToAdd }
@@ -200,6 +206,22 @@ final class VaporController {
         dropHover = .none
         orbMotion = .still
         clearFinderFolder()
+    }
+
+    /// Vapor was turned on: the orb is on screen. `animated` condenses it out of particles;
+    /// otherwise it is simply there (launch).
+    func showOrb(animated: Bool) {
+        orbPresence = VaporOrbPresence(isShown: true, token: animated ? UUID() : nil)
+    }
+
+    /// Vapor was turned off: the panel closes, the bubbles and the capsule go, and the orb
+    /// shrinks away. The coordinator calls ``stop()`` once it has.
+    func hideOrb() {
+        closePanel()
+        isOrbHovered = false
+        dropHover = .none
+        hoveredSuggestionID = nil
+        orbPresence = VaporOrbPresence(isShown: false, token: UUID())
     }
 
     // MARK: Adding and removing
@@ -306,7 +328,7 @@ final class VaporController {
     // MARK: Panel
 
     func openPanel() {
-        guard !isPanelOpen else { return }
+        guard !isPanelOpen, orbPresence.isShown else { return }
         isPanelOpen = true
         hoveredSuggestionID = nil
     }
@@ -441,7 +463,8 @@ final class VaporController {
         removalTasks.append(task)
     }
 
-    /// Renames the staged folders back. Folders whose path is taken stay staged and are removed.
+    /// Renames the staged folders back, then shows "Put back …". Folders whose path is taken
+    /// stay staged and are removed.
     /// - Returns: The restore task, for tests to await. Nil outside an undo window.
     @discardableResult
     func undo() -> Task<Void, Never>? {
@@ -451,7 +474,7 @@ final class VaporController {
         undoTask = nil
         statusTask?.cancel()
         statusTask = nil
-        status = nil
+        // The capsule stays until the renames are done, then becomes "Put back …" in place.
         let deleter = dependencies.deleter
         return Task { [weak self] in
             let outcomes = await deleter.restore(batch.entries)
@@ -485,12 +508,19 @@ final class VaporController {
         if !leftover.isEmpty {
             startRemoval(leftover)
             show(.notRestored(count: leftover.count), for: Self.noticeDuration)
+        } else if !restored.isEmpty {
+            show(.restored(count: restored.count), for: Self.restoredDuration)
+        } else {
+            status = nil
         }
     }
 
+    /// Shows a capsule for `duration`. One that follows "Deleted…" keeps that capsule's token,
+    /// so the text changes in place instead of a new capsule popping in.
     private func show(_ kind: VaporStatus.Kind, for duration: Duration) {
         statusTask?.cancel()
-        let status = VaporStatus(kind: kind)
+        var status = VaporStatus(kind: kind)
+        if undoDeadline != nil, let token = self.status?.token { status.token = token }
         self.status = status
         let sleep = dependencies.sleep
         statusTask = Task { [weak self] in
