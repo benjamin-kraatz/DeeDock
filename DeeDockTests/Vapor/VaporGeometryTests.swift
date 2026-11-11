@@ -164,4 +164,27 @@ struct VaporGeometryTests {
         #expect(aboveRight.lean.width > 0 && aboveRight.lean.height < 0)
         #expect(hypot(edge.lean.width, edge.lean.height) <= 7.0001)
     }
+
+    /// The panel's window covers the whole orb, its glow and its swell, wherever the panel is
+    /// clamped, so the panel can grow out of the orb and rows can fly into it unclipped.
+    @Test func panelWindowCoversTheOrbOnEitherSideAndWhenClamped() {
+        let size = CGSize(width: 390, height: 520)
+        let orbs = [CGPoint(x: 1400, y: 300), CGPoint(x: 120, y: 300),
+                    CGPoint(x: 1400, y: 70), CGPoint(x: 120, y: 880),
+                    CGPoint(x: -2490, y: -330), CGPoint(x: -80, y: 950)]
+        for orb in orbs {
+            let display = orb.x < 0 ? left : primary
+            let center = VaporGeometry.clampedCenter(orb, in: display.visibleFrame)
+            let opensLeft = VaporGeometry.opensLeft(orbCenter: center, visibleFrame: display.visibleFrame)
+            let content = VaporGeometry.panelFrame(orbCenter: center, size: size, visibleFrame: display.visibleFrame)
+            let window = VaporGeometry.panelWindowFrame(panelFrame: content, opensLeft: opensLeft)
+            let swollen = VaporGeometry.orbDiameter * 1.12 / 2 + 7
+            let orbRect = CGRect(x: center.x - swollen, y: center.y - swollen, width: swollen * 2, height: swollen * 2)
+            #expect(window.contains(orbRect))
+            // The panel sits at the fixed origin inside its window.
+            let origin = VaporGeometry.panelOrigin(opensLeft: opensLeft)
+            let local = VaporGeometry.local(CGPoint(x: content.minX, y: content.maxY), in: window)
+            #expect(approx(local.x, origin.x) && approx(local.y, origin.y))
+        }
+    }
 }

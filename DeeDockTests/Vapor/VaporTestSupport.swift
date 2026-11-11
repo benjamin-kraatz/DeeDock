@@ -37,7 +37,7 @@ final class VaporTempDirectory {
 
 /// A sleep the test fires by hand. Each call suspends until `fire(_:)` is called with its
 /// duration, or the sleeping task is cancelled (which throws, like `Task.sleep`).
-final class VaporManualSleeper: @unchecked Sendable {
+nonisolated final class VaporManualSleeper: @unchecked Sendable {
     private let lock = NSLock()
     private var waiters: [UUID: (Duration, CheckedContinuation<Void, any Error>)] = [:]
 

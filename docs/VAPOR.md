@@ -159,7 +159,26 @@ All code lives in `DeeDock/Vapor/`, with tests in `DeeDockTests/Vapor/`. The pro
 - **Orb:** an `NSPanel` with `[.borderless, .nonactivatingPanel]`, at level `.floating`, with collection behaviour `[.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]`. It is never key or main.
 - **Panel and suggestions:** separate panels with the same flags. Each is placed from the orb's frame and the visible frame of the orb's display, in AppKit global coordinates. Negative origins and non-primary displays must work.
 - **Drops:** an AppKit `NSDraggingDestination` registered for `.fileURL` on the orb and the panel. It reports hover proximity to the orb view for the lean and glow.
+- **Orb canvas:** the orb's window is the 112 pt orb plus a 48 pt transparent margin on every side, for the badge, the squash, the drop lean and swell, and steam rising out of the glass. Only the sphere takes clicks.
+- **Panel window:** larger than the panel. It also covers the orb, so the panel can grow out of the orb and rows can fly into it without being clipped. The orb's window stays in front of it. Drops count only over the panel itself.
 - **Lifecycle:** panels are re-placed on display changes (`DisplayService`) and after wake. Everything is torn down when Vapor turns off or DOKK quits.
+
+### Fill and motion
+
+- **Physics:** `VaporPhysicsWorld` is a value type stepped in fixed 1/180 s substeps: gravity, circle collisions, the glass as a circular wall, spin from sliding contact, slosh from the orb's drag acceleration, and fit-to-orb shrinking. It is seeded, so tests and snapshots repeat.
+- **Idle cost:** the world sleeps once the pile rests (or after 3 s without input). The orb's `TimelineView` is paused while it sleeps, so a settled orb draws nothing.
+- **Delete sequence:** the rows fly into the orb one after another, the panel shrinks back into it, then the orb evaporates and the capsule appears. `VaporMotion` holds the shared timings.
+
+### Snapshots
+
+`VaporSnapshotTests` renders the orb, panel, capsules and bubbles to PNGs for review against the mockup. It runs only when `VAPOR_SNAPSHOT_DIR` is set:
+
+```sh
+TEST_RUNNER_VAPOR_SNAPSHOT_DIR=/path/to/out xcodebuild test -project DeeDock.xcodeproj -scheme DeeDock \
+  -destination 'platform=macOS' -testLanguage en -only-testing:DeeDockTests/VaporSnapshotTests
+```
+
+Offscreen rendering can't draw Liquid Glass, so panels and capsules use a flat tint in the images, and the orb shows its tint and lighting without the blur behind it.
 
 ### Accessibility and motion
 

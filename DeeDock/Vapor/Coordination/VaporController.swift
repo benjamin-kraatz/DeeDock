@@ -373,11 +373,11 @@ final class VaporController {
         releaseHoldImmediately()
         statusTask?.cancel()
         statusTask = nil
-        let targets = folders
         for index in folders.indices { folders[index].failure = nil }
+        let targets = folders
         isStaging = true
+        deletion = VaporEvent(VaporDeletion(folders: targets, fromPanel: isPanelOpen))
         isPanelOpen = false
-        deletion = VaporEvent(VaporDeletion(folderIDs: targets.map(\.id)))
         let requests = targets.map { VaporStageRequest(folderID: $0.id, url: $0.url, bytes: $0.measurement.bytes) }
         let deleter = dependencies.deleter
         return Task { [weak self] in
@@ -560,8 +560,10 @@ extension VaporController {
     /// Previews only: sets view-facing state directly, without measuring, staging or reading Finder.
     func loadPreviewState(folders: [VaporFolder], status: VaporStatus? = nil, isPanelOpen: Bool = false,
                           finderFolder: URL? = nil, finderItems: [VaporSuggestion] = [],
-                          permission: VaporAutomationPermission = .granted, refusal: VaporRefusal? = nil) {
+                          permission: VaporAutomationPermission = .granted, refusal: VaporRefusal? = nil,
+                          hold: VaporHoldProgress = VaporHoldProgress()) {
         self.folders = folders
+        self.hold = hold
         self.status = status
         self.isPanelOpen = isPanelOpen
         self.finderFolder = finderFolder

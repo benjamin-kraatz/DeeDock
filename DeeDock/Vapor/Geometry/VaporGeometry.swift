@@ -7,8 +7,10 @@ import Foundation
 nonisolated enum VaporGeometry {
     /// The orb's diameter in points.
     static let orbDiameter: CGFloat = 112
-    /// Transparent margin around the orb inside its window, for the badge, squash and glow.
-    static let orbCanvasInset: CGFloat = 36
+    /// Transparent margin around the orb inside its window, for the badge, the squash, the drop
+    /// lean and swell (up to 7 pt plus 12 %), the glow, and steam rising out of the glass.
+    /// Only the sphere takes clicks; the margin lets them through.
+    static let orbCanvasInset: CGFloat = 48
     /// Keeps the orb this far inside its display's visible frame.
     static let screenMargin: CGFloat = 8
     /// Space between the orb's edge and the panel.
@@ -107,6 +109,34 @@ nonisolated enum VaporGeometry {
         var y = orbCenter.y - height * 0.38
         y = min(max(y, area.minY), area.maxY - height)
         return CGRect(x: x, y: y, width: width, height: height)
+    }
+
+    /// The panel window's margin on the orb's side of the panel: room for the gap, the whole orb
+    /// and its glow, so the panel can grow out of the orb and rows can fly into it.
+    static let panelWindowOrbSide: CGFloat = 160
+    /// The panel window's margin on the far side, for the panel's shadow.
+    static let panelWindowFarSide: CGFloat = 44
+    /// The panel window's margin above and below the panel, for the shadow and for an orb that
+    /// sits lower or higher than the panel when the panel is clamped to the screen.
+    static let panelWindowVertical: CGFloat = 80
+
+    /// The transparent window that holds the panel at `panelFrame` and covers the orb beside it.
+    /// The panel keeps a fixed origin inside it (``panelOrigin(opensLeft:)``).
+    static func panelWindowFrame(panelFrame: CGRect, opensLeft: Bool) -> CGRect {
+        let left = opensLeft ? panelWindowFarSide : panelWindowOrbSide
+        let right = opensLeft ? panelWindowOrbSide : panelWindowFarSide
+        return CGRect(x: panelFrame.minX - left, y: panelFrame.minY - panelWindowVertical,
+                      width: panelFrame.width + left + right, height: panelFrame.height + panelWindowVertical * 2)
+    }
+
+    /// The panel's top-left corner inside its window, in SwiftUI coordinates.
+    static func panelOrigin(opensLeft: Bool) -> CGPoint {
+        CGPoint(x: opensLeft ? panelWindowFarSide : panelWindowOrbSide, y: panelWindowVertical)
+    }
+
+    /// A global point in the SwiftUI coordinates (origin top-left, y down) of a window at `frame`.
+    static func local(_ point: CGPoint, in frame: CGRect) -> CGPoint {
+        CGPoint(x: point.x - frame.minX, y: frame.maxY - point.y)
     }
 
     /// The orb's centre as a unit point of `frame` in SwiftUI's y-down space, for a scale

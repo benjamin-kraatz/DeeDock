@@ -36,6 +36,13 @@ nonisolated struct VaporHoldProgress: Equatable, Sendable {
         (1 - progress(at: date)) * Self.holdDuration
     }
 
+    /// Seconds until the fill stops changing: the rest of a hold, or the rest of a drain.
+    /// The button uses it to pause its timeline when a drain finishes.
+    func remainingAnimation(at date: Date) -> TimeInterval {
+        guard startDate != nil else { return 0 }
+        return isHolding ? remainingHold(at: date) : progress(at: date) * Self.drainDuration
+    }
+
     mutating func press(at date: Date) {
         guard !isHolding else { return }
         startValue = progress(at: date)
@@ -55,3 +62,14 @@ nonisolated struct VaporHoldProgress: Equatable, Sendable {
         self = VaporHoldProgress()
     }
 }
+
+#if DEBUG
+extension VaporHoldProgress {
+    /// Previews and snapshots only: a fill frozen at `value`, neither holding nor draining.
+    static func frozen(at value: Double) -> VaporHoldProgress {
+        var progress = VaporHoldProgress()
+        progress.startValue = value
+        return progress
+    }
+}
+#endif

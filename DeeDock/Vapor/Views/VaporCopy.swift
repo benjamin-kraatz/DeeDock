@@ -18,12 +18,6 @@ enum VaporCopy {
         return String(localized: .vaporJoined(folderCount(totals.count), size))
     }
 
-    /// "Total 1.8 GB · 104,226 files", or "Total calculating…" while sizes are pending.
-    static func total(_ totals: VaporTotals) -> String {
-        if totals.isPending { return String(localized: .vaporTotalPending) }
-        return String(localized: .vaporTotal(size(totals.bytes), String(localized: .vaporFileCount(totals.files))))
-    }
-
     /// The orb's VoiceOver value: "3 folders, 1.8 GB" or "Empty".
     static func accessibilityValue(_ totals: VaporTotals) -> String {
         guard totals.count > 0 else { return String(localized: .vaporEmpty) }
@@ -88,7 +82,8 @@ enum VaporCopy {
             guard failed > 0 else { return deleted }
             return String(localized: .vaporJoined(deleted, String(localized: .vaporStatusSomeFailed(failed))))
         case .freed(let bytes, _, let failed):
-            let freed = "✓ " + String(localized: .vaporStatusFreed(size(bytes)))
+            // The capsule draws its own green check in front of this.
+            let freed = String(localized: .vaporStatusFreed(size(bytes)))
             guard failed > 0 else { return freed }
             return String(localized: .vaporJoined(freed, String(localized: .vaporStatusSomeFailed(failed))))
         case .failed(let count):

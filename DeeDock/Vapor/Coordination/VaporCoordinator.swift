@@ -156,6 +156,7 @@ final class VaporCoordinator {
         guard presenting, generation == self.generation else { return }
         withObservationTracking {
             _ = controller.isPanelOpen
+            _ = controller.deletion?.token
             _ = controller.callout
             _ = controller.bubbleSuggestions.map(\.id)
             _ = controller.folders.count

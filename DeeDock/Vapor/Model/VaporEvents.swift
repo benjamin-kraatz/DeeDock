@@ -47,7 +47,13 @@ nonisolated struct VaporAddition: Equatable, Sendable {
 
 /// Payload for "delete started": the folders being pulled into the orb and evaporated.
 nonisolated struct VaporDeletion: Equatable, Sendable {
-    let folderIDs: [UUID]
+    /// The folders as they were when the hold completed. The panel keeps showing these rows
+    /// while they fly into the orb, even after staging has removed them from the controller.
+    let folders: [VaporFolder]
+    /// The panel was open, so rows are pulled into the orb first and the orb evaporates after them.
+    let fromPanel: Bool
+
+    var folderIDs: [UUID] { folders.map(\.id) }
 }
 
 /// The orb's motion while it's being dragged, for the slosh. Points per second (and per

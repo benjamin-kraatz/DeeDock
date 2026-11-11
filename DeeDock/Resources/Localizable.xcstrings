@@ -46902,38 +46902,38 @@
         }
       }
     },
-    "vaporTotal" : {
-      "comment" : "Vapor (the glass orb that deletes cache folders): panel footer. First argument is a size like '1.8 GB', second a file count like '104,226 files'.",
+    "vaporTotalLabel" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): label on the left of the panel footer's total line, before the summed size and file count.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gesamt %1$@ · %2$@"
+            "value" : "Gesamt"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Total %1$@ · %2$@"
+            "value" : "Total"
           }
         }
       }
     },
-    "vaporTotalPending" : {
-      "comment" : "Vapor (the glass orb that deletes cache folders): panel footer while folder sizes are still being measured.",
+    "vaporTotalValue" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): the panel footer's total on the right. First argument is a size like '1.8 GB' (shown bold), second a file count like '104,226 files'.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gesamt wird berechnet …"
+            "value" : "%1$@ · %2$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Total calculating…"
+            "value" : "%1$@ · %2$@"
           }
         }
       }

@@ -19,6 +19,10 @@ class VaporDropView: NSView {
     var dragMoved: ((CGPoint?) -> Void)?
     /// The drop landed. Returns whether anything was added.
     var dropped: (([URL]) -> Bool)?
+    /// The part of the view that takes drops, in its own coordinates; nil means all of it. The
+    /// panel's window is larger than the panel, and drags over its transparent margin are
+    /// reported as leaving.
+    var dropArea: CGRect?
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -46,7 +50,7 @@ class VaporDropView: NSView {
     override func performDragOperation(_ sender: any NSDraggingInfo) -> Bool {
         let urls = VaporDragPasteboard.fileURLs(sender.draggingPasteboard)
         dragMoved?(nil)
-        guard !urls.isEmpty else { return false }
+        guard !urls.isEmpty, isInDropArea(sender) else { return false }
         return dropped?(urls) ?? false
     }
 
@@ -54,7 +58,16 @@ class VaporDropView: NSView {
         guard sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self],
                                                       options: [.urlReadingFileURLsOnly: true]),
               let window else { return [] }
+        guard isInDropArea(sender) else {
+            dragMoved?(nil)
+            return []
+        }
         dragMoved?(window.convertPoint(toScreen: sender.draggingLocation))
         return .copy
+    }
+
+    private func isInDropArea(_ sender: any NSDraggingInfo) -> Bool {
+        guard let dropArea else { return true }
+        return dropArea.contains(convert(sender.draggingLocation, from: nil))
     }
 }
