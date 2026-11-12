@@ -43,6 +43,7 @@ final class VaporWindows {
     private let controller: VaporController
     private let orbPanel = VaporPanel(size: VaporGeometry.orbWindowSize)
     private let orbView: VaporOrbInteractionView
+    private let orbPointerGate: VaporOrbPointerGate
     private let panel = VaporPanel()
     private let panelDrop = VaporDropView(frame: .zero)
     private let presentation = VaporPanelPresentation()
@@ -75,6 +76,7 @@ final class VaporWindows {
         orbHost.autoresizingMask = [.width, .height]
         orbView.addSubview(orbHost)
         orbPanel.contentView = orbView
+        orbPointerGate = VaporOrbPointerGate(view: orbView)
 
         let panelHost = VaporHostingView(rootView: VaporPanelStage(controller: controller, presentation: presentation))
         panelHost.sizingOptions = []
@@ -122,6 +124,7 @@ final class VaporWindows {
             orbPanel.setFrame(frame, display: true)
         }
         orbPanel.orderFrontRegardless()
+        orbPointerGate.start()
     }
 
     /// Places the panel, bubbles and callout around the orb from the controller's state.
@@ -264,6 +267,8 @@ final class VaporWindows {
         calloutPanel.setFrame(frame.insetBy(dx: -margin, dy: -margin), display: true)
         calloutPanel.alphaValue = 1
         calloutPanel.orderFrontRegardless()
+        // The capsule's window reaches a few points into the orb's; the orb stays in front.
+        orbPanel.orderFrontRegardless()
     }
 
     private func scheduleCalloutLayout(at date: Date) {
@@ -297,6 +302,7 @@ final class VaporWindows {
         hideTask = nil
         calloutTask = nil
         calloutHeldUntil = nil
+        orbPointerGate.stop()
         [orbPanel, panel, suggestionsPanel, calloutPanel].forEach { $0.orderOut(nil) }
         panelOnScreen = false
         panelContentFrame = nil
