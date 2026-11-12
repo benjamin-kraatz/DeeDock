@@ -73,6 +73,7 @@ actor VaporDeletionEngine: VaporDeleting {
         case .directory: break
         case .missing: return .failed(folderID: request.folderID, .missing)
         case .notDirectory: return .failed(folderID: request.folderID, .changed)
+        case .unknown: return .failed(folderID: request.folderID, .other(EIO))
         }
         let id = UUID()
         let target = location.stagedURL(for: request.url, id: id)
@@ -103,15 +104,17 @@ actor VaporDeletionEngine: VaporDeleting {
     }
 
     func restore(_ staged: [VaporLedgerEntry]) -> [VaporRestoreOutcome] {
-        var entries = ledger.read()
+        // Nil when the ledger can't be read: the renames still happen, but the file is left as
+        // it is rather than replaced with a list that lost other folders' records.
+        var entries = ledger.readExisting()
         let outcomes = staged.map { entry -> VaporRestoreOutcome in
             if let code = Self.rename(entry.stagedURL, to: entry.originalURL) {
                 return code == EEXIST || code == ENOTEMPTY ? .pathTaken(entry) : .failed(entry, code)
             }
-            entries.removeAll { $0.id == entry.id }
+            entries?.removeAll { $0.id == entry.id }
             return .restored(entry)
         }
-        try? ledger.write(entries)
+        if let entries { try? ledger.write(entries) }
         return outcomes
     }
 
@@ -124,7 +127,7 @@ actor VaporDeletionEngine: VaporDeleting {
             // staged folder still exists, and the entry must outlive the disconnection.
             guard gone, Self.isReachable(entry) else { continue }
             removed.append(entry.id)
-            var entries = ledger.read()
+            guard var entries = ledger.readExisting() else { continue }
             entries.removeAll { $0.id == entry.id }
             try? ledger.write(entries)
         }
@@ -133,17 +136,20 @@ actor VaporDeletionEngine: VaporDeleting {
 
     @discardableResult
     func recover() async -> Int {
-        let entries = ledger.read()
+        guard let entries = ledger.readExisting() else { return 0 }
         var toRemove: [VaporLedgerEntry] = []
         var finished: [UUID] = []
         for entry in entries {
-            let stagedExists = FileManager.default.fileExists(atPath: entry.stagedPath)
-            if stagedExists {
+            switch VaporPathCheck(path: entry.stagedPath) {
+            case .directory, .notDirectory:
                 toRemove.append(entry)
-            } else if Self.isReachable(entry) {
+            case .missing where Self.isReachable(entry):
                 // Either the rename never happened (the folder is still at its original path) or
                 // removal already finished. Both mean the entry is done; nothing is restored.
                 finished.append(entry.id)
+            case .missing, .unknown:
+                // An unplugged disk or a failed lookup: keep the entry for a later launch.
+                break
             }
         }
         if !finished.isEmpty {

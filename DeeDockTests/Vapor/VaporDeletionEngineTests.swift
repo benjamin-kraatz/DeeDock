@@ -212,6 +212,33 @@ struct VaporDeletionEngineTests {
         #expect(fixture.ledger.read() == [unplugged])
     }
 
+    @Test func aFailedLookupIsNeverReadAsGone() async throws {
+        let fixture = try Fixture()
+        let locked = try fixture.temp.folder("locked")
+        let staged = try fixture.temp.folder("locked/x-node_modules")
+        let entry = VaporLedgerEntry(id: UUID(), originalPath: fixture.temp.url.appendingPathComponent("app/node_modules").path,
+                                     stagedPath: staged.path, bytes: 1,
+                                     stagedAt: Date(timeIntervalSince1970: 1_800_000_000), state: .staged)
+        try fixture.ledger.write([entry])
+        // Without search permission on its parent, `lstat` on the staged folder fails with EACCES.
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: locked.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path) }
+        #expect(VaporPathCheck(path: staged.path) == .unknown)
+        #expect(await fixture.engine.recover() == 0)
+        #expect(fixture.ledger.read() == [entry])
+    }
+
+    @Test func removalLeavesAnUnreadableLedgerAsItIs() async throws {
+        let fixture = try Fixture()
+        let folder = try fixture.cache("app/node_modules")
+        let outcomes = await fixture.engine.stage([VaporStageRequest(folderID: UUID(), url: folder, bytes: 0)])
+        guard case .staged(_, let entry) = outcomes.first else { Issue.record("not staged"); return }
+        try Data("not json".utf8).write(to: fixture.ledger.url)
+        #expect(await fixture.engine.remove([entry]) == [entry.id])
+        #expect(!fixture.temp.exists(entry.stagedURL))
+        #expect(try Data(contentsOf: fixture.ledger.url) == Data("not json".utf8))
+    }
+
     @Test(arguments: [(EACCES, VaporStagingFailure.permissionDenied), (EPERM, .permissionDenied), (ENOENT, .missing),
                       (EXDEV, .unsupportedVolume), (EROFS, .unsupportedVolume), (EBUSY, .other(EBUSY))])
     func errnoMapsToARowReason(code: Int32, failure: VaporStagingFailure) {

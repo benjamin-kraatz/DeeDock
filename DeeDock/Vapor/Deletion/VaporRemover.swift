@@ -9,7 +9,8 @@ import Foundation
 nonisolated final class VaporRemover: Sendable {
     static let maxConcurrentRemovals = 4
 
-    /// Removes `folder` and everything in it. Returns true when nothing is left at the path.
+    /// Removes `folder` and everything in it. Returns true only when `lstat` confirms nothing is
+    /// left at the path.
     func remove(_ folder: URL) async -> Bool {
         await withCheckedContinuation { continuation in
             let queue = OperationQueue()
@@ -29,7 +30,8 @@ nonisolated final class VaporRemover: Sendable {
             queue.addBarrierBlock { [queue] in
                 withExtendedLifetime(queue) {}
                 Self.removeTree(atPath: folder.path)
-                continuation.resume(returning: !FileManager.default.fileExists(atPath: folder.path))
+                // Only a confirmed ENOENT counts as gone; a failed lookup keeps the ledger entry.
+                continuation.resume(returning: VaporPathCheck(path: folder.path) == .missing)
             }
         }
     }
