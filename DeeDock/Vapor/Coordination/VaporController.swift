@@ -396,15 +396,28 @@ final class VaporController {
         statusTask?.cancel()
         statusTask = nil
         for index in folders.indices { folders[index].failure = nil }
-        let targets = folders
+        // Check every folder again first: since it was added it may have become a link, or now
+        // resolve into a protected location. Those stay in the orb, untouched, with a reason.
+        let policy = dependencies.policy
+        var refused: [VaporStageOutcome] = []
+        let targets = folders.filter { folder in
+            switch policy.revalidate(folder.url) {
+            case nil: return true
+            case .missing: refused.append(.failed(folderID: folder.id, .missing))
+            case .some: refused.append(.failed(folderID: folder.id, .changed))
+            }
+            return false
+        }
         isStaging = true
-        deletion = VaporEvent(VaporDeletion(folders: targets, fromPanel: isPanelOpen))
-        isPanelOpen = false
+        if !targets.isEmpty {
+            deletion = VaporEvent(VaporDeletion(folders: targets, fromPanel: isPanelOpen))
+            isPanelOpen = false
+        }
         let requests = targets.map { VaporStageRequest(folderID: $0.id, url: $0.url, bytes: $0.measurement.bytes) }
         let deleter = dependencies.deleter
         return Task { [weak self] in
-            let outcomes = await deleter.stage(requests)
-            self?.finishStaging(outcomes, targets: targets)
+            let outcomes = requests.isEmpty ? [] : await deleter.stage(requests)
+            self?.finishStaging(refused + outcomes, targets: targets)
         }
     }
 

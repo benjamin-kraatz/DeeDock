@@ -37,6 +37,9 @@ nonisolated enum VaporDropDecision: Equatable, Sendable {
 nonisolated struct VaporFileInspector: Sendable {
     var kind: @Sendable (URL) -> VaporItemKind
     var isVolumeRoot: @Sendable (URL) -> Bool
+    /// The path with symbolic links in its parent folders resolved (the last component is kept,
+    /// since `kind` already refuses a final link). Fake inspectors leave paths as they are.
+    var resolve: @Sendable (URL) -> URL = { $0 }
 
     /// Reads resource values without following a final symbolic link.
     static let live = VaporFileInspector(
@@ -49,6 +52,15 @@ nonisolated struct VaporFileInspector: Sendable {
         },
         isVolumeRoot: { url in
             (try? url.resourceValues(forKeys: [.isVolumeKey]))?.isVolume == true
+        },
+        // `realpath` rather than `resolvingSymlinksInPath`: it keeps the `/private` prefix, so
+        // `/var/…` resolves to the protected `/private/var/…` instead of losing it.
+        resolve: { url in
+            let parent = url.deletingLastPathComponent()
+            guard let real = realpath(parent.path, nil) else { return url }
+            defer { free(real) }
+            return URL(fileURLWithPath: String(cString: real), isDirectory: true)
+                .appendingPathComponent(url.lastPathComponent)
         }
     )
 }
@@ -79,7 +91,14 @@ nonisolated struct VaporDropPolicy: Sendable {
     func evaluate(_ dropped: URL, existing: [URL]) -> VaporDropDecision {
         let url = Self.normalized(dropped)
         let name = Self.displayName(url)
-        if let refusal = protectedRefusal(url, name: name) { return .refuse(refusal) }
+        if let refusal = protectedRefusal(url, name: name, home: Self.normalized(home)) { return .refuse(refusal) }
+        // A linked parent folder can lead somewhere protected: with `~/alias` pointing at the home
+        // folder, `~/alias/Documents` is the real Documents. Check the resolved path too.
+        let resolved = Self.normalized(inspector.resolve(url))
+        if resolved.path != url.path,
+           let refusal = protectedRefusal(resolved, name: name, home: Self.normalized(inspector.resolve(home))) {
+            return .refuse(refusal)
+        }
         switch inspector.kind(url) {
         case .missing: return .refuse(.missing(name: name))
         case .file, .symbolicLink: return .refuse(.notAFolder)
@@ -111,10 +130,19 @@ nonisolated struct VaporDropPolicy: Sendable {
         }
     }
 
-    private func protectedRefusal(_ url: URL, name: String) -> VaporRefusal? {
+    /// Checks a folder already in the orb again, right before it is deleted. Between Add and
+    /// Delete it may have been swapped for a symbolic link or moved under a protected location.
+    /// - Returns: The refusal, or nil when the folder may still be deleted.
+    func revalidate(_ url: URL) -> VaporRefusal? {
+        switch evaluate(url, existing: []) {
+        case .accept: nil
+        case .refuse(let refusal): refusal
+        }
+    }
+
+    private func protectedRefusal(_ url: URL, name: String, home homeURL: URL) -> VaporRefusal? {
         let path = url.path
         if path == "/" { return .volumeRoot(name: name) }
-        let homeURL = Self.normalized(home)
         if Self.same(url, homeURL) { return .homeFolder }
         if Self.same(url.deletingLastPathComponent(), homeURL),
            Self.standardHomeFolders.contains(where: { $0.caseInsensitiveCompare(url.lastPathComponent) == .orderedSame }) {

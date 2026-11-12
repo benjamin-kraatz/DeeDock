@@ -30,6 +30,9 @@ nonisolated enum VaporStagingFailure: Equatable, Sendable {
     case unsupportedVolume
     /// The folder no longer exists at its path.
     case missing
+    /// Since it was added, the path stopped being a folder Vapor may delete: it was replaced by a
+    /// symbolic link, or it now resolves into a protected location. It is left untouched.
+    case changed
     /// Any other error, with its `errno` for diagnostics.
     case other(Int32)
 

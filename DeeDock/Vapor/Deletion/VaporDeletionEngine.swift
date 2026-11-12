@@ -67,8 +67,12 @@ actor VaporDeletionEngine: VaporDeleting {
     }
 
     private func stage(_ request: VaporStageRequest) -> VaporStageOutcome {
-        guard FileManager.default.fileExists(atPath: request.url.path) else {
-            return .failed(folderID: request.folderID, .missing)
+        // `lstat`, not `fileExists`: a folder swapped for a link since it was added must not be
+        // renamed, or removal would later reach whatever the link points to.
+        switch VaporPathCheck(path: request.url.path) {
+        case .directory: break
+        case .missing: return .failed(folderID: request.folderID, .missing)
+        case .notDirectory: return .failed(folderID: request.folderID, .changed)
         }
         let id = UUID()
         let target = location.stagedURL(for: request.url, id: id)

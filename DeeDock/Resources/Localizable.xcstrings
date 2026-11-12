@@ -45738,6 +45738,24 @@
         }
       }
     },
+    "vaporFailureChanged" : {
+      "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row that was left alone because, since it was added, it became a link or now points into a protected location.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist kein Ordner mehr, den Vapor löschen darf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is no longer a folder Vapor can delete."
+          }
+        }
+      }
+    },
     "vaporFailureMissing" : {
       "comment" : "Vapor (the glass orb that deletes cache folders): reason on a folder row whose folder disappeared before it could be deleted.",
       "extractionState" : "manual",

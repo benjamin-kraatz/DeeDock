@@ -127,4 +127,26 @@ struct VaporDropPolicyTests {
         #expect(!inspector.isVolumeRoot(folder))
         #expect(inspector.isVolumeRoot(URL(fileURLWithPath: "/")))
     }
+
+    @Test func aLinkedParentCannotReachAProtectedFolder() throws {
+        let temp = try VaporTempDirectory("vapor-linked-parent")
+        let home = try temp.folder("home")
+        try temp.folder("home/Documents")
+        try temp.folder("home/dev/node_modules")
+        let alias = temp.url.appendingPathComponent("alias")
+        try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: home)
+        // Temporary folders live under /private, a system location, so that list is emptied here.
+        let policy = VaporDropPolicy(home: home, systemRoots: [])
+        let throughLink = alias.appendingPathComponent("Documents")
+        #expect(policy.evaluate(throughLink, existing: []) == .refuse(.standardFolder(name: "Documents")))
+        #expect(policy.revalidate(throughLink) == .standardFolder(name: "Documents"))
+        #expect(policy.evaluate(alias, existing: []) == .refuse(.notAFolder))
+        // A cache reached through the same link is still fine.
+        let cache = alias.appendingPathComponent("dev/node_modules")
+        guard case .accept(let accepted, _) = policy.evaluate(cache, existing: []) else {
+            Issue.record("a cache behind a linked parent was refused")
+            return
+        }
+        #expect(accepted.path == cache.path)
+    }
 }

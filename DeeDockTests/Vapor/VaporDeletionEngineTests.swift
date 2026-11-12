@@ -156,6 +156,29 @@ struct VaporDeletionEngineTests {
         #expect(!temp.exists(ledger.url))
     }
 
+    @Test func aFolderSwappedForALinkIsNotStaged() async throws {
+        let fixture = try Fixture()
+        let folder = try fixture.cache("app/node_modules")
+        let keep = try fixture.temp.file("elsewhere/keep/important.txt")
+        try FileManager.default.removeItem(at: folder)
+        try FileManager.default.createSymbolicLink(at: folder, withDestinationURL: keep.deletingLastPathComponent())
+        let outcomes = await fixture.engine.stage([VaporStageRequest(folderID: UUID(), url: folder, bytes: 0)])
+        guard case .failed(_, let failure) = outcomes.first else { Issue.record("staged a link: \(outcomes)"); return }
+        #expect(failure == .changed)
+        #expect(fixture.temp.exists(keep))
+        #expect(fixture.ledger.read().isEmpty)
+    }
+
+    @Test func removingAStagedLinkLeavesItsTargetAlone() async throws {
+        let temp = try VaporTempDirectory("vapor-remover")
+        let keep = try temp.file("target/keep/important.txt")
+        let link = temp.url.appendingPathComponent("staged-link")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: keep.deletingLastPathComponent().deletingLastPathComponent())
+        #expect(await VaporRemover().remove(link))
+        #expect(VaporPathCheck(path: link.path) == .missing)
+        #expect(temp.exists(keep))
+    }
+
     @Test(arguments: [(EACCES, VaporStagingFailure.permissionDenied), (EPERM, .permissionDenied), (ENOENT, .missing),
                       (EXDEV, .unsupportedVolume), (EROFS, .unsupportedVolume), (EBUSY, .other(EBUSY))])
     func errnoMapsToARowReason(code: Int32, failure: VaporStagingFailure) {

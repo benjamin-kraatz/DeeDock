@@ -218,6 +218,21 @@ struct VaporControllerTests {
         #expect(!only.recorder.events.contains { if case .deleted = $0 { true } else { false } })
     }
 
+    @Test func aFolderSwappedForALinkAfterAddingIsLeftAlone() async throws {
+        let fixture = try Fixture()
+        let folder = try fixture.folder("dev/app/node_modules")
+        let keep = try fixture.temp.file("home/precious/keep.txt")
+        fixture.controller.add([folder], source: .drop)
+        try FileManager.default.removeItem(at: folder)
+        try FileManager.default.createSymbolicLink(at: folder, withDestinationURL: keep.deletingLastPathComponent())
+        await fixture.controller.deleteAll()?.value
+        #expect(paths(fixture.controller) == [folder.path])
+        #expect((try #require(fixture.controller.folders.first)).failure == .changed)
+        #expect(fixture.controller.status?.kind == .failed(count: 1))
+        #expect(fixture.temp.exists(keep))
+        #expect(await fixture.engine.ledgerEntries().isEmpty)
+    }
+
     @Test func aSecondDeleteCommitsTheFirstUndoWindow() async throws {
         let fixture = try Fixture()
         let a = try fixture.folder("a/node_modules")

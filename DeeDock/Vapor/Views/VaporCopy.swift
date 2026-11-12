@@ -70,6 +70,7 @@ enum VaporCopy {
         case .permissionDenied: .vaporFailurePermission
         case .unsupportedVolume: .vaporFailureVolume
         case .missing: .vaporFailureMissing
+        case .changed: .vaporFailureChanged
         case .other: .vaporFailureOther
         }
     }

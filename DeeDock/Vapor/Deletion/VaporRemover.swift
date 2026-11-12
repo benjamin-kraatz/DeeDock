@@ -16,7 +16,10 @@ nonisolated final class VaporRemover: Sendable {
             queue.name = "DOKK.Vapor.removal"
             queue.qualityOfService = .utility
             queue.maxConcurrentOperationCount = Self.maxConcurrentRemovals
-            let children = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
+            // Only a real directory is listed. `contentsOfDirectory` follows a link, so a staged
+            // link would expose its target's contents; anything else is removed as itself below.
+            let isDirectory = VaporPathCheck(path: folder.path) == .directory
+            let children = isDirectory ? (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? [] : []
             for child in children {
                 let path = folder.appendingPathComponent(child).path
                 queue.addOperation { Self.removeTree(atPath: path) }
