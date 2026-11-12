@@ -451,6 +451,10 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `robi_answered` | `model` (`on_device`, `claude`), `claude_model` (`haiku`, `sonnet`, `opus`; only when Claude answered), `intent` (`explain`, `translate`, `summarize`, `do_it`, `proofread`, `improve`, `shorten`, `formal`, `friendly`, `reply`, `action_items`; `suggested` for a question Apple Intelligence suggested; `custom` for a typed question), `outcome` (`answered`, `proposed`, `failed`, `stopped`, `unavailable`, `key_missing`), `duration` (for `stopped`, until the stop), `picture` (a region or window picture went to the model) |
 | `robi_action` | `action` (`copy`, `replace`, `paste`, `run_command` for clicking Run on proposed steps, `point` for clicking a reference in the answer, which spotlights it on the window) |
 | `robi_steps_run` | `step_count`, `completed_count` (steps that ran before one could not, or all of them), `menu_count`, `press_count`, `toggle_count`, `type_count` |
+| `vapor_toggled` | `enabled`. From the menu bar's Vapor toggle or the orb's Hide Vapor. |
+| `vapor_folders_added` | `source` (`drop` on the orb or panel, `suggestion` for one Finder suggestion, `add_all`), `count` |
+| `vapor_deleted` | `count` (folders staged for deletion), `size` (`unknown`, `under_100mb`, `under_1gb`, `under_10gb`, `over_10gb`) |
+| `vapor_undo` | `count` (folders put back) |
 
 Turning the notification feed on or off is `setting_changed` with `key = showNotificationFeed`.
 **Clear when closed** is `setting_changed` with `key = notificationFeedClearsOnClose`. The feed's
@@ -466,6 +470,9 @@ the key itself never leaves the Keychain except in requests to Anthropic.
 Robi's product events never include the app, the window, the selection, recognized text, the
 question, the answer, or the proposed steps (no menu paths, element labels, or typed text). Its model calls go to LLM analytics in full, like
 DOKK's other model calls; see [AI observability](#ai-observability).
+
+Vapor's events carry counts, a size bucket and the add source only. They never include a folder's name, its path,
+or its tag. Folders restored by Undo or at launch don't count as added.
 
 Plugin events carry counts, durations, surfaces, and yes/no flags only. They never include which plugin, its bundle ID, its app, or anything the plugin shows.
 The feed sends no event when a notification arrives, and none of its events carry text or app

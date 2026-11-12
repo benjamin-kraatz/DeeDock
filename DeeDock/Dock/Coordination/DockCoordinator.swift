@@ -41,6 +41,8 @@ final class DockCoordinator {
     let harbor = HarborCoordinator()
     /// Robi on the focused window. Opt-in; started with the coordinator and inert while off.
     let robi = RobiController()
+    /// The Vapor orb. Opt-in from the menu bar; while off only its launch recovery runs.
+    let vapor = VaporCoordinator()
     /// The one DOKK Hub (Apps, Windows, Files), opened from any display's DOKK tile.
     @ObservationIgnored let hub: HubCoordinator
     @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
@@ -408,6 +410,7 @@ final class DockCoordinator {
             self?.refreshPanels()
         }
         displayService.didChange = { [weak self] in
+            self?.vapor.updateDisplays($0)
             // Harbor's panels and layout belong to the old arrangement, and so does the Hub's anchor.
             self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
             self?.hub.suspend()
@@ -422,6 +425,8 @@ final class DockCoordinator {
         volumes.start()
         capsules.start()
         scheduleShelfSemanticWarmup()
+        // Before the display service, so its first arrangement reaches the orb.
+        vapor.start()
         displayService.start()
         // After the first reconcile, so the macOS Dock is placed away from the real dock.
         systemDockTuck.mainDockEdge = mainDockEdge
@@ -1170,6 +1175,7 @@ final class DockCoordinator {
         badges.stop()
         notificationFeed.stop()
         robi.stop()
+        vapor.stop()
         badgeMemoryWindow.stop()
         catalog.stop()
         volumeDock.stop()

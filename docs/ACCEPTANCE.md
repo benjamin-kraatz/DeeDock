@@ -3594,3 +3594,61 @@ The filter's rules come from Finder, Helium, ChatGPT, Xcode, Ghostty, WhatsApp, 
 - Restored Dock: no rows, no read, and no delay.
 
 Fullscreen apps and plain auto-hide without DOKK's tuck are not covered. VoiceOver reaches the rows through the context menu; the tile's accessibility actions do not include them.
+
+## Vapor (DEE-160)
+
+Built on `codex/vapor-orb` after the confirmed mockup `docs/mockups/vapor-orb.html`. Behavior and engineering notes are in [VAPOR.md](VAPOR.md).
+
+### Implemented
+
+- **Toggle.** A **Vapor** checkmark item in the Tools section of the menu-bar menu. There is no shortcut. The on/off state, the folder list and the orb's position on each display persist.
+- **Orb.** A non-activating floating panel, drawn as lit glass:
+  - The light comes from a virtual lamp above each display's top centre.
+  - Folder icons fill it in a seeded 2D physics pile that sleeps once settled.
+  - It sloshes when dragged, squashes when a folder lands, and shakes when it refuses one.
+- **Drop policy.** `VaporDropPolicy` refuses files, symbolic links, packages, home, the standard home folders, system locations, volume roots and Vapor's own staging folders.
+- **Classification.** `VaporClassifier` matches names plus sibling markers. `dist`, `build` and `out` are tagged but never suggested.
+- **Deletion.**
+  - `VaporDeletionEngine` writes the ledger entry before it renames anything.
+  - Renames use `renamex_np(RENAME_EXCL)` into a staging folder on the same volume, or in place as a fallback.
+  - Undo renames back and never overwrites.
+  - `VaporRemover` runs `removefile` on at most four top-level children at a time.
+  - Launch recovery only finishes removals; it never restores.
+- **Finder suggestions.**
+  - `VaporFinderObserver` watches Finder's activation, plus focus and title changes over Accessibility when trusted.
+  - `VaporFinderReader` reads `Finder window 1`'s target after checking Automation permission without prompting.
+  - `VaporSuggestionScanner` lists the folder's direct children.
+- **Panel and callouts.**
+  - The panel grows out of the orb, with a Found-in section, size shimmer and count-up, Hold to Delete (0.9 s), and rows that fly into the orb on delete.
+  - The Undo capsule shows a 5 s countdown ring, then "Put back" or "Freed".
+- **Analytics.** `vapor_toggled`, `vapor_folders_added`, `vapor_deleted` and `vapor_undo`. Counts and buckets only.
+- **Automation prompt text.** `NSAppleEventsUsageDescription` now mentions Vapor.
+
+### Validation status
+
+- `xcodebuild … -only-testing:DeeDockTests … test` into a scratch `-derivedDataPath` (unsigned, as CI runs it): **1370 tests in 174 suites passed**, with no warnings in Vapor files.
+- The Vapor suites cover:
+  - the classifier and its sibling markers;
+  - the drop policy;
+  - staging, undo, removal, ledger recovery and the in-place fallback, all on temporary folders;
+  - panel, callout and suggestion geometry across displays with negative origins;
+  - the lamp;
+  - the controller state machine;
+  - hold progress;
+  - Finder result parsing;
+  - physics (settles, no deep overlaps, sleeps, evaporate finishes).
+- The opt-in `VaporSnapshotTests` (`TEST_RUNNER_VAPOR_SNAPSHOT_DIR`) rendered the orb, pile, evaporate, panel, callouts and suggestions in light and dark. The renders were compared with the mockup. Offscreen rendering cannot draw Liquid Glass, and it captures motion at rest.
+
+The app was not launched, because a production DOKK was running on the same Mac. Nothing below has been exercised on screen.
+
+### Hands-on acceptance
+
+- Turn Vapor on and off from the menu bar. The orb appears with its gather animation, then disappears, and comes back with the same folders and position.
+- Drag folders from Finder onto the orb and onto the open panel. Check that a file, Home, Downloads and an app are refused, with a shake.
+- Click and drag the orb without DOKK becoming the active app. Check that Finder stays frontmost and the pile sloshes.
+- Click a suggestion bubble next to the orb. This checks that clicks pass through the orb window's transparent margin, which the bubbles depend on.
+- Turn on Finder access from the panel, then move between folders in Finder. Check that suggestions follow, both with and without Accessibility.
+- Hold to Delete on a real `node_modules`. Check that the folder vanishes from Finder at once, that Undo restores it within 5 s, and that the "Freed" capsule appears after.
+- Quit DOKK during the undo window and relaunch. The staged folder should be removed and not restored.
+- Move the orb across displays, including one with a negative origin, through sleep and wake, and over a full-screen app.
+- Check VoiceOver on the orb, rows and delete action. Check Reduce Motion and Reduce Transparency.

@@ -92,6 +92,10 @@ extension AnalyticsEvent {
         case .robiAnswered: "robi_answered"
         case .robiActionTaken: "robi_action"
         case .robiStepsRun: "robi_steps_run"
+        case .vaporToggled: "vapor_toggled"
+        case .vaporFoldersAdded: "vapor_folders_added"
+        case .vaporDeleted: "vapor_deleted"
+        case .vaporUndo: "vapor_undo"
         case .discoveryCallout: "discovery_callout"
         case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
@@ -310,6 +314,14 @@ extension AnalyticsEvent {
             ["step_count": .init(counts.total), "completed_count": .init(completed),
              "menu_count": .init(counts.menu), "press_count": .init(counts.press),
              "toggle_count": .init(counts.toggle), "type_count": .init(counts.type)]
+        case let .vaporToggled(enabled):
+            ["enabled": .init(enabled)]
+        case let .vaporFoldersAdded(source, count):
+            ["source": .init(source), "count": .init(count)]
+        case let .vaporDeleted(count, size):
+            ["count": .init(count), "size": .init(size)]
+        case let .vaporUndo(count):
+            ["count": .init(count)]
         case let .discoveryCallout(destination, action):
             ["callout": .init(destination), "action": .init(action)]
         case let .lineIconCoverage(coverage):
