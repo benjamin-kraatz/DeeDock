@@ -42,7 +42,13 @@ nonisolated struct VaporLedgerFile: Sendable {
     /// read or decoded. Staging uses this: writing over an unreadable ledger would drop the
     /// records of folders already staged and strand them.
     func readExisting() -> [VaporLedgerEntry]? {
-        guard FileManager.default.fileExists(atPath: url.path) else { return [] }
+        // Only a confirmed ENOENT means "no ledger yet"; `fileExists` is also false for a path
+        // it can't reach, and treating that as empty would let the next write replace it.
+        switch VaporPathCheck(path: url.path) {
+        case .missing: return []
+        case .unknown: return nil
+        case .directory, .notDirectory: break
+        }
         guard let data = try? Data(contentsOf: url) else { return nil }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601

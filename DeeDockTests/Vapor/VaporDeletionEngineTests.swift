@@ -228,6 +228,20 @@ struct VaporDeletionEngineTests {
         #expect(fixture.ledger.read() == [entry])
     }
 
+    @Test func aLedgerThatCantBeReachedStopsStaging() async throws {
+        let fixture = try Fixture()
+        let folder = try fixture.cache("app/node_modules")
+        try fixture.ledger.write([VaporLedgerEntry(id: UUID(), originalPath: "/a/b", stagedPath: "/s/b", bytes: 1,
+                                                   stagedAt: Date(timeIntervalSince1970: 1_800_000_000), state: .staged)])
+        let support = fixture.ledger.url.deletingLastPathComponent()
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: support.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: support.path) }
+        #expect(fixture.ledger.readExisting() == nil)
+        let outcomes = await fixture.engine.stage([VaporStageRequest(folderID: UUID(), url: folder, bytes: 0)])
+        guard case .failed = outcomes.first else { Issue.record("staged without a readable ledger: \(outcomes)"); return }
+        #expect(fixture.temp.exists(folder))
+    }
+
     @Test func removalLeavesAnUnreadableLedgerAsItIs() async throws {
         let fixture = try Fixture()
         let folder = try fixture.cache("app/node_modules")
