@@ -9,6 +9,14 @@ struct VaporFolderRow: View {
 
     @State private var hovered = false
 
+    /// Size and file count, then the reason the last delete left this folder, if any: the row
+    /// ignores its children for VoiceOver, so the visible failure line must be repeated here.
+    private var accessibilityValue: String {
+        let size = VaporRowSize.accessibilityValue(folder.measurement)
+        guard let failure = folder.failure else { return size }
+        return "\(size), \(String(localized: VaporCopy.failure(failure)))"
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             VaporFolderIcon(size: 30)
@@ -49,7 +57,7 @@ struct VaporFolderRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(.vaporRowAccessibility(folder.name, String(localized: VaporCopy.tag(folder.classification)),
                                                         folder.parentPath(home: home))))
-        .accessibilityValue(Text(verbatim: VaporRowSize.accessibilityValue(folder.measurement)))
+        .accessibilityValue(Text(verbatim: accessibilityValue))
         .accessibilityAction(named: Text(.vaporRemove), remove)
     }
 }

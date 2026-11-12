@@ -179,6 +179,39 @@ struct VaporDeletionEngineTests {
         #expect(temp.exists(keep))
     }
 
+    @Test func aFolderHoldingTheStagingFolderIsRenamedInPlace() async throws {
+        // Dropping the Caches folder that holds Vapor's own staging folder.
+        let fixture = try Fixture(stagingPath: "Caches/DOKK/Vapor/staging")
+        let caches = try fixture.cache("Caches")
+        let outcomes = await fixture.engine.stage([VaporStageRequest(folderID: UUID(), url: caches, bytes: 0)])
+        guard case .staged(_, let entry) = outcomes.first else { Issue.record("not staged: \(outcomes)"); return }
+        #expect(entry.stagedURL.deletingLastPathComponent().path == caches.deletingLastPathComponent().path)
+        #expect(entry.stagedURL.lastPathComponent.hasPrefix(".Caches.dokk-vapor-"))
+        #expect(!fixture.temp.exists(caches))
+    }
+
+    @Test func anUnreadableLedgerStopsStagingAndIsKept() async throws {
+        let fixture = try Fixture()
+        let folder = try fixture.cache("app/node_modules")
+        try FileManager.default.createDirectory(at: fixture.ledger.url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("not json".utf8).write(to: fixture.ledger.url)
+        let outcomes = await fixture.engine.stage([VaporStageRequest(folderID: UUID(), url: folder, bytes: 0)])
+        guard case .failed = outcomes.first else { Issue.record("staged over a broken ledger: \(outcomes)"); return }
+        #expect(fixture.temp.exists(folder))
+        #expect(try Data(contentsOf: fixture.ledger.url) == Data("not json".utf8))
+    }
+
+    @Test func recoveryKeepsEntriesOnAnUnpluggedDisk() async throws {
+        let fixture = try Fixture()
+        let unplugged = VaporLedgerEntry(id: UUID(), originalPath: "/Volumes/Gone/app/node_modules",
+                                         stagedPath: "/Volumes/Gone/.dokk-vapor/x-node_modules", bytes: 1,
+                                         stagedAt: Date(timeIntervalSince1970: 1_800_000_000), state: .staged)
+        try fixture.ledger.write([unplugged])
+        #expect(await fixture.engine.recover() == 0)
+        #expect(await fixture.engine.remove([unplugged]).isEmpty)
+        #expect(fixture.ledger.read() == [unplugged])
+    }
+
     @Test(arguments: [(EACCES, VaporStagingFailure.permissionDenied), (EPERM, .permissionDenied), (ENOENT, .missing),
                       (EXDEV, .unsupportedVolume), (EROFS, .unsupportedVolume), (EBUSY, .other(EBUSY))])
     func errnoMapsToARowReason(code: Int32, failure: VaporStagingFailure) {

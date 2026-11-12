@@ -114,6 +114,16 @@ struct VaporControllerTests {
         #expect(fixture.recorder.events.isEmpty)
     }
 
+    @Test func savedFoldersThatAreAllGoneAreForgotten() throws {
+        let fixture = try Fixture()
+        let a = try fixture.folder("a/node_modules")
+        fixture.store.setFolders([a])
+        try FileManager.default.removeItem(at: a)
+        fixture.controller.start()
+        #expect(fixture.controller.folders.isEmpty)
+        #expect(fixture.store.state.folderPaths.isEmpty)
+    }
+
     @Test func deleteStagesOpensTheUndoWindowThenFreesAndRemoves() async throws {
         let clock = Date(timeIntervalSinceReferenceDate: 10_000)
         let fixture = try Fixture(now: { clock })

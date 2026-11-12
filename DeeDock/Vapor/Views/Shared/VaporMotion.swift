@@ -9,8 +9,15 @@ nonisolated enum VaporMotion {
     /// The delay between neighbouring rows starting to fly.
     static let rowPullStagger: Double = 0.04
 
+    /// The latest a row may start flying. The Undo window opens when staging finishes, and the
+    /// capsule waits for the sequence, so a long list must not eat into those 5 seconds.
+    static let rowPullMaxDelay: Double = 0.4
+
+    /// When row `index` starts flying into the orb.
+    static func rowPullDelay(index: Int) -> Double { min(Double(index) * rowPullStagger, rowPullMaxDelay) }
+
     /// When the panel starts shrinking after a delete pulled `rows` rows into the orb.
-    static func panelCloseDelay(rows: Int) -> Double { 0.3 + Double(rows) * rowPullStagger }
+    static func panelCloseDelay(rows: Int) -> Double { 0.3 + rowPullDelay(index: rows) }
 
     /// When the orb starts evaporating after a delete, so it follows the rows and the panel.
     static func evaporateDelay(rows: Int, fromPanel: Bool) -> Double {

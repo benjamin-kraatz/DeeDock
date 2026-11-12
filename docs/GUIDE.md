@@ -495,7 +495,7 @@ Choose **Vapor** in the Tools section of the DOKK menu in the menu bar. A glass 
 
 Drag folders from Finder onto the orb, or onto its panel while the panel is open. Each one drops in as a small folder that tumbles to the bottom. Larger folders are bigger. Drag the orb and they slosh around. Hover over the orb to see how many folders it holds and their total size.
 
-Vapor accepts folders only. It refuses files, apps and other packages, your home folder, its standard folders (Desktop, Documents, Downloads, Library and the like), system locations, and whole disks. The orb shakes and says why. Folders inside those places are fine: `~/Library/Caches/org.swift.swiftpm` can go in, `~/Library` can't.
+Vapor accepts folders only. It refuses files, apps and other packages, your home folder, its standard folders (Desktop, Documents, Downloads, Library and the like), system locations, and whole disks. The orb shakes and says why. Folders inside your home folder's standard folders are fine: `~/Library/Caches/org.swift.swiftpm` can go in, `~/Library` can't. Nothing inside a system location can.
 
 ### Suggestions from Finder
 
@@ -507,7 +507,7 @@ Reading Finder's folder needs permission to control Finder. Vapor never asks on 
 
 Click the orb to open its panel. Each folder shows its size and file count, and a tag such as "npm packages" or "Xcode build cache". Folders Vapor doesn't recognize get an orange **Not a known cache** tag, so check them before deleting. Click × on a row to take a folder out, or **Clear** to empty the orb without deleting anything.
 
-Press and hold **Hold to Delete** until the button fills. The folders fly into the orb, the orb evaporates them, and they disappear from Finder at once. For the next 5 seconds, **Undo** puts them back where they were. After that, DOKK removes the files in the background and shows how much space was freed. If DOKK quits before it finishes, it finishes on the next launch.
+Press and hold **Hold to Delete** until the button fills. The folders fly into the orb, the orb evaporates them, and they disappear from Finder at once. For the next 5 seconds, **Undo** puts them back where they were. A folder whose place is taken by then, for example by a freshly reinstalled `node_modules`, or whose parent folder was moved, can't go back. It is removed, and the capsule says how many weren't restored. After that, DOKK removes the files in the background and shows how much space was freed. If DOKK quits before it finishes, it finishes on the next launch.
 
 Right-click the orb for **Open**, **Delete All…**, **Clear Without Deleting** and **Hide Vapor**. With VoiceOver, the delete button's action deletes right away, since holding isn't practical there. Reduce Motion places folders already settled and replaces the animations with fades. Reduce Transparency uses solid colors instead of glass.
 

@@ -35,10 +35,18 @@ nonisolated struct VaporLedgerFile: Sendable {
 
     /// Every entry, or an empty list when the file is missing or unreadable.
     func read() -> [VaporLedgerEntry] {
-        guard let data = try? Data(contentsOf: url) else { return [] }
+        readExisting() ?? []
+    }
+
+    /// Every entry, an empty list when there is no file, or nil when a file exists but can't be
+    /// read or decoded. Staging uses this: writing over an unreadable ledger would drop the
+    /// records of folders already staged and strand them.
+    func readExisting() -> [VaporLedgerEntry]? {
+        guard FileManager.default.fileExists(atPath: url.path) else { return [] }
+        guard let data = try? Data(contentsOf: url) else { return nil }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return (try? decoder.decode([VaporLedgerEntry].self, from: data)) ?? []
+        return try? decoder.decode([VaporLedgerEntry].self, from: data)
     }
 
     /// Replaces the file atomically. An empty list removes the file.

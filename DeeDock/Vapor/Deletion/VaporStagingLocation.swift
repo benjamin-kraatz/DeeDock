@@ -22,7 +22,11 @@ nonisolated struct VaporStagingLocation: Sendable {
         let inPlace = parent.appendingPathComponent(".\(name).dokk-vapor-\(id.uuidString)")
         guard let folderVolume = Self.volumeIdentifier(of: parent) else { return inPlace }
         let candidate: URL
-        if let homeVolume = Self.volumeIdentifier(ofNearestExisting: homeStaging), homeVolume.isEqual(folderVolume) {
+        // A folder can't be renamed into itself: dropping `~/Library/Caches` puts the home
+        // staging folder inside the folder being deleted, so that case renames in place.
+        if homeStaging.isSameOrDescendant(of: folder) {
+            return inPlace
+        } else if let homeVolume = Self.volumeIdentifier(ofNearestExisting: homeStaging), homeVolume.isEqual(folderVolume) {
             candidate = homeStaging
         } else if let root = Self.volumeRoot(of: parent) {
             candidate = root.appendingPathComponent(".dokk-vapor", isDirectory: true)

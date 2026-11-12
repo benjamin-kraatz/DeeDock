@@ -46099,7 +46099,7 @@
       }
     },
     "vaporMoreSuggestions" : {
-      "comment" : "Vapor (the glass orb that deletes cache folders): suggestion capsule: how many more suggestions there are than bubbles.",
+      "comment" : "Vapor (the glass orb that deletes cache folders): in the suggestion capsule and under the panel's Found-in rows, how many more suggestions there are than are shown.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {

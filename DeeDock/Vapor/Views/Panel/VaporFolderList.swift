@@ -53,7 +53,7 @@ struct VaporFolderList: View {
 }
 
 /// Flies a row into the orb: it shrinks to 12 % and fades on its way, starting
-/// ``VaporMotion/rowPullStagger`` after the row above it.
+/// ``VaporMotion/rowPullStagger`` after the row above it, at most ``VaporMotion/rowPullMaxDelay``.
 ///
 /// The row's frame is read before the transforms, in the panel stage's coordinate space, so the
 /// offset is measured from where the row sits in the list (scrolling included).
@@ -75,7 +75,7 @@ private struct VaporRowPullEffect: ViewModifier {
                     pulled = false
                     return
                 }
-                withAnimation(VaporMotion.rowPull.delay(Double(index) * VaporMotion.rowPullStagger)) { pulled = true }
+                withAnimation(VaporMotion.rowPull.delay(VaporMotion.rowPullDelay(index: index))) { pulled = true }
             }
     }
 

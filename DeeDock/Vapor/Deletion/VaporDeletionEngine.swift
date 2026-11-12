@@ -80,7 +80,10 @@ actor VaporDeletionEngine: VaporDeleting {
         let stagedAt = Date(timeIntervalSince1970: now().timeIntervalSince1970.rounded(.down))
         var entry = VaporLedgerEntry(id: id, originalPath: request.url.path, stagedPath: target.path,
                                      bytes: request.bytes, stagedAt: stagedAt, state: .staging)
-        var entries = ledger.read()
+        guard var entries = ledger.readExisting() else {
+            // The existing ledger can't be read; writing a new one would lose its records.
+            return .failed(folderID: request.folderID, .other(EIO))
+        }
         entries.append(entry)
         do {
             try ledger.write(entries)
@@ -117,7 +120,9 @@ actor VaporDeletionEngine: VaporDeleting {
         var removed: [UUID] = []
         for entry in staged {
             let gone = await remover.remove(entry.stagedURL)
-            guard gone else { continue }
+            // "Not there" only counts when its folder is: on a disk that was unplugged, the
+            // staged folder still exists, and the entry must outlive the disconnection.
+            guard gone, Self.isReachable(entry) else { continue }
             removed.append(entry.id)
             var entries = ledger.read()
             entries.removeAll { $0.id == entry.id }
@@ -135,7 +140,7 @@ actor VaporDeletionEngine: VaporDeleting {
             let stagedExists = FileManager.default.fileExists(atPath: entry.stagedPath)
             if stagedExists {
                 toRemove.append(entry)
-            } else {
+            } else if Self.isReachable(entry) {
                 // Either the rename never happened (the folder is still at its original path) or
                 // removal already finished. Both mean the entry is done; nothing is restored.
                 finished.append(entry.id)
@@ -145,6 +150,12 @@ actor VaporDeletionEngine: VaporDeleting {
             try? ledger.write(entries.filter { !finished.contains($0.id) })
         }
         return await remove(toRemove).count
+    }
+
+    /// Whether the folder holding `entry`'s staged path is there, so a missing staged path
+    /// means it was removed rather than that its disk is unplugged.
+    private static func isReachable(_ entry: VaporLedgerEntry) -> Bool {
+        VaporPathCheck(path: entry.stagedURL.deletingLastPathComponent().path) == .directory
     }
 
     /// The entries currently in the ledger. For tests and diagnostics.

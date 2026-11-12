@@ -260,8 +260,10 @@ final class VaporController {
             }
         }
         if announce, let firstRefusal { refuse(firstRefusal) }
+        // A restore rewrites the list even when nothing came back, so saved paths that are gone
+        // now stay gone instead of returning on a later launch.
+        if source == .restore || !added.isEmpty { persistFolders() }
         guard !added.isEmpty else { return false }
-        persistFolders()
         if announce {
             addition = VaporEvent(VaporAddition(folderIDs: added.map(\.id), source: source))
             if source != .restore { dependencies.analytics(.foldersAdded(source: source, count: added.count)) }
@@ -583,8 +585,11 @@ final class VaporController {
         add([suggestion.url], source: .suggestion)
     }
 
-    func addAllSuggestions() {
-        let urls = suggestions.map(\.url)
+    /// Adds `shown`, the suggestions on screen when Add All was clicked, or the current ones when
+    /// nil. The bubbles fly before this runs; passing what was shown keeps a Finder folder change
+    /// during that flight from adding a different folder's caches.
+    func addAllSuggestions(_ shown: [VaporSuggestion]? = nil) {
+        let urls = (shown ?? suggestions).map(\.url)
         guard !urls.isEmpty else { return }
         hoveredSuggestionID = nil
         add(urls, source: .addAll)

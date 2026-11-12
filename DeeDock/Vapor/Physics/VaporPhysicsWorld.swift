@@ -136,6 +136,9 @@ nonisolated struct VaporPhysicsWorld: Sendable {
 
     /// Folders with a body in the pile (not leaving), in body order.
     var memberIDs: [UUID] { bodies.filter(\.isSettledMember).map(\.folderID) }
+    /// Folders whose staggered drop hasn't started yet. A folder taken out in that moment must
+    /// cancel its drop too, or it would land in an orb that no longer holds it.
+    var pendingSpawnIDs: [UUID] { pendingSpawns.map(\.folderID) }
 
     // MARK: Changes
 

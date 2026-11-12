@@ -9,6 +9,9 @@ struct VaporFoundInSection: View {
     let add: (VaporSuggestion) -> Void
     let addAll: () -> Void
 
+    /// Rows shown before the rest collapse into "N more".
+    static let maxRows = 4
+
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 8) {
@@ -26,9 +29,18 @@ struct VaporFoundInSection: View {
                     .buttonStyle(VaporPillButtonStyle(prominent: true))
             }
             .padding(EdgeInsets(top: 8, leading: 10, bottom: 4, trailing: 8))
-            ForEach(suggestions) { suggestion in
+            // A DerivedData folder can hold dozens of caches. Only the first few get rows, so the
+            // panel never grows past the display and Hold to Delete stays reachable; Add All
+            // still takes every one.
+            ForEach(suggestions.prefix(Self.maxRows)) { suggestion in
                 VaporFoundInRow(suggestion: suggestion) { add(suggestion) }
                     .transition(reduceMotion ? .opacity : .offset(x: 24).combined(with: .opacity))
+            }
+            if suggestions.count > Self.maxRows {
+                Text(.vaporMoreSuggestions(suggestions.count - Self.maxRows))
+                    .font(.system(size: 11.5, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .padding(EdgeInsets(top: 2, leading: 44, bottom: 2, trailing: 8))
             }
         }
         .padding(.bottom, 6)

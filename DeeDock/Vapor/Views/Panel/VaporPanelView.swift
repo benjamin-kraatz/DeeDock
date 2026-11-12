@@ -25,7 +25,7 @@ struct VaporPanelView: View {
             if !controller.suggestions.isEmpty, pull == nil {
                 VaporFoundInSection(folderName: controller.finderFolder?.lastPathComponent ?? "",
                                     suggestions: controller.suggestions, reduceMotion: reduceMotion,
-                                    add: controller.addSuggestion, addAll: controller.addAllSuggestions)
+                                    add: controller.addSuggestion, addAll: { controller.addAllSuggestions() })
                     .transition(.opacity)
             }
             if folders.isEmpty {

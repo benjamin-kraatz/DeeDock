@@ -57,7 +57,7 @@ final class VaporPileEngine {
 
         let present = Set(folders.map(\.id))
         var removed = 0
-        for id in world.memberIDs where !present.contains(id) && !leaving.contains(id) {
+        for id in world.memberIDs + world.pendingSpawnIDs where !present.contains(id) && !leaving.contains(id) {
             world.remove(id, delay: reduceMotion ? 0 : Double(removed) * 0.06, reduceMotion: reduceMotion)
             removed += 1
         }

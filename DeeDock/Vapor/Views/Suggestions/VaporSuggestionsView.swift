@@ -57,7 +57,10 @@ struct VaporSuggestionsView: View {
                     text: text, extra: hovered == nil ? max(all.count - bubbles.count, 0) : 0,
                     reduceTransparency: controller.reduceTransparency, reduceMotion: reduceMotion,
                     animatesEntrance: animatesEntrance,
-                    addAll: { eat(bubbles, then: controller.addAllSuggestions) },
+                    addAll: {
+                        let shown = all
+                        eat(bubbles) { controller.addAllSuggestions(shown) }
+                    },
                     dismiss: controller.dismissSuggestions)
                     // Flush with the side of the reserved room that faces the orb: `dx` -1 puts
                     // all the slack on the left.
