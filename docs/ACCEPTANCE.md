@@ -3641,6 +3641,8 @@ Built on `codex/vapor-orb` after the confirmed mockup `docs/mockups/vapor-orb.ht
 
 The app was not launched, because a production DOKK was running on the same Mac. Nothing below has been exercised on screen.
 
+The first hands-on run found that the orb took no clicks or drags: Liquid Glass is composited outside the window's backing, so the clear window passed every click on the sphere to the window behind it. `VaporOrbPointerGate` now sets `ignoresMouseEvents` from the pointer position, `false` over the sphere and `true` elsewhere. The fix was built but has not yet been exercised on screen.
+
 ### Hands-on acceptance
 
 - Turn Vapor on and off from the menu bar. The orb appears with its gather animation, then disappears, and comes back with the same folders and position.

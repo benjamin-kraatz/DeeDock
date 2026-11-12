@@ -214,4 +214,16 @@ struct VaporGeometryTests {
             #expect(approx(local.x, origin.x) && approx(local.y, origin.y))
         }
     }
+
+    /// Only the sphere takes the pointer; the window's transparent margin, where the suggestion
+    /// bubbles sit, must let clicks through.
+    @Test func onlyTheSphereTakesThePointer() {
+        let window = VaporGeometry.orbWindowFrame(center: CGPoint(x: -400, y: 300))
+        let center = CGPoint(x: window.midX, y: window.midY)
+        let radius = VaporGeometry.orbDiameter / 2
+        #expect(VaporGeometry.isOnOrb(center, orbCenter: center))
+        #expect(VaporGeometry.isOnOrb(CGPoint(x: center.x + radius + VaporGeometry.orbHitSlop - 1, y: center.y), orbCenter: center))
+        #expect(!VaporGeometry.isOnOrb(CGPoint(x: center.x, y: center.y - radius - VaporGeometry.orbHitSlop - 1), orbCenter: center))
+        #expect(!VaporGeometry.isOnOrb(CGPoint(x: window.maxX - 1, y: window.maxY - 1), orbCenter: center))
+    }
 }

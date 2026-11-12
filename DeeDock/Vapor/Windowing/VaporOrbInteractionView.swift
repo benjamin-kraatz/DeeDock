@@ -2,10 +2,11 @@ import AppKit
 
 /// The orb window's content view: click, drag to move, right-click, hover and file drops.
 ///
-/// Only the sphere itself is interactive: `hitTest` returns nil outside the orb's circle (plus
-/// a few points of slop), and the transparent canvas around it lets clicks fall through to the
-/// window below. Mouse events reach this view instead of the SwiftUI subview because hit-testing
-/// returns `self`; the SwiftUI view still provides the accessibility element.
+/// Only the sphere itself is interactive. ``VaporOrbPointerGate`` makes the window ignore the
+/// pointer everywhere else, so the transparent canvas around the orb lets clicks fall through to
+/// the window below, and `hitTest` returns nil outside the sphere as a second line. Mouse events
+/// reach this view instead of the SwiftUI subview because hit-testing returns `self`; the
+/// SwiftUI view still provides the accessibility element. Hover comes from the gate too.
 final class VaporOrbInteractionView: VaporDropView {
     /// A press that moved less than this is a click.
     static let dragThreshold: CGFloat = 3
@@ -22,19 +23,33 @@ final class VaporOrbInteractionView: VaporDropView {
     private var pressLocation: CGPoint?
     private var pressOrigin: CGPoint?
     private var isMoving = false
-    private var trackingArea: NSTrackingArea?
     private var isHovered = false
+    /// The last value the gate gave the window's `ignoresMouseEvents`, so the window server is
+    /// only told about changes. Nil until the first explicit value.
+    private var gateIgnores: Bool?
 
     private var orbCenter: CGPoint { CGPoint(x: bounds.midX, y: bounds.midY) }
-
-    private func isInsideOrb(_ point: CGPoint) -> Bool {
-        hypot(point.x - orbCenter.x, point.y - orbCenter.y) <= VaporGeometry.orbDiameter / 2 + 4
-    }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
         guard let superview else { return nil }
         let local = convert(point, from: superview)
-        return isInsideOrb(local) ? self : nil
+        return VaporGeometry.isOnOrb(local, orbCenter: orbCenter) ? self : nil
+    }
+
+    /// Takes the pointer while it is over the sphere or a press that started there is held, and
+    /// passes it through otherwise; also updates hover. Called by ``VaporOrbPointerGate``.
+    /// - Parameter force: Sets `ignoresMouseEvents` even when the gate's last value matches,
+    ///   for a window that was just shown.
+    func updatePointerGate(force: Bool = false) {
+        guard let window else { return }
+        let point = convert(window.convertPoint(fromScreen: NSEvent.mouseLocation), from: nil)
+        let onOrb = window.isVisible && VaporGeometry.isOnOrb(point, orbCenter: orbCenter)
+        let ignores = !(onOrb || pressLocation != nil)
+        if force || gateIgnores != ignores {
+            gateIgnores = ignores
+            window.ignoresMouseEvents = ignores
+        }
+        setHovered(onOrb)
     }
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
@@ -60,6 +75,8 @@ final class VaporOrbInteractionView: VaporDropView {
             pressLocation = nil
             pressOrigin = nil
             isMoving = false
+            // A move can end with the pointer off the orb; let the next click through.
+            updatePointerGate()
         }
         guard pressLocation != nil else { return }
         if isMoving, let window {
@@ -72,30 +89,13 @@ final class VaporOrbInteractionView: VaporDropView {
     override func rightMouseDown(with event: NSEvent) {
         guard let menu = makeMenu?() else { return }
         NSMenu.popUpContextMenu(menu, with: event, for: self)
+        // The menu tracks the pointer itself, so it may have left the orb meanwhile.
+        updatePointerGate()
     }
 
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        if let trackingArea { removeTrackingArea(trackingArea) }
-        let area = NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .mouseMoved, .activeAlways, .inVisibleRect],
-                                  owner: self)
-        addTrackingArea(area)
-        trackingArea = area
-    }
-
-    override func mouseMoved(with event: NSEvent) { updateHover(event) }
-    override func mouseEntered(with event: NSEvent) { updateHover(event) }
-
-    override func mouseExited(with event: NSEvent) {
-        guard isHovered else { return }
-        isHovered = false
-        hoverChanged?(false)
-    }
-
-    private func updateHover(_ event: NSEvent) {
-        let inside = isInsideOrb(convert(event.locationInWindow, from: nil))
-        guard inside != isHovered else { return }
-        isHovered = inside
-        hoverChanged?(inside)
+    private func setHovered(_ hovered: Bool) {
+        guard hovered != isHovered else { return }
+        isHovered = hovered
+        hoverChanged?(hovered)
     }
 }

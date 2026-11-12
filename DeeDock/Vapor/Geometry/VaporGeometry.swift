@@ -29,6 +29,15 @@ nonisolated enum VaporGeometry {
         return CGSize(width: side, height: side)
     }
 
+    /// How far past the sphere's edge a press or a drop still counts as on the orb.
+    static let orbHitSlop: CGFloat = 4
+
+    /// Whether `point` is on the sphere, the only part of the orb's window that takes the pointer.
+    /// Both points must be in the same coordinate space.
+    static func isOnOrb(_ point: CGPoint, orbCenter: CGPoint) -> Bool {
+        hypot(point.x - orbCenter.x, point.y - orbCenter.y) <= orbDiameter / 2 + orbHitSlop
+    }
+
     /// The orb window's frame for an orb centred at `center`.
     static func orbWindowFrame(center: CGPoint) -> CGRect {
         let size = orbWindowSize
