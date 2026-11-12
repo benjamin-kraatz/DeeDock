@@ -76,6 +76,9 @@ final class VaporWindows {
         orbHost.autoresizingMask = [.width, .height]
         orbView.addSubview(orbHost)
         orbPanel.contentView = orbView
+        // Moves over the orb's own window must reach the pointer gate's local monitor, or the
+        // gate would stay open after the pointer slides from the sphere into the margin.
+        orbPanel.acceptsMouseMovedEvents = true
         orbPointerGate = VaporOrbPointerGate(view: orbView)
 
         let panelHost = VaporHostingView(rootView: VaporPanelStage(controller: controller, presentation: presentation))
