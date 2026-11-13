@@ -21,6 +21,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -37,9 +38,14 @@ def fetch(package, version, cache):
     folder = os.path.join(cache, f"{package}-{version}")
     if not os.path.isdir(folder):
         os.makedirs(folder)
-        archive = subprocess.check_output(["npm", "pack", f"{package}@{version}", "--silent"], cwd=cache).decode().strip()
-        with tarfile.open(os.path.join(cache, archive)) as tar:
-            extract_safely(tar, folder, archive)
+        try:
+            archive = subprocess.check_output(["npm", "pack", f"{package}@{version}", "--silent"], cwd=cache).decode().strip()
+            with tarfile.open(os.path.join(cache, archive)) as tar:
+                extract_safely(tar, folder, archive)
+        except BaseException:
+            # The folder's existence is the cache key, so a failed or refused fetch must not leave one behind.
+            shutil.rmtree(folder, ignore_errors=True)
+            raise
     return os.path.join(folder, "package")
 
 
