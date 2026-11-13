@@ -31,6 +31,8 @@ final class LauncherSuggestionObservation {
                     self?.suspensions.insert(reason)
                     self?.dwell?.cancel()
                     self?.store.endSession()
+                    // Coalesced history would otherwise wait out its delay across the sleep.
+                    if reason == .systemSleep { self?.store.saveNow() }
                 }
             })
             observers.append(center.addObserver(forName: resume, object: nil, queue: .main) { [weak self] _ in

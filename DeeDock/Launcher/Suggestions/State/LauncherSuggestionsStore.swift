@@ -38,9 +38,18 @@ final class LauncherSuggestionsStore {
     @ObservationIgnored private let repository: LauncherSuggestionsRepository
     @ObservationIgnored private var document = LauncherSuggestionDocument()
     @ObservationIgnored private var recorder = LauncherSuggestionRecorder()
+    /// Bumped on every change to `document`, so it names the state a write captures. A completed
+    /// write may reconcile `document` only while no later change has been made.
     @ObservationIgnored private var sequence: UInt64 = 0
+    /// The newest sequence the repository has confirmed on disk.
+    @ObservationIgnored private var writtenSequence: UInt64 = 0
     @ObservationIgnored private var loadTask: Task<Void, Never>?
     @ObservationIgnored private var saveTask: Task<Void, Never>?
+    /// The coalescing timer. Non-nil exactly while `document` has changes not yet submitted to disk.
+    @ObservationIgnored private var pendingSave: Task<Void, Never>?
+    @ObservationIgnored private var firstUnsavedChange: ContinuousClock.Instant?
+    @ObservationIgnored private let saveDelay: Duration
+    @ObservationIgnored private let saveMaxWait: Duration
     @ObservationIgnored private var sessionActive = false
     @ObservationIgnored private var latestClock: Date?
     @ObservationIgnored private var timeZone = TimeZone.autoupdatingCurrent.identifier
@@ -57,9 +66,15 @@ final class LauncherSuggestionsStore {
     }
 
     /// Nil directory and defaults are fully isolated from real preferences and user history.
+    ///
+    /// - Parameters:
+    ///   - saveDelay: Quiet period after the latest change before the history file is rewritten.
+    ///   - saveMaxWait: Longest a change waits for its write while changes keep arriving.
     init(directory: URL? = LauncherSuggestionsStore.defaultDirectory, defaults: UserDefaults? = .standard,
-         coreMLSeedURL: URL? = nil) {
+         coreMLSeedURL: URL? = nil, saveDelay: Duration = .seconds(30), saveMaxWait: Duration = .seconds(300)) {
         self.defaults = defaults
+        self.saveDelay = saveDelay
+        self.saveMaxWait = saveMaxWait
         self.coreMLSeedURL = coreMLSeedURL
         cleansAbandonedModels = directory != nil && coreMLSeedURL == nil
         coreML = LauncherSuggestionCoreML(seedURL: coreMLSeedURL)
@@ -91,7 +106,8 @@ final class LauncherSuggestionsStore {
                 let pruned = pruneExcludedContexts()
                 promptRevision &+= 1
                 ready = true
-                if document.expire(now: Date()) || pruned { persist() }
+                // Excluded or expired records must not stay on disk until the next coalesced write.
+                if document.expire(now: Date()) || pruned { persist(immediately: true) }
                 activityChanged?()
             } catch {
                 guard let self, !Task.isCancelled else { return }
@@ -197,7 +213,7 @@ final class LauncherSuggestionsStore {
         pruneExcludedContexts()
         cancelLearning()
         recorder.stop(); sessionActive = false; activityChanged?()
-        savePreferences(); persist()
+        savePreferences(); persist(immediately: true)
     }
 
     func include(appID: String) {
@@ -212,7 +228,7 @@ final class LauncherSuggestionsStore {
         document = LauncherSuggestionDocument()
         promptRevision &+= 1
         ready = true; storageUnavailable = false
-        invalidate(); savePreferences(); persist()
+        invalidate(); savePreferences(); persist(immediately: true)
     }
 
     func capture(foregroundID: String?) -> LauncherSuggestionContext? {
@@ -369,7 +385,49 @@ final class LauncherSuggestionsStore {
     }
 
     /// Awaitable durability boundary for scoped tests and application teardown diagnostics.
-    func flush() async { await saveTask?.value }
+    /// Writes any coalesced changes now, then waits for the latest write to finish.
+    func flush() async {
+        saveNow()
+        await saveTask?.value
+    }
+
+    /// Starts writing coalesced changes now instead of after the quiet period. Called before system
+    /// sleep, so a Mac that never wakes keeps what was recorded. No-op when nothing is pending.
+    func saveNow() {
+        guard pendingSave != nil else { return }
+        write()
+    }
+
+    /// Writes unsaved changes before the process exits, blocking the main thread for at most
+    /// `timeout`. Only `applicationWillTerminate` should call this, after the catalog has stopped and
+    /// recorded its session end.
+    ///
+    /// The ordinary write path cannot be awaited here: its task starts and finishes on the main actor,
+    /// which this method blocks. So the snapshot goes straight to the repository actor from a detached
+    /// task; nothing awaited needs the main actor, so the wait cannot deadlock. A write already queued
+    /// on the repository runs first, and the repeated sequence number is accepted after it.
+    func flushBeforeExit(timeout: TimeInterval = 2) {
+        // A started write may not have reached the repository yet, because its task needs the main
+        // actor, so anything not confirmed on disk is written again here.
+        guard sequence != writtenSequence, ready, !storageUnavailable else { return }
+        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil
+        let snapshot = document, sequence = sequence, repository = repository
+        let done = DispatchSemaphore(value: 0)
+        Task.detached {
+            _ = try? await repository.save(snapshot, sequence: sequence)
+            done.signal()
+        }
+        _ = done.wait(timeout: .now() + timeout)
+    }
+
+    /// The store lives as long as the app; this covers scoped owners such as tests. A pending timer
+    /// must not outlive the store, and its changes are still submitted rather than dropped.
+    isolated deinit {
+        guard let pendingSave else { return }
+        pendingSave.cancel()
+        let snapshot = document, sequence = sequence, repository = repository
+        Task.detached { _ = try? await repository.save(snapshot, sequence: sequence) }
+    }
 
     private func recordEvent(_ kind: LauncherSuggestionEvent.Kind, appID: String?, now: Date) {
         document.events.append(.init(date: now, kind: kind, appID: appID, context: recorder.context(now: now)))
@@ -441,12 +499,40 @@ final class LauncherSuggestionsStore {
         }
     }
 
-    private func persist() {
+    /// Records that `document` changed and schedules its write.
+    ///
+    /// Activations, launches and terminations change the history every few seconds, and each write
+    /// encodes and atomically replaces the whole file (up to 16 MiB). Writes are therefore coalesced:
+    /// one happens after `saveDelay` without further changes, or `saveMaxWait` after the first unsaved
+    /// change if changes keep arriving. Privacy actions pass `immediately` so cleared or excluded
+    /// records do not linger on disk.
+    private func persist(immediately: Bool = false) {
         guard ready, !storageUnavailable else { return }
         if document.expire(now: Date()) {
             revision = UUID(); cancelLearning()
         }
         sequence &+= 1
+        if immediately { write(); return }
+        let now = ContinuousClock.now
+        let first = firstUnsavedChange ?? now
+        firstUnsavedChange = first
+        let deadline = min(now.advanced(by: saveDelay), first.advanced(by: saveMaxWait))
+        pendingSave?.cancel()
+        pendingSave = Task { [weak self] in
+            try? await Task.sleep(until: deadline, clock: .continuous)
+            guard !Task.isCancelled, let self else { return }
+            write()
+        }
+    }
+
+    /// Submits the current document to the repository and ends any coalescing period.
+    private func write() {
+        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil
+        guard ready, !storageUnavailable else { return }
+        if document.expire(now: Date()) {
+            sequence &+= 1
+            revision = UUID(); cancelLearning()
+        }
         let sequence = sequence, snapshot = document, repository = repository
         // Cancel work not yet submitted to disk; the serial repository rejects an older write
         // if it arrives after reset. In-progress atomic writes complete before the next write.
@@ -455,7 +541,9 @@ final class LauncherSuggestionsStore {
             do {
                 try Task.checkCancellation()
                 let retained = try await repository.save(snapshot, sequence: sequence)
-                guard let self, self.sequence == sequence else { return }
+                guard let self else { return }
+                writtenSequence = max(writtenSequence, sequence)
+                guard self.sequence == sequence else { return }
                 if retained.events.count != document.events.count || retained.examples.count != document.examples.count
                     || retained.feedback.count != document.feedback.count || retained.impressions.count != document.impressions.count {
                     document = retained
