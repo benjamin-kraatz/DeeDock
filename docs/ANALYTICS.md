@@ -626,6 +626,9 @@ prompt or answer contains:
 One Robi interaction, from the click to the card closing, is one trace: its suggested questions
 and every answer asked in it share a `$ai_trace_id`.
 
+The Settings "recently sent" list shows each `$ai_generation` by name only; the prompt and answer
+are not repeated there.
+
 ### Robi's cache diagnostics
 
 Each Claude request names the response before it, and the API reports the first place the two
