@@ -72,7 +72,9 @@ extension WindowMarkupExport {
     /// An item provider for dragging the picture out: PNG data for apps, a file for Finder.
     ///
     /// The file representation writes to a temporary directory only when a drop target asks for a
-    /// file, so a drag that ends in a text field or is cancelled never touches the disk.
+    /// file, so a drag that ends in a text field or is cancelled never touches the disk. Each write
+    /// also sweeps earlier export folders past their grace period (``WindowMarkupTempCleanup``), so
+    /// pictures of windows don't pile up in the temporary folder.
     static func dragProvider(png: Data, filename: String) -> NSItemProvider {
         let provider = NSItemProvider()
         provider.suggestedName = filename
@@ -82,8 +84,9 @@ extension WindowMarkupExport {
         }
         provider.registerFileRepresentation(forTypeIdentifier: UTType.png.identifier, fileOptions: [],
                                             visibility: .all) { completion in
+            WindowMarkupTempCleanup.runInBackground()
             let folder = FileManager.default.temporaryDirectory
-                .appendingPathComponent("DeeDockMarkup-\(UUID().uuidString)", isDirectory: true)
+                .appendingPathComponent("\(WindowMarkupTempCleanup.folderPrefix)\(UUID().uuidString)", isDirectory: true)
             do {
                 try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
                 let url = folder.appendingPathComponent(filename)

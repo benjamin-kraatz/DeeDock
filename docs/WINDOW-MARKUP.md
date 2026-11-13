@@ -100,6 +100,11 @@ Share stay in memory and the pasteboard. Vision text recognition and pixelation 
 Live Text's Visual Look Up is Apple's feature and follows Apple's own policy when the user invokes
 it.
 
+A Finder drop writes the picture to `$TMPDIR/DeeDockMarkup-<UUID>/` so the drop target can copy it.
+DOKK deletes those folders once they are more than five minutes old: each new drag-out file sweeps
+the earlier ones, and so does every launch. The sweep touches only real folders with that exact
+name pattern, owned by the current user, directly inside the temporary folder.
+
 ## Accessibility
 
 Every control is labelled, and tool selection, colour, weight, copy, save, crop reset, and text
