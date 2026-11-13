@@ -252,10 +252,15 @@ final class DockPanelController {
                             y: panel.frame.height - local.y - geometry.contentOrigin.y)
         let sample = DockAnimationGeometry.sample(style: visibility.settings.animationStyle, progress: visibility.progress,
                                                   size: geometry.contentSize, reduceMotion: visibility.reduceMotion, edge: interaction.layout.edge)
-        let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
-        let inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation) && rects.contains { sample.paintedRect($0).contains(point) }
+        // This runs for every mouse event anywhere on screen, mostly far from the dock, so the
+        // painted-region list is built only once the cheap visibility and frame tests pass.
+        var inside = visibility.exposesContent && panel.frame.contains(NSEvent.mouseLocation)
+        if inside {
+            let rects = [interaction.surfaceRect, interaction.errorRect] + Array(interaction.iconRects.values)
+            inside = rects.contains { sample.paintedRect($0).contains(point) }
+        }
         let timelineHeld = interaction.timeline?.isActive(on: store.displayID) == true
-        panel.ignoresMouseEvents = !inside
+        if panel.ignoresMouseEvents == inside { panel.ignoresMouseEvents = !inside }
         // An open stack makes every dock dismissal-only. Clearing the pointer settles
         // magnification and hover without changing the dock's visible hold region.
         // Timeline scrub keeps the resting axis stable, so magnification is suppressed.
