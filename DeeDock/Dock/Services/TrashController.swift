@@ -37,6 +37,13 @@ final class TrashController {
     @ObservationIgnored private var generation = UUID()
     @ObservationIgnored private var lastRead: ContinuousClock.Instant?
     @ObservationIgnored private var attentionTask: Task<Void, Never>?
+    /// Set once Automation access is known to exist, so the fallback loop should run whenever
+    /// DOKK is not suspended.
+    @ObservationIgnored private var monitoringWanted = false
+    /// Why the fallback loop is paused: the displays sleep, or the user session is inactive.
+    /// Nobody can see the tile then, and each read wakes Finder.
+    @ObservationIgnored private var suspensionReasons: Set<String> = []
+    @ObservationIgnored private var suspensionObservers: [NSObjectProtocol] = []
     #if DEBUG
     @ObservationIgnored private var intervalObserver: Any?
     @ObservationIgnored private var observedInterval = TrashRefreshInterval.current
@@ -49,6 +56,7 @@ final class TrashController {
     /// Reads Finder state only when the user has already granted Automation access.
     func start() {
         generation = UUID()
+        observeSuspension()
         refreshIfAuthorized()
         #if DEBUG
         // Restart the fallback loop when the Debug interval changes, rather than after the old wait.
@@ -127,6 +135,10 @@ final class TrashController {
 
     func stop() {
         generation = UUID()
+        suspensionObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
+        suspensionObservers.removeAll()
+        suspensionReasons.removeAll()
+        monitoringWanted = false
         queryTask?.cancel()
         queryTask = nil
         monitoringTask?.cancel()
@@ -177,17 +189,53 @@ final class TrashController {
     /// Finder does not publish a public Trash-change notification. Once Automation access exists, a
     /// serialized fallback read at `TrashRefreshInterval.current` catches changes no event announced,
     /// such as emptying Trash from the system Dock while DDock sits untouched.
-    private func startMonitoring() {
-        guard monitoringTask == nil else { return }
+    /// - Parameter readFirst: Reads at once before the first wait, for a resume after suspension.
+    private func startMonitoring(readFirst: Bool = false) {
+        monitoringWanted = true
+        guard monitoringTask == nil, suspensionReasons.isEmpty else { return }
         let token = generation
         monitoringTask = Task { [weak self] in
             guard let self else { return }
+            if readFirst {
+                await refreshAuthorizedState()
+            }
             while !Task.isCancelled, generation == token {
                 try? await Task.sleep(for: .seconds(TrashRefreshInterval.current))
                 guard !Task.isCancelled, generation == token else { return }
                 await refreshAuthorizedState()
             }
         }
+    }
+
+    /// Pauses the fallback loop while the displays sleep or the session is inactive, the same
+    /// events `DockBadgeController` suspends for, and resumes with one immediate read.
+    private func observeSuspension() {
+        guard suspensionObservers.isEmpty else { return }
+        let center = NSWorkspace.shared.notificationCenter
+        for (sleep, wake, reason) in [
+            (NSWorkspace.screensDidSleepNotification, NSWorkspace.screensDidWakeNotification, "screens"),
+            (NSWorkspace.sessionDidResignActiveNotification, NSWorkspace.sessionDidBecomeActiveNotification, "session")
+        ] {
+            suspensionObservers.append(center.addObserver(forName: sleep, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.suspend(reason) }
+            })
+            suspensionObservers.append(center.addObserver(forName: wake, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.resume(reason) }
+            })
+        }
+    }
+
+    private func suspend(_ reason: String) {
+        suspensionReasons.insert(reason)
+        monitoringTask?.cancel()
+        monitoringTask = nil
+    }
+
+    private func resume(_ reason: String) {
+        suspensionReasons.remove(reason)
+        // A display waking must not restart reads for an inactive user session.
+        guard monitoringWanted, suspensionReasons.isEmpty, monitoringTask == nil else { return }
+        startMonitoring(readFirst: true)
     }
 
     private func refreshAuthorizedState() async {
