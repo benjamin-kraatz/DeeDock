@@ -50,7 +50,8 @@ struct HubFilesItemIcon: View {
 
     private func loadThumbnail() async {
         guard thumbnailKey != nil else { rendered = nil; return }
-        let image = await HubThumbnailCache.shared.thumbnail(for: item.url, size: CGSize(width: size, height: size), scale: scale)
+        let image = await HubThumbnailCache.shared.thumbnail(for: item.url, size: CGSize(width: size, height: size), scale: scale,
+                                                             modified: item.modified)
         guard !Task.isCancelled else { return }
         rendered = image
     }

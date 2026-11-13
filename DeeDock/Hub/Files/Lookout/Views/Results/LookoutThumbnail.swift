@@ -63,7 +63,8 @@ struct LookoutThumbnail: View {
     private func load() async {
         guard key != nil else { thumbnail = nil; return }
         let cache = HubThumbnailCache.shared
-        let image = await cache.thumbnail(for: item.url, size: CGSize(width: size, height: size), scale: scale)
+        let image = await cache.thumbnail(for: item.url, size: CGSize(width: size, height: size), scale: scale,
+                                          modified: item.modified)
         guard !Task.isCancelled else { return }
         // The cache answers with the workspace icon itself when Quick Look can't render: keep the plain icon then.
         thumbnail = image === cache.icon(for: item.url) ? nil : image
