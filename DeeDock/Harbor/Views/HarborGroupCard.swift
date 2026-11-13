@@ -32,7 +32,10 @@ struct HarborGroupCard: View {
                 .shadow(color: .black.opacity(colorScheme == .dark ? 0.22 : 0.12), radius: 25, y: 18)
                 .background {
                     // Behind the card and cut out inside it, so the halo never tints the glass.
-                    HarborGlowBorder(cornerRadius: HarborStyle.groupCornerRadius, reduceMotion: reduceMotion)
+                    // Every card carries the ring at opacity 0, which does not pause a timeline, so only
+                    // the highlighted card's ring turns. It freezes while fading out, which reads fine.
+                    HarborGlowBorder(cornerRadius: HarborStyle.groupCornerRadius, reduceMotion: reduceMotion,
+                                     paused: !highlighted)
                         .opacity(highlighted ? 1 : 0)
                         .animation(.easeInOut(duration: 0.35), value: highlighted)
                 }
@@ -74,10 +77,12 @@ struct HarborGroupHeader: View {
 struct HarborGlowBorder: View {
     let cornerRadius: CGFloat
     let reduceMotion: Bool
+    /// Stops scheduling frames while the ring is not shown. Unlike Reduce Motion, it keeps the angle.
+    var paused = false
 
     var body: some View {
         let reach = HarborStyle.glowReach
-        TimelineView(.animation(paused: reduceMotion)) { context in
+        TimelineView(.animation(paused: reduceMotion || paused)) { context in
             let turn = reduceMotion ? 0
                 : context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: HarborStyle.glowPeriod)
                     / HarborStyle.glowPeriod
