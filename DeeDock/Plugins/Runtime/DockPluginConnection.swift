@@ -22,6 +22,8 @@ final class DockPluginConnection: DockPluginSession {
     /// Ends a session whose plugin never answers, so its tile does not wait forever.
     private var replyTimeout: Task<Void, Never>?
     private var finished = false
+    /// Coalesces the plugin's tile states: only the newest undelivered one reaches the main actor.
+    private let stateMailbox = DockPluginStateMailbox()
     /// How long a plugin has to send its first tile state, launch included. The spike measured
     /// replies within 0.3 seconds of a cold start.
     private static let replyDeadline: Duration = .seconds(15)
@@ -65,10 +67,14 @@ final class DockPluginConnection: DockPluginSession {
             end(unexpected: true, reason: "connection failed: \(error)")
             return
         }
-        let endpoint = DockPluginHostEndpoint(stateChanged: { [weak self] state in
-            guard let self else { return }
-            Task { @MainActor in self.deliver(.state(state)) }
-        }, requested: { [weak self] request in
+        let mailbox = stateMailbox
+        // Every tile state goes through the mailbox, so a plugin that floods DOKK costs at most
+        // one pending main-actor task, and a late `connect` reply can't replace a newer push.
+        let enqueueState: @Sendable (DOKKPluginTileState) -> Void = { [weak self] state in
+            guard let self, mailbox.put(state) else { return }
+            Task { @MainActor in self.deliverLatestState() }
+        }
+        let endpoint = DockPluginHostEndpoint(stateChanged: enqueueState, requested: { [weak self] request in
             guard let self else { return }
             Task { @MainActor in self.deliver(.request(request)) }
         })
@@ -86,9 +92,9 @@ final class DockPluginConnection: DockPluginSession {
         let proxy = connection.remoteObjectProxyWithErrorHandler { [weak self] error in
             Task { @MainActor in self?.end(unexpected: true, reason: "connect failed: \(error.localizedDescription)") }
         } as? DOKKPluginService
-        proxy?.connect(DOKKPluginHostInfo().encoded()) { [weak self] data in
-            guard let state = DOKKPluginTileState.decode(data) else { return }
-            Task { @MainActor in self?.deliver(.state(state)) }
+        proxy?.connect(DOKKPluginHostInfo().encoded()) { data in
+            guard let state = DockPluginHostEndpoint.decodeState(data) else { return }
+            enqueueState(state)
         }
     }
 
@@ -96,9 +102,10 @@ final class DockPluginConnection: DockPluginSession {
     func refresh() {
         guard !finished, let connection else { return }
         let proxy = connection.remoteObjectProxyWithErrorHandler { _ in } as? DOKKPluginService
+        let mailbox = stateMailbox
         proxy?.fetchTileState { [weak self] data in
-            guard let state = DOKKPluginTileState.decode(data) else { return }
-            Task { @MainActor in self?.deliver(.state(state)) }
+            guard let self, let state = DockPluginHostEndpoint.decodeState(data), mailbox.put(state) else { return }
+            Task { @MainActor in self.deliverLatestState() }
         }
     }
 
@@ -142,6 +149,12 @@ final class DockPluginConnection: DockPluginSession {
     static func endsReplyDeadline(_ event: Event) -> Bool {
         if case .state = event { return true }
         return false
+    }
+
+    /// Delivers the newest state waiting in the mailbox, if any.
+    private func deliverLatestState() {
+        guard let state = stateMailbox.take() else { return }
+        deliver(.state(state))
     }
 
     private func deliver(_ event: Event) {

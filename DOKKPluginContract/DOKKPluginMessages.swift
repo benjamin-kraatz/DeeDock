@@ -73,6 +73,9 @@ nonisolated enum DOKKPluginRequest: String, Codable, Equatable, Sendable {
     /// Closes the plugin's panel if it is open.
     case closePanel
     /// Opens the app the plugin ships in and closes the panel.
+    ///
+    /// DOKK honours it only in answer to the person: while the plugin's panel is open, or within
+    /// two seconds of them choosing one of its menu items. At any other time it is ignored.
     case openApp
 
     private enum CodingKeys: String, CodingKey { case kind }
