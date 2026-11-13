@@ -28,6 +28,9 @@ struct UpdateAwarenessPip: View {
     let reduceMotion: Bool
     /// Announces a finished automatic install instead of a waiting offer.
     var installed = false
+    /// Stops the pulse while the dock is hidden or idle-faded, so a `repeatForever` animation does
+    /// not keep scheduling frames nobody sees. Resuming starts the pulse again.
+    var paused = false
     @State private var pulse = false
 
     var body: some View {
@@ -37,9 +40,11 @@ struct UpdateAwarenessPip: View {
             .frame(width: 9, height: 9)
             .shadow(color: UpdateAwarenessMark.indigo.opacity(0.35), radius: reduceMotion ? 0 : 3)
             .opacity(reduceMotion ? 1 : (pulse ? 1 : 0.72))
-            .animation(reduceMotion ? nil : .easeInOut(duration: 2.4).repeatForever(autoreverses: true),
+            // Setting `pulse` again without an animation replaces the running repeat, which stops it.
+            .animation(reduceMotion || paused ? nil : .easeInOut(duration: 2.4).repeatForever(autoreverses: true),
                        value: pulse)
-            .onAppear { pulse = !reduceMotion }
+            .onAppear { pulse = !reduceMotion && !paused }
+            .onChange(of: paused) { _, paused in pulse = !reduceMotion && !paused }
             .accessibilityLabel(Text(installed ? .updatesInstalledBadge : .updatesAwarenessPip))
     }
 }

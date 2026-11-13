@@ -1,4 +1,5 @@
 import AppKit
+import Observation
 import SwiftUI
 
 /// Owns metadata observation and one nonactivating panel. Stop removes every timer and observer.
@@ -10,6 +11,10 @@ final class DiscoveryController {
     /// Handles the callout's primary button. Returns what the callout must still do itself.
     var openDestination: (DiscoveryProposal.Destination) -> DiscoveryProposal.FollowUp = { _ in .none }
     private var timer: Timer?
+    /// True between `start()` and `stop()`. Gates timer re-arming and the observation chain.
+    private var started = false
+    /// Bumped by `stop()`, so a registration left over from a previous start cannot fork a second chain.
+    private var trackingGeneration = 0
     private var panel: DiscoveryPanel?
     private var shownAt: Date?
     #if DEBUG
@@ -24,6 +29,7 @@ final class DiscoveryController {
         closePanel()
         isDebugPresentation = true
         present(proposal, on: screen)
+        updateTimer()
     }
     #endif
     private var observers: [NSObjectProtocol] = []
@@ -34,7 +40,8 @@ final class DiscoveryController {
     private var suspended: Bool { !suspensionReasons.isEmpty }
 
     func start() {
-        guard timer == nil else { return }
+        guard !started else { return }
+        started = true
         let center = NSWorkspace.shared.notificationCenter
         for (name, reason) in [(NSWorkspace.willSleepNotification, "sleep"),
                                (NSWorkspace.screensDidSleepNotification, "screens"),
@@ -43,6 +50,7 @@ final class DiscoveryController {
                 MainActor.assumeIsolated {
                     self?.suspensionReasons.insert(reason)
                     self?.finish()
+                    self?.updateTimer()
                 }
             })
         }
@@ -50,7 +58,11 @@ final class DiscoveryController {
                                (NSWorkspace.screensDidWakeNotification, "screens"),
                                (NSWorkspace.sessionDidBecomeActiveNotification, "session")] {
             observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.suspensionReasons.remove(reason); self?.refresh() }
+                MainActor.assumeIsolated {
+                    self?.suspensionReasons.remove(reason)
+                    self?.updateTimer()
+                    self?.refresh()
+                }
             })
         }
         for name in [NSWorkspace.activeSpaceDidChangeNotification, NSWorkspace.didActivateApplicationNotification] {
@@ -74,14 +86,53 @@ final class DiscoveryController {
                                                   object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.finish() }
         })
-        // Native idle/fullscreen state has no unified public notification, so a low-frequency timer checks it.
-        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refresh() }
-        }
-        timer.tolerance = 0.2
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
+        trackEngine()
         refresh()
+    }
+
+    /// Whether the 1 Hz check has anything to do: a callout is up, or the engine has queued tips
+    /// it could still present. An empty queue, a disabled engine, or a suspended session needs no
+    /// wakeups; the events that change that re-arm the timer.
+    private var needsTimer: Bool {
+        guard started else { return false }
+        if panel != nil { return true }
+        return !suspended && engine.enabled && (engine.visible != nil || !engine.queue.isEmpty)
+    }
+
+    /// Starts or stops the timer to match `needsTimer`. Call after anything that changes it.
+    private func updateTimer() {
+        if needsTimer {
+            guard timer == nil else { return }
+            // Native idle/fullscreen state has no unified public notification, so a low-frequency timer checks it.
+            let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+                MainActor.assumeIsolated { self?.refresh() }
+            }
+            timer.tolerance = 0.2
+            RunLoop.main.add(timer, forMode: .common)
+            self.timer = timer
+        } else {
+            timer?.invalidate(); timer = nil
+        }
+    }
+
+    /// Re-arms the timer whenever the engine's enabled state, visible tip, or queue changes,
+    /// whoever changed it. Observation fires once, so each change registers the next one; the
+    /// chain ends with `stop()`.
+    private func trackEngine() {
+        guard started else { return }
+        let generation = trackingGeneration
+        withObservationTracking {
+            _ = engine.enabled; _ = engine.visible; _ = engine.queue
+        } onChange: { [weak self] in
+            guard let self else { return }
+            // `onChange` runs before the new value is stored; read it on the next main-actor turn.
+            Task { @MainActor in
+                guard self.started, self.trackingGeneration == generation else { return }
+                self.updateTimer()
+                self.trackEngine()
+            }
+        }
+        updateTimer()
     }
 
     func setEnabled(_ enabled: Bool) {
@@ -110,6 +161,10 @@ final class DiscoveryController {
         guard !suspended, engine.enabled else { closePanel(); return }
         guard engine.visible != nil || !engine.queue.isEmpty else { return }
         let now = Date.now
+        // Without a callout, the native gates below matter only when a tip could be presented.
+        // Most ticks find nothing due (spacing, calm, snooze, caps), so skip the window-server
+        // query and idle read for them. A showing callout still needs `blocked` every tick.
+        if panel == nil, !engine.isDue(at: now) { return }
         let screen = targetScreen()
         let blocked = screen == nil || menuDepth > 0 || interactionBlocked() || nativeBlocked(on: screen)
         if let panel {
@@ -200,10 +255,13 @@ final class DiscoveryController {
         #endif
         monitors.forEach(NSEvent.removeMonitor); monitors.removeAll()
         panel?.close(); panel = nil; shownAt = nil
+        updateTimer()
     }
 
     func stop() {
         finish()
+        started = false
+        trackingGeneration += 1
         timer?.invalidate(); timer = nil
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()

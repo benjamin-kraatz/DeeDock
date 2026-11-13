@@ -7,6 +7,11 @@ import AppKit
 @MainActor
 enum SessionCapsuleApplicationIcons {
     private static var cache: [String: NSImage] = [:]
+    /// Bundle identifiers LaunchServices could not resolve, and when that was learned. Capsule panels
+    /// ask on every body pass, so a missing app is not looked up again until the entry expires, which
+    /// still lets a newly installed app show up within about a minute.
+    private static var misses: [String: ContinuousClock.Instant] = [:]
+    private static let missLifetime: Duration = .seconds(60)
 
     /// Distinct application icons for a capsule's windows, in the order the user selected them.
     ///
@@ -28,8 +33,14 @@ enum SessionCapsuleApplicationIcons {
     static func icon(for bundleIdentifier: String?) -> NSImage? {
         guard let bundleIdentifier else { return nil }
         if let cached = cache[bundleIdentifier] { return cached }
+        let now = ContinuousClock.now
+        if let missed = misses[bundleIdentifier], missed.duration(to: now) < missLifetime { return nil }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
-        else { return nil }
+        else {
+            misses[bundleIdentifier] = now
+            return nil
+        }
+        misses[bundleIdentifier] = nil
         let image = NSWorkspace.shared.icon(forFile: url.path)
         image.size = NSSize(width: 44, height: 44)
         cache[bundleIdentifier] = image

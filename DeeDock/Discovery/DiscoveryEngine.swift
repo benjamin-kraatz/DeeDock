@@ -65,14 +65,11 @@ final class DiscoveryEngine {
     func advance(at now: Date, canPresent: Bool) -> DiscoveryProposal? {
         guard enabled, visible == nil, !queue.isEmpty else { return nil }
         queue.removeAll { id in catalog.first(where: { $0.id == id }).map(suppressed) ?? true }
-        guard !queue.isEmpty else { return nil }
-        if let slot = nextSlot, now < slot { return nil }
-        guard canPresent, sessionCount < 2, let index = firstEligibleIndex(at: now),
+        guard canPresent, let index = dueIndex(at: now),
               let proposal = catalog.first(where: { $0.id == queue[index] }) else { return nil }
         if !Calendar.current.isDate(saved.day, inSameDayAs: now) {
             saved.day = now; saved.dailyCount = 0
         }
-        guard saved.dailyCount < 3 else { return nil }
         queue.remove(at: index)
         visible = proposal
         sessionCount += 1; saved.dailyCount += 1
@@ -83,10 +80,30 @@ final class DiscoveryEngine {
         return proposal
     }
 
-    /// First queue entry that is past its snooze and whose calm interval has elapsed.
+    /// Whether `advance(at: now, canPresent: true)` would present a tip. Changes nothing.
+    ///
+    /// The controller asks this before paying for its native gates (a window-server query and
+    /// system idle time), which only matter when a tip is actually due.
+    func isDue(at now: Date) -> Bool { dueIndex(at: now) != nil }
+
+    /// Every gate `advance` applies apart from the caller's `canPresent`: enabled, nothing visible,
+    /// the spacing slot reached, the session and daily caps, and an eligible queued tip. Shared by
+    /// `advance` and `isDue` so the two cannot drift. Pure: a new day counts as zero shown without
+    /// being written back.
+    private func dueIndex(at now: Date) -> Int? {
+        guard enabled, visible == nil else { return nil }
+        if let slot = nextSlot, now < slot { return nil }
+        guard sessionCount < 2 else { return nil }
+        let dailyCount = Calendar.current.isDate(saved.day, inSameDayAs: now) ? saved.dailyCount : 0
+        guard dailyCount < 3 else { return nil }
+        return firstEligibleIndex(at: now)
+    }
+
+    /// First queue entry that is not suppressed, is past its snooze, and whose calm interval has
+    /// elapsed. `advance` purges suppressed entries first; `isDue` relies on the check here.
     private func firstEligibleIndex(at now: Date) -> Int? {
         queue.firstIndex { id in
-            guard let proposal = catalog.first(where: { $0.id == id }),
+            guard let proposal = catalog.first(where: { $0.id == id }), !suppressed(proposal),
                   now >= saved.snoozed[id, default: .distantPast],
                   let progress = progress[id] else { return false }
             return now.timeIntervalSince(progress.last) >= proposal.calmInterval

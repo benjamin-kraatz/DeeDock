@@ -146,7 +146,13 @@ final class BadgeMemoryStore {
         var matched: [String: BadgeObservation] = [:]
         var conflicted: Set<String> = []
         for (path, value) in observations {
-            let target = stored.first { DockBadgePath.sameInstallation($0, path) } ?? path
+            // A scan usually names the saved spelling exactly, so skip the per-pair installation
+            // check then. `rekeyInstallations` leaves one saved key per resolved path, which makes
+            // an exact hit the only match. Should two case-only spellings of a missing app both
+            // survive, the scan below picked one in dictionary order, which is arbitrary anyway.
+            let target = document.apps[path] != nil
+                ? path
+                : stored.first { DockBadgePath.sameInstallation($0, path) } ?? path
             if let existing = matched[target], existing != value { conflicted.insert(target) }
             matched[target] = value
         }

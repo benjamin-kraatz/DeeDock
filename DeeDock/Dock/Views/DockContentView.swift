@@ -13,7 +13,6 @@ struct DockContentView: View {
     let reduceTransparency: Bool
     /// False while the dock's contents are crossfading inside the launcher's own material.
     var drawsBackground = true
-    var ambientAnimated = false
     let primaryAppAction: (DockItem) -> Void
     let openApp: (DockItem) -> Void
     let togglePin: (DockItem) -> Void
@@ -30,12 +29,16 @@ struct DockContentView: View {
         )
     }
     private var sizes: [CGFloat] {
-        layout.sizes(
-            pointerAlong: interaction.dragActive
-                ? nil
-                : interaction.pointer.map {
+        // Read `pointer` only when it can change a size. Reading it registers this body with
+        // Observation, so with magnification off, under Reduce Motion, or during a drag every
+        // pointer move would otherwise rebuild the dock for identical resting sizes.
+        let magnifies = !interaction.dragActive && !reduceMotion && layout.magnification != 1
+        return layout.sizes(
+            pointerAlong: magnifies
+                ? interaction.pointer.map {
                     layout.edge.along($0) - scrollOffset
-                },
+                }
+                : nil,
             reduceMotion: reduceMotion
         )
     }
@@ -179,8 +182,8 @@ struct DockContentView: View {
             }
         }
         .onChange(of: layout.edge) { _, _ in hoveredID = nil }
-        .onChange(of: interaction.pointer == nil) { _, outside in
-            if outside { hoveredID = nil }
+        .onChange(of: interaction.pointerInside) { _, inside in
+            if !inside { hoveredID = nil }
         }
         .onChange(of: slots.compactMap(\.target)) { _, ids in
             if let hoveredID, !ids.contains(hoveredID) { self.hoveredID = nil }

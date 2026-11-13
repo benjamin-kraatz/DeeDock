@@ -157,6 +157,9 @@ final class DockInteraction {
     var layout = DockGeometry.layout(count: 0, favoriteCount: 0, availableLength: 800)
     /// Pointer in panel-local, top-left-origin points; nil outside the surface and exposed app buttons.
     var pointer: CGPoint?
+    /// Whether `pointer` is non-nil, published separately so hover clearing does not observe
+    /// every pointer move. Kept in step by `setPointer`.
+    private(set) var pointerInside = false
     /// Re-evaluates click passthrough when painted regions change under a stationary pointer.
     @ObservationIgnored var geometryDidChange: (() -> Void)?
     /// Canvas-space frames published once per layout turn for tooltip placement.
@@ -213,6 +216,9 @@ final class DockInteraction {
     /// Avoids invalidating the dock again when geometry resamples the same native pointer event.
     func setPointer(_ point: CGPoint?) {
         if pointer != point { pointer = point }
+        // Observation skips an Equatable assignment that does not change the value, so views that
+        // only care about inside/outside are not invalidated by every move.
+        pointerInside = point != nil
     }
 
     /// Whether a panel-local point reaches the glass or an exposed application button.
