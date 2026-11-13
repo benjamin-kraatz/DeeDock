@@ -122,6 +122,14 @@ jobs:
           if [ -n "${INPUT_MARKETING_VERSION:-}" ]; then
             marketing="$INPUT_MARKETING_VERSION"
           fi
+          # Both values end up in file paths, the release tag, and
+          # GITHUB_OUTPUT. Accept only digits and dots, and digits only.
+          case "$marketing" in
+            ''|*[!0-9.]*|.*|*.|*..*) echo "Invalid MARKETING_VERSION. Use digits and dots, such as 0.27.0."; exit 1 ;;
+          esac
+          case "$build" in
+            ''|*[!0-9]*) echo "Invalid CURRENT_PROJECT_VERSION. Use digits only."; exit 1 ;;
+          esac
           echo "marketing_version=$marketing" >> "$GITHUB_OUTPUT"
           echo "build_number=$build" >> "$GITHUB_OUTPUT"
           echo "release_tag=v${marketing}" >> "$GITHUB_OUTPUT"
