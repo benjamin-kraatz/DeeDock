@@ -4,13 +4,14 @@
 # Separate from Release. Do not sign, notarize, or read repository secrets.
 # POSTHOG_PROJECT_TOKEN stays empty, so analytics stay a no-op.
 #
-# Runner: xcode-27, Benn's Mac image. The Release archive job uses the same
-# label. Xcode selection below is that job's discovery step: highest
-# installed Xcode, which must be major 27. It does not hardcode an app path.
+# Runner: xcode-27, a GitHub-hosted macOS image. Every job gets a fresh,
+# ephemeral VM; nothing on disk carries over between jobs. The Release
+# archive job uses the same label. Xcode selection below is that job's
+# discovery step: highest installed Xcode, which must be major 27. It does
+# not hardcode an app path.
 #
 # DOKK.app and DeeDockTests use a fresh DerivedData under RUNNER_TEMP.
-# This runner keeps a disk between jobs, and a restored app product can be
-# signed or stale, so DerivedData is not cached.
+# DerivedData is not cached: a restored app product can be signed or stale.
 #
 # actions/cache stores SPM checkouts only. Key: Package.resolved, runner
 # OS and architecture, and the selected Xcode version. No restore-key
@@ -31,9 +32,10 @@ on:
       - main
   workflow_dispatch:
 
+# Checkout needs contents: read. Cache and artifact steps use the runner's
+# own runtime token, and concurrency cancellation needs no token.
 permissions:
   contents: read
-  actions: write
 
 # A new push to a PR cancels the previous run for that PR. Pushes to main
 # share one group, so a newer main commit cancels the older one.
@@ -48,7 +50,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No later step uses git credentials; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Select Xcode 27
         id: xcode
@@ -97,7 +102,7 @@ jobs:
 
       - name: Restore SPM source packages
         id: spm-sources
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/ci-cache/source-packages
           key: spm-sources-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.xcode_version }}+${{ steps.xcode.outputs.xcode_build }}-${{ hashFiles('DeeDock.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
@@ -116,14 +121,14 @@ jobs:
 
       - name: Save SPM source packages
         if: success() && steps.spm-sources.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/ci-cache/source-packages
           key: ${{ steps.spm-sources.outputs.cache-primary-key }}
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: build-and-test-results
           path: |
