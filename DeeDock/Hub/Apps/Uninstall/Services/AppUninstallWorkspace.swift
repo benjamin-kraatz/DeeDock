@@ -51,10 +51,16 @@ enum AppUninstallWorkspace {
 
     /// Whether only Finder can move `url`: root owns it, or DOKK can't write to its folder (or, for a folder,
     /// to the folder itself, which moving it to another parent requires).
+    ///
+    /// Never true for a symbolic link. ``AppUninstallFinder`` hands paths to Finder as aliases, and an alias
+    /// resolves the link, so Finder would trash its target, wherever that is. ``recycle(_:)`` moves the link
+    /// itself, or fails when only root may move it.
     nonisolated static func needsFinder(_ url: URL) -> Bool {
         let path = url.path
-        if let owner = (try? FileManager.default.attributesOfItem(atPath: path))?[.ownerAccountID] as? NSNumber,
-           owner.intValue == 0 {
+        // Doesn't follow a symbolic link: these are the link's own attributes.
+        let attributes = try? FileManager.default.attributesOfItem(atPath: path)
+        if attributes?[.type] as? FileAttributeType == .typeSymbolicLink { return false }
+        if let owner = attributes?[.ownerAccountID] as? NSNumber, owner.intValue == 0 {
             return true
         }
         if access(url.deletingLastPathComponent().path, W_OK) != 0 { return true }

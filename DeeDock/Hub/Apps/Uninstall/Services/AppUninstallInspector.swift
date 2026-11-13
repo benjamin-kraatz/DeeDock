@@ -134,8 +134,11 @@ nonisolated enum AppUninstallInspector {
         return identifiers
     }
 
-    /// An uninstaller app in the bundle's Resources, in the folder the app lives in (when that folder is the
-    /// vendor's own), or next to it named after the app.
+    /// An uninstaller app in the bundle's Resources, or next to the app and named after it.
+    ///
+    /// A sibling must carry one of the app's names in whatever folder the app lives in: the sheet's
+    /// "Open Uninstaller" button doesn't show which app it opens, and a folder such as Downloads can hold
+    /// another product's uninstaller.
     private static func vendorUninstaller(for url: URL, names: [String]) -> URL? {
         let isUninstaller = { (candidate: URL) in
             candidate.pathExtension == "app" && candidate.lastPathComponent.localizedCaseInsensitiveContains("uninstall")
@@ -144,12 +147,10 @@ nonisolated enum AppUninstallInspector {
         if let inside = (try? FileManager.default.contentsOfDirectory(at: resources, includingPropertiesForKeys: nil))?.first(where: isUninstaller) {
             return inside
         }
-        let parent = url.deletingLastPathComponent()
-        let shared = ["/Applications", FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications").path]
-        let siblings = (try? FileManager.default.contentsOfDirectory(at: parent, includingPropertiesForKeys: nil)) ?? []
+        let siblings = (try? FileManager.default.contentsOfDirectory(at: url.deletingLastPathComponent(),
+                                                                     includingPropertiesForKeys: nil)) ?? []
         return siblings.first { sibling in
-            isUninstaller(sibling) && (!shared.contains(parent.standardizedFileURL.path)
-                || names.contains { sibling.lastPathComponent.localizedCaseInsensitiveContains($0) })
+            isUninstaller(sibling) && names.contains { sibling.lastPathComponent.localizedCaseInsensitiveContains($0) }
         }
     }
 
