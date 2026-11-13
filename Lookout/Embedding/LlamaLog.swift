@@ -17,6 +17,10 @@ nonisolated final class LlamaLog: @unchecked Sendable {
     private var file: FileHandle?             // nil: stderr
     private var level = GGML_LOG_LEVEL_INFO   // CONT continues the previous message, at its level
 
+    /// A log larger than this when it's opened keeps only its last `keptBytes`.
+    static let maxBytes: UInt64 = 1_024 * 1_024
+    static let keptBytes: UInt64 = 256 * 1_024
+
     func send(to url: URL?) {
         lock.withLock {
             try? file?.close()
@@ -25,8 +29,17 @@ nonisolated final class LlamaLog: @unchecked Sendable {
             if !FileManager.default.fileExists(atPath: url.path) {
                 FileManager.default.createFile(atPath: url.path, contents: nil)
             }
-            file = try? FileHandle(forWritingTo: url)
-            file?.seekToEndOfFile()
+            file = try? FileHandle(forUpdating: url)
+            guard let file, let size = try? file.seekToEnd() else { return }
+            // The services append for as long as Lookout is installed, so the file is bounded each time a service
+            // opens it: the newest lines stay for diagnosis, starting at a whole line.
+            if size > Self.maxBytes {
+                try? file.seek(toOffset: size - Self.keptBytes)
+                var tail = (try? file.readToEnd()) ?? Data()
+                if let newline = tail.firstIndex(of: UInt8(ascii: "\n")) { tail = tail[tail.index(after: newline)...] }
+                try? file.truncate(atOffset: 0)
+                try? file.write(contentsOf: tail)
+            }
         }
     }
 

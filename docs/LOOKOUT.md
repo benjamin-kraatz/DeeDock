@@ -48,7 +48,7 @@ Lookout keeps everything in `~/Library/Application Support/DDock/Lookout/` (`Loo
 | `index.sqlite`, with `-wal` and `-shm` beside it | The index |
 | `Models/` | The two model files, each only after its checksum matched |
 | `Partial/` | Downloads in progress, as `<name>.partial` |
-| `Logs/` | llama.cpp warnings and errors: `index-service.log` and `query-service.log` |
+| `Logs/` | llama.cpp warnings and errors: `index-service.log` and `query-service.log`. A log over 1 MB keeps its last 256 KB when a service opens it |
 
 The crawler never walks `~/Library`, so the index can't index itself.
 
