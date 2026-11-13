@@ -11,11 +11,13 @@ import Testing
     private let monitor = FakeMonitor()
     private let power = FakePowerPolicy()
 
-    private func engine(_ settings: LookoutSettings = .activeForTests, canRun: Bool = true) -> LookoutEngine {
+    private func engine(_ settings: LookoutSettings = .activeForTests, canRun: Bool = true,
+                        syncTiming: LookoutSyncPacer.Timing? = nil) -> LookoutEngine {
         LookoutEngine(settings: settings, repository: nil, connection: connection, encoder: encoder, reader: reader,
                       monitor: monitor, power: power,
                       paths: LookoutPaths(base: URL(fileURLWithPath: "/tmp/lookout-engine-tests", isDirectory: true)),
-                      canRun: canRun, syncDebounce: .milliseconds(30), releaseDelay: .milliseconds(60))
+                      canRun: canRun, syncDebounce: .milliseconds(30), syncTiming: syncTiming,
+                      releaseDelay: .milliseconds(60))
     }
 
     private func status(_ activity: LookoutIndexStatus.Activity, pending: Int = 0, unfinished: Int = 0,
@@ -143,6 +145,55 @@ import Testing
         try? await Task.sleep(for: .milliseconds(80))
         #expect(connection.calls == [.syncNow])
         _ = engine
+    }
+
+    /// A folder that never goes quiet (a build, a sync client) still gets a sync once the maximum wait is up.
+    @Test func continuousChangesSyncAfterTheMaximumWait() async {
+        let engine = engine(syncTiming: LookoutSyncPacer.Timing(
+            quiet: .seconds(60), maxWait: .milliseconds(50), minGap: .zero, maxGap: .zero,
+            burstWindow: .seconds(60), resetAfter: .seconds(300)))
+        engine.start()
+        connection.clearCalls()
+        let churn = Task { @MainActor in
+            while !Task.isCancelled {
+                monitor.emit(.foldersChanged)
+                try? await Task.sleep(for: .milliseconds(5))
+            }
+        }
+        #expect(await eventually(timeout: .seconds(10)) { connection.calls.contains(.syncNow) })
+        churn.cancel()
+        _ = engine
+    }
+
+    /// Outside the Files tab, a sync right after another waits out the minimum gap; opening the tab runs it at once.
+    @Test func backToBackSyncsWaitForTheGapUnlessTheFilesTabIsOpen() async {
+        let engine = engine(syncTiming: LookoutSyncPacer.Timing(
+            quiet: .milliseconds(10), maxWait: .seconds(60), minGap: .seconds(30), maxGap: .seconds(60),
+            burstWindow: .seconds(60), resetAfter: .seconds(300)))
+        engine.start()
+        connection.clearCalls()
+        monitor.emit(.foldersChanged)
+        #expect(await eventually(timeout: .seconds(10)) { connection.calls == [.syncNow] })
+        monitor.emit(.foldersChanged)
+        try? await Task.sleep(for: .milliseconds(150))
+        #expect(connection.calls == [.syncNow])   // held back: 30 s since the last sync haven't passed
+        engine.hubFilesDidAppear()
+        #expect(await eventually(timeout: .seconds(10)) { connection.calls.filter { $0 == .syncNow }.count == 2 })
+        // While the tab is open, changes sync after their quiet period alone.
+        monitor.emit(.foldersChanged)
+        #expect(await eventually(timeout: .seconds(10)) { connection.calls.filter { $0 == .syncNow }.count == 3 })
+        engine.hubDidClose()
+        _ = engine
+    }
+
+    @Test func stoppingCancelsAPendingFolderSync() async {
+        let engine = engine()
+        engine.start()
+        connection.clearCalls()
+        monitor.emit(.foldersChanged)
+        engine.stop()
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(!connection.calls.contains(.syncNow))
     }
 
     @Test func drivesWakeAndTheModelSyncAtOnce() {

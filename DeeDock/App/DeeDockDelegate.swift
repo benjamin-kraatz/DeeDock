@@ -110,6 +110,8 @@ final class DeeDockDelegate: NSObject, NSApplicationDelegate {
         // After the collector, whose stop recorded any open question as interrupted through `willPause`.
         appHealthLabelling.stop()
         coordinator.stop()
+        // After the coordinator, whose catalog stop recorded the suggestion session's end.
+        coordinator.launcherSuggestions.flushBeforeExit()
         lineIconCoverage.stop()
         Analytics.shared.stop()
     }

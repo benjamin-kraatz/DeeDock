@@ -22,7 +22,7 @@ import os
         stop()
     }
 
-    func start(roots: [String], onEvent: @escaping (LookoutMonitorEvent) -> Void) {
+    func start(roots: [String], options: IndexOptions, onEvent: @escaping (LookoutMonitorEvent) -> Void) {
         stop()
         self.onEvent = onEvent
         let center = NSWorkspace.shared.notificationCenter
@@ -33,17 +33,18 @@ import os
                 MainActor.assumeIsolated { self?.onEvent?(event) }
             })
         }
-        watch(roots: roots)
+        watch(roots: roots, options: options)
     }
 
-    func watch(roots: [String]) {
+    func watch(roots: [String], options: IndexOptions) {
         watcher = nil
         guard onEvent != nil else { return }
         let present = roots.filter { root in
             var isFolder: ObjCBool = false
             return FileManager.default.fileExists(atPath: root, isDirectory: &isFolder) && isFolder.boolValue
         }
-        watcher = LookoutFolderWatcher(paths: present, latency: Self.latency, queue: watchQueue) { [weak self] _ in
+        watcher = LookoutFolderWatcher(paths: present, latency: Self.latency, queue: watchQueue,
+                                       scope: Rules.ChangeScope(roots: roots, options: options)) { [weak self] _ in
             DispatchQueue.main.async { MainActor.assumeIsolated { self?.onEvent?(.foldersChanged) } }
         }
         if watcher == nil, !present.isEmpty { LookoutLog.logger.error("Can't watch the Lookout folders") }

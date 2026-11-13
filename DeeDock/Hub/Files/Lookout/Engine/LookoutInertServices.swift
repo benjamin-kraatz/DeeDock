@@ -38,8 +38,8 @@ nonisolated struct LookoutInertIndexReader: LookoutIndexSearching {
 }
 
 @MainActor final class LookoutInertMonitor: LookoutMonitoring {
-    func start(roots: [String], onEvent: @escaping (LookoutMonitorEvent) -> Void) {}
-    func watch(roots: [String]) {}
+    func start(roots: [String], options: IndexOptions, onEvent: @escaping (LookoutMonitorEvent) -> Void) {}
+    func watch(roots: [String], options: IndexOptions) {}
     func stop() {}
 }
 

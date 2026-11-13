@@ -16,7 +16,7 @@ nonisolated struct LauncherSuggestionCoreMLResult: Sendable {
 }
 
 /// On-device nearest-neighbor alternative. Personalized models live only in this actor;
-/// every changed training snapshot rebuilds from the empty bundled seed to forget removals.
+/// every changed training key rebuilds from the empty bundled seed to forget removals.
 actor LauncherSuggestionCoreML {
     nonisolated static let version = "coreml-knn-v1"
 
@@ -28,16 +28,20 @@ actor LauncherSuggestionCoreML {
         case superseded
     }
 
-    private struct TrainingSnapshot: Encodable {
-        let examples: [LauncherSuggestionExample]
+    /// Identity of one training input. An example's `id` is assigned once, when the recorder
+    /// creates it, and its context, target and date are immutable, so the ordered IDs identify
+    /// the content without encoding up to 10,000 examples on every prediction. Removal, expiry,
+    /// exclusion and the repository's size halving all change the ID list, so they still rebuild.
+    private struct TrainingKey: Equatable {
+        let exampleIDs: [UUID]
         let numberOfNeighbors: Int
     }
 
     private let seedURL: URL?
     private var model: MLModel?
-    private var trainingSnapshot: Data?
+    private var trainingKey: TrainingKey?
     private var generation = UUID()
-    private var training: (snapshot: Data, generation: UUID, task: Task<Void, Error>)?
+    private var training: (key: TrainingKey, generation: UUID, task: Task<Void, Error>)?
 
     /// Removes crash leftovers without touching another live process's training directory.
     /// Call during store startup/reset; each rebuild also runs this before creating files.
@@ -65,7 +69,7 @@ actor LauncherSuggestionCoreML {
         generation = UUID()
         training?.task.cancel()
         training = nil
-        trainingSnapshot = nil
+        trainingKey = nil
         model = nil
         _ = await pending?.result
     }
@@ -92,13 +96,11 @@ actor LauncherSuggestionCoreML {
             return .init(scores: [:], preparationMilliseconds: Self.milliseconds(since: preparationStart),
                          inferenceMilliseconds: 0, cacheReused: false, effectiveNeighbors: nil)
         }
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
         let neighbors = min(100, max(1, numberOfNeighbors))
-        let snapshot = try encoder.encode(TrainingSnapshot(examples: retained, numberOfNeighbors: neighbors))
-        let cacheReused = trainingSnapshot == snapshot && model != nil
+        let key = TrainingKey(exampleIDs: retained.map(\.id), numberOfNeighbors: neighbors)
+        let cacheReused = trainingKey == key && model != nil
         if !cacheReused {
-            if training?.snapshot != snapshot {
+            if training?.key != key {
                 training?.task.cancel()
                 let request = UUID()
                 generation = request
@@ -109,9 +111,9 @@ actor LauncherSuggestionCoreML {
                     try Task.checkCancellation()
                     guard self.generation == request else { throw Failure.superseded }
                     self.model = rebuilt
-                    self.trainingSnapshot = snapshot
+                    self.trainingKey = key
                 }
-                training = (snapshot, request, task)
+                training = (key, request, task)
             }
             guard let active = training else { throw Failure.superseded }
             do {

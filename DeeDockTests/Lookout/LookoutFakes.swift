@@ -124,12 +124,19 @@ actor FakeIndexReader: LookoutIndexSearching {
     private(set) var stopped = 0
     private var onEvent: ((LookoutMonitorEvent) -> Void)?
 
-    func start(roots: [String], onEvent: @escaping (LookoutMonitorEvent) -> Void) {
+    /// The options of the latest `start` or `watch`.
+    private(set) var options: IndexOptions?
+
+    func start(roots: [String], options: IndexOptions, onEvent: @escaping (LookoutMonitorEvent) -> Void) {
         startedRoots = roots
+        self.options = options
         self.onEvent = onEvent
     }
 
-    func watch(roots: [String]) { watched.append(roots) }
+    func watch(roots: [String], options: IndexOptions) {
+        watched.append(roots)
+        self.options = options
+    }
 
     func stop() {
         stopped += 1

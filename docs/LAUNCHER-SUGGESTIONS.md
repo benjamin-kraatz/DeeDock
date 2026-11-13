@@ -186,6 +186,11 @@ The atomic history file is limited to 16 MiB. When it exceeds that limit, the ne
 These limits can shorten the retained history on busy installations. Exclusions and consent are separate preferences and do not expire.
 
 History lives in `~/Library/Application Support/DDock/LauncherSuggestions/history-v1.json`, with private filesystem permissions and exclusion from system backup.
+Each write encodes and replaces the whole file, so ordinary changes (activations, launches, terminations, session boundaries,
+impressions, feedback) are coalesced: the file is written 30 seconds after the latest change, or 5 minutes after the first
+unsaved change while changes keep arriving. Reset, excluding an app, and the cleanup at startup write at once, so removed records
+do not stay on disk. Pending changes are also written before system sleep and, with a wait of up to two seconds, when DOKK quits.
+A crash or forced quit can lose up to five minutes of recorded activity; it never leaves a partial file.
 Unreadable or unsupported storage stops the feature and leaves normal Launcher use available. Reset is the explicit recovery action.
 No detailed behavioral history is added to general logs or exported diagnostics.
 
