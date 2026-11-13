@@ -1,4 +1,5 @@
 import AppKit
+import Observation
 import SwiftUI
 
 /// Owns the update island: one nonactivating panel under the menu bar of the main display.
@@ -20,8 +21,17 @@ final class UpdateIslandController {
     var targetScreen: () -> NSScreen? = { NSScreen.main }
     var openUpdate: () -> Void = {}
     var openWhatsNew: () -> Void = {}
+    /// The 1 Hz callout check. Armed only while a callout is due or one is up, see `needsTicks`.
     private var timer: Timer?
+    /// One-shot at the moment a staged offer's callout becomes due, which nothing else announces.
+    private var deadlineTimer: Timer?
+    private var deadlineTimerDate: Date?
+    /// True between `start()` and `stop()`.
+    private var started = false
+    /// Bumped by `stop()`, so a registration left over from a previous start cannot fork a second chain.
+    private var trackingGeneration = 0
     private var observers: [NSObjectProtocol] = []
+    private var workspaceObservers: [NSObjectProtocol] = []
     private var panel: UpdateIslandPanel?
     /// State of the open island. Nil exactly when `panel` is nil.
     private var model: UpdateIslandModel?
@@ -48,27 +58,42 @@ final class UpdateIslandController {
 
     /// Starts watching awareness state for callouts. The panel works without it.
     func start() {
-        guard timer == nil else { return }
+        guard !started else { return }
+        started = true
         observers.append(NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.screensChanged() }
         })
-        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refresh() }
-        }
-        timer.tolerance = 0.25
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
+        // A run-loop timer's fire date does not count time asleep, and a clock change moves the
+        // deadline relative to it, so both reschedule the patience deadline from scratch.
+        observers.append(NotificationCenter.default.addObserver(
+            forName: .NSSystemClockDidChange, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.rescheduleDeadline() }
+        })
+        workspaceObservers.append(NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.rescheduleDeadline() }
+        })
+        trackAwareness()
         refresh()
     }
 
     /// Releases the hosting hierarchy without invoking a user response.
     func stop() {
+        started = false
+        trackingGeneration += 1
         timer?.invalidate()
         timer = nil
+        deadlineTimer?.invalidate()
+        deadlineTimer = nil
+        deadlineTimerDate = nil
         observers.forEach { NotificationCenter.default.removeObserver($0) }
         observers.removeAll()
+        workspaceObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
+        workspaceObservers.removeAll()
         closePanel()
         finishDeparture()
         isBlocked = { false }
@@ -101,7 +126,101 @@ final class UpdateIslandController {
         dismissPanel()
     }
 
+    /// Whether the 1 Hz check has work: a callout is due (it may be blocked by dock activity,
+    /// which has no notification), or a callout is up and may need closing.
+    private var needsTicks: Bool {
+        guard started else { return false }
+        if let model, model.content != .panel { return true }
+        return announcement != nil
+    }
+
+    /// When a staged offer's callout becomes due by time alone, or nil when that is not pending.
+    /// Every other input to `announcement` is observed.
+    private var calloutDeadline: Date? {
+        guard awareness.showsIndicators, awareness.offerVersion != nil, !awareness.windowIsOpen,
+              awareness.installWhenIdle, let stagedSince = awareness.stagedSince else { return nil }
+        let deadline = stagedSince.addingTimeInterval(UpdateAwarenessStore.calloutPatience)
+        return deadline > .now ? deadline : nil
+    }
+
+    /// Re-arms the timers whenever awareness state behind `announcement` changes. Observation
+    /// fires once, so each change registers the next one; the chain ends with `stop()`.
+    private func trackAwareness() {
+        guard started else { return }
+        let generation = trackingGeneration
+        withObservationTracking {
+            _ = announcement
+            _ = calloutDeadline
+            // `announcement` can skip this read; a closing Update window must still re-check.
+            _ = awareness.windowIsOpen
+        } onChange: { [weak self] in
+            guard let self else { return }
+            // `onChange` runs before the new value is stored; read it on the next main-actor turn.
+            // A new callout still waits for the next tick, as it did when the tick ran all the
+            // time. A cleared announcement is applied now, because the timer may stop with it:
+            // that pass forgets the reported callout and closes a callout still up. A departing
+            // island is already detached, so its animation is not cut short.
+            Task { @MainActor in
+                guard self.started, self.trackingGeneration == generation else { return }
+                if self.announcement == nil { self.refresh() } else { self.updateTimers() }
+                self.trackAwareness()
+            }
+        }
+        updateTimers()
+    }
+
+    /// Matches the 1 Hz timer to `needsTicks` and the one-shot to `calloutDeadline`.
+    private func updateTimers() {
+        if needsTicks {
+            if timer == nil {
+                let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.refresh() }
+                }
+                timer.tolerance = 0.25
+                RunLoop.main.add(timer, forMode: .common)
+                self.timer = timer
+            }
+        } else {
+            timer?.invalidate()
+            timer = nil
+        }
+        let deadline = started && announcement == nil ? calloutDeadline : nil
+        guard deadline != deadlineTimerDate else { return }
+        deadlineTimer?.invalidate()
+        deadlineTimer = nil
+        deadlineTimerDate = deadline
+        guard let deadline else { return }
+        // The patience check is `>=`, and a timer never fires early, so the tick at the deadline
+        // finds the callout due and arms the 1 Hz check from there.
+        let timer = Timer(fire: deadline, interval: 0, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.deadlineTimer = nil
+                self.deadlineTimerDate = nil
+                self.refresh()
+            }
+        }
+        timer.tolerance = 0.25
+        RunLoop.main.add(timer, forMode: .common)
+        deadlineTimer = timer
+    }
+
+    /// Drops the pending one-shot and checks again, which reschedules it against the current clock.
+    private func rescheduleDeadline() {
+        guard started else { return }
+        deadlineTimer?.invalidate()
+        deadlineTimer = nil
+        deadlineTimerDate = nil
+        refresh()
+    }
+
     private func refresh() {
+        refreshCallout()
+        // Showing or closing a callout changes `needsTicks` without an awareness change.
+        updateTimers()
+    }
+
+    private func refreshCallout() {
         if model?.content == .panel { return }
         guard let announcement else {
             reportedCallout = nil
