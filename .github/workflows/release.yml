@@ -323,7 +323,8 @@ jobs:
           cloned="$RUNNER_TEMP/SourcePackages"
           mkdir -p "$cloned"
           xcodebuild -project "$XCODE_PROJECT" -resolvePackageDependencies \
-            -clonedSourcePackagesDirPath "$cloned"
+            -clonedSourcePackagesDirPath "$cloned" \
+            -onlyUsePackageVersionsFromResolvedFile
           tool="$(find "$cloned" -type f -name generate_appcast -perm -111 | head -n 1 || true)"
           if [ -z "$tool" ]; then
             echo "generate_appcast was not in the resolved Sparkle artifact."
@@ -400,6 +401,7 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath "$archive" \
             -clonedSourcePackagesDirPath "$CLONED_SOURCE_PACKAGES" \
+            -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath "$derived" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
