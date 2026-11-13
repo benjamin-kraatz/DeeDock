@@ -12,6 +12,12 @@ struct DockUpdateButton: View {
     @AccessibilityFocusState private var focused: Bool
     @State private var arrived = false
 
+    /// A dock nobody can see, or one that has already faded out, schedules no frames. The tile can
+    /// sit in every dock for days, so it follows the same gate as Stardust and the Hub halo.
+    private var live: Bool {
+        !reduceMotion && interaction.exposesContent && interaction.idleFade.fraction == 0
+    }
+
     var body: some View {
         Button { interaction.openUpdate?(item) } label: {
             DockIconPresentation(
@@ -21,7 +27,7 @@ struct DockUpdateButton: View {
                     idleFraction: interaction.idleFade.fraction, reduceTransparency: reduceTransparency).icons,
                 artworkAnimation: interaction.idleFade.animation
             ) {
-                UpdateTileArtwork(state: item.state, side: size * 0.85, animated: !reduceMotion)
+                UpdateTileArtwork(state: item.state, side: size * 0.85, animated: !reduceMotion, playing: live)
                     // The tile grows out of the dock when an update turns up.
                     .scaleEffect(arrived || reduceMotion ? 1 : 0.2)
                     .opacity(arrived || reduceMotion ? 1 : 0)
@@ -50,20 +56,41 @@ struct DockUpdateButton: View {
 struct UpdateTileArtwork: View {
     let state: UpdateDockItem.State
     let side: CGFloat
+    /// False draws the static tile (Reduce Motion).
     let animated: Bool
+    /// Whether frames are scheduled right now. The owner folds in dock visibility and idle fade.
+    /// Pausing holds the frame drawn last, so an animated tile never jumps to its rest pose.
+    var playing = true
 
     /// Elapsed time wraps to this period. Every rate below is a whole number of cycles in it.
     private static let period: Double = 24
 
+    /// The turn shown when playback last stopped; playback resumes from it.
+    @State private var heldTurn: Double = 0
+    /// When the current playback started.
+    @State private var startedAt = Date()
+
     var body: some View {
         if animated {
-            TimelineView(.animation(minimumInterval: 1 / 30, paused: false)) { context in
-                tile(turn: context.date.timeIntervalSinceReferenceDate
-                    .truncatingRemainder(dividingBy: Self.period) / Self.period)
+            TimelineView(.animation(minimumInterval: 1 / 30, paused: !playing)) { context in
+                tile(turn: playing ? turn(at: context.date) : heldTurn)
+            }
+            .onChange(of: playing) { _, plays in
+                if plays {
+                    startedAt = .now
+                } else {
+                    heldTurn = turn(at: .now)
+                }
             }
         } else {
             tile(turn: 0.1)
         }
+    }
+
+    /// Wrapped turn in 0..<1. Every rate is whole cycles per period, so the wrap is seamless.
+    private func turn(at date: Date) -> Double {
+        let turns = heldTurn + date.timeIntervalSince(startedAt) / Self.period
+        return turns - turns.rounded(.down)
     }
 
     private func tile(turn: Double) -> some View {
@@ -136,6 +163,7 @@ enum UpdateAwarenessTint {
         UpdateTileArtwork(state: .ready, side: 64, animated: true)
         UpdateTileArtwork(state: .installed, side: 64, animated: true)
         UpdateTileArtwork(state: .ready, side: 64, animated: false)
+        UpdateTileArtwork(state: .ready, side: 64, animated: true, playing: false)
     }
     .padding(40)
     .background(.black.opacity(0.7))

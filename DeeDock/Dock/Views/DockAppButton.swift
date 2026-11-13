@@ -76,7 +76,8 @@ struct DockAppButton: View {
                     }
                     if AppDockPresence.representsCurrentApplication(item.reference),
                        let awareness = interaction?.updateAwareness, awareness.showsDockPip {
-                        UpdateAwarenessPip(reduceMotion: reduceMotion, installed: !awareness.showsIndicators)
+                        UpdateAwarenessPip(reduceMotion: reduceMotion, installed: !awareness.showsIndicators,
+                                           paused: interaction.map { !$0.exposesContent || $0.idleFade.fraction > 0 } ?? false)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                             .padding(2)
                             .allowsHitTesting(false)
