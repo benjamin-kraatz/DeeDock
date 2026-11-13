@@ -211,6 +211,104 @@ struct DiscoveryEngineTests {
         #expect(second.queue == ["notificationFeed", "islands", "harbor"])
     }
 
+    /// Asks `isDue` and then `advance(canPresent: true)` at the same instant and requires them to
+    /// agree. The controller skips its native gates whenever `isDue` is false, so a disagreement
+    /// would either hide a due tip or waste a window-server query.
+    private func dueAndAdvance(_ engine: DiscoveryEngine, at now: Date) -> DiscoveryProposal? {
+        let due = engine.isDue(at: now)
+        let shown = engine.advance(at: now, canPresent: true)
+        #expect(due == (shown != nil))
+        return shown
+    }
+
+    @Test("isDue agrees with advance at every gate")
+    func isDueMatchesAdvance() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let calm = proposal(id: "calm", threshold: 1, calmInterval: 5)
+        let second = proposal(id: "second", threshold: 1)
+        let third = proposal(id: "third", threshold: 1)
+        let fourth = proposal(id: "fourth", threshold: 1)
+        let catalog = [calm, second, third, fourth]
+        let start = try sameDay(hour: 9)
+
+        // Empty queue.
+        let engine = DiscoveryEngine(defaults: defaults, catalog: catalog)
+        #expect(dueAndAdvance(engine, at: start) == nil)
+
+        // Calm interval not yet elapsed for the head; the others are due.
+        engine.record(.launched, at: start)
+        #expect(engine.queue == ["calm", "second", "third", "fourth"])
+        #expect(dueAndAdvance(engine, at: start)?.id == "second")
+
+        // A visible tip blocks everything.
+        #expect(dueAndAdvance(engine, at: start.addingTimeInterval(DiscoveryEngine.spacing)) == nil)
+        engine.finish(forever: false, at: start)
+
+        // The spacing slot: one second early, then exactly on time.
+        #expect(dueAndAdvance(engine, at: start.addingTimeInterval(DiscoveryEngine.spacing - 1)) == nil)
+        let slot = start.addingTimeInterval(DiscoveryEngine.spacing)
+        #expect(dueAndAdvance(engine, at: slot)?.id == "calm")
+        engine.finish(forever: false, at: slot)
+
+        // Session cap: two shown, so `third` waits although its slot has come.
+        #expect(engine.queue == ["third", "fourth"])
+        #expect(dueAndAdvance(engine, at: slot.addingTimeInterval(DiscoveryEngine.spacing)) == nil)
+
+        // Daily cap: a relaunch shows one more today, then nothing until tomorrow.
+        let relaunch = slot.addingTimeInterval(600)
+        let next = DiscoveryEngine(defaults: defaults, catalog: catalog)
+        next.record(.launched, at: relaunch)
+        // `calm` and `second` are still snoozed, so `third` shows.
+        #expect(dueAndAdvance(next, at: relaunch.addingTimeInterval(5))?.id == "third")
+        next.finish(forever: false, at: relaunch.addingTimeInterval(5))
+        // `fourth` is eligible and its slot has come; only the daily cap holds it.
+        let laterToday = relaunch.addingTimeInterval(DiscoveryEngine.spacing + 5)
+        #expect(next.queue.contains("fourth"))
+        #expect(dueAndAdvance(next, at: laterToday) == nil)
+
+        // A new day resets the daily count without `isDue` writing it back.
+        let tomorrow = laterToday.addingTimeInterval(24 * 3600)
+        #expect(next.isDue(at: tomorrow))
+        #expect(next.isDue(at: tomorrow))
+        #expect(dueAndAdvance(next, at: tomorrow) != nil)
+    }
+
+    @Test("isDue agrees with advance for snoozed, used, and disabled tips")
+    func isDueMatchesAdvanceWhenSuppressed() throws {
+        let (defaults, suite) = try isolatedDefaults()
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let only = proposal(id: "only", threshold: 1, snoozeInterval: 300)
+        let start = try sameDay(hour: 10)
+
+        // Snoozed: queued again on a relaunch but not due until the snooze ends.
+        let engine = DiscoveryEngine(defaults: defaults, catalog: [only])
+        engine.record(.launched, at: start)
+        #expect(dueAndAdvance(engine, at: start)?.id == "only")
+        engine.finish(forever: false, at: start)
+        let relaunched = DiscoveryEngine(defaults: defaults, catalog: [only])
+        relaunched.record(.launched, at: start.addingTimeInterval(100))
+        #expect(relaunched.queue == ["only"])
+        #expect(dueAndAdvance(relaunched, at: start.addingTimeInterval(299)) == nil)
+        #expect(dueAndAdvance(relaunched, at: start.addingTimeInterval(300))?.id == "only")
+
+        // Used: nothing left to show.
+        let (usedDefaults, usedSuite) = try isolatedDefaults()
+        defer { usedDefaults.removePersistentDomain(forName: usedSuite) }
+        let used = DiscoveryEngine(defaults: usedDefaults, catalog: [only])
+        used.record(.launched, at: start)
+        used.markUsed(only.destination)
+        #expect(dueAndAdvance(used, at: start) == nil)
+
+        // Disabled, after a tip was queued.
+        let (offDefaults, offSuite) = try isolatedDefaults()
+        defer { offDefaults.removePersistentDomain(forName: offSuite) }
+        let off = DiscoveryEngine(defaults: offDefaults, catalog: [only])
+        off.record(.launched, at: start)
+        off.setEnabled(false)
+        #expect(dueAndAdvance(off, at: start) == nil)
+    }
+
     /// A fixed local time, so a test's minutes of presentations stay on one calendar day.
     private func sameDay(hour: Int) throws -> Date {
         try #require(Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 3, hour: hour)))
