@@ -80,6 +80,13 @@ nonisolated struct VaporDropPolicy: Sendable {
     /// Standard folders directly inside the home folder. Their subfolders are allowed.
     static let standardHomeFolders = ["Desktop", "Documents", "Downloads", "Library", "Applications", "Movies",
                                       "Music", "Pictures", "Public"]
+    /// Items directly in the home folder that hold credentials or shell setup, such as `~/.ssh` and
+    /// `~/.gnupg`. Shared with the uninstaller's list so the two can't drift; `~/.cache` is left
+    /// out because it is a cache folder Vapor should take.
+    static let protectedHomeItems = AppUninstallPathPolicy.protectedHomeItems.subtracting([".cache"])
+    /// Folders in `~/Library` protected with everything inside them. Keychains hold credentials;
+    /// in the other two a rename out of the folder syncs as a deletion to every device.
+    static let protectedLibraryTrees = ["Keychains", "Mobile Documents", "CloudStorage"]
 
     let home: URL
     var systemRoots: [String] = VaporDropPolicy.systemRoots
@@ -147,6 +154,21 @@ nonisolated struct VaporDropPolicy: Sendable {
         if Self.same(url.deletingLastPathComponent(), homeURL),
            Self.standardHomeFolders.contains(where: { $0.caseInsensitiveCompare(url.lastPathComponent) == .orderedSame }) {
             return .standardFolder(name: name)
+        }
+        // Credential and shell folders in the home folder. Deletion skips the Trash, so these
+        // are refused even though the user asked.
+        if Self.same(url.deletingLastPathComponent(), homeURL),
+           Self.protectedHomeItems.contains(where: { $0.caseInsensitiveCompare(url.lastPathComponent) == .orderedSame }) {
+            return .standardFolder(name: name)
+        }
+        // Every folder directly in `~/Library` (Keychains, Mail, Application Support as a whole…)
+        // holds data that apps and macOS expect to find. Deeper caches such as
+        // `~/Library/Caches/<app>` stay allowed: they are what Vapor is for.
+        let library = homeURL.appendingPathComponent("Library", isDirectory: true)
+        if Self.same(url.deletingLastPathComponent(), library) { return .standardFolder(name: name) }
+        for tree in Self.protectedLibraryTrees
+        where url.isSameOrDescendant(of: library.appendingPathComponent(tree, isDirectory: true), resolvingSymlinks: false) {
+            return .systemLocation(name: name)
         }
         if Self.exactRoots.contains(where: { Self.same(url, URL(fileURLWithPath: $0)) }) {
             return .systemLocation(name: name)

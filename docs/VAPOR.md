@@ -53,7 +53,9 @@ Protected locations:
 - the home folder: "DOKK won’t delete your home folder."
 - the standard home folders (Desktop, Documents, Downloads, Library, Applications, Movies, Music, Pictures, Public): "*name* is a standard macOS folder. DOKK won’t delete it."
 - `/System`, `/Library`, `/Applications`, `/usr`, `/bin`, `/sbin`, `/private`, `/etc`, `/var`, `/opt`, `/cores` and anything inside them
-- `~/Library` itself (its subfolders such as `~/Library/Caches/...` are allowed)
+- `~/Library` itself and every folder directly inside it, such as `~/Library/Caches`, `~/Library/Mail` or `~/Library/Application Support`: "*name* is a standard macOS folder. DOKK won’t delete it." Deeper folders such as `~/Library/Caches/<app>` or `~/Library/Developer/Xcode/DerivedData` are allowed.
+- `~/Library/Keychains`, `~/Library/Mobile Documents` and `~/Library/CloudStorage`, with everything inside them: credentials, and cloud folders where a rename out of the folder syncs as a deletion to every device
+- credential and shell items directly in the home folder, the same list the uninstaller protects except `~/.cache`: `.Trash`, `.ssh`, `.gnupg`, `.config`, `.local` and the shell profile files
 - any bundle (`.app`, `.framework` and so on): Vapor takes folders, not packages
 
 ### Recognized folders
