@@ -9,8 +9,9 @@ import os
 /// the Hub is open, so new files get indexed. It does nothing until Lookout is set up and turned on, and never under
 /// the test host or in previews (`live()` returns an inert engine there).
 ///
-/// The index service exits by itself when idle. The engine wakes it on demand: FSEvents changes (debounced
-/// `syncDebounce`), a drive mounted or ejected, wake from sleep, a settings change, the model arriving, the backfill
+/// The index service exits by itself when idle. The engine wakes it on demand: FSEvents changes (paced by
+/// `LookoutSyncPacer`: `syncDebounce` of quiet, at most 30 s, and spaced out while syncs keep following each other
+/// outside the Files tab), a drive mounted or ejected, wake from sleep, a settings change, the model arriving, the backfill
 /// becoming allowed, and `resume()`. The connection replays the configuration and pause state to a relaunched
 /// service (`LookoutIndexControlling`).
 ///
@@ -63,8 +64,10 @@ final class LookoutEngine {
     /// Where the index and the models live.
     @ObservationIgnored let paths: LookoutPaths
     @ObservationIgnored private let canRun: Bool
-    @ObservationIgnored private let syncDebounce: Duration
+    @ObservationIgnored private var syncPacer: LookoutSyncPacer
     @ObservationIgnored private let releaseDelay: Duration
+    /// Between `hubFilesDidAppear` and `hubDidClose`: folder-change syncs skip the pacer's minimum gap.
+    @ObservationIgnored private var filesVisible = false
 
     @ObservationIgnored private var userPaused = false
     @ObservationIgnored private var serviceUnavailable = false
@@ -84,7 +87,9 @@ final class LookoutEngine {
     ///   - settings: The settings to start with (usually `repository.loadOrDefault()`).
     ///   - repository: Where `apply` saves settings; nil never saves.
     ///   - canRun: False for an engine that must never start (previews, tests of the UI).
-    ///   - syncDebounce: The FSEvents debounce; tests shorten it.
+    ///   - syncDebounce: The FSEvents quiet period; tests shorten it.
+    ///   - syncTiming: The rest of the folder-change pacing (`LookoutSyncPacer`); nil is the standard pacing with
+    ///     `syncDebounce` as its quiet period. Tests shorten it.
     ///   - releaseDelay: The vector release delay; tests shorten it.
     ///   - progressInterval: The progress throttle; tests shorten it.
     ///   - now: The clock the progress's pace is measured with; tests pass their own.
@@ -92,6 +97,7 @@ final class LookoutEngine {
          encoder: any LookoutQueryEncoding, reader: any LookoutIndexSearching, monitor: any LookoutMonitoring,
          power: any LookoutPowerPolicing, paths: LookoutPaths, canRun: Bool,
          syncDebounce: Duration = LookoutEngine.syncDebounce,
+         syncTiming: LookoutSyncPacer.Timing? = nil,
          releaseDelay: Duration = LookoutEngine.vectorReleaseDelay,
          progressInterval: Duration = LookoutEngine.progressInterval,
          now: @escaping () -> Date = Date.init) {
@@ -104,7 +110,7 @@ final class LookoutEngine {
         self.power = power
         self.paths = paths
         self.canRun = canRun
-        self.syncDebounce = syncDebounce
+        syncPacer = LookoutSyncPacer(timing: syncTiming ?? .standard(quiet: syncDebounce))
         self.releaseDelay = releaseDelay
         self.progressInterval = progressInterval
         self.now = now
@@ -165,6 +171,7 @@ final class LookoutEngine {
     func stop() {
         syncTask?.cancel()
         syncTask = nil
+        syncPacer.reset()
         releaseTask?.cancel()
         releaseTask = nil
         warmTask?.cancel()
@@ -238,7 +245,10 @@ final class LookoutEngine {
     func hubFilesDidAppear() {
         releaseTask?.cancel()
         releaseTask = nil
+        filesVisible = true
         guard isRunning else { return }
+        // A sync held back by the minimum gap runs now, once its quiet period is over.
+        if syncPacer.isPending { scheduleFolderSync() }
         startWarmUp()
         let reader = reader
         Task { await reader.prepareVectors() }
@@ -279,6 +289,7 @@ final class LookoutEngine {
     func hubDidClose() {
         releaseTask?.cancel()
         releaseTask = nil
+        filesVisible = false
         guard isRunning else { return }
         let reader = reader
         let delay = releaseDelay
@@ -385,19 +396,28 @@ final class LookoutEngine {
     private func monitorEvent(_ event: LookoutMonitorEvent) {
         switch event {
         case .foldersChanged:
-            syncTask?.cancel()
-            let delay = syncDebounce
-            syncTask = Task { [weak self] in
-                try? await Task.sleep(for: delay)
-                guard !Task.isCancelled, let self else { return }
-                syncTask = nil
-                connection.syncNow()
-            }
+            syncPacer.changed(at: .now)
+            scheduleFolderSync()
         case .volumesChanged:
             let configuration = configuration()
             monitor.watch(roots: configuration.roots, options: configuration.options)
             connection.syncNow()
         case .didWake:
+            connection.syncNow()
+        }
+    }
+
+    /// (Re)schedules the one sync that covers the pending folder changes, at the pacer's deadline. Replacing the task
+    /// moves the deadline; the changes stay pending in the pacer until the sync starts, so none is lost.
+    private func scheduleFolderSync() {
+        syncTask?.cancel()
+        syncTask = nil
+        guard let due = syncPacer.deadline(filesVisible: filesVisible) else { return }
+        syncTask = Task { [weak self] in
+            try? await Task.sleep(until: due, clock: .continuous)
+            guard !Task.isCancelled, let self else { return }
+            syncTask = nil
+            syncPacer.synced(at: .now)
             connection.syncNow()
         }
     }
