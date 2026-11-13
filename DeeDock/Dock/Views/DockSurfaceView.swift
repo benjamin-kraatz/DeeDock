@@ -183,19 +183,12 @@ struct DockSurfaceView: View {
                     )
                 }
             }
-            // Canvas space, same as tooltips, so a scrolled pin still owns its burst.
-            DockSoapBubbleOverlay(
-                bursts: interaction.soapBubbles.bursts,
-                frames: interaction.renderedFrames,
-                enabled: interaction.soapBubbles.isEnabled
-            )
-            DockTooltipsOverlay(
+            DockCanvasOverlays(
                 slots: slots,
-                frames: interaction.renderedFrames,
                 hovered: hoveredID,
                 selected: keyboardFocus ? selectedTarget : nil,
                 // The open menu already names its tile.
-                enabled: showsLabel && menuTarget == nil,
+                tooltipsEnabled: showsLabel && menuTarget == nil,
                 layout: layout,
                 viewport: viewport,
                 interaction: interaction,
@@ -217,6 +210,46 @@ struct DockSurfaceView: View {
             reduceMotion
                 ? nil : .interpolatingSpring(stiffness: 300, damping: 30),
             value: sizes
+        )
+    }
+}
+
+/// Soap bubbles and tooltips, which follow the rendered tile frames.
+///
+/// Magnification moves tile frames, and `DockInteraction` republishes `renderedFrames` a turn
+/// after layout. Reading them here, rather than in ``DockSurfaceView``'s body, keeps that second
+/// publication from re-running the whole surface on every pointer move.
+private struct DockCanvasOverlays: View {
+    let slots: [DockRenderSlot]
+    let hovered: DockEntryID?
+    let selected: DockEntryID?
+    let tooltipsEnabled: Bool
+    let layout: DockGeometry.Layout
+    /// Visible viewport in canvas coordinates.
+    let viewport: CGRect
+    let interaction: DockInteraction
+    let reduceMotion: Bool
+    let reduceTransparency: Bool
+
+    var body: some View {
+        let frames = interaction.renderedFrames
+        // Canvas space, same as tooltips, so a scrolled pin still owns its burst.
+        DockSoapBubbleOverlay(
+            bursts: interaction.soapBubbles.bursts,
+            frames: frames,
+            enabled: interaction.soapBubbles.isEnabled
+        )
+        DockTooltipsOverlay(
+            slots: slots,
+            frames: frames,
+            hovered: hovered,
+            selected: selected,
+            enabled: tooltipsEnabled,
+            layout: layout,
+            viewport: viewport,
+            interaction: interaction,
+            reduceMotion: reduceMotion,
+            reduceTransparency: reduceTransparency
         )
     }
 }
