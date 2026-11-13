@@ -64,6 +64,8 @@ nonisolated final class LineIconCatalog: Sendable {
 
     private nonisolated struct State: Sendable {
         var document: Document?
+        /// Set once a background warm-up has been requested, so repeated requests start one task.
+        var warming = false
         /// Nil records a reference whose paths failed to parse, so it is not retried on every lookup.
         var glyphs: [String: LineIconGlyph?] = [:]
     }
@@ -75,6 +77,23 @@ nonisolated final class LineIconCatalog: Sendable {
     ///   nil or malformed data behaves as an empty catalog.
     init(load: @escaping @Sendable () -> Data?) {
         self.load = load
+    }
+
+    /// Decodes the catalog on a utility-priority task, ahead of the first tile lookup, which would
+    /// otherwise decode about a megabyte of JSON on the main thread inside a SwiftUI `body`.
+    ///
+    /// Every lookup loads under the same lock, so a lookup that arrives during the warm-up waits for
+    /// it instead of decoding twice. Later calls, and calls after a lookup has loaded it, do nothing.
+    func warmInBackground() {
+        let start = state.withLock { state in
+            guard state.document == nil, !state.warming else { return false }
+            state.warming = true
+            return true
+        }
+        guard start else { return }
+        Task.detached(priority: .utility) { [self] in
+            state.withLock { _ = loaded(&$0) }
+        }
     }
 
     /// The glyph for an application, or nil when the catalog has none.

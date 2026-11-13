@@ -144,6 +144,8 @@ final class DockPanelController {
         interaction.retainHitRegions(exposedIDs)
         accessibilityIDs.formIntersection(exposedIDs)
         interaction.runningIndicatorStyle = settings.runningIndicatorStyle
+        // Decode the line-glyph catalog off the main thread before the tiles first ask for it.
+        if settings.iconStyle == .line { LineIconCatalog.shared.warmInBackground() }
         interaction.iconStyle = settings.iconStyle
         interaction.lineIconMotion = settings.lineIconMotion
         interaction.animateIndicators = settings.animateIndicators
