@@ -32,7 +32,8 @@ nonisolated struct AppLeftoverRoot: Sendable, Hashable {
 /// ## What is selected
 /// An entry named exactly after one of the app's identifiers or app groups, or after an identifier plus
 /// a suffix component that apps commonly add (`.ShipIt`, `.helper`, a ByHost UUID, …). These go in the
-/// sheet's App data section, selected.
+/// sheet's App data section, selected. An embedded bundle's identifier, a helper's, or an app group
+/// counts only when it is related to the main bundle identifier; see ``owns(_:isGroup:)``.
 ///
 /// ## What is only offered
 /// Any other `identifier.something` entry, and folders named exactly like the app (`Application
@@ -47,11 +48,14 @@ nonisolated struct AppLeftoverRoot: Sendable, Hashable {
 nonisolated struct AppLeftoverRules: Sendable {
     /// The app being uninstalled, as the rules see it.
     struct Identity: Sendable {
-        /// The main bundle identifier first, then embedded bundles'.
+        /// The main bundle identifier first (when ``hasMainIdentifier``), then embedded bundles'.
         var identifiers: [String]
         var helperIdentifiers: [String]
         var appGroups: [String]
         var names: [String]
+        /// False when the app has no bundle identifier of its own, so `identifiers` holds only embedded
+        /// bundles'. Nothing the app declares then counts as its own; see ``AppLeftoverRules/owns(_:isGroup:)``.
+        var hasMainIdentifier = true
     }
 
     /// Another installed app, which may share or own similarly named data.
@@ -90,6 +94,9 @@ nonisolated struct AppLeftoverRules: Sendable {
 
     let identity: Identity
     let others: [OtherApp]
+    /// The app's own bundle identifier, which embedded, helper, and group identifiers must relate to.
+    /// Nil when the app has none, or one too broad to keep.
+    let mainIdentifier: String?
 
     /// - Parameters:
     ///   - identity: The app being uninstalled. Identifiers with fewer than two components are dropped,
@@ -97,6 +104,9 @@ nonisolated struct AppLeftoverRules: Sendable {
     ///   - others: The other installed apps, excluding every copy of this bundle at the same path.
     init(identity: Identity, others: [OtherApp]) {
         var identity = identity
+        // Taken before filtering: a dropped main identifier must not promote an embedded bundle's to main.
+        let main = identity.hasMainIdentifier ? identity.identifiers.first : nil
+        mainIdentifier = main.flatMap { Self.isSpecific($0) ? $0 : nil }
         identity.identifiers = Self.unique(identity.identifiers.filter(Self.isSpecific))
         identity.helperIdentifiers = Self.unique(identity.helperIdentifiers.filter(Self.isSpecific))
         identity.appGroups = Self.unique(identity.appGroups.filter { !$0.isEmpty })
@@ -140,9 +150,12 @@ nonisolated struct AppLeftoverRules: Sendable {
 
     private func groupLeftover(_ stem: String, url: URL, root: AppLeftoverRoot) -> AppLeftover? {
         guard identity.appGroups.contains(stem) else { return nil }
+        let sharedWith = others.first(where: { $0.appGroups.contains(stem) })?.name
+        // Shared data starts unselected anyway, and keeps its place in App data with its "Also used by" note.
+        let match: AppLeftover.Match = sharedWith != nil || owns(stem, isGroup: true) ? .appGroup : .similarName
         var item = AppLeftover(url: url, kind: root.kind == .scripts ? .scripts : .groupContainer,
-                               match: .appGroup, domain: root.domain)
-        item.sharedWith = others.first(where: { $0.appGroups.contains(stem) })?.name
+                               match: match, domain: root.domain)
+        item.sharedWith = sharedWith
         return item
     }
 
@@ -175,10 +188,65 @@ nonisolated struct AppLeftoverRules: Sendable {
         guard owner.isEmpty else { return nil }
         var kind = root.kind
         if kind == .container, let main = identity.identifiers.first, identifier != main { kind = .extensionContainer }
-        var item = AppLeftover(url: url, kind: kind, match: loose ? .similarName : .bundleIdentifier, domain: root.domain)
         // Another copy of the app (or anything else declaring this identifier for a bundle or helper) uses it too.
-        item.sharedWith = others.first(where: { $0.uses(identifier) })?.name
+        let sharedWith = others.first(where: { $0.uses(identifier) })?.name
+        // Shared data starts unselected anyway, and keeps its place in App data with its "Also used by" note.
+        let trusted = sharedWith != nil || owns(identifier, isGroup: false)
+        var item = AppLeftover(url: url, kind: kind, match: loose || !trusted ? .similarName : .bundleIdentifier,
+                               domain: root.domain)
+        item.sharedWith = sharedWith
         return item
+    }
+
+    /// Whether `identifier`, one the app declares for itself, is related to its main bundle identifier, so
+    /// data named after it may be selected.
+    ///
+    /// Embedded bundles' identifiers, helper names, and app groups come from files inside the bundle that
+    /// nothing verifies: unsigned `Info.plist`s, file names in `Contents/Library/LaunchDaemons` and its
+    /// siblings, and entitlements read without validating the signature. Taken at face value, an app could
+    /// declare another vendor's identifier and get that vendor's data selected; a LaunchDaemon moved to
+    /// the Trash stops loading at the next restart. So such an identifier counts only when it:
+    /// - is the main identifier or starts with `main.`; or
+    /// - shares the main identifier's vendor prefix (see ``vendorPrefix(of:)``) and no other installed app
+    ///   uses that prefix in its bundle identifier, helpers, or app groups. Other copies of this app don't
+    ///   count. Team identifiers aren't compared: the rules don't receive other apps', and they come from
+    ///   the same unvalidated signature.
+    ///
+    /// A `com.apple.` identifier never counts unless the main identifier is `com.apple.…` too, and without
+    /// a main identifier nothing counts. Anything that fails is still listed, under "Possibly related".
+    /// The main identifier itself always passes, so its own matches are unaffected.
+    private func owns(_ identifier: String, isGroup: Bool) -> Bool {
+        guard let main = mainIdentifier?.lowercased() else { return false }
+        let value = Self.normalized(identifier, isGroup: isGroup)
+        if value.hasPrefix("com.apple."), !main.hasPrefix("com.apple.") { return false }
+        if value == main || value.hasPrefix(main + ".") { return true }
+        guard let vendor = Self.vendorPrefix(of: value), vendor == Self.vendorPrefix(of: main) else { return false }
+        return !others.contains { other in
+            guard other.bundleIdentifier?.lowercased() != main else { return false }
+            let theirs = ([other.bundleIdentifier].compactMap { $0 } + other.otherIdentifiers).map { Self.normalized($0, isGroup: false) }
+                + other.appGroups.map { Self.normalized($0, isGroup: true) }
+            return theirs.contains { Self.vendorPrefix(of: $0) == vendor }
+        }
+    }
+
+    /// `identifier` in lowercase without a leading `group.` and, for an app group, without a leading team
+    /// identifier (ten uppercase letters and digits, as in `ABCDE12345.com.example.shared`).
+    static func normalized(_ identifier: String, isGroup: Bool) -> String {
+        var value = Substring(identifier)
+        if value.hasPrefix("group.") { value = value.dropFirst("group.".count) }
+        if isGroup, let dot = value.firstIndex(of: "."), value.distance(from: value.startIndex, to: dot) == 10,
+           value[..<dot].allSatisfy({ $0.isASCII && ($0.isUppercase || $0.isNumber) }) {
+            value = value[value.index(after: dot)...]
+        }
+        return value.lowercased()
+    }
+
+    /// The first two components of a ``normalized(_:isGroup:)`` identifier (`com.example`), or nil when it
+    /// has fewer than two.
+    static func vendorPrefix(of normalized: String) -> String? {
+        let parts = normalized.split(separator: ".", omittingEmptySubsequences: false)
+        guard parts.count >= 2, !parts[0].isEmpty, !parts[1].isEmpty else { return nil }
+        return "\(parts[0]).\(parts[1])"
     }
 
     private func otherAppNamed(_ name: String) -> Bool {

@@ -47,7 +47,8 @@ nonisolated enum AppLeftoverScanner {
     static func scan(_ target: AppUninstallTarget, others: [AppLeftoverRules.OtherApp], home: URL) -> [AppLeftover] {
         let rules = AppLeftoverRules(identity: .init(
             identifiers: [target.bundleIdentifier].compactMap { $0 } + target.embeddedIdentifiers,
-            helperIdentifiers: target.helperIdentifiers, appGroups: target.appGroups, names: target.names),
+            helperIdentifiers: target.helperIdentifiers, appGroups: target.appGroups, names: target.names,
+            hasMainIdentifier: target.bundleIdentifier != nil),
                                      others: others)
         let bundlePath = target.url.standardizedFileURL.path + "/"
         var found: [AppLeftover] = []

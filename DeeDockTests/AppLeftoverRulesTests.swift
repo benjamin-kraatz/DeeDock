@@ -96,10 +96,12 @@ struct AppLeftoverRulesTests {
     }
 
     @Test func appGroupsAreSelectedUnlessAnotherAppUsesThem() {
-        let word = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Word", name: "Word", appGroups: ["TEAM.Office"])
-        let found = rules(groups: ["TEAM.Office", "TEAM.Editor"], others: [word])
-            .leftovers(in: root("Group Containers", .groupContainer, .group), entries: ["TEAM.Office", "TEAM.Editor", "TEAM.Other"])
-        #expect(names(found) == ["TEAM.Office", "TEAM.Editor"])
+        let office = "ABCDE12345.com.example.Office", editor = "ABCDE12345.com.example.Editor"
+        let word = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Word", name: "Word", appGroups: [office])
+        let found = rules(groups: [office, editor], others: [word])
+            .leftovers(in: root("Group Containers", .groupContainer, .group),
+                       entries: [office, editor, "ABCDE12345.com.example.Other"])
+        #expect(names(found) == [office, editor])
         #expect(found[0].sharedWith == "Word")
         #expect(found[0].selectedByDefault == false)
         #expect(found[1].selectedByDefault)
@@ -145,6 +147,83 @@ struct AppLeftoverRulesTests {
                        entries: ["com.example.EditorHelperTool.plist", "com.example.Editor.update.plist", "com.vendor.other.plist"])
         #expect(names(found) == ["com.example.EditorHelperTool.plist", "com.example.Editor.update.plist"])
         #expect(found.allSatisfy { $0.keepsRunning && $0.domain == .allUsers })
+    }
+
+    // Embedded, helper, and group identifiers come from unverified files inside the bundle, so one that
+    // isn't related to the app's own identifier is only offered.
+
+    @Test func aHelperNamedForAnotherVendorIsOnlyOffered() {
+        let found = rules(helpers: ["com.othervendor.securityd"])
+            .leftovers(in: root("LaunchDaemons", .backgroundHelper, .launchd, domain: .allUsers),
+                       entries: ["com.othervendor.securityd.plist"])
+        #expect(names(found) == ["com.othervendor.securityd.plist"])
+        #expect(found.first?.match == .similarName)
+        #expect(found.first?.selectedByDefault == false)
+    }
+
+    @Test func anotherVendorsExtensionIdentifierIsOnlyOffered() {
+        let found = rules(identifiers: ["com.example.Editor", "com.othervendor.Product.ShareExtension"])
+            .leftovers(in: root("Containers", .container, .bundle), entries: ["com.othervendor.Product.ShareExtension"])
+        #expect(names(found) == ["com.othervendor.Product.ShareExtension"])
+        #expect(found.first?.match == .similarName)
+        #expect(found.first?.selectedByDefault == false)
+    }
+
+    @Test func anUnrelatedAppGroupIsOnlyOffered() {
+        let groups = ["group.com.othervendor.shared", "ABCDE12345.com.othervendor.shared"]
+        let found = rules(groups: groups).leftovers(in: root("Group Containers", .groupContainer, .group), entries: groups)
+        #expect(names(found) == groups)
+        #expect(found.allSatisfy { $0.match == .similarName && !$0.selectedByDefault })
+    }
+
+    @Test func appleIdentifiersAreOnlyAppleAppsOwn() {
+        let daemons = root("LaunchDaemons", .backgroundHelper, .launchd, domain: .allUsers)
+        let thirdParty = rules(helpers: ["com.apple.installer.helper"])
+            .leftovers(in: daemons, entries: ["com.apple.installer.helper.plist"])
+        #expect(thirdParty.first?.match == .similarName)
+        #expect(thirdParty.first?.selectedByDefault == false)
+        // A bare `com.apple` would otherwise own everything under it.
+        let bare = rules(identifiers: ["com.apple"], helpers: ["com.apple.securityd"])
+            .leftovers(in: daemons, entries: ["com.apple.securityd.plist"])
+        #expect(bare.first?.match == .similarName)
+        let apple = rules(identifiers: ["com.apple.Pages"], helpers: ["com.apple.iWork.helper"])
+            .leftovers(in: daemons, entries: ["com.apple.iWork.helper.plist"])
+        #expect(apple.first?.selectedByDefault == true)
+    }
+
+    @Test func theAppsOwnAndSameVendorHelpersAreSelected() {
+        let found = rules(helpers: ["com.example.Editor.helper", "com.example.EditorHelperTool"])
+            .leftovers(in: root("LaunchDaemons", .backgroundHelper, .launchd, domain: .allUsers),
+                       entries: ["com.example.Editor.helper.plist", "com.example.EditorHelperTool.plist"])
+        #expect(found.count == 2)
+        #expect(found.allSatisfy { $0.match == .bundleIdentifier && $0.selectedByDefault })
+    }
+
+    @Test func aSameVendorHelperIsOnlyOfferedWhenAnotherAppUsesTheVendor() {
+        let daemons = root("LaunchDaemons", .backgroundHelper, .launchd, domain: .allUsers)
+        let viewer = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Viewer", name: "Viewer", appGroups: [])
+        let found = rules(helpers: ["com.example.EditorHelperTool", "com.example.Editor.helper"], others: [viewer])
+            .leftovers(in: daemons, entries: ["com.example.EditorHelperTool.plist", "com.example.Editor.helper.plist"])
+        #expect(found.map(\.match) == [.similarName, .bundleIdentifier])
+        #expect(found.map(\.selectedByDefault) == [false, true])
+        // Another copy of the app itself doesn't count.
+        let copy = AppLeftoverRules.OtherApp(bundleIdentifier: "com.example.Editor", name: "Editor (~/Applications)", appGroups: [])
+        let withCopy = rules(helpers: ["com.example.EditorHelperTool"], others: [copy])
+            .leftovers(in: daemons, entries: ["com.example.EditorHelperTool.plist"])
+        #expect(withCopy.first?.selectedByDefault == true)
+    }
+
+    @Test func withoutAMainIdentifierNothingDeclaredIsSelected() {
+        let containers = root("Containers", .container, .bundle)
+        let missing = AppLeftoverRules(identity: .init(identifiers: ["com.example.Editor.Widget"], helperIdentifiers: [],
+                                                       appGroups: [], names: ["Editor"], hasMainIdentifier: false), others: [])
+        // A main identifier too broad to keep doesn't hand its place to an embedded bundle's.
+        let broad = rules(identifiers: ["Editor", "com.example.Editor.Widget"])
+        for rules in [missing, broad] {
+            let found = rules.leftovers(in: containers, entries: ["com.example.Editor.Widget"])
+            #expect(found.first?.match == .similarName)
+            #expect(found.first?.selectedByDefault == false)
+        }
     }
 
     @Test func protectedItemsAreNeverSelected() {
