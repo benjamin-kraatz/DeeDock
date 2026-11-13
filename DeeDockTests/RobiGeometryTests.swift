@@ -197,6 +197,37 @@ struct RobiSettingsTests {
         #expect(!store.hasClaudeKey)
     }
 
+    /// Counts how often the secret itself is read.
+    private nonisolated final class CountingKeyStore: RobiAPIKeyStoring, @unchecked Sendable {
+        private let lock = NSLock()
+        private var key: String?
+        private(set) var reads = 0
+
+        init(key: String?) { self.key = key }
+
+        func read() -> String? { lock.withLock { reads += 1; return key } }
+        func exists() -> Bool { lock.withLock { key != nil } }
+        func save(_ key: String) -> Bool { lock.withLock { self.key = key }; return true }
+        func delete() { lock.withLock { key = nil } }
+    }
+
+    @Test("The store learns whether a key is saved without reading it; only a request reads it")
+    @MainActor
+    func readsTheKeyOnlyForARequest() throws {
+        let suite = "robi.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let keychain = CountingKeyStore(key: "sk-ant-saved")
+        let store = RobiStore(defaults: defaults, keychain: keychain)
+        #expect(store.hasClaudeKey)
+        #expect(store.saveClaudeKey("sk-ant-new"))
+        #expect(store.hasClaudeKey)
+        #expect(keychain.reads == 0)
+        #expect(store.claudeKey() == "sk-ant-new")
+        #expect(keychain.reads == 1)
+        #expect(!RobiStore(defaults: defaults, keychain: CountingKeyStore(key: nil)).hasClaudeKey)
+    }
+
     @Test("Tab positions default to none, survive a missing or malformed value, and round-trip")
     func decodesTabPositions() throws {
         let missing = try JSONDecoder().decode(RobiSettings.self, from: Data(#"{"isEnabled":true}"#.utf8))

@@ -33,7 +33,9 @@ final class RobiStore {
         self.defaults = defaults
         self.keychain = keychain
         settings = defaults?.data(forKey: Self.key).flatMap { try? JSONDecoder().decode(RobiSettings.self, from: $0) } ?? .init()
-        hasClaudeKey = defaults != nil && keychain.read() != nil
+        // `exists()`, not `read()`: launch must not decrypt the key (or risk a Keychain prompt)
+        // while Robi may not even be on.
+        hasClaudeKey = defaults != nil && keychain.exists()
     }
 
     /// Saves a pasted key after trimming whitespace. Returns false when it is empty or the
@@ -43,7 +45,7 @@ final class RobiStore {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, defaults != nil else { return false }
         let saved = keychain.save(trimmed)
-        hasClaudeKey = keychain.read() != nil
+        hasClaudeKey = keychain.exists()
         if saved { changed?() }
         return saved
     }

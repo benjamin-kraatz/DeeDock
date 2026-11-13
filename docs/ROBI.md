@@ -137,7 +137,7 @@ The card is not kept on screen for the background window. Robi's panel floats ab
 
 ## Settings, analytics, and Discovery
 
-`RobiStore` keeps `RobiSettings` under `robi.settings.v1`, apart from `DockSettings`, because no display can override Robi. Every field decodes leniently. `RobiAPIKeyStore` keeps the key as a this-device-only generic password that is not synchronized.
+`RobiStore` keeps `RobiSettings` under `robi.settings.v1`, apart from `DockSettings`, because no display can override Robi. Every field decodes leniently. `RobiAPIKeyStore` keeps the key as a generic password in the file-based login keychain. It is not synchronizable, and its access control list trusts only the app that created it, by code signature. macOS ignores the accessibility class there, so "this device only" comes from the item not syncing, not from that class. At launch `RobiStore` only asks whether the item exists (`exists()`, no `kSecReturnData`), which never decrypts the secret or prompts; the key is read only when a request to Anthropic is about to go out.
 
 Product analytics are count-only: `robi_opened`, `robi_answered`, `robi_action` (including `point` for a clicked reference), and `setting_changed` with `area = robi`. Model calls go to PostHog LLM analytics through `AIObservability`, like DOKK's other model calls: `robi_answer` for both models, with token usage, errors, and stopped answers, and `robi_suggest_questions`, under one trace per interaction. They carry the prompt, the instructions, and the answer in full. The API key is never part of them, and pictures are noted, not sent. Claude's `robi_answer` also carries the cache token counts and the API's cache diagnostics. See [ANALYTICS.md](ANALYTICS.md#ai-observability).
 
