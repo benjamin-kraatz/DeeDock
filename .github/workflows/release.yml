@@ -47,7 +47,9 @@
 #   POSTHOG_PROJECT_TOKEN is the PostHog project token (it starts with phc_).
 #   Local.xcconfig is git-ignored, so CI has no other source for it.
 #
-# Runner: xcode-27 is Benn's Mac image. Only the archive job uses it.
+# Runner: xcode-27 is a GitHub-hosted macOS image. Every job gets a fresh,
+# ephemeral VM; nothing on disk carries over between jobs. Only the archive
+# job uses it.
 
 name: Release
 
@@ -266,7 +268,7 @@ jobs:
     # Job-level if cannot use env. workflow_dispatch exposes inputs.intent.
     if: inputs.intent == 'ship'
     needs: watch
-    # Benn's Xcode 27 image. Only this job uses it.
+    # GitHub-hosted, ephemeral Xcode 27 image. Only this job uses it.
     runs-on: xcode-27
     timeout-minutes: 180
     permissions:

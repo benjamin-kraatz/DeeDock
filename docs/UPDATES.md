@@ -188,7 +188,7 @@ Do not run those archive steps in parallel.
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
-`xcode-27` is Benn's Mac image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
+`xcode-27` is a GitHub-hosted macOS image. Each job gets a fresh, ephemeral VM, and nothing on disk carries over between jobs. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain inside the job.
 
 On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline` and SendToAgent-pings Nara with the failure blob. Do not add label `Bot-Nara` on that issue. `Bot-Nara` stays on feature tickets only. Nara does not dispatch Release, bump versions on feature work, hold secrets, or publish Latest.
 
