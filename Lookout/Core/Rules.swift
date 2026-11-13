@@ -64,6 +64,14 @@ nonisolated enum Rules {
     /// crawler classifies before its `lstat` check, so the file may still be a FIFO (opening one with no writer blocks
     /// forever), a link, or a placeholder whose contents a read would download.
     static func classify(_ url: URL, type: UTType?, options: IndexOptions) -> Classification {
+        let byName = classifyByName(url, type: type, options: options)
+        if byName == .index(.image), isScreenshot(url) { return .index(.screenshot) }
+        return byName
+    }
+
+    /// `classify` without the screenshot attribute: what follows from the name and the type alone, with every picture
+    /// `.index(.image)`. Reads nothing from disk, so it also serves `canAffectIndex` on FSEvents' queue.
+    static func classifyByName(_ url: URL, type: UTType?, options: IndexOptions) -> Classification {
         let ext = url.pathExtension.lowercased()
         if options.excludedExtensions.contains(ext) { return .skip("excluded type") }
         if isSecret(url.lastPathComponent) { return .skip("key or password file") }
@@ -76,7 +84,7 @@ nonisolated enum Rules {
         guard let type else { return .ignore }
         if type.conforms(to: .sourceCode) || type.conforms(to: .script) { return .skip("code or data file") }
         if type.conforms(to: .pdf) { return .index(.pdf) }
-        if isPicture(type) { return .index(isScreenshot(url) ? .screenshot : .image) }
+        if isPicture(type) { return .index(.image) }
         return .ignore   // audio, video, SVG and everything else
     }
 
@@ -102,6 +110,70 @@ nonisolated enum Rules {
         if getxattr(url.path, "com.apple.metadata:kMDItemIsScreenCapture", nil, 0, 0, XATTR_NOFOLLOW) > 0 { return true }
         let name = url.lastPathComponent
         return screenshotPrefixes.contains { name.hasPrefix($0) }
+    }
+
+    // MARK: Folder changes
+
+    /// What `canAffectIndex` checks a changed path against: the walk's roots and skips, as the crawler applies them.
+    /// Built when the folders are watched; building it resolves the roots' real paths, checking a path touches nothing.
+    struct ChangeScope: Sendable, Equatable {
+        /// The roots the crawler walks, as real paths (`checkRoots`), the way FSEvents reports changes.
+        var roots: [String]
+        /// Skipped folders as given and as real paths, as `Crawler.crawl` compares them.
+        var excludedFolders: [String]
+        var options: IndexOptions
+        var home: String
+
+        init(roots: [String], options: IndexOptions,
+             home: String = FileManager.default.homeDirectoryForCurrentUser.path) {
+            self.roots = Rules.checkRoots(roots, home: home).allowed
+            excludedFolders = options.excludedFolders.flatMap { [$0, FolderSelection.realPath($0)] }
+            self.options = options
+            self.home = home
+        }
+    }
+
+    /// Whether a change at `path` can change what the next sync finds, judged by the path alone (no `stat`, no
+    /// extended attribute, no read): editor autosaves, builds and sync clients write many files the crawler never
+    /// indexes, and each burst would otherwise cost a walk of every root.
+    ///
+    /// False only when every root's walk would pass `path` by: a folder on the way the crawler skips (`skipReason`:
+    /// developer folders, `.noindex`, skipped folders), or a file whose name and extension `classifyByName` never
+    /// indexes. Directories, project markers, package documents, files without an extension (an old type code could
+    /// make one a PDF), types the system doesn't know, and paths under no root as spelled are kept. A false keep costs
+    /// one sync; a false drop would hide a file until the next sync.
+    static func canAffectIndex(path: String, isDirectory: Bool, scope: ChangeScope) -> Bool {
+        let roots = scope.roots.filter { path == $0 || FolderSelection.isInside(path, $0) }
+        guard !roots.isEmpty else { return true }
+        guard roots.contains(where: { walk(from: $0, reaches: path, scope: scope) }) else { return false }
+        if isDirectory { return true }
+        let name = (path as NSString).lastPathComponent
+        if projectMarkers.contains(name) { return true }
+        let url = URL(fileURLWithPath: path, isDirectory: false)
+        let ext = url.pathExtension.lowercased()
+        // The crawl reads the type from the file's resource values, which follow the extension for a type the system
+        // knows. Without one, the type may come from the file itself, so an ignored file of unknown type is kept.
+        let type = ext.isEmpty ? nil : UTType(filenameExtension: ext)
+        switch classifyByName(url, type: type, options: scope.options) {
+        case .index: return true
+        case .skip: return false
+        case .ignore: return type.map(\.isDynamic) ?? true
+        }
+    }
+
+    /// Whether the crawler's walk of `root` goes through every folder between it and `path`. A package document on
+    /// the way (`packageDocuments`) is indexed whole, so a change inside it counts.
+    private static func walk(from root: String, reaches path: String, scope: ChangeScope) -> Bool {
+        guard path != root else { return true }
+        let skips = scope.excludedFolders.filter { FolderSelection.isInside($0, root) }
+        var folder = root
+        for component in path.dropFirst(root.count + 1).split(separator: "/").dropLast() {
+            folder += "/" + component
+            let url = URL(fileURLWithPath: folder, isDirectory: true)
+            if packageDocumentEntry(url) != nil { return true }
+            if skipReason(forFolder: url, home: scope.home, excluded: skips) != nil { return false }
+        }
+        return true
     }
 
     /// Why the crawler doesn't walk into `url`, or nil. `excluded` are the skipped folders that apply inside the root

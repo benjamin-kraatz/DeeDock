@@ -178,10 +178,11 @@ nonisolated enum LookoutMonitorEvent: Sendable, Equatable {
 
 /// File-system and system events that should make the index service sync. The live one is `LookoutMonitor`.
 @MainActor protocol LookoutMonitoring: AnyObject {
-    /// Starts watching `roots` (the ones that are there now) and the system.
-    func start(roots: [String], onEvent: @escaping (LookoutMonitorEvent) -> Void)
-    /// Watches `roots` instead: the folders changed, or a drive came back.
-    func watch(roots: [String])
+    /// Starts watching `roots` (the ones that are there now) and the system. Changes the crawler would pass by under
+    /// `options` (`Rules.canAffectIndex`) are not reported.
+    func start(roots: [String], options: IndexOptions, onEvent: @escaping (LookoutMonitorEvent) -> Void)
+    /// Watches `roots` with `options` instead: the folders or exclusions changed, or a drive came back.
+    func watch(roots: [String], options: IndexOptions)
     /// Stops everything and drops `onEvent`.
     func stop()
 }

@@ -151,7 +151,7 @@ final class LookoutEngine {
         connection.onStatus = { [weak self] in self?.received($0) }
         connection.onConnectionEvent = { [weak self] in self?.connectionChanged($0) }
         let configuration = configuration()
-        monitor.start(roots: configuration.roots) { [weak self] in self?.monitorEvent($0) }
+        monitor.start(roots: configuration.roots, options: configuration.options) { [weak self] in self?.monitorEvent($0) }
         if userPaused { connection.pause() }
         connection.start(configuration)
         search.filter = filter()
@@ -206,7 +206,7 @@ final class LookoutEngine {
         if newSettings.indexOnBattery != old.indexOnBattery { power.setIndexOnBattery(newSettings.indexOnBattery) }
         if newSettings.selection != old.selection || newSettings.excludedExtensions != old.excludedExtensions {
             let configuration = configuration()
-            monitor.watch(roots: configuration.roots)
+            monitor.watch(roots: configuration.roots, options: configuration.options)
             connection.start(configuration)
             search.filter = filter()
             pictureSearch.filter = search.filter
@@ -394,7 +394,8 @@ final class LookoutEngine {
                 connection.syncNow()
             }
         case .volumesChanged:
-            monitor.watch(roots: configuration().roots)
+            let configuration = configuration()
+            monitor.watch(roots: configuration.roots, options: configuration.options)
             connection.syncNow()
         case .didWake:
             connection.syncNow()

@@ -1,3 +1,4 @@
+import CoreServices
 import Foundation
 import Testing
 import UniformTypeIdentifiers
@@ -140,5 +141,88 @@ struct LookoutRulesTests {
                                        home: folder.path + "/home")
         #expect(checked.allowed == [documents.path])
         #expect(checked.refused.map(\.refusal) == [.library, .homeFolder])
+    }
+
+    // MARK: Folder changes
+
+    /// The paths a change may be reported at, and whether a sync should follow. `excluded` is skipped as a folder,
+    /// `md` is not excluded here.
+    private static let changes: [(path: String, keep: Bool)] = [
+        ("notes.md", true), ("scan.pdf", true), ("holiday.jpg", true), ("Screenshot 2026-10-01 at 9.41.07 PM.png", true),
+        ("README", true), ("data.unknownextension42", true), ("package.json", true), ("Letter.rtfd/TXT.rtf", true),
+        ("Projects/App/Sources/main.swift", false), ("Projects/App/data.json", false), ("server.key", false),
+        ("id_ed25519", false), ("song.mp3", false), ("app.ts", false), ("node_modules/pkg/readme.md", false),
+        ("Projects/App/DerivedData/Build/notes.md", false), ("Archive.noindex/notes.md", false),
+        ("Downloads/Media/notes.md", false), ("Downloads/invoice.txt", true),
+    ]
+
+    private func changeScope(_ folder: LookoutTestFolder, extraRoots: [String] = []) -> Rules.ChangeScope {
+        var options = IndexOptions()
+        options.excludedFolders = [folder.path + "/Downloads/Media"]
+        return Rules.ChangeScope(roots: [folder.path] + extraRoots, options: options)
+    }
+
+    @Test func changesTheCrawlerWouldPassByAreDropped() {
+        let folder = LookoutTestFolder()
+        let scope = changeScope(folder)
+        for change in Self.changes {
+            #expect(Rules.canAffectIndex(path: folder.path + "/" + change.path, isDirectory: false, scope: scope)
+                    == change.keep, "\(change.path)")
+        }
+        // Folders are kept themselves, but not inside a skipped one; nor is anything outside the roots dropped.
+        #expect(Rules.canAffectIndex(path: folder.path + "/node_modules", isDirectory: true, scope: scope))
+        #expect(!Rules.canAffectIndex(path: folder.path + "/node_modules/pkg", isDirectory: true, scope: scope))
+        #expect(Rules.canAffectIndex(path: folder.path, isDirectory: true, scope: scope))
+        #expect(Rules.canAffectIndex(path: "/somewhere/else/main.swift", isDirectory: false, scope: scope))
+    }
+
+    @Test func excludedExtensionsAndChosenFoldersInsideSkippedOnesFollowTheCrawler() {
+        let folder = LookoutTestFolder()
+        var options = IndexOptions()
+        options.excludedExtensions = ["md"]
+        let excluding = Rules.ChangeScope(roots: [folder.path], options: options)
+        #expect(!Rules.canAffectIndex(path: folder.path + "/notes.md", isDirectory: false, scope: excluding))
+        #expect(Rules.canAffectIndex(path: folder.path + "/notes.txt", isDirectory: false, scope: excluding))
+        // A folder chosen inside a skipped one is walked whole, by its own root.
+        let nested = changeScope(folder, extraRoots: [folder.path + "/node_modules/kept"])
+        #expect(Rules.canAffectIndex(path: folder.path + "/node_modules/kept/notes.md", isDirectory: false, scope: nested))
+        #expect(!Rules.canAffectIndex(path: folder.path + "/node_modules/other/notes.md", isDirectory: false, scope: nested))
+    }
+
+    /// The predicate never drops a file the crawl indexes: the same tree, walked for real.
+    @Test func noChangeToAnIndexedFileIsDropped() throws {
+        let folder = LookoutTestFolder()
+        // No package.json: it would make the whole tree a code project, where only screenshots count.
+        for change in Self.changes where !change.path.hasSuffix(".rtfd/TXT.rtf") && change.path != "package.json" {
+            try folder.write(change.path)
+        }
+        let scope = changeScope(folder)
+        var options = IndexOptions()
+        options.excludedFolders = [folder.path + "/Downloads/Media"]
+        let report = Crawler.crawl([folder.url], options: options, readsLastUsed: false)
+        let indexed = Set(report.candidates.map(\.path))
+        #expect(!indexed.isEmpty)
+        for path in indexed {
+            #expect(Rules.canAffectIndex(path: path, isDirectory: false, scope: scope), "\(path)")
+        }
+        for change in Self.changes where !change.keep {
+            #expect(!indexed.contains(folder.path + "/" + change.path), "\(change.path)")
+        }
+    }
+
+    @Test func lostEventsAndRootChangesAlwaysSync() {
+        let folder = LookoutTestFolder()
+        let scope = changeScope(folder)
+        let file = FSEventStreamEventFlags(kFSEventStreamEventFlagItemIsFile)
+        let code = folder.path + "/main.swift"
+        #expect(!LookoutFolderWatcher.isRelevant(path: code, flags: file, scope: scope))
+        #expect(LookoutFolderWatcher.isRelevant(path: folder.path + "/notes.md", flags: file, scope: scope))
+        #expect(!LookoutFolderWatcher.isRelevant(path: folder.path + "/.DS_Store", flags: file, scope: scope))
+        for lost in [kFSEventStreamEventFlagMustScanSubDirs, kFSEventStreamEventFlagUserDropped,
+                     kFSEventStreamEventFlagKernelDropped, kFSEventStreamEventFlagRootChanged] {
+            #expect(LookoutFolderWatcher.isRelevant(path: code, flags: file | FSEventStreamEventFlags(lost), scope: scope))
+        }
+        // No item kind: nothing to judge by.
+        #expect(LookoutFolderWatcher.isRelevant(path: code, flags: 0, scope: scope))
     }
 }
