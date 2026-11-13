@@ -336,6 +336,18 @@ jobs:
           echo "CLONED_SOURCE_PACKAGES=$cloned" >> "$GITHUB_ENV"
           echo "Found generate_appcast in $sparkle_bin"
 
+      # Upstream CMake runs here, before the Developer ID keychain exists.
+      # The archive's "Build llama.cpp" phases then find the stamp in
+      # Vendor/llama/BUILD and exit at once. The stamp comes only from
+      # values in the script and the patch, so it matches inside xcodebuild.
+      - name: Build llama.cpp before signing material exists
+        run: |
+          set -eu
+          # xcodebuild hands its phases the selected Xcode as DEVELOPER_DIR.
+          # Do the same, or the script falls back to /Applications/Xcode.app.
+          DEVELOPER_DIR="$(xcode-select -p)" /bin/bash scripts/build-llama.sh
+          echo "Vendor/llama/BUILD: $(cat Vendor/llama/BUILD)"
+
       - name: Import Developer ID certificate
         env:
           DEVELOPER_ID_APPLICATION_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE }}
