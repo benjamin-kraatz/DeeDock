@@ -47,7 +47,9 @@
 #   POSTHOG_PROJECT_TOKEN is the PostHog project token (it starts with phc_).
 #   Local.xcconfig is git-ignored, so CI has no other source for it.
 #
-# Runner: xcode-27 is Benn's Mac image. Only the archive job uses it.
+# Runner: xcode-27 is a GitHub-hosted macOS image. Every job gets a fresh,
+# ephemeral VM; nothing on disk carries over between jobs. Only the archive
+# job uses it.
 
 name: Release
 
@@ -106,7 +108,10 @@ jobs:
       comic_panel_count: ${{ steps.comic.outputs.comic_panel_count }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Resolve versions
         id: versions
@@ -119,6 +124,14 @@ jobs:
           if [ -n "${INPUT_MARKETING_VERSION:-}" ]; then
             marketing="$INPUT_MARKETING_VERSION"
           fi
+          # Both values end up in file paths, the release tag, and
+          # GITHUB_OUTPUT. Accept only digits and dots, and digits only.
+          case "$marketing" in
+            ''|*[!0-9.]*|.*|*.|*..*) echo "Invalid MARKETING_VERSION. Use digits and dots, such as 0.27.0."; exit 1 ;;
+          esac
+          case "$build" in
+            ''|*[!0-9]*) echo "Invalid CURRENT_PROJECT_VERSION. Use digits only."; exit 1 ;;
+          esac
           echo "marketing_version=$marketing" >> "$GITHUB_OUTPUT"
           echo "build_number=$build" >> "$GITHUB_OUTPUT"
           echo "release_tag=v${marketing}" >> "$GITHUB_OUTPUT"
@@ -255,14 +268,17 @@ jobs:
     # Job-level if cannot use env. workflow_dispatch exposes inputs.intent.
     if: inputs.intent == 'ship'
     needs: watch
-    # Benn's Xcode 27 image. Only this job uses it.
+    # GitHub-hosted, ephemeral Xcode 27 image. Only this job uses it.
     runs-on: xcode-27
     timeout-minutes: 180
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Select Xcode 27
         run: |
@@ -309,7 +325,8 @@ jobs:
           cloned="$RUNNER_TEMP/SourcePackages"
           mkdir -p "$cloned"
           xcodebuild -project "$XCODE_PROJECT" -resolvePackageDependencies \
-            -clonedSourcePackagesDirPath "$cloned"
+            -clonedSourcePackagesDirPath "$cloned" \
+            -onlyUsePackageVersionsFromResolvedFile
           tool="$(find "$cloned" -type f -name generate_appcast -perm -111 | head -n 1 || true)"
           if [ -z "$tool" ]; then
             echo "generate_appcast was not in the resolved Sparkle artifact."
@@ -320,6 +337,18 @@ jobs:
           echo "SPARKLE_BIN=$sparkle_bin" >> "$GITHUB_ENV"
           echo "CLONED_SOURCE_PACKAGES=$cloned" >> "$GITHUB_ENV"
           echo "Found generate_appcast in $sparkle_bin"
+
+      # Upstream CMake runs here, before the Developer ID keychain exists.
+      # The archive's "Build llama.cpp" phases then find the stamp in
+      # Vendor/llama/BUILD and exit at once. The stamp comes only from
+      # values in the script and the patch, so it matches inside xcodebuild.
+      - name: Build llama.cpp before signing material exists
+        run: |
+          set -eu
+          # xcodebuild hands its phases the selected Xcode as DEVELOPER_DIR.
+          # Do the same, or the script falls back to /Applications/Xcode.app.
+          DEVELOPER_DIR="$(xcode-select -p)" /bin/bash scripts/build-llama.sh
+          echo "Vendor/llama/BUILD: $(cat Vendor/llama/BUILD)"
 
       - name: Import Developer ID certificate
         env:
@@ -386,6 +415,7 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath "$archive" \
             -clonedSourcePackagesDirPath "$CLONED_SOURCE_PACKAGES" \
+            -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath "$derived" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
@@ -648,7 +678,7 @@ jobs:
           ls -la "$artifact_dir"
 
       - name: Upload Sparkle artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ddock-sparkle
           # Required files always exist in ARTIFACT_DIR. Optional comic
@@ -693,13 +723,16 @@ jobs:
       contents: write
     steps:
       - name: Download Sparkle artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ddock-sparkle
           path: ${{ runner.temp }}/ddock-sparkle
 
       - name: Checkout GitHub release notes
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Open a draft GitHub Release
         env:

@@ -174,12 +174,13 @@ Release-prep is a separate PR. It raises `CURRENT_PROJECT_VERSION` and `MARKETIN
 
 1. Confirm the image has Xcode 27 and the macOS 27 SDK.
 2. Resolve Sparkle tools from the pinned 2.9.6 package (`generate_appcast` under the cloned `artifacts/sparkle` tree).
-3. Import `DEVELOPER_ID_APPLICATION_CERTIFICATE` into a temporary keychain. The job deletes that keychain when it finishes.
-4. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime.
-5. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
-6. Verify `codesign --deep --strict` and `stapler validate`.
-7. Build `DDock.zip` with `ditto`, copy the German notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`. Do not stage `-github.md` in that directory.
-8. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, version metadata, and any staged comic files as a workflow artifact.
+3. Build llama.cpp with `scripts/build-llama.sh`, so upstream CMake runs before any signing material is on the runner. The archive's `Build llama.cpp` phases then find the stamp in `Vendor/llama/BUILD` and do nothing.
+4. Import `DEVELOPER_ID_APPLICATION_CERTIFICATE` into a temporary keychain. The job deletes that keychain when it finishes.
+5. Archive the `DeeDock` scheme for Release with Developer ID and hardened runtime.
+6. Export with a generated Developer ID options plist, then `xcrun notarytool submit ... --apple-id --password --team-id --wait`, then `stapler staple`. Nested Sparkle code stays signed. The job does not weaken hardened runtime.
+7. Verify `codesign --deep --strict` and `stapler validate`.
+8. Build `DDock.zip` with `ditto`, copy the German notes to `DDock.md`, copy a What’s New comic to `DDock-comic.md` plus flat `panel-0N.png` files when that comic exists, and run `generate_appcast --ed-key-file - --maximum-deltas 0`. Do not stage `-github.md` in that directory.
+9. Upload `DDock.zip`, `appcast.xml`, `DDock.md`, version metadata, and any staged comic files as a workflow artifact.
 
 Do not run those archive steps in parallel.
 
@@ -187,7 +188,7 @@ Do not run those archive steps in parallel.
 
 `publish_latest` defaults to false. Turn it on only after Benn confirms a Latest cut. The first smoke path must stay a draft.
 
-`xcode-27` is Benn's Mac image. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain on that runner.
+`xcode-27` is a GitHub-hosted macOS image. Each job gets a fresh, ephemeral VM, and nothing on disk carries over between jobs. DDock still needs Xcode 27 and the macOS 27 SDK. If the image reports an older toolchain, archive fails and tells Esi and Benn. Developer ID import uses a temporary keychain inside the job.
 
 On failure, Esi opens a high-priority Linear issue on project or label `release-pipeline` and SendToAgent-pings Nara with the failure blob. Do not add label `Bot-Nara` on that issue. `Bot-Nara` stays on feature tickets only. Nara does not dispatch Release, bump versions on feature work, hold secrets, or publish Latest.
 
