@@ -219,8 +219,14 @@ They are independent of dock pins and remain when you clear launch history.
 **Ask Robi** appears in the controls row when the trimmed query is not empty. ⌘Return does the same. It matches a
 task description to installed apps using on-device Apple Intelligence. The button animates
 in and out with a short snappy animation. Reduce Motion shows and hides it at once.
-It receives the task and app names, categories, and bundle identifiers. It receives no file
-contents or window captures. Requests use bounded batches and can be cancelled. Editing the
+The prompt carries the task and, for each candidate app, its name, App Store category, the
+file types it edits or opens, and a one-line description. It carries no bundle identifiers, file
+contents or window captures. Descriptions come from bundled catalogs first; for Mac App Store
+installs without one, DOKK sends their bundle identifiers to Apple's public iTunes Lookup endpoint
+(`itunes.apple.com/lookup`, at most 50 per request, with the Mac's region) and caches the answers,
+"not found" included, for 30 days in `Application Support/DDock/Launcher/AppStoreDescriptions.json`.
+With usage sharing on, the prompt and answer are also sent to PostHog as `$ai_generation`; see
+[AI observability](ANALYTICS.md#ai-observability). Requests use bounded batches and can be cancelled. Editing the
 query, hiding the Apps tab, or closing the Hub invalidates pending suggestions.
 
 While Robi's answer is shown, a **Robi** chip leads the controls row and Ask Robi hides.

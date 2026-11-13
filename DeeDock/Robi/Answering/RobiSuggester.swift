@@ -10,11 +10,12 @@ nonisolated private struct RobiGeneratedQuestions {
 /// Suggests a few questions about the context the person just handed Robi, with Apple's
 /// on-device model.
 ///
-/// It runs only after a click or the shortcut, once the context is read, and always on this Mac,
-/// whichever model answers: the context never leaves the Mac for a suggestion. Robi does not
-/// generate suggestions before the click, because that would mean reading windows the person
-/// never offered. Like `RobiAgent`, it treats the context as untrusted data and keeps no session.
-/// Each request is reported to PostHog LLM analytics through `AIObservability`, under the
+/// It runs only after a click or the shortcut, once the context is read, and always with the
+/// on-device model, whichever model answers, so the context is never sent to Anthropic for a
+/// suggestion. Robi does not generate suggestions before the click, because that would mean
+/// reading windows the person never offered. Like `RobiAgent`, it treats the context as untrusted
+/// data and keeps no session. With usage sharing on, each request, context included, and its
+/// suggestions are sent to PostHog as `$ai_generation` through `AIObservability`, under the
 /// interaction's trace, like DOKK's other on-device model calls.
 @MainActor
 enum RobiSuggester {

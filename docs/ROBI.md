@@ -145,7 +145,7 @@ The Discovery callout `robi` announces Robi once on launch. **Turn On** enables 
 
 ## Privacy
 
-Robi reads a window only after a click or the shortcut. Text and pictures live in memory for one request and are dropped when the card closes. Nothing is written to disk. Suggested questions always come from the on-device model. With Claude, the question and its context go from the Mac straight to Anthropic with the person's key. DOKK runs no server in between. Because Robi uses cache diagnostics, Anthropic briefly keeps a fingerprint of each request, made of hashes and token estimates and never the text. When the person shares usage statistics, each request and answer also goes to PostHog in full, as for DOKK's other AI features; Robi's settings, the Privacy card, and the tour say so.
+Robi reads a window only after a click or the shortcut. Text and pictures live in memory for one request and are dropped when the card closes. Robi writes none of it to disk itself. When the person shares usage statistics, though, the PostHog SDK queues each `$ai_generation` event, prompt and answer included, as a file under Application Support until it uploads. Suggested questions always come from the on-device model. With Claude, the question and its context go from the Mac straight to Anthropic with the person's key. DOKK runs no server in between. Because Robi uses cache diagnostics, Anthropic briefly keeps a fingerprint of each request, made of hashes and token estimates and never the text. When the person shares usage statistics, each request and answer also goes to PostHog in full, as for DOKK's other AI features; Robi's settings, the Privacy card, and the tour say so.
 
 ## Known limitations
 

@@ -860,8 +860,9 @@ final class RobiController {
     /// Asks Apple's on-device model for a few questions about the context the person just picked.
     ///
     /// Runs only in `.prompting`, once the context is read, so only after a click or the shortcut
-    /// handed it to Robi; before that Robi reads nothing. It always runs on this Mac, whichever
-    /// model answers, so the context never leaves the Mac for a suggestion. Failures, refusals
+    /// handed it to Robi; before that Robi reads nothing. It always uses the on-device model,
+    /// whichever model answers, so the context is never sent to Anthropic for a suggestion; with
+    /// usage sharing on, the request and suggestions go to PostHog as `$ai_generation`. Failures, refusals
     /// and slow answers end silently: the built-in actions are still there.
     private func suggestQuestions() {
         cancelSuggestions()

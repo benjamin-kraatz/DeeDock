@@ -2,7 +2,8 @@ import Foundation
 
 /// Which model answers what the person asks Robi.
 nonisolated enum RobiAnswerModel: String, Codable, CaseIterable, Sendable {
-    /// Apple's on-device model. Nothing leaves the Mac.
+    /// Apple's on-device model. The answer is generated on this Mac; with usage sharing on, the
+    /// request and answer also go to PostHog as `$ai_generation` (see `AIObservability`).
     case onDevice = "on_device"
     /// Claude through the person's own Anthropic API key, as the model `RobiClaudeModel` picks.
     case claude
@@ -39,7 +40,8 @@ nonisolated struct RobiSettings: Codable, Equatable, Sendable {
     var claudeModel: RobiClaudeModel = .sonnet
     var claudeEffort: RobiClaudeEffort = .medium
     /// After the person picks context, Apple's on-device model suggests a few questions about it.
-    /// Always on this Mac, whichever model answers.
+    /// Always the on-device model, whichever model answers; with usage sharing on, the request
+    /// and suggestions also go to PostHog as `$ai_generation`.
     var suggestQuestions = true
     /// A picture of the whole window goes with every question about it, beside its text. Off,
     /// Robi takes the picture only when the window has too little accessibility text to read.
