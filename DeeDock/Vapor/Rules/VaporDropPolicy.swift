@@ -87,6 +87,9 @@ nonisolated struct VaporDropPolicy: Sendable {
     /// Folders in `~/Library` protected with everything inside them. Keychains hold credentials;
     /// in the other two a rename out of the folder syncs as a deletion to every device.
     static let protectedLibraryTrees = ["Keychains", "Mobile Documents", "CloudStorage"]
+    /// Folders directly in `~/Library` that Vapor still takes whole, because everything in them
+    /// can be rebuilt. Every other folder directly in `~/Library` is refused.
+    static let disposableLibraryFolders = ["Caches", "Logs"]
 
     let home: URL
     var systemRoots: [String] = VaporDropPolicy.systemRoots
@@ -161,11 +164,15 @@ nonisolated struct VaporDropPolicy: Sendable {
            Self.protectedHomeItems.contains(where: { $0.caseInsensitiveCompare(url.lastPathComponent) == .orderedSame }) {
             return .standardFolder(name: name)
         }
-        // Every folder directly in `~/Library` (Keychains, Mail, Application Support as a whole…)
-        // holds data that apps and macOS expect to find. Deeper caches such as
-        // `~/Library/Caches/<app>` stay allowed: they are what Vapor is for.
+        // A folder directly in `~/Library` (Keychains, Mail, Application Support as a whole…)
+        // holds data that apps and macOS expect to find. The cache and log folders are the
+        // exception, and deeper caches such as `~/Library/Caches/<app>` stay allowed: they are
+        // what Vapor is for.
         let library = homeURL.appendingPathComponent("Library", isDirectory: true)
-        if Self.same(url.deletingLastPathComponent(), library) { return .standardFolder(name: name) }
+        if Self.same(url.deletingLastPathComponent(), library),
+           !Self.disposableLibraryFolders.contains(where: { $0.caseInsensitiveCompare(url.lastPathComponent) == .orderedSame }) {
+            return .standardFolder(name: name)
+        }
         for tree in Self.protectedLibraryTrees
         where url.isSameOrDescendant(of: library.appendingPathComponent(tree, isDirectory: true), resolvingSymlinks: false) {
             return .systemLocation(name: name)

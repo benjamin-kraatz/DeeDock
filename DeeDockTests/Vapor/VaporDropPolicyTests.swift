@@ -44,8 +44,8 @@ struct VaporDropPolicyTests {
 
     @Test func credentialAndCloudFoldersAreRefused() {
         let policy = policy()
-        // Every folder directly in ~/Library, including the cache folder as a whole.
-        for name in ["Keychains", "Mail", "Application Support", "Caches", "Developer", "Mobile Documents", "CloudStorage"] {
+        // Folders directly in ~/Library, except the cache and log folders.
+        for name in ["Keychains", "Mail", "Application Support", "Developer", "Mobile Documents", "CloudStorage"] {
             #expect(policy.evaluate(home.appendingPathComponent("Library/\(name)"), existing: []) == .refuse(.standardFolder(name: name)),
                     "\(name)")
         }
@@ -58,6 +58,11 @@ struct VaporDropPolicyTests {
         // Credential and shell folders the uninstaller protects too.
         for name in [".ssh", ".gnupg", ".config", ".local", ".Trash", ".SSH"] {
             #expect(policy.evaluate(home.appendingPathComponent(name), existing: []) == .refuse(.standardFolder(name: name)), "\(name)")
+        }
+        // The cache and log folders can be rebuilt, so Vapor still takes them whole.
+        for name in ["Caches", "Logs", "caches"] {
+            let folder = home.appendingPathComponent("Library/\(name)")
+            #expect(policy.evaluate(folder, existing: []) == .accept(url: folder, replacing: []), "\(name)")
         }
         // ~/.cache is a cache, so it stays allowed.
         let cache = home.appendingPathComponent(".cache")
