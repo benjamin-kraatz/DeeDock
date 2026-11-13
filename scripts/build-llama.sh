@@ -13,15 +13,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 TAG=b11461   # the first tags with EmbeddingGemma 2 (text + vision + audio) are b11452+
+COMMIT=4d756bc72bf00a4aacf410ae15a2d315f3db400d  # b11461; bump together with TAG
+# Git tags can move upstream. The checkout must be exactly COMMIT before anything is patched or built, because this
+# code runs CMake on CI and in the release archive and links into the signed XPC services.
 # A new TAG ships only if `LookoutBench reference` passes: it checks this build makes DigUp's reference vectors, so
 # every index is kept. If it fails, keep this TAG, or bump LlamaEmbedder.vectorVersion and write new reference
 # vectors: every index then embeds again.
 PATCH=scripts/llama.cpp-no-logits.patch
 SOURCE=Vendor/llama.cpp
 OUT=Vendor/llama
-# The deployment target is part of the stamp, so changing it rebuilds the libraries.
+# The deployment target and commit are part of the stamp, so changing either rebuilds the libraries.
 DEPLOYMENT_TARGET=27.0
-STAMP="$TAG $(shasum -a 256 "$PATCH" | cut -c1-12) macOS$DEPLOYMENT_TARGET"
+STAMP="$TAG $COMMIT $(shasum -a 256 "$PATCH" | cut -c1-12) macOS$DEPLOYMENT_TARGET"
 built() { [[ -f "$OUT/lib/libllamacpp.a" && "$(cat "$OUT/BUILD" 2>/dev/null)" == "$STAMP" ]]; }
 if built; then
   exit 0
@@ -47,11 +50,18 @@ elif [[ "$(git -C "$SOURCE" describe --tags --exact-match 2>/dev/null)" != "$TAG
   git -C "$SOURCE" fetch --quiet --depth 1 origin tag "$TAG"
   git -C "$SOURCE" checkout --quiet --force "$TAG"   # --force also drops the old patch
 fi
+# Covers all three ways in: a fresh clone, a fetched tag, and a checkout that was already at TAG. Fail closed.
+checked_out="$(git -C "$SOURCE" rev-parse 'HEAD^{commit}' 2>/dev/null || true)"
+if [[ "$checked_out" != "$COMMIT" ]]; then
+  echo "error: llama.cpp $TAG in $SOURCE is at ${checked_out:-an unreadable HEAD}, expected $COMMIT. Either the tag moved" \
+    "upstream (check it, then update TAG and COMMIT together) or the checkout is stale (delete $SOURCE and build again)." >&2
+  exit 1
+fi
 # Without the patch, every input token costs 1 MiB of logits that an embedding model never produces (262k vocabulary).
 # Only a patch that reverses cleanly counts as applied. Anything else (an older patch, a half-applied one, other edits)
-# starts over from the pinned tag, and a patch that won't apply there fails the build before anything is stamped.
+# starts over from the pinned commit, and a patch that won't apply there fails the build before anything is stamped.
 if ! git -C "$SOURCE" apply --reverse --check "../../$PATCH" 2>/dev/null; then
-  git -C "$SOURCE" checkout --quiet --force "$TAG"
+  git -C "$SOURCE" checkout --quiet --force "$COMMIT"
   git -C "$SOURCE" clean --quiet -d --force
   if ! git -C "$SOURCE" apply "../../$PATCH"; then
     echo "error: $PATCH doesn't apply to llama.cpp $TAG in $SOURCE. Update the patch for this tag." >&2
@@ -62,7 +72,7 @@ fi
 if ! command -v cmake > /dev/null; then
   if [[ ! -x Vendor/cmake-venv/bin/cmake ]]; then
     uv venv --quiet Vendor/cmake-venv --python 3.12
-    uv pip install --quiet --python Vendor/cmake-venv/bin/python cmake ninja
+    uv pip install --quiet --python Vendor/cmake-venv/bin/python cmake==4.4.4 ninja==1.13.2
   fi
   export PATH="$PWD/Vendor/cmake-venv/bin:$PATH"
 fi
