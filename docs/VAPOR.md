@@ -147,6 +147,7 @@ All code lives in `DeeDock/Vapor/`, with tests in `DeeDockTests/Vapor/`. The pro
 - **Ledger:** `~/Library/Application Support/DOKK/Vapor/ledger.json` records each staged path, its original path, its size and when it was staged. It is written before the rename, and the entry is updated after it.
 - **Removal:** after the undo window, a background task (utility QoS) lists the staged folder's top-level children and calls `removefile(_:_:REMOVEFILE_RECURSIVE)` on them, at most 4 at a time. It then removes the staged folder and clears the ledger entry.
 - **Recovery:** on launch, DOKK finishes removing every ledger entry still staged, even if Vapor is off. A staged folder is never restored without an explicit Undo.
+- **Ledger validation:** recovery and removal delete only what staging could have produced. The staged path must have one of the three shapes above for that entry's id and original name (`<staging>/<uuid>-<name>`, `<volume root>/.dokk-vapor/<uuid>-<name>`, or the in-place `.<name>.dokk-vapor-<uuid>` sibling), and `lstat` must show a real directory owned by the current user. Recovery drops any other entry from the ledger without touching the disk, including a file or link at a staged path. Missing paths are handled as before: an entry whose staging folder is unreachable (an unplugged disk) is kept.
 - **Undo** is a rename back to the original path. It never overwrites an existing item.
 
 ### Finder
