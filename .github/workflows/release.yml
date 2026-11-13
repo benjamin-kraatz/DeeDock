@@ -107,6 +107,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Resolve versions
         id: versions
@@ -263,6 +266,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Select Xcode 27
         run: |
@@ -700,6 +706,9 @@ jobs:
 
       - name: Checkout GitHub release notes
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # No step runs git, and every gh call sets GH_TOKEN; keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Open a draft GitHub Release
         env:
