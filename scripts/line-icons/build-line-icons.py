@@ -21,6 +21,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -37,10 +38,33 @@ def fetch(package, version, cache):
     folder = os.path.join(cache, f"{package}-{version}")
     if not os.path.isdir(folder):
         os.makedirs(folder)
-        archive = subprocess.check_output(["npm", "pack", f"{package}@{version}", "--silent"], cwd=cache).decode().strip()
-        with tarfile.open(os.path.join(cache, archive)) as tar:
-            tar.extractall(folder)
+        try:
+            archive = subprocess.check_output(["npm", "pack", f"{package}@{version}", "--silent"], cwd=cache).decode().strip()
+            with tarfile.open(os.path.join(cache, archive)) as tar:
+                extract_safely(tar, folder, archive)
+        except BaseException:
+            # The folder's existence is the cache key, so a failed or refused fetch must not leave one behind.
+            shutil.rmtree(folder, ignore_errors=True)
+            raise
     return os.path.join(folder, "package")
+
+
+def extract_safely(tar, folder, archive):
+    """Extracts an npm tarball without letting a member write outside `folder`.
+
+    Python 3.12+ and the 3.8.17/3.9.17/3.10.12/3.11.4 security releases have the "data" filter. The macOS system
+    python3 (3.9.6) does not, so there every member is checked by hand first: only regular files and directories that
+    resolve inside `folder` are allowed, which is all an npm package contains.
+    """
+    if hasattr(tarfile, "data_filter"):
+        tar.extractall(folder, filter="data")
+        return
+    root = os.path.realpath(folder)
+    for member in tar.getmembers():
+        target = os.path.realpath(os.path.join(root, member.name))
+        if not (member.isfile() or member.isdir()) or os.path.commonpath([root, target]) != root:
+            sys.exit(f"Refusing unsafe member {member.name!r} in {archive}")
+    tar.extractall(folder)
 
 
 def number(value):
