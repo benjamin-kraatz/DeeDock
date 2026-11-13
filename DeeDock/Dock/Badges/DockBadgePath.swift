@@ -53,8 +53,10 @@ nonisolated enum DockBadgePath {
 
     private static func samePath(_ lhs: String, _ rhs: String) -> Bool {
         if lhs == rhs { return true }
-        guard !URL(fileURLWithPath: lhs).volumeReportsCaseSensitiveNames else { return false }
-        return lhs.compare(rhs, options: [.caseInsensitive], locale: posix) == .orderedSame
+        // The string test is cheap and rules out almost every pair; the volume query is a file
+        // system lookup, so ask it only for spellings that differ by case alone.
+        guard lhs.compare(rhs, options: [.caseInsensitive], locale: posix) == .orderedSame else { return false }
+        return !URL(fileURLWithPath: lhs).volumeReportsCaseSensitiveNames
     }
 
     /// `realpath` allocates the buffer when the second argument is `nil`.
