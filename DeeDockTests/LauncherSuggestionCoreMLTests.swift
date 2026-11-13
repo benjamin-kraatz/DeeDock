@@ -164,6 +164,28 @@ struct LauncherSuggestionCoreMLTests {
         #expect(cold.effectiveNeighbors == 7 && !cold.cacheReused)
     }
 
+    @Test("Core ML rebuilds when the same number of examples carry different identities")
+    func cacheKeyFollowsExampleIdentity() async throws {
+        let engine = LauncherSuggestionCoreML(seedURL: try LauncherSuggestionTestSeed.url())
+        let now = Date()
+        let query = context(now)
+        let records = examples(context: query, labels: ["first", "second"])
+        let cold = try await engine.prediction(context: query, examples: records, now: now)
+        #expect(!cold.cacheReused)
+        // Equal count, equal labels and contexts, but new example IDs: the key must differ.
+        let replacement = examples(context: query, labels: ["first", "second"])
+        #expect(replacement.count == records.count)
+        let rebuilt = try await engine.prediction(context: query, examples: replacement, now: now)
+        #expect(!rebuilt.cacheReused)
+        #expect(Set(rebuilt.scores.keys) == ["first", "second"])
+        let reused = try await engine.prediction(context: query, examples: replacement, now: now)
+        #expect(reused.cacheReused)
+        // Reordering the same identities is a different training input as well.
+        let reordered = try await engine.prediction(context: query, examples: replacement.reversed(), now: now)
+        #expect(!reordered.cacheReused)
+        await engine.reset()
+    }
+
     private func context(_ date: Date) -> LauncherSuggestionContext {
         LauncherSuggestionContext(date: date, foregroundID: "source", hour: 10, weekday: 2)
     }
