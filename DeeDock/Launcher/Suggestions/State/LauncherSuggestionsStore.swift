@@ -48,6 +48,8 @@ final class LauncherSuggestionsStore {
     /// The coalescing timer. Non-nil exactly while `document` has changes not yet submitted to disk.
     @ObservationIgnored private var pendingSave: Task<Void, Never>?
     @ObservationIgnored private var firstUnsavedChange: ContinuousClock.Instant?
+    /// The instant `pendingSave` is waiting for.
+    @ObservationIgnored private var pendingSaveDeadline: ContinuousClock.Instant?
     @ObservationIgnored private let saveDelay: Duration
     @ObservationIgnored private let saveMaxWait: Duration
     @ObservationIgnored private var sessionActive = false
@@ -410,7 +412,7 @@ final class LauncherSuggestionsStore {
         // A started write may not have reached the repository yet, because its task needs the main
         // actor, so anything not confirmed on disk is written again here.
         guard sequence != writtenSequence, ready, !storageUnavailable else { return }
-        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil
+        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil; pendingSaveDeadline = nil
         let snapshot = document, sequence = sequence, repository = repository
         let done = DispatchSemaphore(value: 0)
         Task.detached {
@@ -517,6 +519,10 @@ final class LauncherSuggestionsStore {
         let first = firstUnsavedChange ?? now
         firstUnsavedChange = first
         let deadline = min(now.advanced(by: saveDelay), first.advanced(by: saveMaxWait))
+        // Once the maximum wait caps the deadline it stops moving. Keep the task that already waits for
+        // it: replacing it on every change would let steady activity cancel each one before it ran.
+        if pendingSave != nil, deadline == pendingSaveDeadline { return }
+        pendingSaveDeadline = deadline
         pendingSave?.cancel()
         pendingSave = Task { [weak self] in
             try? await Task.sleep(until: deadline, clock: .continuous)
@@ -527,7 +533,7 @@ final class LauncherSuggestionsStore {
 
     /// Submits the current document to the repository and ends any coalescing period.
     private func write() {
-        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil
+        pendingSave?.cancel(); pendingSave = nil; firstUnsavedChange = nil; pendingSaveDeadline = nil
         guard ready, !storageUnavailable else { return }
         if document.expire(now: Date()) {
             sequence &+= 1

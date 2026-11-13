@@ -68,6 +68,8 @@ final class LookoutEngine {
     @ObservationIgnored private let releaseDelay: Duration
     /// Between `hubFilesDidAppear` and `hubDidClose`: folder-change syncs skip the pacer's minimum gap.
     @ObservationIgnored private var filesVisible = false
+    /// The deadline `syncTask` is waiting for; nil exactly when no folder-change sync is scheduled.
+    @ObservationIgnored private var syncDue: ContinuousClock.Instant?
 
     @ObservationIgnored private var userPaused = false
     @ObservationIgnored private var serviceUnavailable = false
@@ -409,14 +411,22 @@ final class LookoutEngine {
 
     /// (Re)schedules the one sync that covers the pending folder changes, at the pacer's deadline. Replacing the task
     /// moves the deadline; the changes stay pending in the pacer until the sync starts, so none is lost.
+    ///
+    /// A task already waiting for the same deadline is kept. Once the maximum wait caps the deadline it stops
+    /// moving, and replacing the task on every change would let steady churn cancel each one before it ran, which is
+    /// the starvation the cap exists to prevent.
     private func scheduleFolderSync() {
+        let due = syncPacer.deadline(filesVisible: filesVisible)
+        if syncTask != nil, due == syncDue { return }
         syncTask?.cancel()
         syncTask = nil
-        guard let due = syncPacer.deadline(filesVisible: filesVisible) else { return }
+        syncDue = due
+        guard let due else { return }
         syncTask = Task { [weak self] in
             try? await Task.sleep(until: due, clock: .continuous)
             guard !Task.isCancelled, let self else { return }
             syncTask = nil
+            syncDue = nil
             syncPacer.synced(at: .now)
             connection.syncNow()
         }
