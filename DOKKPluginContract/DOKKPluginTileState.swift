@@ -44,9 +44,12 @@ nonisolated struct DOKKPluginTileState: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         contractVersion = (try? values.decodeIfPresent(Int.self, forKey: .contractVersion)) ?? 1
-        title = try? values.decodeIfPresent(String.self, forKey: .title)
+        // Text is cut here, in the decoder, so every consumer gets bounded strings from a plugin.
+        title = (try? values.decodeIfPresent(String.self, forKey: .title))?
+            .dokkPluginClamped(to: DOKKPluginContract.maximumLabelLength)
         badge = try? values.decodeIfPresent(DOKKPluginBadge.self, forKey: .badge)
-        accessibilityValue = try? values.decodeIfPresent(String.self, forKey: .accessibilityValue)
+        accessibilityValue = (try? values.decodeIfPresent(String.self, forKey: .accessibilityValue))?
+            .dokkPluginClamped(to: DOKKPluginContract.maximumAccessibilityValueLength)
         panelSize = try? values.decodeIfPresent(DOKKPluginSize.self, forKey: .panelSize)
         primaryAction = (try? values.decodeIfPresent(DOKKPluginPrimaryAction.self, forKey: .primaryAction)) ?? .openPanel
         menuItems = (try? values.decodeIfPresent([DOKKPluginMenuItem].self, forKey: .menuItems)) ?? []
@@ -144,5 +147,25 @@ nonisolated struct DOKKPluginMenuItem: Codable, Equatable, Sendable, Identifiabl
         self.title = title
         self.systemImage = systemImage
         self.opensPanel = opensPanel
+    }
+
+    private enum CodingKeys: String, CodingKey { case id, title, systemImage, opensPanel }
+
+    /// Decodes like the synthesized decoder, but cuts `id`, `title` and `systemImage` to
+    /// ``DOKKPluginContract/maximumLabelLength`` characters.
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let limit = DOKKPluginContract.maximumLabelLength
+        id = try values.decode(String.self, forKey: .id).dokkPluginClamped(to: limit)
+        title = try values.decode(String.self, forKey: .title).dokkPluginClamped(to: limit)
+        systemImage = try values.decodeIfPresent(String.self, forKey: .systemImage)?.dokkPluginClamped(to: limit)
+        opensPanel = try values.decodeIfPresent(Bool.self, forKey: .opensPanel)
+    }
+}
+
+nonisolated private extension String {
+    /// The first `limit` characters.
+    func dokkPluginClamped(to limit: Int) -> String {
+        count > limit ? String(prefix(limit)) : self
     }
 }

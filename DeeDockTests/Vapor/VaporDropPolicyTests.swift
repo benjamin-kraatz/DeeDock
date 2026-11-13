@@ -42,10 +42,39 @@ struct VaporDropPolicyTests {
         #expect(policy.evaluate(url("/Users/test/dev/../../test"), existing: []) == .refuse(.homeFolder))
     }
 
+    @Test func credentialAndCloudFoldersAreRefused() {
+        let policy = policy()
+        // Folders directly in ~/Library, except the cache and log folders.
+        for name in ["Keychains", "Mail", "Application Support", "Developer", "Mobile Documents", "CloudStorage"] {
+            #expect(policy.evaluate(home.appendingPathComponent("Library/\(name)"), existing: []) == .refuse(.standardFolder(name: name)),
+                    "\(name)")
+        }
+        // Keychains and the cloud-synced folders are protected with everything inside them.
+        for path in ["Library/Keychains/ABC-123", "Library/Mobile Documents/com~apple~CloudDocs/app/node_modules",
+                     "Library/CloudStorage/Dropbox/app/node_modules", "library/cloudstorage/Box/build"] {
+            let folder = home.appendingPathComponent(path)
+            #expect(policy.evaluate(folder, existing: []) == .refuse(.systemLocation(name: folder.lastPathComponent)), "\(path)")
+        }
+        // Credential and shell folders the uninstaller protects too.
+        for name in [".ssh", ".gnupg", ".config", ".local", ".Trash", ".SSH"] {
+            #expect(policy.evaluate(home.appendingPathComponent(name), existing: []) == .refuse(.standardFolder(name: name)), "\(name)")
+        }
+        // The cache and log folders can be rebuilt, so Vapor still takes them whole.
+        for name in ["Caches", "Logs", "caches"] {
+            let folder = home.appendingPathComponent("Library/\(name)")
+            #expect(policy.evaluate(folder, existing: []) == .accept(url: folder, replacing: []), "\(name)")
+        }
+        // ~/.cache is a cache, so it stays allowed.
+        let cache = home.appendingPathComponent(".cache")
+        #expect(policy.evaluate(cache, existing: []) == .accept(url: cache, replacing: []))
+        #expect(!VaporDropPolicy.protectedHomeItems.contains(".cache"))
+        #expect(VaporDropPolicy.protectedHomeItems.isSubset(of: AppUninstallPathPolicy.protectedHomeItems))
+    }
+
     @Test func subfoldersOfStandardFoldersAreAllowed() {
         let policy = policy()
         for path in ["Library/Caches/com.example", "Library/Developer/Xcode/DerivedData", "Documents/app/node_modules",
-                     "Downloads/old/build"] {
+                     "Downloads/old/build", "Library/Application Support/Code/Cache", ".config/app/cache"] {
             let folder = home.appendingPathComponent(path)
             #expect(policy.evaluate(folder, existing: []) == .accept(url: folder, replacing: []), "\(path)")
         }

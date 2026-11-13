@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import os
 
 /// One folder the controller asks to stage.
 nonisolated struct VaporStageRequest: Equatable, Sendable {
@@ -54,6 +55,7 @@ actor VaporDeletionEngine: VaporDeleting {
     private let location: VaporStagingLocation
     private let remover = VaporRemover()
     private let now: @Sendable () -> Date
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DOKK", category: "Vapor")
 
     init(ledger: VaporLedgerFile = .standard, location: VaporStagingLocation = .standard,
          now: @escaping @Sendable () -> Date = Date.init) {
@@ -122,6 +124,12 @@ actor VaporDeletionEngine: VaporDeleting {
     func remove(_ staged: [VaporLedgerEntry]) async -> [UUID] {
         var removed: [UUID] = []
         for entry in staged {
+            // Defence in depth: recovery validates before it gets here, and Undo-window entries
+            // come from this session's own `stage`, but nothing reaches `removefile` unchecked.
+            guard mayRemove(entry) else {
+                Self.logger.error("Vapor skipped removing a ledger entry that is not a staged folder")
+                continue
+            }
             let gone = await remover.remove(entry.stagedURL)
             // "Not there" only counts when its folder is: on a disk that was unplugged, the
             // staged folder still exists, and the entry must outlive the disconnection.
@@ -141,8 +149,15 @@ actor VaporDeletionEngine: VaporDeleting {
         var finished: [UUID] = []
         for entry in entries {
             switch VaporPathCheck(path: entry.stagedPath) {
-            case .directory, .notDirectory:
+            case .directory where mayRemove(entry):
                 toRemove.append(entry)
+            case .directory, .notDirectory:
+                // The ledger names something Vapor never staged: a path of the wrong shape, a
+                // folder someone else owns, or a file or link (`stage` only renames real
+                // folders). Recovery deletes recursively without the Trash, so a corrupt or
+                // edited ledger must never choose what goes. Drop the entry, leave the disk alone.
+                Self.logger.error("Vapor dropped a ledger entry that does not name a staged folder")
+                finished.append(entry.id)
             case .missing where Self.isReachable(entry):
                 // Either the rename never happened (the folder is still at its original path) or
                 // removal already finished. Both mean the entry is done; nothing is restored.
@@ -156,6 +171,17 @@ actor VaporDeletionEngine: VaporDeleting {
             try? ledger.write(entries.filter { !finished.contains($0.id) })
         }
         return await remove(toRemove).count
+    }
+
+    /// Whether `entry` may be handed to the remover: its staged path has a shape ``stage`` produces
+    /// for that entry, and `lstat` finds either nothing there (removal then only confirms it's gone)
+    /// or a real directory owned by the current user. Never a link, a file, or another user's
+    /// folder, since the remover deletes recursively and skips the Trash.
+    private func mayRemove(_ entry: VaporLedgerEntry) -> Bool {
+        guard location.isStagedPath(entry.stagedURL, id: entry.id, original: entry.originalURL) else { return false }
+        var info = stat()
+        guard lstat(entry.stagedURL.path, &info) == 0 else { return errno == ENOENT }
+        return (info.st_mode & S_IFMT) == S_IFDIR && info.st_uid == getuid()
     }
 
     /// Whether the folder holding `entry`'s staged path is there, so a missing staged path

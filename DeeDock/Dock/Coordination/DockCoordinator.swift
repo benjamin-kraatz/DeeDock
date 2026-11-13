@@ -214,6 +214,7 @@ final class DockCoordinator {
         fileDestinations.start()
         localHistory.start()
         ClipboardMuseumCleanup.runInBackground()
+        WindowMarkupTempCleanup.runInBackground()
         // Someone who already turned the feed on needs no announcement.
         if settings.value.showNotificationFeed { discovery.markUsed(.notificationFeed) }
         if settings.value.islands.isEnabled { discovery.markUsed(.islands) }

@@ -25,14 +25,14 @@ struct DockPluginControllerTests {
     private let suite = "DockPluginControllerTests.\(UUID().uuidString)"
 
     /// A controller with one enabled plugin, and every session it makes, in order.
-    private func makeController() throws -> (DockPluginController, () -> [FakeSession]) {
+    private func makeController(now: @escaping () -> Date = Date.init) throws -> (DockPluginController, () -> [FakeSession]) {
         let defaults = try #require(UserDefaults(suiteName: suite))
         var sessions: [FakeSession] = []
-        let controller = DockPluginController(pins: DockPluginPinStore(defaults: defaults)) { _, report in
+        let controller = DockPluginController(pins: DockPluginPinStore(defaults: defaults), makeSession: { _, report in
             let session = FakeSession(report: report)
             sessions.append(session)
             return session
-        }
+        }, now: now)
         controller.apply([DockPluginRecord(id: id, name: "Test", identity: nil)], waiting: 0, disabled: 0)
         return (controller, { sessions })
     }
@@ -118,5 +118,33 @@ struct DockPluginControllerTests {
         #expect(sessions()[0].stopped)
         #expect(controller.dockItems.isEmpty && controller.plugins.isEmpty)
         #expect(controller.waitingCount == 1)
+    }
+
+    @Test("A plugin can open its app only from its open panel or right after a menu choice")
+    func openAppNeedsTheMenuOrPanel() throws {
+        defer { cleanUp() }
+        var clock = Date(timeIntervalSince1970: 1_800_000_000)
+        let (controller, sessions) = try makeController(now: { clock })
+        sessions()[0].report(.state(DOKKPluginTileState()))
+        // Nothing the person did: the request is ignored.
+        #expect(!controller.acceptsOpenAppRequest(from: id))
+
+        controller.notePanel(id, open: true)
+        #expect(controller.acceptsOpenAppRequest(from: id))
+        controller.notePanel(id, open: false)
+        #expect(!controller.acceptsOpenAppRequest(from: id))
+
+        controller.chooseMenuItem("open-app", of: id)
+        #expect(controller.acceptsOpenAppRequest(from: id))
+        #expect(!controller.acceptsOpenAppRequest(from: "com.example.Other.Plugin"))
+        clock += DockPluginController.menuChoiceGestureWindow + 0.1
+        #expect(!controller.acceptsOpenAppRequest(from: id))
+
+        // A request uses up the menu choice, so a second one is ignored. The fake plugin has no
+        // containing app, so honouring the request launches nothing.
+        try #require(controller.plugin(id)?.app.url == nil)
+        controller.chooseMenuItem("open-app", of: id)
+        sessions()[0].report(.request(.openApp))
+        #expect(!controller.acceptsOpenAppRequest(from: id))
     }
 }

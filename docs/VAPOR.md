@@ -53,7 +53,9 @@ Protected locations:
 - the home folder: "DOKK won’t delete your home folder."
 - the standard home folders (Desktop, Documents, Downloads, Library, Applications, Movies, Music, Pictures, Public): "*name* is a standard macOS folder. DOKK won’t delete it."
 - `/System`, `/Library`, `/Applications`, `/usr`, `/bin`, `/sbin`, `/private`, `/etc`, `/var`, `/opt`, `/cores` and anything inside them
-- `~/Library` itself (its subfolders such as `~/Library/Caches/...` are allowed)
+- `~/Library` itself and the folders directly inside it, such as `~/Library/Mail` or `~/Library/Application Support`: "*name* is a standard macOS folder. DOKK won’t delete it." `~/Library/Caches` and `~/Library/Logs` are the exception and are allowed, as are deeper folders such as `~/Library/Caches/<app>` or `~/Library/Developer/Xcode/DerivedData`.
+- `~/Library/Keychains`, `~/Library/Mobile Documents` and `~/Library/CloudStorage`, with everything inside them: credentials, and cloud folders where a rename out of the folder syncs as a deletion to every device
+- credential and shell items directly in the home folder, the same list the uninstaller protects except `~/.cache`: `.Trash`, `.ssh`, `.gnupg`, `.config`, `.local` and the shell profile files
 - any bundle (`.app`, `.framework` and so on): Vapor takes folders, not packages
 
 ### Recognized folders
@@ -147,6 +149,7 @@ All code lives in `DeeDock/Vapor/`, with tests in `DeeDockTests/Vapor/`. The pro
 - **Ledger:** `~/Library/Application Support/DOKK/Vapor/ledger.json` records each staged path, its original path, its size and when it was staged. It is written before the rename, and the entry is updated after it.
 - **Removal:** after the undo window, a background task (utility QoS) lists the staged folder's top-level children and calls `removefile(_:_:REMOVEFILE_RECURSIVE)` on them, at most 4 at a time. It then removes the staged folder and clears the ledger entry.
 - **Recovery:** on launch, DOKK finishes removing every ledger entry still staged, even if Vapor is off. A staged folder is never restored without an explicit Undo.
+- **Ledger validation:** recovery and removal delete only what staging could have produced. The staged path must have one of the three shapes above for that entry's id and original name (`<staging>/<uuid>-<name>`, `<volume root>/.dokk-vapor/<uuid>-<name>`, or the in-place `.<name>.dokk-vapor-<uuid>` sibling), and `lstat` must show a real directory owned by the current user. Recovery drops any other entry from the ledger without touching the disk, including a file or link at a staged path. Missing paths are handled as before: an entry whose staging folder is unreachable (an unplugged disk) is kept.
 - **Undo** is a rename back to the original path. It never overwrites an existing item.
 
 ### Finder

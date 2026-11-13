@@ -15,9 +15,10 @@ import Foundation
 ///
 /// When the context has landmarks, the model sees them as numbered lines with their positions and
 /// links what it mentions as `[words](#number)`; `RobiReferencedAnswer` turns those links into
-/// references the card can spotlight. Every generation is reported to PostHog LLM analytics
-/// through `AIObservability`, like DOKK's other model calls, with the prompt and answer in full and
-/// never the API key. Claude's reports add the API's cache diagnostics: see `cacheDiagnostics`.
+/// references the card can spotlight. With usage sharing on, every generation, on-device ones
+/// included, is sent to PostHog as `$ai_generation` through `AIObservability`, like DOKK's other
+/// model calls, with the prompt and answer in full and never the API key. Claude's reports add the
+/// API's cache diagnostics: see `cacheDiagnostics`.
 @MainActor
 final class RobiAgent {
     enum Model {

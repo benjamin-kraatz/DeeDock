@@ -41,7 +41,15 @@ nonisolated final class RecordingAnalyticsBackend: AnalyticsBackend {
     }
 
     func captureLog(_ record: AnalyticsLogRecord) { base.captureLog(record) }
-    func captureAI(_ record: AIObservabilityRecord) { base.captureAI(record) }
+
+    /// Lists `$ai_generation` by name only, like surveys. It is the event that carries prompts and
+    /// answers, so leaving it out would make "Recently sent" hide the most sensitive thing DOKK
+    /// sends; its content is not repeated in Settings.
+    func captureAI(_ record: AIObservabilityRecord) {
+        base.captureAI(record)
+        let entry = AnalyticsRecord(name: record.name, properties: [:])
+        Task { @MainActor [log] in log.append(entry) }
+    }
 
     /// Lists the event by name only. Its responses are not repeated in Settings.
     func captureSurvey(_ record: AnalyticsSurveyRecord) {

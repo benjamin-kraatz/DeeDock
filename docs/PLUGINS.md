@@ -79,20 +79,24 @@ All values travel as JSON over two `@objc` protocols in `DOKKPluginXPC.swift`. O
 | DOKK → plugin | `connect(_:reply:)` | `DOKKPluginHostInfo` in, `DOKKPluginTileState` back. The first call on every connection. |
 | DOKK → plugin | `fetchTileState(reply:)` | `DOKKPluginTileState` back. Sent when the Plugins settings page opens. |
 | DOKK → plugin | `handle(_:)` | `DOKKPluginHostEvent`: `panelOpened`, `panelClosed`, `menuItemChosen(id)`, `willDisconnect` |
-| Plugin → DOKK | `tileStateDidChange(_:)` | `DOKKPluginTileState`. Send it on every change. DOKK keeps only the latest. |
+| Plugin → DOKK | `tileStateDidChange(_:)` | `DOKKPluginTileState`. Send it on every change. DOKK keeps only the latest: states that arrive faster than DOKK applies them replace each other. |
 | Plugin → DOKK | `perform(_:)` | `DOKKPluginRequest`: `closePanel`, `openApp` |
+
+DOKK reads at most 64 KB (`DOKKPluginContract.maximumMessageBytes`) of JSON per message from a plugin, tile state replies included. Larger messages are dropped unread.
+
+`openApp` is honoured only in answer to the person: while the plugin's panel is open (a button in the panel), or within two seconds of them choosing one of the plugin's menu items (the sample's "Show Sample App"). Sent at any other time, it is ignored, just as a plugin can't open its own panel. One menu choice opens the app at most once. A tile whose `primaryAction` is `openApp` is unaffected: DOKK opens the app itself on the click.
 
 `DOKKPluginTileState` fields, all optional on the wire:
 
 | Field | Meaning |
 | --- | --- |
 | `contractVersion` | The sender's contract version, `1` today |
-| `title` | The tile's name in tooltips, menus, and VoiceOver. Defaults to the extension's display name. |
+| `title` | The tile's name in tooltips, menus, and VoiceOver. Defaults to the extension's display name. Cut to 100 characters. |
 | `badge` | `count(Int)`, `text(String)`, or `dot`. Drawn like an app badge: no badge at 0, `99+` above 99, text cut to 4 characters. Hidden while the plugin is stopped. |
-| `accessibilityValue` | What VoiceOver reads after the title, such as "2 new highlights" |
+| `accessibilityValue` | What VoiceOver reads after the title, such as "2 new highlights". Cut to 200 characters. |
 | `panelSize` | The content size the plugin would like, in points, below DOKK's header |
 | `primaryAction` | `openPanel` (the default) or `openApp`: what a click on the tile does |
-| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, an optional SF Symbol name, and an optional `opensPanel` |
+| `menuItems` | Up to 4 extra commands in the tile's menu, each with an `id`, a localized `title`, an optional SF Symbol name, and an optional `opensPanel`. The `id`, `title` and symbol name are cut to 100 characters. |
 
 ### Versioning
 

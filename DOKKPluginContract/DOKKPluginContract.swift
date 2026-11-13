@@ -42,4 +42,16 @@ nonisolated enum DOKKPluginContract {
 
     /// The longest badge text DOKK draws. Longer text is cut.
     static let maximumBadgeTextLength = 4
+
+    /// The longest tile title, menu item id, menu item title or symbol name DOKK keeps, in
+    /// characters. Longer text is cut when DOKK decodes the tile state.
+    static let maximumLabelLength = 100
+
+    /// The longest ``DOKKPluginTileState/accessibilityValue`` DOKK keeps, in characters. Longer
+    /// text is cut when DOKK decodes the tile state.
+    static let maximumAccessibilityValueLength = 200
+
+    /// The largest message DOKK reads from a plugin, in bytes of JSON. Larger tile states and
+    /// requests are dropped unread.
+    static let maximumMessageBytes = 64 * 1024
 }

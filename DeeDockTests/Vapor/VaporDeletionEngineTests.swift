@@ -121,14 +121,16 @@ struct VaporDeletionEngineTests {
         guard case .staged(_, let stagedEntry) = outcomes.first else { Issue.record("not staged"); return }
         // An entry written before a rename that never happened: the folder is still in place.
         let untouched = try fixture.cache("b/node_modules")
-        let interrupted = VaporLedgerEntry(id: UUID(), originalPath: untouched.path,
-                                           stagedPath: fixture.staging.appendingPathComponent("never").path,
+        let interruptedID = UUID()
+        let interrupted = VaporLedgerEntry(id: interruptedID, originalPath: untouched.path,
+                                           stagedPath: fixture.staging.appendingPathComponent("\(interruptedID.uuidString)-node_modules").path,
                                            bytes: 0, stagedAt: .now, state: .staging)
         // An entry written before a rename that did happen, with the update lost.
         let renamed = try fixture.cache("c/target")
-        let renamedTarget = fixture.staging.appendingPathComponent("\(UUID().uuidString)-target")
+        let lostID = UUID()
+        let renamedTarget = fixture.staging.appendingPathComponent("\(lostID.uuidString)-target")
         try FileManager.default.moveItem(at: renamed, to: renamedTarget)
-        let lost = VaporLedgerEntry(id: UUID(), originalPath: renamed.path, stagedPath: renamedTarget.path,
+        let lost = VaporLedgerEntry(id: lostID, originalPath: renamed.path, stagedPath: renamedTarget.path,
                                     bytes: 0, stagedAt: .now, state: .staging)
         try fixture.ledger.write(fixture.ledger.read() + [interrupted, lost])
 
@@ -142,6 +144,70 @@ struct VaporDeletionEngineTests {
         #expect(!fixture.temp.exists(renamed))
         #expect(fixture.temp.exists(untouched.appendingPathComponent("pkg0/index.js")))
         #expect(fixture.ledger.read().isEmpty)
+    }
+
+    @Test func recoveryNeverDeletesAPathOutsideStaging() async throws {
+        let fixture = try Fixture()
+        // A well-formed entry whose staged path names an ordinary folder, as a corrupt or edited
+        // ledger could.
+        let precious = try fixture.cache("Projects/app", files: 2)
+        let entry = VaporLedgerEntry(id: UUID(), originalPath: fixture.temp.url.appendingPathComponent("x/node_modules").path,
+                                     stagedPath: precious.path, bytes: 1,
+                                     stagedAt: Date(timeIntervalSince1970: 1_800_000_000), state: .staged)
+        try fixture.ledger.write([entry])
+        #expect(await fixture.engine.recover() == 0)
+        #expect(fixture.temp.exists(precious.appendingPathComponent("pkg0/index.js")))
+        #expect(fixture.ledger.read().isEmpty)
+        // Removal applies the same check.
+        #expect(await fixture.engine.remove([entry]).isEmpty)
+        #expect(fixture.temp.exists(precious.appendingPathComponent("pkg1/index.js")))
+    }
+
+    @Test func recoveryLeavesAFileOrLinkAtAStagedPathAlone() async throws {
+        let fixture = try Fixture()
+        let original = fixture.temp.url.appendingPathComponent("app/node_modules")
+        let keep = try fixture.temp.file("elsewhere/keep/important.txt")
+        try FileManager.default.createDirectory(at: fixture.staging, withIntermediateDirectories: true)
+        // A link at a path with exactly the shape staging produces.
+        let linkID = UUID()
+        let link = fixture.staging.appendingPathComponent(VaporStagingLocation.stagedName(for: "node_modules", id: linkID))
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: keep.deletingLastPathComponent())
+        // And a plain file at another one.
+        let fileID = UUID()
+        let file = fixture.staging.appendingPathComponent(VaporStagingLocation.stagedName(for: "node_modules", id: fileID))
+        try Data("data".utf8).write(to: file)
+        let entries = [(linkID, link), (fileID, file)].map { pair in
+            VaporLedgerEntry(id: pair.0, originalPath: original.path, stagedPath: pair.1.path, bytes: 1,
+                             stagedAt: Date(timeIntervalSince1970: 1_800_000_000), state: .staged)
+        }
+        try fixture.ledger.write(entries)
+        #expect(await fixture.engine.recover() == 0)
+        #expect(VaporPathCheck(path: link.path) == .notDirectory)
+        #expect(fixture.temp.exists(file))
+        #expect(fixture.temp.exists(keep))
+        #expect(fixture.ledger.read().isEmpty)
+    }
+
+    @Test func stagedPathShapesMatchWhatStagingProduces() {
+        let location = VaporStagingLocation(homeStaging: URL(fileURLWithPath: "/Users/u/Library/Caches/DOKK/Vapor/staging", isDirectory: true))
+        let id = UUID()
+        let original = URL(fileURLWithPath: "/Volumes/Work/code/app/node_modules")
+        let name = VaporStagingLocation.stagedName(for: "node_modules", id: id)
+        func check(_ path: String, id: UUID = id) -> Bool {
+            location.isStagedPath(URL(fileURLWithPath: path), id: id, original: original)
+        }
+        #expect(check("/Users/u/Library/Caches/DOKK/Vapor/staging/\(name)"))
+        #expect(check("/Volumes/Work/.dokk-vapor/\(name)"))
+        #expect(check("/Volumes/Work/code/app/\(VaporStagingLocation.inPlaceName(for: "node_modules", id: id))"))
+        // Another entry's id, another name, or a folder outside every staging location.
+        #expect(!check("/Users/u/Library/Caches/DOKK/Vapor/staging/\(name)", id: UUID()))
+        #expect(!check("/Users/u/Library/Caches/DOKK/Vapor/staging/\(id.uuidString)-target"))
+        #expect(!check("/Users/u/Documents/\(name)"))
+        #expect(!check("/Users/u/Documents"))
+        // A `.dokk-vapor` folder that isn't on the path to the original, and `..` escapes.
+        #expect(!check("/Volumes/Other/.dokk-vapor/\(name)"))
+        #expect(!check("/Users/u/Library/Caches/DOKK/Vapor/staging/../../../../Documents/\(name)"))
+        #expect(!check("/Volumes/Work/code/other/\(VaporStagingLocation.inPlaceName(for: "node_modules", id: id))"))
     }
 
     @Test func ledgerRoundTripsAndAnEmptyListRemovesTheFile() throws {

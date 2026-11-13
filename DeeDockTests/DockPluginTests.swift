@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import os
 import Testing
 @testable import DeeDock
 
@@ -124,6 +125,60 @@ struct DockPluginTests {
         #expect(DOKKPluginHostEvent.decode(Data(#"{"kind":"later"}"#.utf8)) == nil)
         #expect(DOKKPluginRequest.decode(Data(#"{"kind":"openPanel"}"#.utf8)) == nil)
         #expect(DOKKPluginTileState.decode(Data("not json".utf8)) == nil)
+    }
+
+    @Test("A message over 64 KB is dropped before it is decoded")
+    func oversizedMessagesAreDropped() {
+        let padding = String(repeating: "x", count: DOKKPluginContract.maximumMessageBytes)
+        let oversized = Data(#"{"title":"Hi","pad":"\#(padding)"}"#.utf8)
+        #expect(oversized.count > DOKKPluginContract.maximumMessageBytes)
+        // Valid JSON for a tile state, so only the size keeps it out.
+        #expect(DOKKPluginTileState.decode(oversized)?.title == "Hi")
+        #expect(DockPluginHostEndpoint.decodeState(oversized) == nil)
+        #expect(DockPluginHostEndpoint.decodeState(Data(#"{"title":"Hi"}"#.utf8))?.title == "Hi")
+
+        let states = OSAllocatedUnfairLock(initialState: [DOKKPluginTileState]())
+        let requests = OSAllocatedUnfairLock(initialState: [DOKKPluginRequest]())
+        let endpoint = DockPluginHostEndpoint(stateChanged: { state in states.withLock { $0.append(state) } },
+                                              requested: { request in requests.withLock { $0.append(request) } })
+        endpoint.tileStateDidChange(oversized)
+        endpoint.perform(Data(#"{"kind":"closePanel","pad":"\#(padding)"}"#.utf8))
+        #expect(states.withLock { $0.isEmpty })
+        #expect(requests.withLock { $0.isEmpty })
+        endpoint.perform(DOKKPluginRequest.closePanel.encoded())
+        #expect(requests.withLock { $0 } == [.closePanel])
+    }
+
+    @Test("Long text from a plugin is cut when it is decoded")
+    func longTextIsClamped() throws {
+        let long = String(repeating: "é", count: 500)
+        let state = DOKKPluginTileState(title: long, accessibilityValue: long,
+                                        menuItems: [DOKKPluginMenuItem(id: long, title: long, systemImage: long)])
+        let decoded = try #require(DOKKPluginTileState.decode(state.encoded()))
+        #expect(decoded.title?.count == DOKKPluginContract.maximumLabelLength)
+        #expect(decoded.accessibilityValue?.count == DOKKPluginContract.maximumAccessibilityValueLength)
+        let item = try #require(decoded.menuItems.first)
+        #expect(item.id.count == DOKKPluginContract.maximumLabelLength)
+        #expect(item.title.count == DOKKPluginContract.maximumLabelLength)
+        #expect(item.systemImage?.count == DOKKPluginContract.maximumLabelLength)
+        // Short text and missing optionals are untouched.
+        let short = DOKKPluginTileState(title: "Hi", menuItems: [DOKKPluginMenuItem(id: "a", title: "A")])
+        #expect(DOKKPluginTileState.decode(short.encoded()) == short)
+        // A menu item without an id or title is still rejected, as before.
+        #expect(DOKKPluginTileState.decode(Data(#"{"menuItems":[{"title":"A"}]}"#.utf8))?.menuItems == [])
+    }
+
+    @Test("A plugin's tile states coalesce to the newest, with one delivery pending")
+    func tileStatesCoalesce() {
+        let mailbox = DockPluginStateMailbox()
+        #expect(mailbox.put(DOKKPluginTileState(title: "1")))
+        #expect(!mailbox.put(DOKKPluginTileState(title: "2")))
+        #expect(!mailbox.put(DOKKPluginTileState(title: "3")))
+        #expect(mailbox.take()?.title == "3")
+        #expect(mailbox.take() == nil)
+        // After a delivery, the next state schedules a new one.
+        #expect(mailbox.put(DOKKPluginTileState(title: "4")))
+        #expect(mailbox.take()?.title == "4")
     }
 
     // MARK: Tile

@@ -43,11 +43,20 @@ final class DockPluginController {
     /// Plugins whose panel is open. A session that connects later, after a restart or a slow
     /// launch, is told so once its first state arrives, since `panelOpened` sent earlier was lost.
     @ObservationIgnored private var openPanels: Set<String> = []
+    /// When the person last chose one of each plugin's menu items, for ``acceptsOpenAppRequest(from:)``.
+    @ObservationIgnored private var menuChoices: [String: Date] = [:]
+    @ObservationIgnored private let now: () -> Date
+
+    /// How long after a menu choice a plugin's `openApp` request still counts as answering it.
+    static let menuChoiceGestureWindow: TimeInterval = 2
 
     /// - Parameters:
     ///   - pins: Where pins are saved. Nil uses the app's defaults.
     ///   - makeSession: Makes each plugin's session. Nil connects through ExtensionKit; tests pass fakes.
-    init(pins: DockPluginPinStore? = nil, makeSession: DockPluginSessionFactory? = nil) {
+    ///   - now: The clock for the menu-choice window. Tests pass a fixed one.
+    init(pins: DockPluginPinStore? = nil, makeSession: DockPluginSessionFactory? = nil,
+         now: @escaping () -> Date = Date.init) {
+        self.now = now
         self.pins = pins ?? DockPluginPinStore()
         self.makeSession = makeSession ?? { plugin, onEvent in
             plugin.identity.map { DockPluginConnection(identity: $0, onEvent: onEvent) }
@@ -81,6 +90,7 @@ final class DockPluginController {
         for session in sessions.values { session.stop() }
         sessions.removeAll()
         openPanels.removeAll()
+        menuChoices.removeAll()
         for plugin in plugins { plugin.status = .idle }
         dockItemsChanged = nil
         closePanel = nil
@@ -140,7 +150,22 @@ final class DockPluginController {
 
     /// Reports a chosen plugin menu item back to the plugin.
     func chooseMenuItem(_ itemID: String, of id: String) {
+        menuChoices[id] = now()
         sessions[id]?.send(.menuItemChosen(itemID))
+    }
+
+    /// Whether a plugin's ``DOKKPluginRequest/openApp`` request answers something the person just
+    /// did: its panel is open (the request comes from a button in it), or they chose one of its
+    /// menu items within ``menuChoiceGestureWindow``.
+    ///
+    /// A plugin is a third-party process. Without this check it could launch and activate its
+    /// app at any moment, stealing focus, which the contract rules out just as it rules out a
+    /// plugin opening its own panel.
+    func acceptsOpenAppRequest(from id: String) -> Bool {
+        if openPanels.contains(id) { return true }
+        guard let chosen = menuChoices[id] else { return false }
+        let elapsed = now().timeIntervalSince(chosen)
+        return elapsed >= 0 && elapsed <= Self.menuChoiceGestureWindow
     }
 
     /// Tells the plugin its panel opened or closed.
@@ -291,7 +316,11 @@ final class DockPluginController {
     private func handle(_ request: DOKKPluginRequest, from id: String) {
         switch request {
         case .closePanel: closePanel?(id)
-        case .openApp: openApp(id)
+        case .openApp:
+            guard acceptsOpenAppRequest(from: id) else { return }
+            // One menu choice opens the app at most once.
+            menuChoices[id] = nil
+            openApp(id)
         }
     }
 }
