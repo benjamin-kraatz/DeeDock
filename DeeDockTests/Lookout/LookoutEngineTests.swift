@@ -168,15 +168,16 @@ import Testing
     /// Outside the Files tab, a sync right after another waits out the minimum gap; opening the tab runs it at once.
     @Test func backToBackSyncsWaitForTheGapUnlessTheFilesTabIsOpen() async {
         let engine = engine(syncTiming: LookoutSyncPacer.Timing(
-            quiet: .milliseconds(10), maxWait: .seconds(60), minGap: .seconds(30), maxGap: .seconds(60),
-            burstWindow: .seconds(60), resetAfter: .seconds(300)))
+            quiet: .milliseconds(10), maxWait: .seconds(60), minGap: .seconds(300), maxGap: .seconds(300),
+            burstWindow: .seconds(60), resetAfter: .seconds(600)))
         engine.start()
         connection.clearCalls()
         monitor.emit(.foldersChanged)
         #expect(await eventually { connection.calls == [.syncNow] })
         monitor.emit(.foldersChanged)
         try? await Task.sleep(for: .milliseconds(150))
-        #expect(connection.calls == [.syncNow])   // held back: 30 s since the last sync haven't passed
+        // Held back: the gap is far longer than any wait below, so only opening the tab can release it.
+        #expect(connection.calls == [.syncNow])
         engine.hubFilesDidAppear()
         #expect(await eventually { connection.calls.filter { $0 == .syncNow }.count == 2 })
         // While the tab is open, changes sync after their quiet period alone.
