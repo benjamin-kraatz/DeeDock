@@ -160,7 +160,7 @@ import Testing
                 try? await Task.sleep(for: .milliseconds(5))
             }
         }
-        #expect(await eventually(timeout: .seconds(10)) { connection.calls.contains(.syncNow) })
+        #expect(await eventually { connection.calls.contains(.syncNow) })
         churn.cancel()
         _ = engine
     }
@@ -173,15 +173,15 @@ import Testing
         engine.start()
         connection.clearCalls()
         monitor.emit(.foldersChanged)
-        #expect(await eventually(timeout: .seconds(10)) { connection.calls == [.syncNow] })
+        #expect(await eventually { connection.calls == [.syncNow] })
         monitor.emit(.foldersChanged)
         try? await Task.sleep(for: .milliseconds(150))
         #expect(connection.calls == [.syncNow])   // held back: 30 s since the last sync haven't passed
         engine.hubFilesDidAppear()
-        #expect(await eventually(timeout: .seconds(10)) { connection.calls.filter { $0 == .syncNow }.count == 2 })
+        #expect(await eventually { connection.calls.filter { $0 == .syncNow }.count == 2 })
         // While the tab is open, changes sync after their quiet period alone.
         monitor.emit(.foldersChanged)
-        #expect(await eventually(timeout: .seconds(10)) { connection.calls.filter { $0 == .syncNow }.count == 3 })
+        #expect(await eventually { connection.calls.filter { $0 == .syncNow }.count == 3 })
         engine.hubDidClose()
         _ = engine
     }

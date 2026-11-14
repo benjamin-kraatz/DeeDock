@@ -43,7 +43,7 @@ struct HubThumbnailCacheTests {
         let cache = cache()
         let leaving = Task { await cache.thumbnail(for: url, size: size, scale: 2) }
         let staying = Task { await cache.thumbnail(for: url, size: size, scale: 2) }
-        #expect(await eventually(timeout: .seconds(10)) { await probe.starts == 1 })
+        #expect(await eventually { await probe.starts == 1 })
         leaving.cancel()
         #expect(await leaving.value == nil)
         let image = await staying.value
@@ -58,10 +58,10 @@ struct HubThumbnailCacheTests {
         await probe.setDelay(.seconds(30))
         let cache = cache()
         let leaving = Task { await cache.thumbnail(for: url, size: size, scale: 2) }
-        #expect(await eventually(timeout: .seconds(10)) { await probe.starts == 1 })
+        #expect(await eventually { await probe.starts == 1 })
         leaving.cancel()
         #expect(await leaving.value == nil)
-        #expect(await eventually(timeout: .seconds(10)) { await probe.cancellations == 1 })
+        #expect(await eventually { await probe.cancellations == 1 })
         await probe.setDelay(.zero)
         #expect(await cache.thumbnail(for: url, size: size, scale: 2) != nil)
         #expect(await probe.starts == 2)
