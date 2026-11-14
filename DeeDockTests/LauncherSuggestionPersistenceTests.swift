@@ -26,7 +26,7 @@ struct LauncherSuggestionPersistenceTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = try await store(directory, delay: .milliseconds(20), maxWait: .seconds(600))
         observeTransition(store)
-        #expect(await eventually(timeout: .seconds(10)) {
+        #expect(await eventually {
             (try? await repository.load())?.examples.count == 1
         })
         withExtendedLifetime(store) {}
@@ -38,7 +38,7 @@ struct LauncherSuggestionPersistenceTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = try await store(directory, delay: .seconds(60), maxWait: .milliseconds(20))
         observeTransition(store)
-        #expect(await eventually(timeout: .seconds(10)) {
+        #expect(await eventually {
             (try? await repository.load())?.examples.count == 1
         })
         withExtendedLifetime(store) {}
@@ -55,7 +55,7 @@ struct LauncherSuggestionPersistenceTests {
         try await repository.save(history, sequence: 1)
         let store = try await store(directory, delay: .seconds(60), maxWait: .seconds(600))
         if action == "reset" { store.reset() } else { store.exclude(appID: "target") }
-        #expect(await eventually(timeout: .seconds(10)) {
+        #expect(await eventually {
             (try? await repository.load())?.examples.isEmpty == true
         })
         withExtendedLifetime(store) {}
