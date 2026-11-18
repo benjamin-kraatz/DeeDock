@@ -114,10 +114,13 @@ struct WindowPreviewPrivacyTests {
         #expect(reopened.cards.allSatisfy { $0.preview == nil })
     }
 
-    @Test("The compiled model is bundled and runs in the app's inference path")
-    func bundledModel() async throws {
-        let result = await CoreMLWindowPreviewClassifier.shared.classify(try image())
-        #expect(result != .unavailable)
+    @Test("The bundled Core ML model produces a sensitive confidence score")
+    func bundledModel() throws {
+        let url = try #require(Bundle.main.url(forResource: "SensitiveWindowPreview", withExtension: "mlmodelc"))
+        let model = try WindowPreviewScoring.load(url)
+        // The hosted runner lacks Vision's OCR backend. Exercise the same image scoring the app uses.
+        let score = try WindowPreviewScoring.score(try image(), model: model)
+        #expect((0...1).contains(score))
     }
 
     private func frame(_ decision: WindowPreviewDecision) async throws -> ClassifiedWindowPreview {
