@@ -16,14 +16,17 @@ actor HarborWindowService {
 
     /// Gathers every window of `apps` in the current Space, plus their minimized and hidden windows.
     func discover(apps: [HarborRunningApp]) async -> HarborDiscovery {
-        await end()
         let session = UUID()
+        shareable = [:]
         sessionID = session
+        await accessibility.stop()
+        guard sessionID == session, !Task.isCancelled else { return Self.emptyDiscovery(session) }
         var screen = Self.screenWindows()
         var capturable: Set<CGWindowID>?
         if CGPreflightScreenCaptureAccess() {
             do {
                 let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
+                guard sessionID == session, !Task.isCancelled else { return Self.emptyDiscovery(session) }
                 shareable = Dictionary(content.windows.map { ($0.windowID, $0) }, uniquingKeysWith: { first, _ in first })
                 capturable = Set(shareable.keys)
                 for index in screen.indices {
@@ -40,21 +43,29 @@ actor HarborWindowService {
             }
             summaries = try? await accessibility.discover(processes: processes, sessionID: session)
         }
+        guard sessionID == session, !Task.isCancelled else { return Self.emptyDiscovery(session) }
         let windows = HarborDiscoveryProjection.windows(apps: apps, accessibility: summaries, screen: screen,
                                                          capturable: capturable)
         return HarborDiscovery(windows: windows, access: HarborAccess(windows: summaries != nil, thumbnails: capturable != nil),
                                sessionID: session)
     }
 
-    /// Captures one window fitted into `pixels`. Returns nil when the window is gone or protected.
-    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize) async -> CGImage? {
-        guard let window = shareable[number] else { return nil }
+    private static func emptyDiscovery(_ session: UUID) -> HarborDiscovery {
+        HarborDiscovery(windows: [], access: HarborAccess(windows: false, thumbnails: false), sessionID: session)
+    }
+
+    /// Captures and classifies the window resolved by `session`. Returns nil if discovery replaced it.
+    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize, session: UUID) async -> ClassifiedWindowPreview? {
+        guard sessionID == session, let window = shareable[number] else { return nil }
         do {
-            return try await WindowScreenshot.capture(window, fittingPixels: pixels)
+            let image = try await WindowScreenshot.capture(window, fittingPixels: pixels)
+            guard sessionID == session, !Task.isCancelled else { return nil }
+            let preview = await ClassifiedWindowPreview.classify(image, using: CoreMLWindowPreviewClassifier.shared)
+            return sessionID == session && !Task.isCancelled ? preview : nil
         } catch is CancellationError {
             return nil
         } catch {
-            Self.logger.error("Harbor thumbnail failed: \(error.localizedDescription, privacy: .public)")
+            Self.logger.error("Harbor thumbnail capture failed")
             return nil
         }
     }

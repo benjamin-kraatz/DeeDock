@@ -22,7 +22,7 @@ protocol HubWindowsSource: AnyObject {
 
     /// Captures one window fitted into `pixels`, or nil when it is gone, protected, or Screen
     /// Recording is off. Runs off the main actor.
-    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize) async -> CGImage?
+    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize, session: UUID) async -> ClassifiedWindowPreview?
 
     /// Brings `window` forward: unhides its app, unminimizes it, and raises the exact window when
     /// Accessibility allows, otherwise activates its app.
@@ -52,8 +52,8 @@ final class HarborHubWindowsSource: HubWindowsSource {
         await service.discover(apps: apps)
     }
 
-    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize) async -> CGImage? {
-        await service.thumbnail(number, fittingPixels: pixels)
+    func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize, session: UUID) async -> ClassifiedWindowPreview? {
+        await service.thumbnail(number, fittingPixels: pixels, session: session)
     }
 
     func activate(_ window: HarborWindow) async {

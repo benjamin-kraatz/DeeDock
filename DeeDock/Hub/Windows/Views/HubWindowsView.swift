@@ -52,7 +52,10 @@ private struct HubWindowsGrid: View {
             ScrollView(.vertical) {
                 HubWindowsWrapLayout(spacing: 14, lineSpacing: 14) {
                     ForEach(Array(model.shownGroups.enumerated()), id: \.element.id) { index, group in
-                        HubWindowGroupCard(group: group, icon: model.icons[group.id], thumbnails: model.thumbnails,
+                        HubWindowGroupCard(group: group, icon: model.icons[group.id],
+                                           thumbnail: model.thumbnail, previewControl: model.previewControl,
+                                           previewUnavailable: model.previewUnavailable,
+                                           hoverPreview: model.hoverPreview,
                                            selection: model.selection, reduceMotion: model.reduceMotion,
                                            activate: model.activate,
                                            reportFrame: { id, frame in model.cardFrames[id] = frame })

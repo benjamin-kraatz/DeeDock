@@ -194,6 +194,8 @@ final class WindowPeekPanelController {
         state.showAll = nil
         state.hovered = nil
         state.thumbnailNeeded = nil
+        state.resetPreviewReveal()
+        state.cards = []
         state.cardHovered = nil
         ownsAuxiliaryWindow = nil
         panel.keyboardHandler = nil
@@ -233,6 +235,10 @@ final class WindowPeekPanelController {
             if let card = state.cards.first(where: { $0.id == state.selectedID }) {
                 state.addToFusion?(card.window)
             }
+        case 15 where WindowPreviewRevealShortcut.matches(event):
+            guard let card = state.cards.first(where: { $0.id == state.selectedID }),
+                  let control = state.previewControl(for: card) else { return false }
+            if !event.isARepeat { control.action() }
         case 36, 76: state.chooseSelection()
         case 53: close(returnFocus: true)
         case 123, 126: state.select(by: -1)

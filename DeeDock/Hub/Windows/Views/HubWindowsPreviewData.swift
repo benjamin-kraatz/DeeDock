@@ -12,7 +12,7 @@ enum HubWindowsPreviewData {
         func discover(apps: [HarborRunningApp]) async -> HarborDiscovery {
             HarborDiscovery(windows: [], access: HarborAccess(windows: true, thumbnails: true), sessionID: UUID())
         }
-        func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize) async -> CGImage? { nil }
+        func thumbnail(_ number: CGWindowID, fittingPixels pixels: CGSize, session: UUID) async -> ClassifiedWindowPreview? { nil }
         func activate(_ window: HarborWindow) async {}
         func end(session: UUID) async {}
     }

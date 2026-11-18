@@ -302,7 +302,7 @@ final class HarborCoordinator: HarborIntents {
         let requests = captureRequests(screens: screens)
         let captures = Task { [weak self] in
             guard let self else { return }
-            await capture(requests, generation: generation)
+            await capture(requests, generation: generation, sessionID: discovery.sessionID)
         }
         capturing = captures
 
@@ -368,15 +368,15 @@ final class HarborCoordinator: HarborIntents {
     }
 
     /// Captures thumbnails a few at a time and publishes each one as it lands.
-    private func capture(_ requests: [(UUID, CGWindowID, CGSize)], generation: UUID) async {
+    private func capture(_ requests: [(UUID, CGWindowID, CGSize)], generation: UUID, sessionID: UUID) async {
         let service = service
-        await withTaskGroup(of: (UUID, CGImage?).self) { group in
+        await withTaskGroup(of: (UUID, ClassifiedWindowPreview?).self) { group in
             var next = 0
             func enqueue() {
                 guard next < requests.count else { return }
                 let (id, number, pixels) = requests[next]
                 next += 1
-                group.addTask { (id, await service.thumbnail(number, fittingPixels: pixels)) }
+                group.addTask { (id, await service.thumbnail(number, fittingPixels: pixels, session: sessionID)) }
             }
             for _ in 0..<Self.captureConcurrency { enqueue() }
             while let (id, image) = await group.next() {
@@ -392,6 +392,8 @@ final class HarborCoordinator: HarborIntents {
                         snap.disablesAnimations = true
                         withTransaction(snap) { session.setThumbnail(image, for: id) }
                     }
+                } else {
+                    session.setThumbnail(nil, for: id)
                 }
                 enqueue()
             }
@@ -469,6 +471,11 @@ final class HarborCoordinator: HarborIntents {
             } else {
                 dismiss()
             }
+            return true
+        case 15 where WindowPreviewRevealShortcut.matches(event):
+            guard let id = session.selected ?? session.hovered,
+                  let control = session.previewControl(for: id) else { return false }
+            if !event.isARepeat { control.action() }
             return true
         case 36, 76:
             if let id = session.selected ?? session.hovered ?? session.keyboardOrder.first { activate(id) }

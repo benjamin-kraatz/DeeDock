@@ -49272,6 +49272,96 @@
         }
       }
     },
+    "windowPreviewHide" : {
+      "comment" : "Accessibility label for the control that covers a revealed window thumbnail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide preview"
+          }
+        }
+      }
+    },
+    "windowPreviewHideHelp" : {
+      "comment" : "Keyboard shortcut help for covering a revealed window thumbnail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählte Vorschau mit ⌥R ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide the selected preview with ⌥R"
+          }
+        }
+      }
+    },
+    "windowPreviewReveal" : {
+      "comment" : "Button and accessibility label that temporarily shows a sensitive window thumbnail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show preview"
+          }
+        }
+      }
+    },
+    "windowPreviewRevealHelp" : {
+      "comment" : "Keyboard shortcut help for revealing the selected sensitive window thumbnail.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählte Vorschau mit ⌥R anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the selected preview with ⌥R"
+          }
+        }
+      }
+    },
+    "windowPreviewUnavailable" : {
+      "comment" : "Placeholder label when a window thumbnail is missing or its classification failed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschau nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview unavailable"
+          }
+        }
+      }
+    },
     "windowSearchCapsuleEvidence" : {
       "comment" : "Window search: Saved capsule text · historical",
       "extractionState" : "manual",

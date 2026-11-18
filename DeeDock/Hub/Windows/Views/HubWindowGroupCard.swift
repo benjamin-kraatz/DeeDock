@@ -5,7 +5,10 @@ import SwiftUI
 struct HubWindowGroupCard: View {
     let group: HubWindowGroup
     let icon: NSImage?
-    let thumbnails: [CGWindowID: CGImage]
+    let thumbnail: (HubWindowItem) -> CGImage?
+    let previewControl: (HubWindowItem) -> WindowPreviewControl?
+    let previewUnavailable: (HubWindowItem) -> Bool
+    let hoverPreview: (String) -> Void
     let selection: String?
     let reduceMotion: Bool
     let activate: (HubWindowItem) -> Void
@@ -21,10 +24,13 @@ struct HubWindowGroupCard: View {
             HubWindowsWrapLayout(spacing: 12, lineSpacing: 14) {
                 ForEach(group.windows) { item in
                     HubWindowCard(item: item, appName: group.name, icon: icon,
-                                  thumbnail: item.window.captureID.flatMap { thumbnails[$0] },
-                                  isSelected: selection == item.id, reduceMotion: reduceMotion) {
+                                  thumbnail: thumbnail(item),
+                                  isSelected: selection == item.id, reduceMotion: reduceMotion,
+                                  previewControl: previewControl(item),
+                                  previewUnavailable: previewUnavailable(item)) {
                         activate(item)
                     }
+                    .onHover { if $0 { hoverPreview(item.id) } }
                     .id(item.id)
                     .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(HubWindowsView.gridSpace)) } action: {
                         reportFrame(item.id, $0)

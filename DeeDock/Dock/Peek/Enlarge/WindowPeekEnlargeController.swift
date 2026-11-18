@@ -22,6 +22,7 @@ import SwiftUI
 @MainActor
 final class WindowPeekEnlargeController {
     private let thumbnails: any WindowThumbnailServicing
+    private let classifier: any WindowPreviewClassifying
     private weak var peek: WindowPeekPanelController?
     /// Opens the markup editor for the staged card; set by the coordinator.
     var markup: ((ApplicationWindowToken) -> Void)?
@@ -55,9 +56,10 @@ final class WindowPeekEnlargeController {
     private var landing: WindowPeekLanding?
 
     init(peek: WindowPeekPanelController, thumbnails: any WindowThumbnailServicing,
-         externallyBlocked: @escaping () -> Bool) {
+         classifier: any WindowPreviewClassifying, externallyBlocked: @escaping () -> Bool) {
         self.peek = peek
         self.thumbnails = thumbnails
+        self.classifier = classifier
         self.externallyBlocked = externallyBlocked
         // Local only: clicks and keys in Peek's own panel. Outside clicks already close all of Peek.
         eventMonitor = NSEvent.addLocalMonitorForEvents(
@@ -209,6 +211,10 @@ final class WindowPeekEnlargeController {
     func hover(_ token: ApplicationWindowToken, inside: Bool) {
         guard !stopped else { return }
         if inside {
+            if let staged, staged.token != token {
+                captureTask?.cancel()
+                captureTask = nil
+            }
             hovered = token
             leaveTask?.cancel()
             leaveTask = nil
@@ -410,7 +416,7 @@ final class WindowPeekEnlargeController {
             peek.state.liftedID = token
         }
         if reusable == nil {
-            requestDetail(for: card.window, exhibit: exhibit,
+            requestDetail(for: card, exhibit: exhibit,
                           pixels: WindowPeekEnlargeGeometry.capturePixels(hero: hero.size,
                                                                          backingScale: screen.backingScaleFactor))
         }
@@ -418,15 +424,24 @@ final class WindowPeekEnlargeController {
 
     /// The strip image is only as sharp as the card. `pixels` is already the hero in backing pixels
     /// and must reach `fittingPixels` unchanged.
-    private func requestDetail(for window: ApplicationWindowSummary, exhibit: WindowPeekExhibit, pixels: CGSize) {
+    private func requestDetail(for card: WindowPeekCard, exhibit: WindowPeekExhibit, pixels: CGSize) {
+        let window = card.window
         guard !window.isMinimized else { return }
-        captureTask = Task { @MainActor [weak self, thumbnails] in
+        captureTask = Task { @MainActor [weak self, thumbnails, classifier] in
             let image = await thumbnails.capture(window, fittingPixels: pixels)
             guard let self, !Task.isCancelled, staged === exhibit else { return }
+            guard let image else { captureTask = nil; return }
+            let preview = await ClassifiedWindowPreview.classify(image, using: classifier)
+            guard !Task.isCancelled, staged === exhibit, let state = peek?.state,
+                  state.cards.contains(where: { $0.captureRevision == card.captureRevision }) else { return }
             captureTask = nil
-            guard let image else { return }
-            // The exhibit view crossfades from the strip image when this arrives.
-            exhibit.detail = image
+            if let image = preview.clearedImage {
+                // The stage crossfades only between independently cleared frames.
+                exhibit.detail = image
+            } else {
+                state.applyPreview(preview, to: card)
+                dismiss()
+            }
         }
     }
 
