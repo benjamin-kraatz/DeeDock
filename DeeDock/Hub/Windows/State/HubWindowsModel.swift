@@ -37,10 +37,51 @@ final class HubWindowsModel: HubTabModel {
     private(set) var access = HarborAccess(windows: true, thumbnails: true)
     /// App icons by app ID.
     private(set) var icons: [String: NSImage] = [:]
-    /// Captured thumbnails by window-server number, which survives rediscovery.
-    private(set) var thumbnails: [CGWindowID: CGImage] = [:]
+    /// Classified frames are scoped to the discovery that resolved their window-server numbers.
+    private var previews: [CGWindowID: ClassifiedWindowPreview] = [:]
+    private var previewReveal = WindowPreviewReveal<String>()
+    private var missingPreviews: Set<CGWindowID> = []
+    #if DEBUG
+    private var fixtureThumbnails: [CGWindowID: CGImage] = [:]
+    #endif
+
+    func thumbnail(for item: HubWindowItem) -> CGImage? {
+        guard let number = item.window.captureID else { return nil }
+        if let preview = previews[number] { return previewReveal.image(preview, for: item.id) }
+        #if DEBUG
+        return fixtureThumbnails[number]
+        #else
+        return nil
+        #endif
+    }
+
+    func previewControl(for item: HubWindowItem) -> WindowPreviewControl? {
+        guard let number = item.window.captureID, let preview = previews[number],
+              preview.decision == .sensitive else { return nil }
+        let id = item.id, frame = preview.id
+        let revealed = thumbnail(for: item) != nil
+        return WindowPreviewControl(isRevealed: revealed) { [weak self] in
+            guard let self, let preview = previews[number], preview.id == frame,
+                  orderedItems.contains(where: { $0.id == id }) else { return }
+            if revealed {
+                previewReveal.hide(preview, for: id)
+            } else {
+                selection = id
+                previewReveal.reveal(preview, for: id)
+            }
+        }
+    }
+
+    func previewUnavailable(for item: HubWindowItem) -> Bool {
+        guard access.thumbnails, let number = item.window.captureID else { return true }
+        return missingPreviews.contains(number) || previews[number]?.decision == .unavailable
+    }
+
+    func hoverPreview(_ id: String) { previewReveal.select(id) }
     /// The keyboard-selected card's ``HubWindowItem/id``.
-    var selection: String?
+    var selection: String? {
+        didSet { previewReveal.select(selection) }
+    }
     /// Read when the tab appears; previews set it directly.
     private(set) var reduceMotion = false
 
@@ -104,7 +145,7 @@ final class HubWindowsModel: HubTabModel {
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         selection = nil
         installObservers()
-        refresh(recapture: true)
+        refresh()
     }
 
     func hubTabDidDisappear(_ exit: HubTabExit) {
@@ -113,6 +154,9 @@ final class HubWindowsModel: HubTabModel {
         pendingRefresh = nil
         discovery?.cancel()
         discovery = nil
+        previews = [:]
+        missingPreviews = []
+        previewReveal = .init()
         cancelCaptures()
         generation = UUID()
         shell = nil
@@ -158,6 +202,10 @@ final class HubWindowsModel: HubTabModel {
             moveSelection(event.keyCode == 125 ? .down : .up)
             if fromSearchField { shell?.focusContent() }
             return true
+        case 15 where WindowPreviewRevealShortcut.matches(event):
+            guard !fromSearchField, let item = selectedItem, let control = previewControl(for: item) else { return false }
+            if !event.isARepeat { control.action() }
+            return true
         case 36, 76:
             guard modifiers.isEmpty, let item = selectedItem ?? (query.isEmpty ? nil : orderedItems.first) else { return false }
             activate(item)
@@ -191,11 +239,13 @@ final class HubWindowsModel: HubTabModel {
 
     // MARK: Discovery
 
-    /// Starts a discovery that replaces the shown groups when it finishes.
-    /// - Parameter recapture: Captures every thumbnail again rather than only missing ones; set
-    ///   when the tab appears, since windows may have changed while it was hidden.
-    private func refresh(recapture: Bool) {
+    /// Clears previews before rediscovery so a recycled window-server number cannot inherit a frame.
+    private func refresh() {
         discovery?.cancel()
+        cancelCaptures()
+        previews = [:]
+        missingPreviews = []
+        previewReveal = .init()
         let generation = UUID()
         self.generation = generation
         if phase == .idle { phase = .loading }
@@ -208,20 +258,18 @@ final class HubWindowsModel: HubTabModel {
                 await source.end(session: result.sessionID)
                 return
             }
-            self.apply(result, running: running, recapture: recapture)
+            self.apply(result, running: running)
         }
     }
 
-    private func apply(_ discovery: HarborDiscovery, running: [HubRunningApp], recapture: Bool) {
+    private func apply(_ discovery: HarborDiscovery, running: [HubRunningApp]) {
         sessionID = discovery.sessionID
         access = discovery.access
         icons = Dictionary(running.map { ($0.app.id, $0.icon) }, uniquingKeysWith: { first, _ in first })
         groups = HubWindowsGrouping.groups(windows: discovery.windows, apps: running.map(\.app))
-        let numbers = Set(groups.flatMap { $0.windows.compactMap(\.window.captureID) })
-        thumbnails = thumbnails.filter { numbers.contains($0.key) }
         refilter()
         phase = .loaded
-        scheduleCaptures(recapture: recapture)
+        scheduleCaptures()
     }
 
     private func refilter() {
@@ -235,7 +283,7 @@ final class HubWindowsModel: HubTabModel {
         pendingRefresh = Task { [weak self] in
             try? await Task.sleep(for: Self.refreshDelay)
             guard !Task.isCancelled else { return }
-            self?.refresh(recapture: false)
+            self?.refresh()
         }
     }
 
@@ -243,26 +291,28 @@ final class HubWindowsModel: HubTabModel {
 
     /// Queues captures for on-screen windows in display order. Runs after the cards are on screen,
     /// at most ``thumbnailConcurrency`` at a time on the service actor, never on the main path.
-    private func scheduleCaptures(recapture: Bool) {
+    private func scheduleCaptures() {
         cancelCaptures()
         guard access.thumbnails else { return }
         let scale = NSScreen.main?.backingScaleFactor ?? 2
         captureQueue = groups.flatMap(\.windows).compactMap { item in
-            guard let number = item.window.captureID, recapture || thumbnails[number] == nil else { return nil }
+            guard let number = item.window.captureID else { return nil }
             return (number, Self.capturePixels(for: item.window.frame.size, scale: scale))
         }
         pumpCaptures()
     }
 
     private func pumpCaptures() {
+        guard let sessionID else { return }
         let source = source, generation = generation
         while captures.count < Self.thumbnailConcurrency, !captureQueue.isEmpty {
             let (number, pixels) = captureQueue.removeFirst()
             captures[number] = Task { [weak self] in
-                let image = await source.thumbnail(number, fittingPixels: pixels)
+                let image = await source.thumbnail(number, fittingPixels: pixels, session: sessionID)
                 guard let self, !Task.isCancelled, self.generation == generation else { return }
                 self.captures[number] = nil
-                if let image { self.thumbnails[number] = image }
+                if let image { self.previews[number] = image }
+                else { self.missingPreviews.insert(number) }
                 self.pumpCaptures()
             }
         }
@@ -325,7 +375,7 @@ final class HubWindowsModel: HubTabModel {
                         thumbnails: [CGWindowID: CGImage] = [:], selection: String? = nil, query: String = "",
                         reduceMotion: Bool = false) {
         self.access = access
-        self.thumbnails = thumbnails
+        fixtureThumbnails = thumbnails
         self.reduceMotion = reduceMotion
         icons = Dictionary(running.map { ($0.app.id, $0.icon) }, uniquingKeysWith: { first, _ in first })
         groups = HubWindowsGrouping.groups(windows: windows, apps: running.map(\.app))

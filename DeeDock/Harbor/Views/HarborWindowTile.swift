@@ -20,6 +20,8 @@ struct HarborWindowTile: View {
     let lifted: Bool
     let canClose: Bool
     let reduceMotion: Bool
+    var previewControl: WindowPreviewControl? = nil
+    var previewUnavailable = false
     let hover: (Bool) -> Void
     let activate: () -> Void
     let close: () -> Void
@@ -65,11 +67,19 @@ struct HarborWindowTile: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: title == appName ? title : "\(title), \(appName)"))
+            .accessibilityValue(previewUnavailable ? Text(.windowPreviewUnavailable) : Text(verbatim: ""))
             .accessibilityAddTraits(.isButton)
             .accessibilityAction(.default, activate)
             .accessibilityActions {
                 if canClose {
                     Button(action: close) { Text(.harborCloseWindow) }
+                }
+            }
+            .overlay {
+                if let previewControl {
+                    WindowPreviewControls(control: previewControl)
+                        .frame(width: size.width, height: size.height)
+                        .scaleEffect(lifted && !reduceMotion ? HarborStyle.hoverLift : 1)
                 }
             }
     }
@@ -81,8 +91,9 @@ struct HarborWindowTile: View {
                 .resizable()
                 .interpolation(.high)
                 .aspectRatio(contentMode: .fill)
+                .transition(.identity)
         } else {
-            HarborWindowPlaceholder(title: title, icon: icon, size: size)
+            WindowPreviewPlaceholder(icon: icon, covered: previewControl != nil, unavailable: previewUnavailable)
         }
     }
 }
@@ -111,33 +122,6 @@ struct HarborCaption: View {
         }
         .frame(maxWidth: .infinity, alignment: .top)
         .accessibilityHidden(true)
-    }
-}
-
-/// Stands in for a window Harbor cannot capture: Screen Recording is off, the content is
-/// protected, or the thumbnail has not arrived yet.
-struct HarborWindowPlaceholder: View {
-    let title: String
-    let icon: NSImage?
-    let size: CGSize
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        let iconSide = min(64, size.height * 0.42, size.width * 0.42)
-        ZStack {
-            (colorScheme == .dark ? Color(red: 0.16, green: 0.17, blue: 0.20) : Color(red: 0.95, green: 0.95, blue: 0.96))
-            VStack(spacing: iconSide * 0.16) {
-                if let icon {
-                    Image(nsImage: icon).resizable().interpolation(.high).frame(width: iconSide, height: iconSide)
-                }
-                if size.height > 90 {
-                    Text(verbatim: title)
-                        .font(.system(size: 12, weight: .semibold))
-                        .lineLimit(1)
-                        .padding(.horizontal, 10)
-                }
-            }
-        }
     }
 }
 

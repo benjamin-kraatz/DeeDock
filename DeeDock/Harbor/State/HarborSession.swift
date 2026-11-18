@@ -93,7 +93,33 @@ final class HarborSession {
     /// a frame after the panels appear, so both animate in, and off again as the windows fly home.
     private(set) var showsBackdrop = false
     private(set) var displays: [String: HarborDisplayContent] = [:]
-    private(set) var thumbnails: [UUID: CGImage] = [:]
+    private(set) var thumbnails: [UUID: ClassifiedWindowPreview] = [:]
+    private var previewReveal = WindowPreviewReveal<UUID>()
+    private var missingPreviews: Set<UUID> = []
+
+    func thumbnail(for id: UUID) -> CGImage? {
+        thumbnails[id].flatMap { previewReveal.image($0, for: id) }
+    }
+
+    func previewControl(for id: UUID) -> WindowPreviewControl? {
+        guard showsGrid, let preview = thumbnails[id], preview.decision == .sensitive else { return nil }
+        let frame = preview.id
+        let revealed = thumbnail(for: id) != nil
+        return WindowPreviewControl(isRevealed: revealed) { [weak self] in
+            guard let self, showsGrid, let current = thumbnails[id], current.id == frame else { return }
+            if revealed {
+                previewReveal.hide(current, for: id)
+            } else {
+                selected = id
+                previewReveal.reveal(current, for: id)
+            }
+        }
+    }
+
+    func previewUnavailable(for window: HarborWindow) -> Bool {
+        !access.thumbnails || window.captureID == nil ||
+            missingPreviews.contains(window.id) || thumbnails[window.id]?.decision == .unavailable
+    }
     /// Windows that leave from and return to their desktop frame. The rest fade in place,
     /// because without a thumbnail a card flying from the window would not match it.
     private(set) var flying: Set<UUID> = []
@@ -109,8 +135,12 @@ final class HarborSession {
     }
     /// Shows only this app's group, after a click on its strip tile.
     private(set) var appFilter: String?
-    var hovered: UUID?
-    var selected: UUID?
+    var hovered: UUID? {
+        didSet { if let hovered { previewReveal.select(hovered) } }
+    }
+    var selected: UUID? {
+        didSet { previewReveal.select(selected) }
+    }
     /// Captured when Harbor opens, so a settings change mid-animation cannot mix styles.
     private(set) var reduceMotion = false
     private(set) var reduceTransparency = false
@@ -127,12 +157,14 @@ final class HarborSession {
         self.icons = icons
         self.reduceMotion = reduceMotion
         self.reduceTransparency = reduceTransparency
+        previewReveal = .init()
         query = ""
         appFilter = nil
         hovered = nil
         selected = nil
         raisedWindowID = nil
         showsBackdrop = false
+        missingPreviews = []
         relayout()
         phase = .entering
     }
@@ -142,18 +174,22 @@ final class HarborSession {
 
     /// Records which windows had a thumbnail in time to fly, then opens the grid.
     func reveal() {
-        flying = reduceMotion ? [] : Set(thumbnails.keys)
+        flying = reduceMotion ? [] : Set(thumbnails.compactMap { $0.value.clearedImage == nil ? nil : $0.key })
         showsBackdrop = true
         phase = .open
     }
 
-    func setThumbnail(_ image: CGImage, for id: UUID) { thumbnails[id] = image }
+    func setThumbnail(_ preview: ClassifiedWindowPreview?, for id: UUID) {
+        thumbnails[id] = preview
+        if preview == nil { missingPreviews.insert(id) } else { missingPreviews.remove(id) }
+    }
 
     func setWallpaper(_ image: CGImage?, for displayID: String) { displays[displayID]?.wallpaper = image }
 
     /// Starts the return flight. `raising` flies above the others.
     func leave(raising id: UUID?) {
         raisedWindowID = id
+        previewReveal = .init()
         hovered = nil
         selected = nil
         showsBackdrop = false
@@ -165,8 +201,10 @@ final class HarborSession {
         showsBackdrop = false
         displays = [:]
         thumbnails = [:]
+        missingPreviews = []
         flying = []
         icons = [:]
+        previewReveal = .init()
         query = ""
         appFilter = nil
         hovered = nil
@@ -198,6 +236,7 @@ final class HarborSession {
             }
         }
         thumbnails[id] = nil
+        missingPreviews.remove(id)
         if hovered == id { hovered = nil }
         if selected == id { selected = nil }
         relayout()

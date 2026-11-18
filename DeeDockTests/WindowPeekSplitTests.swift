@@ -47,7 +47,7 @@ struct WindowPeekSplitTests {
     func missingCapture() throws {
         let state = try makeState()
         let selected = state.selectedID
-        state.cards[1].thumbnail = nil
+        state.cards[1] = WindowPeekCard(window: state.cards[1].window)
         #expect(state.splitCards.isEmpty)
         #expect(state.splitCandidates.count == 2)
         #expect(state.cards.count == 3)

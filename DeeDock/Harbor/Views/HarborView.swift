@@ -108,13 +108,15 @@ struct HarborView: View {
             let scale = tile.rect.width / max(window.frame.width, 1)
             HarborWindowTile(
                 title: window.title ?? name, appName: name, icon: session.icons[window.appID],
-                thumbnail: session.thumbnails[window.id], size: tile.rect.size,
+                thumbnail: session.thumbnail(for: window.id), size: tile.rect.size,
                 cornerRadius: max(HarborStyle.minimumThumbnailCornerRadius * min(1, scale * 4),
                                   HarborStyle.windowCornerRadius * scale),
                 highlighted: session.showsGrid && (session.hovered == window.id || session.selected == window.id),
                 lifted: session.showsGrid && (session.hovered == window.id || session.selected == window.id),
                 canClose: session.showsGrid && window.token != nil && session.access.windows,
                 reduceMotion: session.reduceMotion,
+                previewControl: session.previewControl(for: window.id),
+                previewUnavailable: session.previewUnavailable(for: window),
                 hover: { inside in
                     if inside { session.hovered = window.id } else if session.hovered == window.id { session.hovered = nil }
                 },
@@ -228,7 +230,7 @@ struct HarborView: View {
             }
         case .entering, .leaving, .hidden:
             return shown.compactMap { window in
-                let flies = session.phase == .entering ? session.thumbnails[window.id] != nil
+                let flies = session.phase == .entering ? session.thumbnails[window.id]?.clearedImage != nil
                     : session.flying.contains(window.id)
                 let grid = content.layout.windows[window.id]
                 if flies {

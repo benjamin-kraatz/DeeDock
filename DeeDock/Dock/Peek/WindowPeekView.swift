@@ -196,11 +196,14 @@ struct WindowPeekView: View {
         ForEach(state.cards) { card in
             if state.routingFiles {
                 WindowPeekCardView(card: card, appIcon: state.appIcon, settings: state.settings,
-                                   selected: state.selectedID == card.id, action: { state.choose?(card.id) })
+                                   selected: state.selectedID == card.id,
+                                   revealedImage: state.revealedImage(for: card),
+                                   previewControl: state.previewControl(for: card), action: { state.choose?(card.id) })
                     .frame(width: size.width, height: size.height)
                     .id(card.id)
                     .overlay { if state.receivingFileDrag { dropTarget(card.id) } }
                     .accessibilityHint(Text(.fileRouteDropHelp))
+                    .onHover { if $0 { state.hoverPreview(card.id) } }
                     .onAppear { state.thumbnailNeeded?(card.id) }
             } else {
                 WindowPeekCardSlot(card: card, appIcon: state.appIcon, settings: state.settings,
@@ -211,15 +214,16 @@ struct WindowPeekView: View {
                                    addToFusion: { state.addToFusion?(card.window) },
                                    startMelt: { state.startMelt?(card.window) },
                                    lifted: state.liftedID == card.id,
-                                   enlargeHover: enlargeHover(card.id),
+                                   revealedImage: state.revealedImage(for: card),
+                                   previewControl: state.previewControl(for: card),
+                                   enlargeHover: { inside in
+                                       if inside { state.hoverPreview(card.id) }
+                                       if state.enlargesCards { state.cardHovered?(card.id, inside) }
+                                   },
                                    artworkFrameChanged: artworkFrameChanged(card.id))
                     .onAppear { state.thumbnailNeeded?(card.id) }
             }
         }
-    }
-
-    private func enlargeHover(_ token: ApplicationWindowToken) -> ((Bool) -> Void)? {
-        state.enlargesCards ? { state.cardHovered?(token, $0) } : nil
     }
 
     private func artworkFrameChanged(_ token: ApplicationWindowToken) -> ((CGRect) -> Void)? {
@@ -269,6 +273,8 @@ struct WindowPeekCardView: View {
     var lifted = false
     /// Reports the artwork's frame in the hosting view's space, the start of the enlarge flight.
     var artworkFrameChanged: ((CGRect) -> Void)? = nil
+    var revealedImage: CGImage? = nil
+    var previewControl: WindowPreviewControl? = nil
     let action: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -278,14 +284,17 @@ struct WindowPeekCardView: View {
 
     var body: some View {
         Button(action: action) {
-            if settings.windowPeekLayout == .list {
-                HStack(spacing: 10) { artwork; caption.frame(maxWidth: .infinity, alignment: .leading) }
-            } else {
-                VStack(alignment: .leading, spacing: settings.windowPeekStyle == .captioned ? 8 : 5) {
-                    artwork
-                    if settings.windowPeekStyle != .minimal { caption }
+            Group {
+                if settings.windowPeekLayout == .list {
+                    HStack(spacing: 10) { artwork; caption.frame(maxWidth: .infinity, alignment: .leading) }
+                } else {
+                    VStack(alignment: .leading, spacing: settings.windowPeekStyle == .captioned ? 8 : 5) {
+                        artwork
+                        if settings.windowPeekStyle != .minimal { caption }
+                    }
                 }
             }
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .padding(settings.windowPeekStyle == .glass ? 7 : 3)
@@ -293,30 +302,50 @@ struct WindowPeekCardView: View {
                     in: .rect(cornerRadius: 11))
         .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2))
         .accessibilityLabel(Text(.applicationMenuOpenWindow(title: title)))
-        .accessibilityValue(card.window.isMinimized ? Text(.windowPeekMinimized) : Text(verbatim: ""))
+        .accessibilityValue(accessibilityValue)
+        // Use the artwork bounds so the privacy button stays separate from activation and the caption.
+        .overlayPreferenceValue(WindowPeekArtworkBounds.self) { bounds in
+            if let bounds, let previewControl {
+                GeometryReader { proxy in
+                    let rect = proxy[bounds]
+                    WindowPreviewControls(control: previewControl)
+                        .frame(width: rect.width, height: rect.height)
+                        .position(x: rect.midX, y: rect.midY)
+                }
+            }
+        }
+    }
+
+    private var accessibilityValue: Text {
+        if card.window.isMinimized { return Text(.windowPeekMinimized) }
+        if card.previewUnavailable { return Text(.windowPreviewUnavailable) }
+        return Text(verbatim: "")
     }
 
     private var artwork: some View {
         Group {
-            if let thumbnail = card.thumbnail {
+            if let thumbnail = card.thumbnail ?? revealedImage {
                 // The card frame is the logical point size. One pixel per point fills that frame.
                 Image(decorative: thumbnail, scale: 1).resizable().interpolation(.high).scaledToFit()
+                    .transition(.identity)
                     .opacity(lifted ? 0 : 1)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: lifted)
                     .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
                         artworkFrameChanged?(frame)
                     }
             } else {
-                ZStack {
-                    Rectangle().fill(.quaternary.opacity(0.55))
-                    Image(nsImage: appIcon).resizable().interpolation(.high).scaledToFit().padding(22)
-                }
+                WindowPreviewPlaceholder(icon: appIcon, covered: previewControl != nil,
+                                         unavailable: card.previewUnavailable)
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                        artworkFrameChanged?(frame)
+                    }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.black.opacity(0.06))
         .compositingGroup()
         .clipShape(.rect(cornerRadius: 7))
+        .anchorPreference(key: WindowPeekArtworkBounds.self, value: .bounds) { $0 }
     }
 
     private var caption: some View {
@@ -330,6 +359,14 @@ struct WindowPeekCardView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+private struct WindowPeekArtworkBounds: PreferenceKey {
+    static let defaultValue: Anchor<CGRect>? = nil
+
+    static func reduce(value: inout Anchor<CGRect>?, nextValue: () -> Anchor<CGRect>?) {
+        value = nextValue() ?? value
     }
 }
 
@@ -396,7 +433,7 @@ private func windowPeekPreviewImage(index: Int) -> CGImage? {
 }
 #Preview("Split-peek with one missing capture") {
     let state = windowPeekPreviewState(split: true)
-    state.cards[1].thumbnail = nil
+    state.cards[1] = WindowPeekCard(window: state.cards[1].window)
     return WindowPeekView(state: state, keyboard: true)
         .frame(width: 790, height: 520)
 }

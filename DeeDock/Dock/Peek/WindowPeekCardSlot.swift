@@ -17,6 +17,8 @@ struct WindowPeekCardSlot: View {
     let startMelt: () -> Void
     /// Enlarged-preview hooks; `nil` while that option is off, so disabled Peek does no extra work.
     var lifted = false
+    var revealedImage: CGImage? = nil
+    var previewControl: WindowPreviewControl? = nil
     var enlargeHover: ((Bool) -> Void)? = nil
     var artworkFrameChanged: ((CGRect) -> Void)? = nil
     @State private var hovering = false
@@ -24,7 +26,7 @@ struct WindowPeekCardSlot: View {
     var body: some View {
         WindowPeekCardView(card: card, appIcon: appIcon, settings: settings,
                            selected: selected, lifted: lifted, artworkFrameChanged: artworkFrameChanged,
-                           action: choose)
+                           revealedImage: revealedImage, previewControl: previewControl, action: choose)
             .contextMenu {
                 Button(.peekActionTitle, systemImage: "ellipsis", action: manage)
                 Divider()

@@ -51,7 +51,7 @@ struct WindowPeekHeroToolbarActions {
 }
 
 /// Buttons must act on the first click; the panel never becomes key, so there is no second one.
-private final class WindowPeekHeroToolbarHostingView<Content: View>: NSHostingView<Content> {
+final class WindowPeekHeroToolbarHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 

@@ -147,7 +147,7 @@ actor ScreenCaptureWindowThumbnailService: WindowThumbnailServicing {
                 } catch is CancellationError {
                     return [:]
                 } catch {
-                    Self.logger.error("ScreenCaptureKit thumbnail failed: \(error.localizedDescription, privacy: .public)")
+                    Self.logger.error("ScreenCaptureKit thumbnail capture failed")
                     continue
                 }
             }

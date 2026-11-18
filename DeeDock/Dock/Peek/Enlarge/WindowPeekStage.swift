@@ -2,7 +2,13 @@ import CoreGraphics
 import Observation
 import SwiftUI
 
-/// One window image travelling between its Peek card and the staged hero frame.
+/// Looks up the current frame and reveal grant each time the enlarged view draws.
+struct WindowPeekSensitiveExhibit {
+    let image: () -> CGImage?
+    let control: () -> WindowPreviewControl?
+}
+
+/// One window preview travelling between its Peek card and the staged hero frame.
 ///
 /// Frames are in the stage panel's top-left-origin space. The view lays the image out once at
 /// `hero` and reaches every other pose with a transform, so the flight animates scale and offset
@@ -14,7 +20,11 @@ final class WindowPeekExhibit: Identifiable {
     let token: ApplicationWindowToken
     let title: String
     /// The strip thumbnail, shown immediately so the flight never waits for a capture.
-    let preview: CGImage
+    var preview: CGImage?
+    /// A covered frame is resolved through the card's grant and never copied into the exhibit.
+    var sensitive: WindowPeekSensitiveExhibit?
+    /// Only cleared artwork can be exported or enter a flight that outlives Peek.
+    var clearedImage: CGImage? { detail ?? preview }
     /// The on-demand capture sized for `hero`; it crossfades over `preview` when it arrives.
     var detail: CGImage?
     /// Where the card's artwork sits; `nil` when unknown, which falls back to fade and scale.
@@ -31,7 +41,7 @@ final class WindowPeekExhibit: Identifiable {
     var stow: WindowPeekStowPath?
     var stowProgress: CGFloat = 0
 
-    init(token: ApplicationWindowToken, title: String, preview: CGImage, detail: CGImage? = nil,
+    init(token: ApplicationWindowToken, title: String, preview: CGImage?, detail: CGImage? = nil,
          source: CGRect?, hero: CGRect, reduceMotion: Bool) {
         self.token = token
         self.title = title

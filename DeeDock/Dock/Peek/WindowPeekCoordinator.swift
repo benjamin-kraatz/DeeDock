@@ -20,6 +20,7 @@ final class WindowPeekCoordinator {
     private let menus: ApplicationMenuController
     private let screenCapture: ScreenCaptureAccessController
     private let thumbnails: any WindowThumbnailServicing
+    private let previewClassifier: any WindowPreviewClassifying
     private var controller: WindowPeekPanelController?
     /// The hover label flying into the open Peek's notice strip, while it is in the air.
     private var noticeFlight: WindowPeekNoticeFlight?
@@ -58,12 +59,14 @@ final class WindowPeekCoordinator {
     init(menus: ApplicationMenuController, screenCapture: ScreenCaptureAccessController,
          applications: any ApplicationServicing,
          thumbnails: any WindowThumbnailServicing = ScreenCaptureWindowThumbnailService(),
+         previewClassifier: (any WindowPreviewClassifying)? = nil,
          history: PeekHistoryStore) {
         self.history = history
         fileHandoff = WindowFileHandoffController(menus: menus, applications: applications)
         self.menus = menus
         self.screenCapture = screenCapture
         self.thumbnails = thumbnails
+        self.previewClassifier = previewClassifier ?? CoreMLWindowPreviewClassifier.shared
         markups = WindowMarkupController(thumbnails: thumbnails)
     }
 
@@ -297,7 +300,7 @@ final class WindowPeekCoordinator {
         next.state.showAll = { [weak self] in self?.displayWindows(applyFilters: false) }
         next.state.thumbnailNeeded = { [weak self] token in self?.requestThumbnail(token) }
         if fileDocuments == nil, context.settings.windowPeekEnlargeEnabled {
-            let enlarge = WindowPeekEnlargeController(peek: next, thumbnails: thumbnails) { [weak self] in
+            let enlarge = WindowPeekEnlargeController(peek: next, thumbnails: thumbnails, classifier: previewClassifier) { [weak self] in
                 self?.enlargeBlocked?() ?? false
             }
             self.enlarge = enlarge
@@ -416,7 +419,11 @@ final class WindowPeekCoordinator {
             if lhs.element.isMain != rhs.element.isMain { return lhs.element.isMain }
             return lhs.offset < rhs.offset
         }.map(\.element)
-        controller.state.cards = ordered.map { WindowPeekCard(window: $0, thumbnail: nil) }
+        let cards = Dictionary(uniqueKeysWithValues: controller.state.cards.map { ($0.id, $0) })
+        controller.state.cards = ordered.map { window in
+            if let card = cards[window.token], card.window == window { return card }
+            return WindowPeekCard(window: window)
+        }
         controller.state.selectedID = ordered.first?.token
         controller.state.phase = .windows
         controller.update(anchor: context.anchor, settings: context.settings, count: ordered.count)
@@ -429,9 +436,13 @@ final class WindowPeekCoordinator {
     }
 
     private func requestThumbnail(_ token: ApplicationWindowToken) {
-        guard !requestedThumbnailIDs.contains(token), allWindows.contains(where: { $0.token == token }) else { return }
+        guard !requestedThumbnailIDs.contains(token),
+              let state = controller?.state, let card = state.cards.first(where: { $0.id == token }) else { return }
         screenCapture.refresh()
-        guard screenCapture.status == .enabled else { return }
+        guard screenCapture.status == .enabled else {
+            if !card.captureUnavailable { state.applyPreview(nil, to: card) }
+            return
+        }
         pendingThumbnailIDs.insert(token)
         scheduleCapture()
     }
@@ -449,27 +460,35 @@ final class WindowPeekCoordinator {
             let ids = pendingThumbnailIDs
             pendingThumbnailIDs.subtract(ids)
             requestedThumbnailIDs.formUnion(ids)
-            let windows = allWindows.filter { ids.contains($0.token) }
-            guard let settings = controller?.state.settings else { return }
+            guard let state = controller?.state else { return }
+            let requests = state.cards.filter { ids.contains($0.id) }
+            let windows = requests.map(\.window)
+            let settings = state.settings
             let size = settings.windowPeekSize.thumbnailSize
             let historyEpoch = history.collectionEpoch
             // OCR reuses this capture at a larger logical size. Capture multiplies by the window's
             // display scale, so a 2× screen stores at most 1600 × 1000 pixels.
             let captureSize = historyEpoch == nil ? size : CGSize(width: 800, height: 500)
             let images = await thumbnails.capture(windows, size: captureSize)
-            guard !Task.isCancelled,
-                  WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
-                  let controller else { return }
-            controller.state.cards = controller.state.cards.map { card in
-                guard let captured = windows.first(where: { $0.token == card.id }),
-                      captured == card.window else { return card }
-                var updated = card
-                updated.thumbnail = images[card.id]
-                return updated
+            var historyCards: [WindowPeekCard] = []
+            for request in requests {
+                guard !Task.isCancelled,
+                      WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation)
+                else { return }
+                guard let image = images[request.id] else {
+                    controller?.state.applyPreview(nil, to: request)
+                    continue
+                }
+                let preview = await ClassifiedWindowPreview.classify(image, using: previewClassifier)
+                guard !Task.isCancelled,
+                      WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
+                      let state = controller?.state else { return }
+                if let card = state.applyPreview(preview, to: request) {
+                    historyCards.append(card)
+                    enlarge?.thumbnailReady(for: card.id)
+                }
             }
-            let historyCards = controller.state.cards.filter { card in
-                images[card.id] != nil && windows.contains { $0 == card.window }
-            }
+            guard let controller else { return }
             history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
             WindowPeekDiagnostics.shared.record(
                 settings: settings, placement: controller.placementFrame, panel: controller.frame,
@@ -594,7 +613,8 @@ final class WindowPeekCoordinator {
         guard let controller, let index = allWindows.firstIndex(where: { $0.token == summary.token }) else { return }
         allWindows[index] = summary
         if let cardIndex = controller.state.cards.firstIndex(where: { $0.id == summary.token }) {
-            controller.state.cards[cardIndex] = WindowPeekCard(window: summary, thumbnail: nil)
+            enlarge?.dismiss()
+            controller.state.cards[cardIndex] = WindowPeekCard(window: summary)
         }
         controller.state.selectedID = summary.token
         requestedThumbnailIDs.remove(summary.token)

@@ -18,6 +18,8 @@ struct HubWindowCard: View {
     let thumbnail: CGImage?
     let isSelected: Bool
     let reduceMotion: Bool
+    var previewControl: WindowPreviewControl? = nil
+    var previewUnavailable = false
     let activate: () -> Void
 
     @State private var isHovered = false
@@ -31,7 +33,8 @@ struct HubWindowCard: View {
         Button(action: activate) {
             VStack(alignment: .leading, spacing: HubWindowCardMetrics.titleSpacing) {
                 HubWindowThumbnail(thumbnail: thumbnail, icon: icon, badge: badge, dimmed: item.isMinimized,
-                                   ringed: isHovered || isSelected, lifted: isHovered && !reduceMotion)
+                                   ringed: isHovered || isSelected, lifted: isHovered && !reduceMotion,
+                                   covered: previewControl?.isRevealed == false, unavailable: previewUnavailable)
                 Text(verbatim: title)
                     .font(.system(size: 12))
                     .lineLimit(1)
@@ -49,10 +52,19 @@ struct HubWindowCard: View {
         .animation(.easeOut(duration: 0.15), value: isSelected)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: title == appName ? title : "\(title), \(appName)"))
-        .accessibilityValue(badge.map { Text($0) } ?? Text(verbatim: ""))
+        .accessibilityValue(badge.map { Text($0) } ?? (previewUnavailable ? Text(.windowPreviewUnavailable) : Text(verbatim: "")))
         .accessibilityHint(Text(.hubWindowsActivateHint))
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
         .accessibilityAction(.default, activate)
+        .overlay(alignment: .top) {
+            if let previewControl {
+                WindowPreviewControls(control: previewControl)
+                    .frame(width: HubWindowCardMetrics.thumbnailSize.width,
+                           height: HubWindowCardMetrics.thumbnailSize.height)
+                    .scaleEffect(isHovered && !reduceMotion ? 1.02 : 1)
+                    .offset(y: isHovered && !reduceMotion ? -3 : 0)
+            }
+        }
     }
 
     private var badge: LocalizedStringResource? {
@@ -72,6 +84,8 @@ private struct HubWindowThumbnail: View {
     let dimmed: Bool
     let ringed: Bool
     let lifted: Bool
+    let covered: Bool
+    let unavailable: Bool
     @Environment(\.colorScheme) private var colorScheme
 
     private var shape: RoundedRectangle {
@@ -81,8 +95,6 @@ private struct HubWindowThumbnail: View {
     var body: some View {
         content
             .frame(width: HubWindowCardMetrics.thumbnailSize.width, height: HubWindowCardMetrics.thumbnailSize.height)
-            // A capture landing after the card is on screen cross-fades over the icon placeholder.
-            .animation(.easeOut(duration: 0.2), value: thumbnail != nil)
             .opacity(dimmed ? 0.55 : 1)
             .saturation(dimmed ? 0.5 : 1)
             .clipShape(shape)
@@ -125,17 +137,9 @@ private struct HubWindowThumbnail: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: HubWindowCardMetrics.thumbnailSize.width,
                        height: HubWindowCardMetrics.thumbnailSize.height, alignment: .top)
+                .transition(.identity)
         } else {
-            ZStack {
-                Rectangle().fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
-                if let icon {
-                    Image(nsImage: icon)
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 48, height: 48)
-                        .shadow(color: .black.opacity(0.18), radius: 4, y: 2)
-                }
-            }
+            WindowPreviewPlaceholder(icon: icon, covered: covered, unavailable: unavailable)
         }
     }
 }

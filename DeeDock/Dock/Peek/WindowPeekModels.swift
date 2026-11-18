@@ -33,7 +33,34 @@ nonisolated enum WindowPeekLifecycle {
 
 struct WindowPeekCard: Identifiable {
     let window: ApplicationWindowSummary
-    var thumbnail: CGImage?
+    // Only cleared images can go to history, split, markup handoff, or the enlarged stage.
+    var thumbnail: CGImage? {
+        if let preview { return preview.clearedImage }
+        #if DEBUG
+        return fixtureThumbnail
+        #else
+        return nil
+        #endif
+    }
+    fileprivate(set) var preview: ClassifiedWindowPreview?
+    let captureRevision = UUID()
+    fileprivate(set) var captureUnavailable = false
+
+    var previewUnavailable: Bool {
+        window.isMinimized || captureUnavailable || preview?.decision == .unavailable
+    }
+    #if DEBUG
+    private var fixtureThumbnail: CGImage?
+
+    init(window: ApplicationWindowSummary, thumbnail: CGImage?) {
+        self.init(window: window)
+        fixtureThumbnail = thumbnail
+    }
+    #endif
+
+    init(window: ApplicationWindowSummary) {
+        self.window = window
+    }
     var id: ApplicationWindowToken { window.token }
 }
 
@@ -45,7 +72,48 @@ final class WindowPeekState {
     var settings: DockSettings
     var phase: WindowPeekPhase = .loading
     var cards: [WindowPeekCard] = []
-    var selectedID: ApplicationWindowToken?
+    var selectedID: ApplicationWindowToken? {
+        didSet { previewReveal.select(selectedID) }
+    }
+    private var previewReveal = WindowPreviewReveal<ApplicationWindowToken>()
+
+    func previewControl(for card: WindowPeekCard) -> WindowPreviewControl? {
+        guard let preview = card.preview, preview.decision == .sensitive else { return nil }
+        let id = card.id, frame = preview.id
+        let revealed = revealedImage(for: card) != nil
+        return WindowPreviewControl(isRevealed: revealed) { [weak self] in
+            guard let self, let current = cards.first(where: { $0.id == id })?.preview,
+                  current.id == frame else { return }
+            if revealed {
+                previewReveal.hide(current, for: id)
+            } else {
+                selectedID = id
+                previewReveal.reveal(current, for: id)
+            }
+        }
+    }
+
+    func revealedImage(for card: WindowPeekCard) -> CGImage? {
+        guard let preview = card.preview, preview.decision == .sensitive else { return nil }
+        return previewReveal.image(preview, for: card.id)
+    }
+
+    func hoverPreview(_ id: ApplicationWindowToken) {
+        previewReveal.select(id)
+    }
+
+    /// Publishes only to the card that requested the frame, even if an identical window was refreshed.
+    @discardableResult
+    func applyPreview(_ preview: ClassifiedWindowPreview?, to request: WindowPeekCard) -> WindowPeekCard? {
+        guard let index = cards.firstIndex(where: { $0.id == request.id && $0.captureRevision == request.captureRevision })
+        else { return nil }
+        cards[index].preview = preview
+        cards[index].captureUnavailable = preview == nil
+        return cards[index]
+    }
+
+    func resetPreviewReveal() { previewReveal = .init() }
+
     /// The ordinary layout stays available for this presentation without changing preferences.
     var showsAllWindows = false
     var splitFitsDisplay = true
