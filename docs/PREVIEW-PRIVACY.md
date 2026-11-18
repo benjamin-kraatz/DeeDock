@@ -4,7 +4,7 @@ Window Peek, Radar, and Hub Windows show the app icon until they have classified
 
 Window Peek uses session-scoped window tokens. It joins Accessibility and ScreenCaptureKit windows by process, title, and frame, and uses ScreenCaptureKit metadata when Accessibility is unavailable. Cards request one-shot captures as they enter view. A window action can replace a card and request another capture. Radar and Hub Windows use window-server numbers tied to their discovery session. Radar captures while opening. Hub Windows discards previous frames when it rediscovers windows.
 
-Only a cleared frame feeds split Peek, enlarged Peek, or opt-in Peek history. The larger frame captured for enlarged Peek is classified independently. A reveal shows the card's specific frame and keeps it out of Peek history. Explicit capture tools such as Mark up window still take their own capture when invoked. The privacy classifier keeps frames and recognized text in memory and sends neither to logging or analytics. Window titles still appear.
+A covered card can enlarge on hover. The larger cover explains why DOKK hid the preview and offers the same reveal control as the card. Revealing the enlarged preview displays the card's captured frame. For cleared thumbnails, enlarged Peek can request a sharper frame and classifies it independently. Split Peek and opt-in Peek history use cleared frames. Explicit capture tools such as Mark up window still take their own capture when invoked. The privacy classifier keeps frames and recognized text in memory and sends neither to logging or analytics. Window titles still appear.
 
 ## Dataset and threshold
 

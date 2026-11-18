@@ -37,6 +37,7 @@ final class WindowPeekEnlargeController {
     /// the tile on screen until the picture lands.
     private var stowsInFlight = 0
     private var heroToolbar: WindowPeekHeroToolbarPanel?
+    private var heroPrivacy: WindowPeekHeroPrivacyPanel?
     private var held = false
     private var corridorTask: Task<Void, Never>?
     /// Collisions owned outside Peek (dock drags, App Fusion gestures) that must not be covered.
@@ -68,7 +69,11 @@ final class WindowPeekEnlargeController {
             self?.observe(event)
             return event
         }
-        peek.ownsAuxiliaryWindow = { [weak self] window in self?.heroToolbar?.owns(window) == true }
+        peek.ownsAuxiliaryWindow = { [weak self] window in self?.ownsHeroControl(window) == true }
+        peek.enlargedPreviewControl = { [weak self] in
+            guard let self, heroPrivacy != nil else { return nil }
+            return staged?.sensitive?.control()
+        }
     }
 
     /// Whether the pointer is on or heading for the staged picture, which keeps Peek open.
@@ -78,8 +83,8 @@ final class WindowPeekEnlargeController {
 
     /// The staged card's picture and where it is on screen, for a hand-off to the markup editor.
     func stagedExhibit(for token: ApplicationWindowToken) -> (frame: CGRect, image: CGImage)? {
-        guard let staged, staged.token == token, let stagePanel else { return nil }
-        return (WindowPeekEnlargeGeometry.screen(staged.hero, in: stagePanel.screenFrame), staged.detail ?? staged.preview)
+        guard let staged, staged.token == token, let stagePanel, let image = staged.clearedImage else { return nil }
+        return (WindowPeekEnlargeGeometry.screen(staged.hero, in: stagePanel.screenFrame), image)
     }
 
     /// The hero block in screen coordinates: the image plus the placard below it.
@@ -114,12 +119,13 @@ final class WindowPeekEnlargeController {
     private func hold() {
         guard let staged, let stagePanel else { return }
         held = true
+        guard staged.clearedImage != nil else { heldChanged?(); return }
         let hero = WindowPeekEnlargeGeometry.screen(staged.hero, in: stagePanel.screenFrame)
         if heroToolbar == nil {
             // One toolbar serves every card staged during this Peek, so it reads the current exhibit.
             heroToolbar = WindowPeekHeroToolbarPanel(level: NSWindow.Level(rawValue: stagePanel.level.rawValue + 1), actions: .init(
                 markup: { [weak self] in
-                    guard let self, let current = self.staged else { return }
+                    guard let self, let current = self.staged, current.clearedImage != nil else { return }
                     markup?(current.token)
                 },
                 copy: { [weak self] in self?.copyStaged() ?? false },
@@ -150,8 +156,8 @@ final class WindowPeekEnlargeController {
     }
 
     private func copyStaged() -> Bool {
-        guard let staged else { return false }
-        return WindowMarkupExport.copy(staged.detail ?? staged.preview)
+        guard let image = staged?.clearedImage else { return false }
+        return WindowMarkupExport.copy(image)
     }
 
     /// Saves the staged picture to the Shelf (or Downloads) without a panel, then flies it into that
@@ -162,8 +168,8 @@ final class WindowPeekEnlargeController {
     /// so this writes directly. Without a tile to aim at, or with Reduce Motion, the stage stays and
     /// the toolbar confirms in place.
     private func saveStaged() -> WindowPeekHeroSaveOutcome {
-        guard let staged, let savePicture,
-              let saved = savePicture(staged.detail ?? staged.preview, staged.title) else { return .failed }
+        guard let staged, let image = staged.clearedImage, let savePicture,
+              let saved = savePicture(image, staged.title) else { return .failed }
         guard let tile = saved.tile, !staged.reduceMotion, let stagePanel, let peek,
               stagePanel.screenFrame.intersects(tile) else {
             saved.arrived()
@@ -207,11 +213,18 @@ final class WindowPeekEnlargeController {
         }
     }
 
+    /// The dwell may finish before the off-main classifier. Pick up the result if the pointer stayed.
+    func thumbnailReady(for token: ApplicationWindowToken) {
+        guard hovered == token, suppressed != token, dwellTask == nil, staged?.token != token else { return }
+        present(token)
+    }
+
     /// Pointer entered or left a card.
     func hover(_ token: ApplicationWindowToken, inside: Bool) {
         guard !stopped else { return }
         if inside {
             if let staged, staged.token != token {
+                closeHeroPrivacy()
                 captureTask?.cancel()
                 captureTask = nil
             }
@@ -222,7 +235,10 @@ final class WindowPeekEnlargeController {
             suppressed = nil
             dwellTask?.cancel()
             dwellTask = nil
-            if staged?.token == token { return }
+            if let staged, staged.token == token {
+                if heroPrivacy == nil, let stagePanel { showHeroPrivacy(for: staged, on: stagePanel) }
+                return
+            }
             let delay = WindowPeekEnlargeTiming.dwell(staged: staged != nil)
             dwellTask = Task { @MainActor [weak self] in
                 try? await Task.sleep(for: delay)
@@ -268,6 +284,7 @@ final class WindowPeekEnlargeController {
         let wasHeld = held
         held = false
         heroToolbar?.hide()
+        closeHeroPrivacy()
         if let staged { retire(staged) }
         staged = nil
         // Notified after the stage is empty, so the coordinator's re-evaluation cannot re-hold it.
@@ -297,6 +314,7 @@ final class WindowPeekEnlargeController {
         held = false
         heroToolbar?.close()
         heroToolbar = nil
+        closeHeroPrivacy()
         markup = nil
         savePicture = nil
         heldChanged = nil
@@ -324,7 +342,7 @@ final class WindowPeekEnlargeController {
         clickTask?.cancel()
         clickTask = nil
         guard !stopped, landing == nil, let exhibit = staged, exhibit.token == token, !exhibit.reduceMotion,
-              let windowFrame, let stagePanel, let primary = NSScreen.screens.first else {
+              exhibit.clearedImage != nil, let windowFrame, let stagePanel, let primary = NSScreen.screens.first else {
             dismiss()
             return
         }
@@ -348,8 +366,9 @@ final class WindowPeekEnlargeController {
 
     private func observe(_ event: NSEvent) {
         guard !stopped, landing == nil else { return }
-        // The hero toolbar's own clicks act on the stage; they must not clear it.
-        if heroToolbar?.owns(event.window) == true { return }
+        // The hero controls act on the stage. A privacy shortcut leaves its exhibit in place.
+        if ownsHeroControl(event.window) { return }
+        if heroPrivacy != nil, event.type == .keyDown, WindowPreviewRevealShortcut.matches(event) { return }
         switch event.type {
         case .leftMouseDown:
             // The card's click commits on mouse-up through `land(_:windowFrame:)`, so a press alone
@@ -380,23 +399,30 @@ final class WindowPeekEnlargeController {
 
     private func present(_ token: ApplicationWindowToken) {
         guard !stopped, !blocked, let peek, let screen = peek.screen,
-              let card = peek.state.cards.first(where: { $0.id == token }),
-              let preview = card.thumbnail else { return }
+              let card = peek.state.cards.first(where: { $0.id == token }) else { return }
+        let preview = card.thumbnail
+        let sensitive = sensitiveExhibit(for: card, state: peek.state)
+        guard preview != nil || sensitive != nil else { return }
         Analytics.count(.peekEnlarge)
-        let imageSize = CGSize(width: CGFloat(preview.width) / max(1, screen.backingScaleFactor),
-                               height: CGFloat(preview.height) / max(1, screen.backingScaleFactor))
-        guard let hero = WindowPeekEnlargeGeometry.hero(windowSize: card.window.frame?.size ?? imageSize,
+        let backingScale = max(1, screen.backingScaleFactor)
+        let imageSize = preview.map {
+            CGSize(width: CGFloat($0.width) / backingScale, height: CGFloat($0.height) / backingScale)
+        }
+        guard let windowSize = card.window.frame?.size ?? imageSize,
+              let hero = WindowPeekEnlargeGeometry.hero(windowSize: windowSize,
                                                         screenFrame: screen.frame,
                                                         visibleFrame: peek.visibleFrame,
                                                         peekFrame: peek.frame, edge: peek.edge) else { return }
         let stagePanel = stagePanel(for: screen.frame)
         let source = peek.state.artworkFrames[token].map { frame in
-            // The card draws its thumbnail scaled to fit, so fly from the pixels, not the slot.
-            stagePanel.local(WindowPeekEnlargeGeometry.aspectFit(
-                CGSize(width: preview.width, height: preview.height), in: peek.screenRect(fromContent: frame)))
+            let artwork = peek.screenRect(fromContent: frame)
+            // Cleared artwork fits its pixels into the card. A cover fills the card's artwork slot.
+            let source = imageSize.map { WindowPeekEnlargeGeometry.aspectFit($0, in: artwork) } ?? artwork
+            return stagePanel.local(source)
         }
         let reusable = staged?.token == token ? staged?.detail : nil
         if held { release() }
+        closeHeroPrivacy()
         if let staged { retire(staged) }
         captureTask?.cancel()
         captureTask = nil
@@ -407,6 +433,7 @@ final class WindowPeekEnlargeController {
                 card.window, untitled: String(localized: .applicationMenuUntitledWindow)),
             preview: preview, detail: reusable, source: source, hero: stagePanel.local(hero),
             reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
+        exhibit.sensitive = sensitive
         staged = exhibit
         stagePanel.stage.cutout = stagePanel.local(peek.frame)
         stagePanel.stage.exhibits.append(exhibit)
@@ -415,7 +442,9 @@ final class WindowPeekEnlargeController {
             stagePanel.stage.dimmed = true
             peek.state.liftedID = token
         }
-        if reusable == nil {
+        if sensitive != nil {
+            showHeroPrivacy(for: exhibit, on: stagePanel)
+        } else if reusable == nil {
             requestDetail(for: card, exhibit: exhibit,
                           pixels: WindowPeekEnlargeGeometry.capturePixels(hero: hero.size,
                                                                          backingScale: screen.backingScaleFactor))
@@ -438,11 +467,51 @@ final class WindowPeekEnlargeController {
             if let image = preview.clearedImage {
                 // The stage crossfades only between independently cleared frames.
                 exhibit.detail = image
+            } else if let refreshed = state.applyPreview(preview, to: card),
+                      let sensitive = sensitiveExhibit(for: refreshed, state: state), let stagePanel {
+                // A sharper capture can change the privacy decision. Remove cleared artwork and
+                // export controls before replacing it with the cover for this newly classified frame.
+                heroToolbar?.close()
+                heroToolbar = nil
+                exhibit.detail = nil
+                exhibit.preview = nil
+                exhibit.sensitive = sensitive
+                showHeroPrivacy(for: exhibit, on: stagePanel)
             } else {
-                state.applyPreview(preview, to: card)
                 dismiss()
             }
         }
+    }
+
+    private func sensitiveExhibit(for card: WindowPeekCard, state: WindowPeekState) -> WindowPeekSensitiveExhibit? {
+        guard let preview = card.preview, preview.decision == .sensitive else { return nil }
+        let token = card.id, frame = preview.id
+        return .init(image: { [weak state] in
+            guard let state, let current = state.cards.first(where: { $0.id == token && $0.preview?.id == frame })
+            else { return nil }
+            return state.revealedImage(for: current)
+        }, control: { [weak state] in
+            guard let state, let current = state.cards.first(where: { $0.id == token && $0.preview?.id == frame })
+            else { return nil }
+            return state.previewControl(for: current)
+        })
+    }
+
+    private func showHeroPrivacy(for exhibit: WindowPeekExhibit, on stagePanel: WindowPeekStagePanelController) {
+        guard let sensitive = exhibit.sensitive else { return }
+        closeHeroPrivacy()
+        heroPrivacy = WindowPeekHeroPrivacyPanel(
+            hero: WindowPeekEnlargeGeometry.screen(exhibit.hero, in: stagePanel.screenFrame),
+            level: NSWindow.Level(rawValue: stagePanel.level.rawValue + 1), sensitive: sensitive)
+    }
+
+    private func closeHeroPrivacy() {
+        heroPrivacy?.close()
+        heroPrivacy = nil
+    }
+
+    private func ownsHeroControl(_ window: NSWindow?) -> Bool {
+        heroToolbar?.owns(window) == true || heroPrivacy?.owns(window) == true
     }
 
     private func retire(_ exhibit: WindowPeekExhibit) {
@@ -459,6 +528,7 @@ final class WindowPeekEnlargeController {
     /// Reuses the panel while Peek stays on one display, replacing it if the display changed.
     private func stagePanel(for screenFrame: CGRect) -> WindowPeekStagePanelController {
         if let stagePanel, stagePanel.screenFrame == screenFrame { return stagePanel }
+        closeHeroPrivacy()
         stagePanel?.close(animated: false)
         staged = nil
         let next = WindowPeekStagePanelController(screenFrame: screenFrame)

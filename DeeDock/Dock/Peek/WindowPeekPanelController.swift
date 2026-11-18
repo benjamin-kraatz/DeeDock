@@ -32,6 +32,8 @@ final class WindowPeekPanelController {
     /// Windows that belong to this Peek without being the panel, such as the enlarged preview's
     /// hero toolbar. A click in one must not count as an outside click that closes Peek.
     var ownsAuxiliaryWindow: ((NSWindow?) -> Bool)?
+    /// Keyboard reveal acts on the enlarged cover while its companion button is present.
+    var enlargedPreviewControl: (() -> WindowPreviewControl?)?
 
     init(item: DockItem, anchor: WindowPeekAnchor, settings: DockSettings, keyboard: Bool) {
         state = WindowPeekState(item: item, settings: settings)
@@ -198,6 +200,7 @@ final class WindowPeekPanelController {
         state.cards = []
         state.cardHovered = nil
         ownsAuxiliaryWindow = nil
+        enlargedPreviewControl = nil
         panel.keyboardHandler = nil
         let callback = closed
         closed = nil
@@ -236,8 +239,9 @@ final class WindowPeekPanelController {
                 state.addToFusion?(card.window)
             }
         case 15 where WindowPreviewRevealShortcut.matches(event):
-            guard let card = state.cards.first(where: { $0.id == state.selectedID }),
-                  let control = state.previewControl(for: card) else { return false }
+            let selected = state.cards.first { $0.id == state.selectedID }
+            guard let control = enlargedPreviewControl?() ?? selected.flatMap({ state.previewControl(for: $0) })
+            else { return false }
             if !event.isARepeat { control.action() }
         case 36, 76: state.chooseSelection()
         case 53: close(returnFocus: true)

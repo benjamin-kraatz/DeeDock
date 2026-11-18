@@ -57,12 +57,18 @@ private struct WindowPeekExhibitView: View {
 
     private var artwork: some View {
         ZStack {
-            image(exhibit.preview)
-            if let detail = exhibit.detail {
-                image(detail).transition(.opacity)
+            if let sensitive = exhibit.sensitive {
+                if !exhibit.leaving, let revealed = sensitive.image() {
+                    image(revealed).transition(.identity)
+                } else {
+                    WindowPeekSensitiveCover().transition(.identity)
+                }
+            } else {
+                if let preview = exhibit.preview { image(preview).transition(.identity) }
+                if let detail = exhibit.detail { image(detail).transition(.opacity) }
             }
         }
-        .animation(.easeOut(duration: 0.22), value: exhibit.detail != nil)
+        .animation(exhibit.sensitive == nil ? .easeOut(duration: 0.22) : nil, value: exhibit.detail != nil)
         .frame(width: exhibit.hero.width, height: exhibit.hero.height)
         .modifier(WindowPeekExhibitMotion(pose: exhibit.pose, stow: exhibit.stow, progress: exhibit.stowProgress))
     }
@@ -74,6 +80,33 @@ private struct WindowPeekExhibitView: View {
             .aspectRatio(contentMode: .fill)
             .frame(width: exhibit.hero.width, height: exhibit.hero.height)
             .clipped()
+    }
+}
+
+/// The enlarged cover has space to explain the classification. Its button lives in a companion panel.
+private struct WindowPeekSensitiveCover: View {
+    var body: some View {
+        Color(nsColor: .windowBackgroundColor)
+            .overlay {
+                ViewThatFits {
+                    VStack(spacing: 12) {
+                        symbol
+                        Text(.windowPreviewSensitiveMessage)
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    symbol
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 32)
+            }
+    }
+
+    private var symbol: some View {
+        Image(systemName: "eye.slash")
+            .font(.system(size: 28, weight: .medium))
+            .foregroundStyle(.secondary)
     }
 }
 
@@ -190,5 +223,23 @@ private func windowPeekStagePreviewImage(width: Int, height: Int) -> CGImage? {
         .preferredColorScheme(.dark)
         .frame(width: 1020, height: 720)
         .background(.orange.gradient)
+}
+#endif
+
+#if DEBUG
+@MainActor private func windowPeekSensitivePreviewStage() -> WindowPeekStage {
+    let stage = windowPeekPreviewStage(lifted: true)
+    if let exhibit = stage.exhibits.first {
+        exhibit.preview = nil
+        exhibit.detail = nil
+        exhibit.sensitive = .init(image: { nil }, control: { nil })
+    }
+    return stage
+}
+
+#Preview("Enlarged sensitive preview") {
+    WindowPeekStageView(stage: windowPeekSensitivePreviewStage())
+        .frame(width: 1020, height: 720)
+        .background(.teal.gradient)
 }
 #endif

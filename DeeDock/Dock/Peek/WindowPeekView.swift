@@ -336,6 +336,9 @@ struct WindowPeekCardView: View {
             } else {
                 WindowPreviewPlaceholder(icon: appIcon, covered: previewControl != nil,
                                          unavailable: card.previewUnavailable)
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                        artworkFrameChanged?(frame)
+                    }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

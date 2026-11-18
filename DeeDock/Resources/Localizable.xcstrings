@@ -49344,6 +49344,24 @@
         }
       }
     },
+    "windowPreviewSensitiveMessage" : {
+      "comment" : "Explains why the enlarged Window Peek is covered.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fenster könnte sensible oder schützenswerte Inhalte zeigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This window may contain sensitive content."
+          }
+        }
+      }
+    },
     "windowPreviewUnavailable" : {
       "comment" : "Placeholder label when a window thumbnail is missing or its classification failed.",
       "extractionState" : "manual",

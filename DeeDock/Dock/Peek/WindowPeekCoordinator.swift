@@ -483,7 +483,10 @@ final class WindowPeekCoordinator {
                 guard !Task.isCancelled,
                       WindowPeekLifecycle.acceptsResult(expected: currentGeneration, current: generation),
                       let state = controller?.state else { return }
-                if let card = state.applyPreview(preview, to: request) { historyCards.append(card) }
+                if let card = state.applyPreview(preview, to: request) {
+                    historyCards.append(card)
+                    enlarge?.thumbnailReady(for: card.id)
+                }
             }
             guard let controller else { return }
             history.record(historyCards, appName: controller.state.appName, epoch: historyEpoch)
