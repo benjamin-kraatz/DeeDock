@@ -96,6 +96,8 @@ final class DockCoordinator {
             || panels.values.contains(where: \.isMenuTracking) || windowPeeks.isOpen
     }
     @ObservationIgnored private let dragging = DockDragCoordinator()
+    /// Drop to Place, its window memory, and Unpin Undo. Driven by `dragging`.
+    @ObservationIgnored private let dropToPlace = DropToPlaceController()
     @ObservationIgnored private let popovers = DockPopoverPresenter()
     @ObservationIgnored private let folderStacks: FolderStackCoordinator
     @ObservationIgnored private let shelves: ShelfCoordinator
@@ -374,6 +376,9 @@ final class DockCoordinator {
         dragging.ejectVolume = { [weak self] volume, panel in
             self?.volumeDock.requestEject(volume, on: panel, keyboard: false)
         }
+        dropToPlace.displays = { [weak self] in self?.profiles.displays ?? [] }
+        dragging.dropToPlace = dropToPlace
+        dropToPlace.start()
         // One shared Shelf: an edit on any display re-renders every dock and the open panel.
         shelf.didChange = { [weak self] in
             self?.scheduleShelfSemanticWarmup()
@@ -1148,6 +1153,8 @@ final class DockCoordinator {
         harbor.stop()
         filePicker.stop()
         dragging.stop()
+        dragging.dropToPlace = nil
+        dropToPlace.stop()
         folderStacks.stop()
         shelves.stop()
         actionTiles.stop()

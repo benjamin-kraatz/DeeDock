@@ -16,6 +16,8 @@ enum AnalyticsCounter: Hashable {
     case peekEnlarge
     /// A dragged drive tile crossed the distance at which releasing it ejects.
     case dragToEjectArmed
+    /// Undo was clicked on the toast after a pin was dragged off a dock.
+    case pinUnpinUndone
     /// An app tile was activated from the dock.
     case appActivated(AnalyticsTrigger)
     /// A soap-bubble burst played.
@@ -58,6 +60,7 @@ enum AnalyticsCounter: Hashable {
         case let .springLoad(kind): "spring_load_\(kind.rawValue)"
         case .peekEnlarge: "peek_enlarge"
         case .dragToEjectArmed: "drag_to_eject_armed"
+        case .pinUnpinUndone: "pin_unpin_undone"
         case let .appActivated(trigger): "app_activated_\(trigger.rawValue)"
         case .soapBubbleBurst: "soap_bubble_burst"
         case let .dockGroupToggled(expanded): expanded ? "dock_group_expanded" : "dock_group_collapsed"

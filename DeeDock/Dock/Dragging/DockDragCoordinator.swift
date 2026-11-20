@@ -45,6 +45,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
     var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
     var deliverToLauncher: ((DocumentResourceAccess, DockPanelController) -> Void)?
+    /// Drop to Place and Unpin Undo. Nil disables both; drags then behave as before.
+    var dropToPlace: DropToPlaceController?
+    /// The dragged application tile while Drop to Place applies to it. Nil for folders, volumes,
+    /// utilities, file drags, and DOKK's own tile.
+    private var placeItem: DockItem?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -76,7 +81,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     func trackSource(_ tracking: Bool) { preparingSource = tracking }
     private var updating = false
     private var cancelling = false
-    private var lastRemovalCue: Bool?
+    /// What the native drag image currently shows. Rebuilt only when this changes.
+    private var lastDragCue: DragCue?
     /// Whether the dragged drive is past the eject distance, so each arming is counted once.
     private var ejectArmed = false
     private var monitor: Any?
@@ -163,6 +169,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         let dimension = min(view.bounds.width, view.bounds.height)
         rememberDragImage(size: CGSize(width: dimension, height: dimension), in: view)
         dragItem.setDraggingFrame(dragImageBaseFrame, contents: dragIcon(for: pin, fallback: icon, side: dimension, panel: panel))
+        if let dropToPlace, let reference = pin.application,
+           let item = panel.store.items.first(where: { $0.id == reference.id }), DropToPlaceController.canPlace(item) {
+            placeItem = item
+            dropToPlace.beginDrag(item, reservedDocks: panels.values.compactMap(\.placementReservedGlass))
+        }
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)
         nativeSession?.animatesToStartingPositionsOnCancelOrFail = true
@@ -512,7 +523,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                                           message: id == sourceID && ejecting ? .volumeEject : nil)
             }
             nativeSession?.animatesToStartingPositionsOnCancelOrFail = !ejecting
-            setDragLabel(ejecting ? String(localized: .volumeEject) : nil, icon: volume.icon)
+            setDragCue(ejecting ? .label(String(localized: .volumeEject)) : .icon, icon: volume.icon)
             if trackingID != sourceID { trackingID = nil }
             updateScrollTimer()
             return
@@ -526,6 +537,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if meltHoverID != hoverID { meltHoverID = hoverID; meltHoverStarted = Date() }
             let ready = Date().timeIntervalSince(meltHoverStarted) >= 0.65
             if ready { meltDestination = (candidate.store.displayID, first, second.reference) }
+            dropToPlace?.update(zone: .near, pointer: point, shift: false)
             for panel in panels.values {
                 let targeted = panel === candidate
                 panel.updateSectionDragHover(at: point, valid: false)
@@ -673,11 +685,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
            !pins.isEmpty, let index = candidate.insertionIndex(at: point) {
             destinationID = candidate.store.displayID; destinationIndex = index
         }
-        let overDock = panels.contains { id, panel in panel.protectsDragRemoval(at: point, isSource: id == sourceID) }
-        let removing = sourcePin.map { pin in
-            sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == pin.id }) == true
-        } == true && !overDock
-            && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
+        let zone = dragZone(at: point)
+        let removing = zone == .unpin, placing = zone == .place
+        if placeItem != nil {
+            dropToPlace?.update(zone: zone, pointer: point, shift: NSEvent.modifierFlags.contains(.shift))
+        }
         for (id, panel) in panels {
             let targeted = candidate === panel
             let proposal = id == destinationID ? DockDragProposal(pins: pins, index: destinationIndex!) : nil
@@ -689,11 +701,26 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             panel.setDragPresentation(proposal: proposal, source: id == sourceID ? sourcePin?.id : nil,
                                       targeted: targeted, message: message)
         }
-        nativeSession?.animatesToStartingPositionsOnCancelOrFail = !removing
+        // Unpin and Place both end where the pointer is; only a drag that does nothing flies back.
+        nativeSession?.animatesToStartingPositionsOnCancelOrFail = !(removing || placing)
         if let pin = sourcePin, let icon = panels[sourceID ?? ""]?.store.icon(for: pin) {
-            setDragLabel(removing ? String(localized: .actionUnpin) : nil, icon: icon)
+            let cue: DragCue = placing ? .placing
+                : removing ? .label(String(localized: .actionUnpin))
+                : zone == .inert && placeItem != nil ? .label(String(localized: .dropPlaceFartherToMove)) : .icon
+            setDragCue(cue, icon: icon)
         }
         updateScrollTimer()
+    }
+
+    /// The release outcome for the dragged pin or tile at `point`. Over-a-dock protection and
+    /// the 64 pt Unpin distance are unchanged; Place applies to ``placeItem`` from 180 pt.
+    private func dragZone(at point: CGPoint) -> DockDragZone {
+        let overDock = panels.contains { id, panel in panel.protectsDragRemoval(at: point, isSource: id == sourceID) }
+        let isPinned = sourcePin.map { pin in
+            sourceID.flatMap { panels[$0] }?.store.pins.contains(where: { $0.id == pin.id }) == true
+        } == true
+        return DockDragZone.resolve(distance: DockDragGeometry.distance(point, outside: sourceBounds), overDock: overDock,
+                                    isPinned: isPinned, canPlace: placeItem != nil && dropToPlace != nil)
     }
 
     /// A volume ejects on release once the pointer has left every dock by the unpin distance.
@@ -702,17 +729,51 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         return !overDock && DockDragGeometry.distance(point, outside: sourceBounds) >= DockDragGeometry.removalDistance
     }
 
-    /// Shows `label` under the drag image, or the bare icon for nil. Rebuilds only on change.
-    private func setDragLabel(_ label: String?, icon: NSImage) {
-        guard let nativeSession, lastRemovalCue != (label != nil) else { return }
-        lastRemovalCue = label != nil
+    /// What the native drag image shows.
+    private enum DragCue: Equatable {
+        /// The tile's artwork at full size.
+        case icon
+        /// The artwork with a caption under it, such as Unpin or Eject.
+        case label(String)
+        /// Drop to Place is armed: the artwork shrinks to a small icon on the pointer, so it reads
+        /// as the app icon at the ghost window's top-left corner.
+        case placing
+    }
+
+    /// Side of the drag artwork while Drop to Place is armed, matching the mockup's 34 pt icon.
+    private static let placingIconSide: CGFloat = 34
+
+    /// Rebuilds the drag image for `cue`. Does nothing while the cue is unchanged.
+    private func setDragCue(_ cue: DragCue, icon: NSImage) {
+        guard let nativeSession, lastDragCue != cue else { return }
+        // A first label-free cue keeps the image AppKit already shows.
+        if lastDragCue == nil, cue == .icon { lastDragCue = cue; return }
+        lastDragCue = cue
+        let pointer = NSEvent.mouseLocation
         nativeSession.enumerateDraggingItems(options: [], for: nil, classes: [NSPasteboardItem.self], searchOptions: [:]) { item, _, _ in
-            let imageSize = item.draggingFrame.size
+            // With a nil view, dragging frames are in screen coordinates (y up). The item keeps
+            // its offset from the pointer for the whole drag, so the pointer's position inside
+            // the frame now is where the small icon belongs.
+            let frame = item.draggingFrame
+            let imageSize = frame.size
+            let side = Self.placingIconSide
+            let inside = CGPoint(x: min(max(pointer.x - frame.minX, side / 2), imageSize.width - side / 2),
+                                 y: min(max(pointer.y - frame.minY, side / 2), imageSize.height - side / 2))
             item.imageComponentsProvider = {
                 let component = NSDraggingImageComponent(key: .icon)
                 component.contents = icon
-                component.frame = CGRect(origin: .zero, size: imageSize)
-                guard let label else { return [component] }
+                let label: String
+                switch cue {
+                case .icon:
+                    component.frame = CGRect(origin: .zero, size: imageSize)
+                    return [component]
+                case .placing:
+                    component.frame = CGRect(x: inside.x - side / 2, y: inside.y - side / 2, width: side, height: side)
+                    return [component]
+                case .label(let text):
+                    component.frame = CGRect(origin: .zero, size: imageSize)
+                    label = text
+                }
                 let caption = NSDraggingImageComponent(key: .label)
                 let text = label as NSString
                 let attributes: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: NSColor.labelColor]
@@ -763,13 +824,28 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             if eject { Analytics.performing(.drag) { ejectVolume?(volume, panel) } }
             return
         }
-        if let sourceID, let sourcePin, let panel = panels[sourceID],
-           completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == sourcePin.id },
-                                  distance: DockDragGeometry.distance(screenPoint, outside: sourceBounds),
-                                  overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) }) {
-            committing = true
-            _ = Analytics.performing(.drag) { panel.store.removePin(sourcePin.id) }
-            committing = false
+        if let sourceID, let sourcePin, let panel = panels[sourceID] {
+            let releasedCleanly = completion.released && !completion.cancelled && !completion.committed
+            if releasedCleanly, let item = placeItem, let dropToPlace, dragZone(at: screenPoint) == .place {
+                // Place takes precedence over Unpin: the pin stays.
+                dropToPlace.commit(at: screenPoint, shift: NSEvent.modifierFlags.contains(.shift)) { [weak panel] done in
+                    guard let panel else { done(false); return }
+                    panel.store.open(item, completion: done)
+                }
+            } else if completion.shouldUnpin(isPinned: panel.store.pins.contains { $0.id == sourcePin.id },
+                                             distance: DockDragGeometry.distance(screenPoint, outside: sourceBounds),
+                                             overDock: panels.contains { id, target in target.protectsDragRemoval(at: screenPoint, isSource: id == sourceID) }) {
+                let index = panel.store.persistedPins.firstIndex { $0.id == sourcePin.id }
+                committing = true
+                let removed = Analytics.performing(.drag) { panel.store.removePin(sourcePin.id) }
+                committing = false
+                if removed, let index, let reference = sourcePin.application {
+                    dropToPlace?.offerUndo(appName: reference.name, glass: panel.restingDragBounds,
+                                           edge: panel.currentSettings?.edge ?? .bottom) { [weak self] in
+                        self?.panels[sourceID]?.store.restorePin(sourcePin, at: index)
+                    }
+                }
+            }
         }
         cancel()
     }
@@ -801,7 +877,9 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         cleanupTask?.cancel(); cleanupTask = nil
         clearFeedback()
         if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil
-        nativeSession = nil; lastRemovalCue = nil; sourceID = nil; sourcePin = nil; sourceUtilityID = nil; sourceVolume = nil; token = nil
+        if placeItem != nil { dropToPlace?.endDrag() }
+        placeItem = nil
+        nativeSession = nil; lastDragCue = nil; sourceID = nil; sourcePin = nil; sourceUtilityID = nil; sourceVolume = nil; token = nil
         dragImageBaseFrame = .zero
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
