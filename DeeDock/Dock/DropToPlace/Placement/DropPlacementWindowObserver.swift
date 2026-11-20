@@ -41,6 +41,7 @@ final class DropPlacementWindowObserver {
                     return
                 }
                 registering = false
+                made?.attach()
                 registration = made
             }
         }
@@ -99,7 +100,12 @@ private nonisolated final class Relay: @unchecked Sendable {
     init(owner: DropPlacementWindowObserver) { self.owner = owner }
 }
 
-/// One AXObserver with its notifications and main-run-loop source. Made and removed on ``queue``.
+/// One AXObserver with its notifications and main-run-loop source.
+///
+/// AX messaging (registering and removing notifications) runs on ``queue``. The run-loop source
+/// is attached and detached only on the main thread, so it can never be detached while the main
+/// run loop is dispatching it. The registration, and with it the AXObserver, stays alive until
+/// its cleanup has finished on the main queue.
 private nonisolated final class Registration: @unchecked Sendable {
     static let queue = DispatchQueue(label: "DeeDock.DropPlacement.observer")
     private static let notifications = [kAXWindowCreatedNotification, kAXFocusedWindowChangedNotification,
@@ -141,21 +147,28 @@ private nonisolated final class Registration: @unchecked Sendable {
             context.release()
             return nil
         }
-        // CFRunLoopAddSource is thread-safe; delivery happens on the main run loop.
-        CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(created), .commonModes)
         return Registration(observer: created, application: application, context: context)
     }
 
-    /// Unregisters on ``queue``. The context is released on the main queue afterwards: the
-    /// source is already gone from the main run loop by then, so no callback can still use it.
+    /// Starts delivery on the main run loop. Main thread only.
+    func attach() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
+    }
+
+    /// Stops delivery at once, then unregisters on ``queue``. Main thread only.
+    ///
+    /// Detaching on the main thread means no callback is running, and none can start afterwards.
+    /// The queue block and the final main-queue block keep `self`, and so the AXObserver and the
+    /// relay, alive until the AX notifications are gone.
     func remove() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
         Self.queue.async { [self] in
             for name in Self.notifications {
                 AXObserverRemoveNotification(observer, application, name as CFString)
             }
-            CFRunLoopRemoveSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .commonModes)
-            let context = context
-            DispatchQueue.main.async { context.release() }
+            DispatchQueue.main.async { [self] in context.release() }
         }
     }
 }
