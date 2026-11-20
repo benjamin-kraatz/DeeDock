@@ -20,6 +20,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Action Tiles](#action-tiles)
 - [DOKK Hub](#dokk-hub)
 - [Lookout](#lookout)
+- [Flix Files](#flix-files)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
 - [Robi on your windows](#robi-on-your-windows)
@@ -129,7 +130,7 @@ The folder stack header has a Sort by menu with Recency, Alphabetical, and Size.
 
 Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in the [DOKK Hub](HUB.md#open-in-hub) and choose grid or list presentation.
 
-Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
+Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. Flix Files moves with an Option-drag, because a plain drag of its tile carries its newest item. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
 
@@ -400,6 +401,50 @@ Press ⌫ in the empty search field, or click ✕ on the chip, to go back to the
 
 Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face, and that request sends nothing about your files. The file names in the first pass show only on your screen. When usage-data sharing is on, Lookout sends counts only, never file names, paths, or what you searched for.
 
+## Flix Files
+
+**Flix Files** keeps what you opened, downloaded, saved, and screenshotted, so you can drag it straight into the window in front: an upload form, a mail, a chat. It is on by default, with its own tile in the dock's utility section. See [Flix Files](FLIX.md) for how it is built, its privacy rules, and its limits.
+
+### Open it
+
+- **Click the Flix Files tile.** The panel opens above the tile (beside it on a side dock) and springs out of it. Click the tile again, press Escape, or click anywhere else to close it.
+- **Press Control-Option-Command-F.** The panel opens at the pointer with the newest item selected and takes the keyboard, so Return opens that item at once. Change the shortcut in **Settings → Flix Files**.
+- **Menu bar.** Turn on **Show in the menu bar** for a Flix Files item; a click opens the panel under it. It is off by default.
+
+Hover never opens the panel. Opening it closes DOKK's other popovers and an anchored Hub.
+
+### The tile
+
+The tile shows the newest item's picture. A red badge counts what arrived by itself since you last looked, such as downloads and new screenshots; opening the panel clears it. A plain drag of the tile carries the newest item, so you can drop the file you just downloaded into a browser without opening anything. Option-drag moves the tile among the other utilities. Drop a file from Finder on the tile to keep it in Flix Files. A purple **✦ N fit here** pill above the tile names items that fit the window in front; that suggestion comes with Flix Files' intelligence (see below) and stays hidden until then.
+
+### The panel
+
+The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved**, and **Flagged**, then **Kinds** (Screenshots, Images, Documents, Folders, Apps), **Smart Filters**, and **Favorites**. Counts follow the noise switch in the footer. The list groups items into **Just Now**, **Today**, **Yesterday**, and **Earlier**. Each row shows the item's picture, its name, what happened ("Downloaded from billing.example.com", "New screenshot", "Saved"), the folder it is in, a flag when flagged, and when.
+
+- **Select** with a click, Command-click to add or remove, Shift-click for a range. Up and Down move the selection; Shift extends it.
+- **Drag** one row or the whole selection out of the panel. As the pointer leaves the panel it fades aside so you can reach the window underneath. After a drop outside, the panel closes; pin it with the header's pin button (or choose **Stay open** in Settings) to keep it open. A cancelled drag brings it back.
+- **Favorites** take drops of rows: a folder moves the files there, with **Undo** in the footer; an app opens them with that app. A folder favorite also filters the list to what is inside it.
+- **Search** with Command-F, the search button, or just by typing. It matches names.
+- **Smart Filters** are saved rules: name contains, folder contains, downloaded from, extension, kind, activity, recent days, or flagged. **New Smart Filter…** builds one; new items join by themselves.
+- **Noise** (autosaves, build products, partial downloads, temporary files) is hidden. The footer says how many and offers **Show**.
+- Files you drop on the panel, and web addresses dragged in from a browser, are kept as items.
+
+Keys: Return opens, Command-Return shows in Finder, Space opens Quick Look, Command-C copies, Option-Command-C copies the path, Command-K flags, Command-D adds to Favorites, Command-F searches, Delete removes from Flix Files, Command-Delete moves to the Trash, and Escape steps back (search, then the panel).
+
+The context menu offers **Open**, **Show in Finder**, **Rename…**, **Copy**, **Copy Path**, **Send to Shelf**, **Flag**, **Add to Favorites**, **Remove from Flix Files**, and **Move to Trash**. Removing an item never touches the file, and **Undo** brings it back. Flagged items never age out of the history, which keeps up to 5,000 items.
+
+Reduce Motion replaces the springs with crossfades. Reduce Transparency draws a solid panel.
+
+### What it tracks
+
+- **Files you open**, from Spotlight's recent-use dates, including folders. This works without any folder access.
+- **New, saved, and downloaded files** in the watched folders: Desktop, Documents, Downloads, and iCloud Drive by default. Downloads carry the page they came from. macOS asks before DOKK may read these folders, so Flix Files waits for you: the panel shows a card with **Allow…** buttons, and **Settings → Flix Files** lists each folder with its own button. Nothing is read before you press one. Folders Lookout already reads with your permission are watched without asking again.
+- **Apps** you bring to the front, at most once every five minutes per app.
+
+### Intelligence (planned)
+
+The panel already has room for the ✦ features in the approved design: suggestions for the window in front, search in your own words, Threads, captions and better names, key facts, versions, Tidy, Where were you?, More like this, a guard for sensitive files, and Ask Robi. They arrive with the next phases of DEE-163 and stay hidden until then. Their switches are already in **Settings → Flix Files**. Web link tracking (off by default) is planned the same way; dropped web addresses are kept already.
+
 ## App badges
 
 Enable **Settings → Features → App badges → Show app badges**, then allow Accessibility access using the controls in that card. The setting is off by default and applies to every display. Screen Recording is not required.
@@ -541,7 +586,7 @@ DOKK checks for newly installed plugins when it comes to the front and when you 
 
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, Radar's Shift-Command-Space shortcut, and Flix Files. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 

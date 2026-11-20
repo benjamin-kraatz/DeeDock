@@ -131,6 +131,17 @@ struct DockEntryView: View {
                     accessibilityFocus(DockEntryID.notificationFeed.hitID, $0)
                 }
             )
+        case .flix:
+            DockFlixButton(
+                size: size,
+                selected: selected,
+                interaction: interaction,
+                menuTracking: menuTracking,
+                accessibilityFocus: {
+                    accessibilityFocus(DockEntryID.flix.hitID, $0)
+                }
+            )
+            .modifier(DockTileArrivalBounce(hitID: DockEntryID.flix.hitID, interaction: interaction))
         case .harbor:
             DockHarborButton(
                 size: size,

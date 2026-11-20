@@ -26,7 +26,7 @@ enum DockAppGroup: String, Hashable { case pinned, running }
 
 /// Navigation identity cannot confuse a section control with a real application.
 enum DockEntryID: Hashable {
-    case launcher, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, notificationFeed, harbor, volume(String), update, trash
+    case launcher, melt(UUID), action(UUID), app(String), folder(UUID), group(DockAppGroup), sessionCapsule(UUID), sessionCapsules, shelf, notificationFeed, flix, harbor, volume(String), update, trash
     /// A plugin tile, by the plugin extension's bundle identifier.
     case plugin(String)
     var hitID: String {
@@ -41,6 +41,7 @@ enum DockEntryID: Hashable {
         case .sessionCapsules: "session-capsules"
         case .shelf: "shelf"
         case .notificationFeed: "notification-feed"
+        case .flix: "flix"
         case .harbor: "harbor"
         case .volume(let id): "volume:\(id)"
         case .update: "update"
@@ -74,6 +75,7 @@ enum DockSectionProjection {
                         sessionCapsules: [SessionCapsuleDockItem] = [],
                         capsules: CapsuleDockItem? = nil, shelf: ShelfDockItem? = nil,
                         notificationFeed: NotificationFeedDockItem? = nil,
+                        flix: FlixDockItem? = nil,
                         harbor: HarborDockItem? = nil,
                         volumes: [VolumeDockItem] = [], update: UpdateDockItem? = nil,
                         trash: TrashDockItem? = nil) -> [DockRenderSlot] {
@@ -105,7 +107,8 @@ enum DockSectionProjection {
         return applications + actions.map(DockRenderSlot.action) + sessionCapsules.map(DockRenderSlot.sessionCapsule)
             + (capsules.map { [.sessionCapsules($0)] } ?? [])
             + (shelf.map { [.shelf($0)] } ?? [])
-            + (notificationFeed.map { [.notificationFeed($0)] } ?? []) + (harbor.map { [.harbor($0)] } ?? [])
+            + (notificationFeed.map { [.notificationFeed($0)] } ?? []) + (flix.map { [.flix($0)] } ?? [])
+            + (harbor.map { [.harbor($0)] } ?? [])
             + volumes.map(DockRenderSlot.volume)
             + (update.map { [.update($0)] } ?? []) + (trash.map { [.trash($0)] } ?? [])
     }

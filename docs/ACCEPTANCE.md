@@ -3654,3 +3654,49 @@ The first hands-on run found that the orb took no clicks or drags: Liquid Glass 
 - Quit DOKK during the undo window and relaunch. The staged folder should be removed and not restored.
 - Move the orb across displays, including one with a negative origin, through sleep and wake, and over a full-screen app.
 - Check VoiceOver on the orb, rows and delete action. Check Reduce Motion and Reduce Transparency.
+
+## DEE-163 Flix Files
+
+Phase A, built on `codex/dee-163-flix-files` after the confirmed mockups `docs/mockups/flix-files-v2.html` and `docs/mockups/flix-files-ai.html`. Architecture, privacy, and limits are in [FLIX.md](FLIX.md).
+
+### Implemented
+
+- History with merge, dedupe, tombstones, a 5,000-item cap that spares flagged items, a separate noise cap, and debounced JSON files in `DDock/Flix/` (`Flix-dev/` for development builds).
+- Sources: Spotlight recents including folders, FSEvents on allowed watched folders (downloads with their page, screenshots, new and saved files), app activations. Rule-based noise.
+- Dock tile with live thumbnail, unseen badge, ✦ pill slot, plain drag of the newest item, Option-drag to reorder, file drops kept. Optional menu bar item.
+- Panel anchored above the tile or at the pointer (⌃⌥⌘F, configurable), sidebar, grouped list, rows, cards, sheets, dialogs, footer toast with Undo, context menu, keyboard, multi-select, drag out with stepping aside, drops on Favorites and the panel.
+- Every ✦ surface wired to `FlixIntelligence` slots, hidden while no provider is installed.
+- Settings → Flix Files with the shortcut recorder, watched folders and explicit access, web links and intelligence switches (saved for phases B1 and B2), history clearing, and a privacy note. Discovery tip.
+
+### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix files.
+- `DeeDockTests/Flix/` compiles: settings defaults and decoding, history merge, removal, cap, partial downloads, unseen count, persistence and recovery, storage folders, download-page stripping, noise rules, Smart Filter rules, sidebar filters, time sections, the shortcut recorder rules and conflicts, the list builder's noise, search, and versions, panel placement on displays with negative origins, and the read policy. **The tests have not been run.**
+- The app was not launched. Nothing below has been exercised on screen.
+
+### Hands-on acceptance
+
+- [ ] On a fresh install, the Flix Files tile appears after the Notification Feed and Harbor tiles, shows the newest item, and survives a relaunch with its position.
+- [ ] Take a screenshot with a watched Desktop allowed: the tile pops, the badge counts 1, and opening the panel clears it.
+- [ ] Download a file in Safari and Chrome into an allowed Downloads: one row "Downloaded from <host>", no partial-download row left behind.
+- [ ] Open a file and a folder in Finder: both appear as Opened without any folder prompt.
+- [ ] With Downloads not yet allowed, no Files and Folders prompt appears at launch or in the background. The panel's card and Settings' **Allow…** each show the prompt once; allowing starts watching at once.
+- [ ] Click the tile: the panel springs out of it above a bottom dock, beside a left or right dock, and below a top dock, fully on screen at the display's edges.
+- [ ] Press ⌃⌥⌘F with Safari in front: the panel opens at the pointer, the newest row is selected, Return opens it, Escape closes the panel and Safari is in front again.
+- [ ] Hover over the tile and over rows: nothing opens and focus never moves.
+- [ ] Clicking the tile while the panel is open closes it without reopening. Clicking another dock tile closes it and does nothing else. Clicking another app closes it.
+- [ ] Opening Flix Files closes an open Shelf, folder stack, notification feed, plugin panel, and anchored Hub; opening any of those closes Flix Files.
+- [ ] Drag a row into a browser upload field: the panel fades aside as the pointer leaves it, the drop works, and the panel closes. With the pin on, it comes back. Escape during the drag brings it back.
+- [ ] Drag three selected rows (⌘-click, ⇧-click) into Mail: all three attach.
+- [ ] Drag the tile into a chat window: the newest item arrives. Option-drag the tile: it moves among the utilities.
+- [ ] Drop rows on a folder favorite: they move, the toast's Undo moves them back. Drop on an app favorite: they open in it.
+- [ ] Drop a Finder file on the tile and on the panel, and a URL from Safari on the panel: each is kept as an item.
+- [ ] Keys: ↑↓ and ⇧↑↓, ↩, ⌘↩, Space (Quick Look, arrows follow, Escape closes only Quick Look), ⌘C, ⌥⌘C, ⌘K, ⌘D, ⌘F, typing to search (first character kept), ⌫ with Undo, ⌘⌫ to the Trash.
+- [ ] Context menu items work on one and several rows; Rename… renames with Undo.
+- [ ] Smart Filter built by hand shows matching items and picks up a new download by itself; deleting it from its context menu works.
+- [ ] Noise (an autosave, an `.o` file, a `.crdownload`) is hidden, counted in the footer, and **Show** reveals it dimmed.
+- [ ] Settings: each switch takes effect immediately; turning Flix Files off removes the tile, menu bar item, and shortcut. Record ⌃⌘J: the old shortcut stops and the new one opens the panel. Recording ⌥⇧⌘Space or ⌘Q is refused; a key without a modifier asks for one; a combination another app holds shows the orange row.
+- [ ] Menu bar item on: it shows the unseen count and opens the panel under it.
+- [ ] Reduce Motion: crossfades instead of springs and pops. Reduce Transparency: solid panel and tile. Light and dark appearance. VoiceOver reads rows, the tile's value, and toasts.
+- [ ] Two displays with different edges and a display with a negative origin; Spaces and a full-screen app; unplugging the display the panel is anchored to; sleep and wake with the panel open.
+- [ ] Discovery: the Flix Files tip appears after the earlier tips and **Open Flix Files** opens the panel; opening it any other way suppresses the tip.

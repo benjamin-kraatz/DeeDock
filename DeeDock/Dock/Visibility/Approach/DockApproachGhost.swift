@@ -70,7 +70,7 @@ private extension DockRenderSlot {
         case .sessionCapsule(let item): item.icon
         case .volume(let item): item.icon
         case .plugin(let item): item.icon
-        case .launcher, .action, .melt, .group, .notificationFeed, .harbor, .update, .gap: nil
+        case .launcher, .action, .melt, .group, .notificationFeed, .flix, .harbor, .update, .gap: nil
         }
     }
 }

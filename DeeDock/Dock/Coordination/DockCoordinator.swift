@@ -37,6 +37,10 @@ final class DockCoordinator {
     var settingsLookoutRequest = false
     /// One-shot route to the Plugins section, from a plugin tile's menu or panel.
     var settingsPluginsRequest = false
+    /// One-shot route to the Flix Files section, from its tile's menu or panel.
+    var settingsFlixRequest = false
+    /// Flix Files: the activity stream behind its dock tile, shortcut, and panel.
+    let flix: FlixCoordinator
     /// The app-grouped window overview, shared by every display.
     let harbor = HarborCoordinator()
     /// Robi on the focused window. Opt-in; started with the coordinator and inert while off.
@@ -153,6 +157,7 @@ final class DockCoordinator {
                                      suggestions: LauncherSuggestionsStore(), launcherFavorites: LauncherFavorites(),
                                      surveyDefaults: .standard, backgroundMonitor: backgroundApplications)
         hub = HubCoordinator(launcher: LauncherState(catalog: catalog), openRadar: { [harbor] in harbor.toggle() })
+        flix = FlixCoordinator.live()
         let menus = ApplicationMenuController(
             access: windowAccess,
             applications: ApplicationMenuService(applications: applicationService, catalog: catalog),
@@ -221,10 +226,13 @@ final class DockCoordinator {
         if robi.store.settings.isEnabled { discovery.markUsed(.robi) }
         // Someone who turned Radar's shortcuts off has been to its settings, and the tip names a shortcut.
         if !settings.value.harborShortcutEnabled { discovery.markUsed(.harbor) }
+        // Someone who turned Flix Files off has decided; the tip would only nag.
+        if !flix.settings.isEnabled { discovery.markUsed(.flix) }
         notificationFeedPopover.prepareSettings = { [weak self] in self?.settingsNotificationFeedRequest = true }
         configurePlugins()
         configureHarbor()
         configureHub()
+        configureFlix()
         restorePendingUninstall()
         // Lookout indexes in the background while the app runs; it does nothing until it's set up and on.
         hub.lookout.start()
@@ -257,6 +265,9 @@ final class DockCoordinator {
                 return enableRobiFromDiscovery()
             case .harbor:
                 harbor.open()
+                return .none
+            case .flix:
+                flix.openFromAnywhere()
                 return .none
             }
         }
@@ -393,6 +404,7 @@ final class DockCoordinator {
             self?.endFocus(restore: false)
             // DEE-155: an app brought forward from anywhere takes its feed entries with it.
             self?.notificationFeedPopover.applicationActivated(app)
+            self?.flix.applicationActivated(app)
         }
         profiles.didChange = { [weak self] in
             guard let self else { return }
@@ -415,6 +427,7 @@ final class DockCoordinator {
             // Harbor's panels and layout belong to the old arrangement, and so does the Hub's anchor.
             self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
             self?.hub.suspend()
+            self?.flix.close(restoreFocus: false, animated: false)
             self?.occupancySuspended = false
             self?.reconcile($0)
         }
@@ -448,6 +461,7 @@ final class DockCoordinator {
                 self?.occupancySuspended = true
                 self?.harbor.close(raising: nil, outcome: .interrupted, animated: false)
                 self?.hub.suspend()
+                self?.flix.close(restoreFocus: false, animated: false)
                 self?.occupancy.stop()
                 self?.dragging.cancel()
                 self?.shelfSemanticWarmup.cancel()
@@ -686,6 +700,10 @@ final class DockCoordinator {
             panel.interaction.clearNotificationFeed = { [weak self] in self?.notificationFeedPopover.clearFromTile() }
             connectPlugins(store: store, panel: panel, displayID: display.id)
             store.openHarbor = { [weak self] in Analytics.performing(.keyboard) { self?.harbor.toggle() } }
+            store.openFlix = { [weak self] in Analytics.performing(.keyboard) { self?.flix.toggleFromTile(displayID: display.id) } }
+            panel.interaction.openFlix = { [weak self] in self?.flix.toggleFromTile(displayID: display.id) }
+            panel.interaction.beginFlixDrag = { [weak self] view, event in self?.flix.beginTileDrag(from: view, event: event) }
+            panel.interaction.prepareFlixSettings = { [weak self] in self?.settingsFlixRequest = true }
             panel.interaction.openHarbor = { [weak self] in self?.harbor.toggle() }
             panel.interaction.prepareNotificationFeedSettings = { [weak self] in
                 self?.settingsNotificationFeedRequest = true
@@ -760,6 +778,8 @@ final class DockCoordinator {
             panel.interaction.badges = badges
             panel.interaction.notificationFeed = notificationFeed
             panel.interaction.plugins = plugins
+            panel.interaction.flix = flix.tile
+            panel.store.configureFlix(flix.showsTile)
             panel.interaction.updateAwareness = updateAwareness
             panel.store.configureUpdateTile(updateAwareness?.dockItem)
             panel.store.openUpdate = { [weak self] in self?.openUpdateTile?($0) }
@@ -775,6 +795,7 @@ final class DockCoordinator {
         sessionCapsules.reanchor()
         notificationFeedPopover.reanchor()
         pluginPanels.reanchor()
+        flix.reanchor()
         windowPeeks.refresh()
         hub.refreshAnchor()
         if let id = zonePreview.displayID {
@@ -1144,6 +1165,8 @@ final class DockCoordinator {
         settingsLookoutRequest = false
         settingsRobiRequest = false
         settingsPluginsRequest = false
+        settingsFlixRequest = false
+        flix.stop()
         hub.files.onOpenLookoutSettings = {}
         harbor.stop()
         filePicker.stop()
@@ -1183,6 +1206,46 @@ final class DockCoordinator {
         volumes.stop()
         trash.stop()
         updateAwareness = nil
+    }
+}
+
+// MARK: - Flix Files
+
+extension DockCoordinator {
+    /// Connects Flix Files to the docks, the other popovers, the Shelf, and Settings, then starts it.
+    fileprivate func configureFlix() {
+        popovers.register(.flix) { [weak self] in self?.flix.close(restoreFocus: false) }
+        flix.tileAnchor = { [weak self] displayID in
+            guard let self else { return nil }
+            let id = displayID ?? DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation)
+            guard let id, let panel = panels[id], let anchor = panel.popoverAnchor(for: .flix),
+                  !anchor.icon.isNull, !anchor.icon.isEmpty else { return nil }
+            return (anchor, id)
+        }
+        flix.willOpen = { [weak self] _ in
+            guard let self else { return }
+            popovers.prepareToOpen(.flix)
+            hub.dismissAnchored()
+            windowPeeks.close(returnFocus: false)
+            volumeDock.cards.close()
+            timeline.end()
+            endFocus(restore: false)
+        }
+        // Only a panel anchored to a tile holds the docks revealed, as the other popovers do.
+        flix.openChanged = { [weak self] open, displayID in
+            guard let self, displayID != nil else { return }
+            if open { popovers.didOpen(.flix) } else { popovers.didClose(.flix) }
+        }
+        flix.previousApplication = { [weak self] in self?.lastExternalApplication }
+        flix.sendToShelf = { [weak self] urls in
+            guard let self else { return false }
+            return (try? shelf.add(urls)) != nil
+        }
+        flix.tileVisibilityChanged = { [weak self] in self?.refreshPanels() }
+        flix.prepareSettings = { [weak self] in self?.settingsFlixRequest = true }
+        flix.didOpen = { [weak self] in self?.discovery.markUsed(.flix) }
+        dragging.keepInFlix = { [weak self] urls in self?.flix.keepDroppedFiles(urls) }
+        flix.start()
     }
 }
 

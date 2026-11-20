@@ -3187,6 +3187,60 @@
         }
       }
     },
+    "discoveryFlixMessage" : {
+      "comment" : "Discovery tip message announcing Flix Files. ⌃⌥⌘F is the default shortcut.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files sammelt, was du geöffnet, geladen und gesichert hast. Alles direkt ins vordere Fenster ziehen, oder ⌃⌥⌘F drücken."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files keeps what you opened, downloaded, and saved. Drag anything straight into the window in front, or press ⌃⌥⌘F."
+          }
+        }
+      }
+    },
+    "discoveryFlixOpen" : {
+      "comment" : "Discovery tip button that opens Flix Files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Flix Files"
+          }
+        }
+      }
+    },
+    "discoveryFlixTitle" : {
+      "comment" : "Discovery tip title announcing Flix Files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine letzten Dateien im Dock"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your recent files, in the dock"
+          }
+        }
+      }
+    },
     "discoveryHarborMessage" : {
       "comment" : "Discovery callout text announcing Radar. Find a Window was the removed window search; use its former German name „Fenster suchen“.",
       "extractionState" : "manual",
@@ -3345,6 +3399,5322 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Turn On"
+          }
+        }
+      }
+    },
+    "flixAccessAllowed" : {
+      "comment" : "Flix Files Settings: folder access status.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird beobachtet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watching"
+          }
+        }
+      }
+    },
+    "flixAccessAllowFolder" : {
+      "comment" : "Flix Files: button on the folder access card. The argument is a folder name supplied by macOS, such as Downloads.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ erlauben …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow %@…"
+          }
+        }
+      }
+    },
+    "flixAccessAsk" : {
+      "comment" : "Flix Files Settings: folder access status before asking.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Braucht deine Erlaubnis"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs your permission"
+          }
+        }
+      }
+    },
+    "flixAccessCardMessage" : {
+      "comment" : "Flix Files: body of the folder access card. Explains why macOS will ask and what works without it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für Downloads, Bildschirmfotos und gesicherte Dateien muss Flix Files diese Ordner lesen. macOS fragt einmal nach. Geöffnete Dateien erscheinen schon jetzt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To show downloads, screenshots, and saved files, Flix Files needs to read these folders. macOS asks you once. Files you open already show up."
+          }
+        }
+      }
+    },
+    "flixAccessCardTitle" : {
+      "comment" : "Flix Files: title of the inline card asking to watch protected folders.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Dateien sofort sehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See new files as they arrive"
+          }
+        }
+      }
+    },
+    "flixAccessDenied" : {
+      "comment" : "Flix Files Settings: folder access status after macOS said no.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlaubt. In Systemeinstellungen → Datenschutz & Sicherheit → Dateien und Ordner änderbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not allowed. Change it in System Settings → Privacy & Security → Files and Folders."
+          }
+        }
+      }
+    },
+    "flixAccessMissing" : {
+      "comment" : "Flix Files Settings: folder access status when the folder is gone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner nicht gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder not found"
+          }
+        }
+      }
+    },
+    "flixActionMoveTo" : {
+      "comment" : "Flix Files: suggestion pill on a downloaded row. The argument is a folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „%@“ bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to %@"
+          }
+        }
+      }
+    },
+    "flixActionRename" : {
+      "comment" : "Flix Files: suggestion pill offering a better file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "flixAfterDragClose" : {
+      "comment" : "Flix Files Settings: the panel closes after a successful drag out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "flixAfterDragStay" : {
+      "comment" : "Flix Files Settings: the panel stays open after a successful drag out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geöffnet lassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay open"
+          }
+        }
+      }
+    },
+    "flixAskInYourOwnWords" : {
+      "comment" : "Flix Files: heading above example search sentences.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In eigenen Worten fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask in your own words"
+          }
+        }
+      }
+    },
+    "flixAskRobiAboutMany" : {
+      "comment" : "Flix Files: Ask Robi sheet title for several files. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Robi zu %lld Datei fragen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Robi zu %lld Dateien fragen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ask Robi about %lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ask Robi about %lld files"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixAskRobiAboutOne" : {
+      "comment" : "Flix Files: Ask Robi sheet title for one file. The argument is the file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi zu „%@“ fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask Robi about “%@”"
+          }
+        }
+      }
+    },
+    "flixAskRobiPlaceholder" : {
+      "comment" : "Flix Files: placeholder of the Ask Robi question field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Frage stellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask a question"
+          }
+        }
+      }
+    },
+    "flixAskRobiPrivacyMany" : {
+      "comment" : "Flix Files: privacy note under Ask Robi for several files. Transparent and neutral.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird mit deinem API-Schlüssel an Claude gesendet, nur die gefragten Dateien. Sonst verlässt nichts diesen Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent to Claude with your API key, only the files you asked about. Nothing else leaves this Mac."
+          }
+        }
+      }
+    },
+    "flixAskRobiPrivacyOne" : {
+      "comment" : "Flix Files: privacy note under Ask Robi for one file. Transparent and neutral.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird mit deinem API-Schlüssel an Claude gesendet, nur die gefragte Datei. Sonst verlässt nichts diesen Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent to Claude with your API key, only the file you asked about. Nothing else leaves this Mac."
+          }
+        }
+      }
+    },
+    "flixByMeaning" : {
+      "comment" : "Flix Files: chip on a search result found by its content, not its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ nach Bedeutung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ by meaning"
+          }
+        }
+      }
+    },
+    "flixCancel" : {
+      "comment" : "Flix Files: cancel button in sheets and dialogs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "flixConfirmNewerMessage" : {
+      "comment" : "Flix Files: dialog message. First argument is the newer file's name, second the older one's.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ ist neuer als „%2$@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” is newer than “%2$@”."
+          }
+        }
+      }
+    },
+    "flixConfirmNewerTitle" : {
+      "comment" : "Flix Files: dialog title before dragging out an older version of a document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es gibt eine neuere Version"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A newer version exists"
+          }
+        }
+      }
+    },
+    "flixConfirmSendAnyway" : {
+      "comment" : "Flix Files: dialog button that allows the sensitive file to be dragged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trotzdem senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Anyway"
+          }
+        }
+      }
+    },
+    "flixConfirmSendOlder" : {
+      "comment" : "Flix Files: dialog button that keeps the older version. The argument is its file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ trotzdem senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send “%@” Anyway"
+          }
+        }
+      }
+    },
+    "flixConfirmSensitiveMessage" : {
+      "comment" : "Flix Files: dialog message. The argument is the file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ scheint einen Ausweis, Bankdaten oder einen Schlüssel zu zeigen. Trotzdem senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” seems to show an ID, bank details, or a key. Send it anyway?"
+          }
+        }
+      }
+    },
+    "flixConfirmSensitiveMessageTo" : {
+      "comment" : "Flix Files: dialog message. First argument is the file name, second the app in front, supplied by macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ scheint einen Ausweis, Bankdaten oder einen Schlüssel zu zeigen. Trotzdem an %2$@ senden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” seems to show an ID, bank details, or a key. Send it to %2$@ anyway?"
+          }
+        }
+      }
+    },
+    "flixConfirmSensitiveTitle" : {
+      "comment" : "Flix Files: dialog title before dragging out a file that looks sensitive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei wirkt vertraulich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file looks sensitive"
+          }
+        }
+      }
+    },
+    "flixConfirmUseNewer" : {
+      "comment" : "Flix Files: dialog button that switches the drag to the newer version. The argument is its file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use “%@”"
+          }
+        }
+      }
+    },
+    "flixDismiss" : {
+      "comment" : "Flix Files: accessibility label of a card's close button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
+    },
+    "flixDragKeep" : {
+      "comment" : "Flix Files: dock drop hint while a file drag is over the Flix Files tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Flix Files behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep in Flix Files"
+          }
+        }
+      }
+    },
+    "flixEmptyMessage" : {
+      "comment" : "Flix Files: empty list message before anything was recorded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier erscheinen Dateien, die du öffnest, lädst oder sicherst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files you open, download, or save show up here."
+          }
+        }
+      }
+    },
+    "flixEmptyTitle" : {
+      "comment" : "Flix Files: empty list title before anything was recorded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts da"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing here yet"
+          }
+        }
+      }
+    },
+    "flixEngineAppleIntelligenceHelp" : {
+      "comment" : "Flix Files Settings: what Apple Intelligence does for Flix Files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Mac. Versteht deine Sätze, benennt Threads, schreibt Beschreibungen und Namen, findet Eckdaten und liest das vordere Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this Mac. Reads your sentences, names Threads, writes captions and names, pulls key facts, and looks at the window in front."
+          }
+        }
+      }
+    },
+    "flixEngineAvailable" : {
+      "comment" : "Flix Files Settings: engine status pill.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available"
+          }
+        }
+      }
+    },
+    "flixEngineLookout" : {
+      "comment" : "Flix Files Settings: engine name. Lookout is DOKK's on-device file search; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookout"
+          }
+        }
+      }
+    },
+    "flixEngineLookoutHelp" : {
+      "comment" : "Flix Files Settings: what Lookout does for Flix Files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Mac. Findet Dateien nach Inhalt, bildet Threads, erkennt Versionen und schlägt Ordner vor."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this Mac. Finds files by what they show or say, groups Threads, spots versions, and suggests folders."
+          }
+        }
+      }
+    },
+    "flixEngineNeedsSetup" : {
+      "comment" : "Flix Files Settings: engine status pill, the engine must be set up first.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht eingerichtet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not set up"
+          }
+        }
+      }
+    },
+    "flixEngineOff" : {
+      "comment" : "Flix Files Settings: engine status pill.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "flixEngineOn" : {
+      "comment" : "Flix Files Settings: engine status pill.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
+          }
+        }
+      }
+    },
+    "flixEngineOnFolders" : {
+      "comment" : "Flix Files Settings: Lookout status pill with its folder count. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ein · %lld Ordner"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ein · %lld Ordner"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On · %lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "On · %lld folders"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixEngineReady" : {
+      "comment" : "Flix Files Settings: engine status pill.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
+          }
+        }
+      }
+    },
+    "flixEngineRobi" : {
+      "comment" : "Flix Files Settings: engine name. Robi is DOKK's assistant; keep the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi"
+          }
+        }
+      }
+    },
+    "flixEngineRobiHelp" : {
+      "comment" : "Flix Files Settings: what Robi does for Flix Files. Transparent about what is sent.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude mit deinem API-Schlüssel, nur wenn du zu Dateien fragst. Die gefragten Dateien werden mit der Frage gesendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude with your API key, only when you ask about files. The files you ask about are sent with your question."
+          }
+        }
+      }
+    },
+    "flixEngineUnavailable" : {
+      "comment" : "Flix Files Settings: engine status pill.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "flixEventDownloaded" : {
+      "comment" : "Flix Files: event line for a download without a known page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded"
+          }
+        }
+      }
+    },
+    "flixEventDownloadedFrom" : {
+      "comment" : "Flix Files: event line for a download. The argument is a web site's host, such as example.com.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladen von %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded from %@"
+          }
+        }
+      }
+    },
+    "flixEventKept" : {
+      "comment" : "Flix Files: event line for an item you dropped on Flix Files to keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept"
+          }
+        }
+      }
+    },
+    "flixEventLink" : {
+      "comment" : "Flix Files: event line for a web page without a host.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webseite"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web page"
+          }
+        }
+      }
+    },
+    "flixEventNew" : {
+      "comment" : "Flix Files: event line for a file that appeared in a watched folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        }
+      }
+    },
+    "flixEventNewScreenshot" : {
+      "comment" : "Flix Files: event line for a new screenshot.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Bildschirmfoto"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New screenshot"
+          }
+        }
+      }
+    },
+    "flixEventOpened" : {
+      "comment" : "Flix Files: event line for an item you opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geöffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened"
+          }
+        }
+      }
+    },
+    "flixEventSaved" : {
+      "comment" : "Flix Files: event line for a file that was saved again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "flixFavoriteAppHint" : {
+      "comment" : "Flix Files: VoiceOver hint of an app or file favorite.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet es. Dateien hier ablegen, um sie damit zu öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens it. Drop files here to open them with it."
+          }
+        }
+      }
+    },
+    "flixFavoriteFolderHint" : {
+      "comment" : "Flix Files: VoiceOver hint of a folder favorite.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt den Inhalt. Dateien hier ablegen, um sie zu bewegen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows what is inside. Drop files here to move them."
+          }
+        }
+      }
+    },
+    "flixFavoriteRemove" : {
+      "comment" : "Flix Files: sidebar favorite context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Favoriten entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Favorites"
+          }
+        }
+      }
+    },
+    "flixFilterAll" : {
+      "comment" : "Flix Files: sidebar entry showing every item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Aktivitäten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Activity"
+          }
+        }
+      }
+    },
+    "flixFilterDownloaded" : {
+      "comment" : "Flix Files: sidebar entry for downloaded files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded"
+          }
+        }
+      }
+    },
+    "flixFilterFlagged" : {
+      "comment" : "Flix Files: sidebar entry for flagged items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flagged"
+          }
+        }
+      }
+    },
+    "flixFilterNew" : {
+      "comment" : "Flix Files: sidebar entry for files that appeared in a watched folder, such as screenshots.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        }
+      }
+    },
+    "flixFilterOpened" : {
+      "comment" : "Flix Files: sidebar entry for items you opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geöffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened"
+          }
+        }
+      }
+    },
+    "flixFilterSaved" : {
+      "comment" : "Flix Files: sidebar entry for files that were saved again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "flixFitAsksFor" : {
+      "comment" : "Flix Files: second line of a suggested row. The argument is a phrase from the window in front, such as the signed contract.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "verlangt „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "asks for “%@”"
+          }
+        }
+      }
+    },
+    "flixFitsTitle" : {
+      "comment" : "Flix Files: heading of the suggestions for the window in front. The argument names the window, such as a web site's host or an app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passt zu %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fits %@"
+          }
+        }
+      }
+    },
+    "flixGroupEarlier" : {
+      "comment" : "Flix Files: list section for older items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Früher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Earlier"
+          }
+        }
+      }
+    },
+    "flixGroupJustNow" : {
+      "comment" : "Flix Files: list section for items from the last ten minutes.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade eben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just Now"
+          }
+        }
+      }
+    },
+    "flixGroupToday" : {
+      "comment" : "Flix Files: list section for items from earlier today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "flixGroupYesterday" : {
+      "comment" : "Flix Files: list section for items from yesterday.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        }
+      }
+    },
+    "flixHintAskRobi" : {
+      "comment" : "Flix Files: footer key hint for Command-R.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask Robi"
+          }
+        }
+      }
+    },
+    "flixHintOpen" : {
+      "comment" : "Flix Files: footer key hint for Return.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "flixHintQuickLook" : {
+      "comment" : "Flix Files: footer key hint for Space.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Übersicht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
+          }
+        }
+      }
+    },
+    "flixItemCount" : {
+      "comment" : "Flix Files: number of items in the list. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixKindApps" : {
+      "comment" : "Flix Files: sidebar kind entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "flixKindDocuments" : {
+      "comment" : "Flix Files: sidebar kind entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        }
+      }
+    },
+    "flixKindFolders" : {
+      "comment" : "Flix Files: sidebar kind entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
+          }
+        }
+      }
+    },
+    "flixKindImages" : {
+      "comment" : "Flix Files: sidebar kind entry. Includes screenshots.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        }
+      }
+    },
+    "flixKindLinks" : {
+      "comment" : "Flix Files: kind name for web pages, in the Smart Filter rule picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webseiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web Pages"
+          }
+        }
+      }
+    },
+    "flixKindScreenshots" : {
+      "comment" : "Flix Files: sidebar kind entry.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfotos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshots"
+          }
+        }
+      }
+    },
+    "flixLabelItems" : {
+      "comment" : "Flix Files: how toasts name several items. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixLabelQuoted" : {
+      "comment" : "Flix Files: how toasts name one item, in quotation marks. The argument is its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”"
+          }
+        }
+      }
+    },
+    "flixLikeToken" : {
+      "comment" : "Flix Files: More like this token. The argument is the file name it started from.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Like %@"
+          }
+        }
+      }
+    },
+    "flixMenuAddToFavorites" : {
+      "comment" : "Flix Files: context menu item adding the item to the sidebar favorites.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Favoriten hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Favorites"
+          }
+        }
+      }
+    },
+    "flixMenuAskRobi" : {
+      "comment" : "Flix Files: context menu item and thread card button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi fragen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask Robi…"
+          }
+        }
+      }
+    },
+    "flixMenuCopy" : {
+      "comment" : "Flix Files: context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "flixMenuCopyPath" : {
+      "comment" : "Flix Files: context menu item that copies the path as text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfad kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Path"
+          }
+        }
+      }
+    },
+    "flixMenuFlag" : {
+      "comment" : "Flix Files: context menu item. Flagged items never age out.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flag"
+          }
+        }
+      }
+    },
+    "flixMenuMoreLikeThis" : {
+      "comment" : "Flix Files: context menu item that finds similar items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr davon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More like this"
+          }
+        }
+      }
+    },
+    "flixMenuMoveTo" : {
+      "comment" : "Flix Files: context menu item applying a suggested folder. The argument is the folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „%@“ bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to %@"
+          }
+        }
+      }
+    },
+    "flixMenuMoveToTrash" : {
+      "comment" : "Flix Files: context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Papierkorb legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Trash"
+          }
+        }
+      }
+    },
+    "flixMenuOpen" : {
+      "comment" : "Flix Files: context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "flixMenuOpenCount" : {
+      "comment" : "Flix Files: context menu item for several items. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt öffnen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte öffnen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Open %lld Item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Open %lld Items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixMenuRemove" : {
+      "comment" : "Flix Files: context menu item. Removes the item from Flix Files only; the file stays.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Flix Files entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from Flix Files"
+          }
+        }
+      }
+    },
+    "flixMenuRename" : {
+      "comment" : "Flix Files: context menu item that opens the rename sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename…"
+          }
+        }
+      }
+    },
+    "flixMenuRenameTo" : {
+      "comment" : "Flix Files: context menu item applying a suggested name. The argument is the name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „%@“ umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename to “%@”"
+          }
+        }
+      }
+    },
+    "flixMenuSendToShelf" : {
+      "comment" : "Flix Files: context menu item that stages the files on DOKK's Shelf.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf die Ablage legen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send to Shelf"
+          }
+        }
+      }
+    },
+    "flixMenuShowInFinder" : {
+      "comment" : "Flix Files: context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "flixMenuShowThread" : {
+      "comment" : "Flix Files: context menu item. The argument is a Thread's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thread „%@“ zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Thread “%@”"
+          }
+        }
+      }
+    },
+    "flixMenuUnflag" : {
+      "comment" : "Flix Files: context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markierung entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unflag"
+          }
+        }
+      }
+    },
+    "flixMoreLikeThisCount" : {
+      "comment" : "Flix Files: count next to the More like this token. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nach Bedeutung"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nach Bedeutung"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld by meaning"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld by meaning"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixMorningTitle" : {
+      "comment" : "Flix Files: title of the morning card that recaps yesterday.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wo warst du?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where were you?"
+          }
+        }
+      }
+    },
+    "flixName" : {
+      "comment" : "Flix Files: the feature's name, used for the dock tile, the panel, the menu bar item, and Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files"
+          }
+        }
+      }
+    },
+    "flixNewSmartFilter" : {
+      "comment" : "Flix Files: sidebar entry that opens the New Smart Filter sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer intelligenter Filter …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Smart Filter…"
+          }
+        }
+      }
+    },
+    "flixNewSmartFilterTitle" : {
+      "comment" : "Flix Files: New Smart Filter sheet title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer intelligenter Filter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Smart Filter"
+          }
+        }
+      }
+    },
+    "flixNoiseChip" : {
+      "comment" : "Flix Files: chip on a noise row, such as an autosave or a build product.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rauschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noise"
+          }
+        }
+      }
+    },
+    "flixNoiseHidden" : {
+      "comment" : "Flix Files: footer text before the Show button. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld als Rauschen ausgeblendet ·"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld als Rauschen ausgeblendet ·"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hidden as noise ·"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hidden as noise ·"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixNoiseHide" : {
+      "comment" : "Flix Files: footer button that hides noise again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide"
+          }
+        }
+      }
+    },
+    "flixNoiseShow" : {
+      "comment" : "Flix Files: footer button that shows hidden noise.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show"
+          }
+        }
+      }
+    },
+    "flixNoiseShowing" : {
+      "comment" : "Flix Files: footer text before the Hide button. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Rauschobjekt sichtbar ·"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Rauschobjekte sichtbar ·"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Showing %lld noise item ·"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Showing %lld noise items ·"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixNothingMatchesMessage" : {
+      "comment" : "Flix Files: empty list message when a filter or search matches nothing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weniger Wörter oder einen anderen Filter versuchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try fewer words, or a different filter."
+          }
+        }
+      }
+    },
+    "flixNothingMatchesTitle" : {
+      "comment" : "Flix Files: empty list title when a filter or search matches nothing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Treffer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing matches"
+          }
+        }
+      }
+    },
+    "flixOnOpenCopyNewest" : {
+      "comment" : "Flix Files Settings: choice that copies the newest item when the panel opens.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuestes kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy newest"
+          }
+        }
+      }
+    },
+    "flixOnOpenCopyPath" : {
+      "comment" : "Flix Files Settings: choice that copies the newest item's path when the panel opens.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pfad kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy its path"
+          }
+        }
+      }
+    },
+    "flixOnOpenNothing" : {
+      "comment" : "Flix Files Settings: choice for what opening the panel also does.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do nothing"
+          }
+        }
+      }
+    },
+    "flixPinHelp" : {
+      "comment" : "Flix Files: help and VoiceOver label of the pin button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach dem Ziehen geöffnet lassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay open after dragging"
+          }
+        }
+      }
+    },
+    "flixPreviewHidden" : {
+      "comment" : "Flix Files: note on a row whose preview is blurred because it looks sensitive.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· Vorschau verborgen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· preview hidden"
+          }
+        }
+      }
+    },
+    "flixPrivacyNote" : {
+      "comment" : "Flix Files Settings: privacy note beside a lock. Transparent and neutral, never alarming.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files speichert seinen Verlauf auf diesem Mac, im eigenen Ordner von DOKK. Es liest Spotlight-Metadaten und die Ordner, die du erlaubst. Beschreibungen, Threads und Fenstervorschläge laufen auf diesem Mac; nur Robi fragen sendet etwas, und nur die gefragten Dateien."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files keeps its history on this Mac, in DOKK's own folder. It reads Spotlight's metadata and the folders you allow. Captions, Threads, and window suggestions run on this Mac; only Ask Robi sends anything, and only the files you ask about."
+          }
+        }
+      }
+    },
+    "flixReaderAccessibility" : {
+      "comment" : "Flix Files: reader name, the macOS accessibility text of a window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "flixReaderAppleIntelligence" : {
+      "comment" : "Flix Files: reader name. Product name, keep in English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence"
+          }
+        }
+      }
+    },
+    "flixReaderVision" : {
+      "comment" : "Flix Files: reader name, text recognition on a window capture.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vision"
+          }
+        }
+      }
+    },
+    "flixReadVia" : {
+      "comment" : "Flix Files: how the window in front was read. The argument is a reader name such as Accessibility.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gelesen über %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "read via %@"
+          }
+        }
+      }
+    },
+    "flixRemoveToken" : {
+      "comment" : "Flix Files: VoiceOver label of a search token's remove button. The argument is the token.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        }
+      }
+    },
+    "flixRenameAction" : {
+      "comment" : "Flix Files: rename sheet button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "flixRenameTitle" : {
+      "comment" : "Flix Files: rename sheet title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "flixRuleActivity" : {
+      "comment" : "Flix Files: Smart Filter rule, the latest activity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activity is"
+          }
+        }
+      }
+    },
+    "flixRuleDays" : {
+      "comment" : "Flix Files: Smart Filter rule, recent activity.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent"
+          }
+        }
+      }
+    },
+    "flixRuleDaysValue" : {
+      "comment" : "Flix Files: value of the Recent rule. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "am letzten Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in den letzten %lld Tagen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in the last day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in the last %lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixRuleExtension" : {
+      "comment" : "Flix Files: Smart Filter rule, the file name extension.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endung ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extension is"
+          }
+        }
+      }
+    },
+    "flixRuleField" : {
+      "comment" : "Flix Files: accessibility label of a rule's field picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rule"
+          }
+        }
+      }
+    },
+    "flixRuleFlagged" : {
+      "comment" : "Flix Files: Smart Filter rule, the item is flagged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ist markiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is flagged"
+          }
+        }
+      }
+    },
+    "flixRuleKind" : {
+      "comment" : "Flix Files: Smart Filter rule, the item kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kind is"
+          }
+        }
+      }
+    },
+    "flixRuleLocation" : {
+      "comment" : "Flix Files: Smart Filter rule, a folder on the path contains text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner enthält"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder contains"
+          }
+        }
+      }
+    },
+    "flixRuleName" : {
+      "comment" : "Flix Files: Smart Filter rule, the name contains text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name enthält"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name contains"
+          }
+        }
+      }
+    },
+    "flixRuleSource" : {
+      "comment" : "Flix Files: Smart Filter rule, the download site contains text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladen von"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded from"
+          }
+        }
+      }
+    },
+    "flixRuleTextPlaceholder" : {
+      "comment" : "Flix Files: placeholder of a rule's text field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "flixSearchHelp" : {
+      "comment" : "Flix Files: help and VoiceOver label of the search button and field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suchen (⌘F)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search (⌘F)"
+          }
+        }
+      }
+    },
+    "flixSearchPlaceholder" : {
+      "comment" : "Flix Files: search field placeholder for name search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Namen suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by name"
+          }
+        }
+      }
+    },
+    "flixSearchPlaceholderWords" : {
+      "comment" : "Flix Files: search field placeholder when sentences are understood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In eigenen Worten fragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask in your own words"
+          }
+        }
+      }
+    },
+    "flixSettingsAddFolder" : {
+      "comment" : "Flix Files Settings: list button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Folder…"
+          }
+        }
+      }
+    },
+    "flixSettingsAddFolderPrompt" : {
+      "comment" : "Flix Files Settings: open panel button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch"
+          }
+        }
+      }
+    },
+    "flixSettingsAfterDrag" : {
+      "comment" : "Flix Files Settings: menu row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach dem Herausziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After you drag something out"
+          }
+        }
+      }
+    },
+    "flixSettingsAllow" : {
+      "comment" : "Flix Files Settings: button that asks macOS for folder access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow…"
+          }
+        }
+      }
+    },
+    "flixSettingsCaptions" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreibungen, Namen und Eckdaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions, names, and key facts"
+          }
+        }
+      }
+    },
+    "flixSettingsClearHistory" : {
+      "comment" : "Flix Files Settings: destructive button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf löschen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear History…"
+          }
+        }
+      }
+    },
+    "flixSettingsClearHistoryConfirm" : {
+      "comment" : "Flix Files Settings: confirmation title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix-Files-Verlauf löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the Flix Files history?"
+          }
+        }
+      }
+    },
+    "flixSettingsClearHistoryMessage" : {
+      "comment" : "Flix Files Settings: confirmation message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Dateien bleiben, wo sie sind. Favoriten und intelligente Filter bleiben auch."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your files stay where they are. Favorites and Smart Filters stay too."
+          }
+        }
+      }
+    },
+    "flixSettingsDockTile" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in the dock"
+          }
+        }
+      }
+    },
+    "flixSettingsDockTileHelp" : {
+      "comment" : "Flix Files Settings: subtitle of the dock tile toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kachel zeigt das neueste Objekt und zählt, was seit dem letzten Blick neu ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The tile shows your newest item and counts what's new since you last looked."
+          }
+        }
+      }
+    },
+    "flixSettingsDragMemory" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lernen, wohin ich ziehe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn where I drag things"
+          }
+        }
+      }
+    },
+    "flixSettingsDragMemoryHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur auf diesem Mac gezählt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counted on this Mac only."
+          }
+        }
+      }
+    },
+    "flixSettingsEnabled" : {
+      "comment" : "Flix Files Settings: master switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files"
+          }
+        }
+      }
+    },
+    "flixSettingsEnabledHelp" : {
+      "comment" : "Flix Files Settings: subtitle of the master switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Verlauf mit allem, was du geöffnet, geladen und gesichert hast, zum direkten Ziehen ins vordere Fenster."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An activity stream of what you opened, downloaded, and saved, to drag straight into the window in front."
+          }
+        }
+      }
+    },
+    "flixSettingsExcludeSite" : {
+      "comment" : "Flix Files Settings: button adding an excluded site.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie erfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never Track"
+          }
+        }
+      }
+    },
+    "flixSettingsExcludeSitePlaceholder" : {
+      "comment" : "Flix Files Settings: placeholder of the excluded site field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bank.example.com"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bank.example.com"
+          }
+        }
+      }
+    },
+    "flixSettingsFolderSuggestions" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner für Downloads vorschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest folders for downloads"
+          }
+        }
+      }
+    },
+    "flixSettingsFootnote" : {
+      "comment" : "Flix Files Settings: footnote under the master switch.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Objekt aus Flix Files zu entfernen, ändert nie die Datei."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing an item from Flix Files never touches the file."
+          }
+        }
+      }
+    },
+    "flixSettingsForget" : {
+      "comment" : "Flix Files Settings: button that clears the drag memory.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forget"
+          }
+        }
+      }
+    },
+    "flixSettingsFrontWindow" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien fürs vordere Fenster vorschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest files for the window in front"
+          }
+        }
+      }
+    },
+    "flixSettingsFrontWindowHelp" : {
+      "comment" : "Flix Files Settings: subtitle. Explains the reading order and that it stays on the Mac.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Öffnen liest Flix Files dieses Fenster: zuerst den Bedienungshilfen-Text, dann per Texterkennung, dann sieht Apple Intelligence das Fenster selbst an. Nichts verlässt den Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When Flix Files opens, it reads that window: first its accessibility text, then Vision text recognition, then Apple Intelligence looks at the window itself. Nothing leaves your Mac."
+          }
+        }
+      }
+    },
+    "flixSettingsHelpers" : {
+      "comment" : "Flix Files Settings: card title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Helfer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Helpers"
+          }
+        }
+      }
+    },
+    "flixSettingsHideNoise" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rauschen ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide noise"
+          }
+        }
+      }
+    },
+    "flixSettingsHideNoiseHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatische Sicherungen, Build-Produkte und unvollständige Downloads."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autosaves, build products, and partial downloads."
+          }
+        }
+      }
+    },
+    "flixSettingsHistory" : {
+      "comment" : "Flix Files Settings: history row title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        }
+      }
+    },
+    "flixSettingsHistoryCount" : {
+      "comment" : "Flix Files Settings: history row subtitle. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt, auf diesem Mac gespeichert"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte, auf diesem Mac gespeichert"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item, kept on this Mac"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items, kept on this Mac"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixSettingsHistoryHelp" : {
+      "comment" : "Flix Files Settings: footnote of the history card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files behält bis zu 5.000 Objekte. Markierte bleiben dauerhaft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files keeps up to 5,000 items. Flagged items never age out."
+          }
+        }
+      }
+    },
+    "flixSettingsKeywords" : {
+      "comment" : "Flix Files Settings: extra search terms, comma separated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zuletzt, letzte, Dateien, Downloads, Bildschirmfotos, Aktivität, ziehen, Verlauf, Kurzbefehl, Favoriten, intelligente Filter, Markierungen, Weblinks, Kachel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "recent, recents, files, downloads, screenshots, activity, drag, history, shortcut, favorites, smart filters, flags, web links, tile"
+          }
+        }
+      }
+    },
+    "flixSettingsMenuBar" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Menüleiste zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show in the menu bar"
+          }
+        }
+      }
+    },
+    "flixSettingsOnOpen" : {
+      "comment" : "Flix Files Settings: menu row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Flix Files öffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When Flix Files opens"
+          }
+        }
+      }
+    },
+    "flixSettingsPagesYouRead" : {
+      "comment" : "Flix Files Settings: toggle, a separate opt-in.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelesene Seiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages you read"
+          }
+        }
+      }
+    },
+    "flixSettingsPagesYouReadHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Seite, die zwei Minuten oder länger vorn bleibt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any page that stays in front for two minutes or more."
+          }
+        }
+      }
+    },
+    "flixSettingsRemoveFolder" : {
+      "comment" : "Flix Files Settings: menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Folder"
+          }
+        }
+      }
+    },
+    "flixSettingsRemoveSite" : {
+      "comment" : "Flix Files Settings: VoiceOver label. The argument is a site's host.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wieder erfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track %@ again"
+          }
+        }
+      }
+    },
+    "flixSettingsSensitiveGuard" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schutz für vertrauliche Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sensitive file guard"
+          }
+        }
+      }
+    },
+    "flixSettingsSensitiveGuardHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwischt Ausweise, Bankdaten und Schlüssel und fragt, bevor sie in eine andere App gehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blurs IDs, bank details, and keys, and asks before they go to another app."
+          }
+        }
+      }
+    },
+    "flixSettingsSensitiveSites" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bank- und Gesundheitsseiten auslassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave out banking and health sites"
+          }
+        }
+      }
+    },
+    "flixSettingsSensitiveSitesHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardmäßig an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On by default."
+          }
+        }
+      }
+    },
+    "flixSettingsSiteIcons" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website-Symbole laden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load site icons"
+          }
+        }
+      }
+    },
+    "flixSettingsSiteIconsHelp" : {
+      "comment" : "Flix Files Settings: subtitle. Off draws a letter instead and makes no request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus zeigt stattdessen den ersten Buchstaben der Website, ohne sie anzufragen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off shows the site's first letter instead, without asking the site for anything."
+          }
+        }
+      }
+    },
+    "flixSettingsSummary" : {
+      "comment" : "Flix Files Settings: sidebar summary of the section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Dateien, Downloads und Bildschirmfotos, bereit zum Ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your recent files, downloads, and screenshots, ready to drag"
+          }
+        }
+      }
+    },
+    "flixSettingsThreads" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität zu Threads bündeln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group activity into Threads"
+          }
+        }
+      }
+    },
+    "flixSettingsTilePill" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„Passt hier“ auf der Kachel zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show “fits here” on the tile"
+          }
+        }
+      }
+    },
+    "flixSettingsTilePillHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest nur Bedienungshilfen-Text, beim Fensterwechsel. Keine Aufnahmen im Hintergrund."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reads accessibility text only, when you switch windows. No captures in the background."
+          }
+        }
+      }
+    },
+    "flixSettingsTrackApps" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
+    },
+    "flixSettingsTrackFolders" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
+          }
+        }
+      }
+    },
+    "flixSettingsTrackLinks" : {
+      "comment" : "Flix Files Settings: toggle, off by default.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weblinks erfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track web links"
+          }
+        }
+      }
+    },
+    "flixSettingsTrackLinksHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seiten, von denen du geladen oder in die du Dateien gezogen hast, und Webdokumente wie Google Docs oder Figma, die eine Weile vorn bleiben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages you downloaded from or dropped files into, and web documents such as Google Docs or Figma that stay in front a while."
+          }
+        }
+      }
+    },
+    "flixSettingsTrackOpened" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geöffnete Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files you open"
+          }
+        }
+      }
+    },
+    "flixSettingsTrackOpenedHelp" : {
+      "comment" : "Flix Files Settings: subtitle. Spotlight is a macOS feature name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus den Nutzungsdaten von Spotlight. Funktioniert ohne Ordnerzugriff."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Spotlight's recent-use dates. Works without folder access."
+          }
+        }
+      }
+    },
+    "flixSettingsTrackWatched" : {
+      "comment" : "Flix Files Settings: toggle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue, gesicherte und geladene Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New, saved, and downloaded files"
+          }
+        }
+      }
+    },
+    "flixSettingsTrackWatchedHelp" : {
+      "comment" : "Flix Files Settings: subtitle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur in den Ordnern unten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only inside the folders below."
+          }
+        }
+      }
+    },
+    "flixSettingsWatchedFolders" : {
+      "comment" : "Flix Files Settings: card title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beobachtete Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watched folders"
+          }
+        }
+      }
+    },
+    "flixSettingsWatchedFoldersHelp" : {
+      "comment" : "Flix Files Settings: footnote explaining folder access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS fragt, bevor DOKK Schreibtisch, Dokumente, Downloads und iCloud Drive lesen darf. Flix Files fragt nur, wenn du Erlauben drückst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS asks before DOKK can read Desktop, Documents, Downloads, and iCloud Drive. Flix Files asks only when you press Allow."
+          }
+        }
+      }
+    },
+    "flixSettingsWebLinks" : {
+      "comment" : "Flix Files Settings: card title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weblinks"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web links"
+          }
+        }
+      }
+    },
+    "flixSettingsWebLinksFootnote" : {
+      "comment" : "Flix Files Settings: footnote of the web links card. Neutral and transparent.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files behält nur Adresse, Titel und Zeit einer Seite, nie ihren Inhalt. Private Fenster werden nie erfasst, Anmelde-Tokens werden aus Adressen entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files keeps only a page's address, title, and time, never what it shows. Private windows are never tracked, and sign-in tokens are removed from addresses."
+          }
+        }
+      }
+    },
+    "flixSettingsWhatItTracks" : {
+      "comment" : "Flix Files Settings: card title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was es erfasst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What it tracks"
+          }
+        }
+      }
+    },
+    "flixSettingsWhatPowersIt" : {
+      "comment" : "Flix Files Settings: card title of the engines.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Was dahintersteckt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ What powers it"
+          }
+        }
+      }
+    },
+    "flixSettingsWhereItLives" : {
+      "comment" : "Flix Files Settings: card title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wo es wohnt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where it lives"
+          }
+        }
+      }
+    },
+    "flixShortcutConflictLauncher" : {
+      "comment" : "Flix Files: shortcut recorder warning. Option-Space is often taken by launcher apps such as Raycast or Alfred.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launcher wie Raycast verwenden diesen Kurzbefehl oft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launchers such as Raycast often use this shortcut."
+          }
+        }
+      }
+    },
+    "flixShortcutConflictRadar" : {
+      "comment" : "Flix Files: shortcut recorder refusal. The combination already opens Radar, DOKK's window overview.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar verwendet diesen Kurzbefehl bereits."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radar already uses this shortcut."
+          }
+        }
+      }
+    },
+    "flixShortcutConflictRobi" : {
+      "comment" : "Flix Files: shortcut recorder refusal. The combination already wakes Robi.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi verwendet diesen Kurzbefehl bereits."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robi already uses this shortcut."
+          }
+        }
+      }
+    },
+    "flixShortcutConflictSpotlight" : {
+      "comment" : "Flix Files: shortcut recorder warning. The combination usually opens Spotlight.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight verwendet diesen Kurzbefehl normalerweise. Er funktioniert nur, wenn er dort ausgeschaltet ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight usually uses this shortcut. It works only if Spotlight's is turned off."
+          }
+        }
+      }
+    },
+    "flixShortcutConflictSystem" : {
+      "comment" : "Flix Files: shortcut recorder refusal. The combination is a standard command in every app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Apps verwenden diesen Kurzbefehl. Bitte einen anderen wählen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every app uses this shortcut. Choose another."
+          }
+        }
+      }
+    },
+    "flixShortcutHelp" : {
+      "comment" : "Flix Files Settings: subtitle of the shortcut row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet Flix Files am Zeiger, mit dem neuesten Objekt ausgewählt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens Flix Files at the pointer, newest item selected."
+          }
+        }
+      }
+    },
+    "flixShortcutNeedsModifier" : {
+      "comment" : "Flix Files Settings: shown when a key without Control, Option, or Command was pressed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘, ⌥ oder ⌃ hinzufügen, damit der Kurzbefehl beim Tippen nie auslöst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ⌘, ⌥, or ⌃, so the shortcut never fires while typing."
+          }
+        }
+      }
+    },
+    "flixShortcutRecordHint" : {
+      "comment" : "Flix Files Settings: VoiceOver hint of the recorder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drücken, um einen neuen Kurzbefehl aufzunehmen. Escape bricht ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press to record a new shortcut. Escape cancels."
+          }
+        }
+      }
+    },
+    "flixShortcutRecording" : {
+      "comment" : "Flix Files Settings: recorder text while waiting for keys.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl eingeben …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type shortcut…"
+          }
+        }
+      }
+    },
+    "flixShortcutReset" : {
+      "comment" : "Flix Files Settings: button restoring Control-Option-Command-F.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌃⌥⌘F verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use ⌃⌥⌘F"
+          }
+        }
+      }
+    },
+    "flixShortcutTitle" : {
+      "comment" : "Flix Files Settings: shortcut row title and recorder label.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastaturkurzbefehl"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard shortcut"
+          }
+        }
+      }
+    },
+    "flixShortcutUnavailable" : {
+      "comment" : "Flix Files Settings: warning when the shortcut could not be registered.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine andere App verwendet diesen Kurzbefehl. Einen anderen wählen oder Flix Files im Dock öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another app uses this shortcut. Choose another, or open Flix Files from the dock."
+          }
+        }
+      }
+    },
+    "flixSidebarFavorites" : {
+      "comment" : "Flix Files: sidebar section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        }
+      }
+    },
+    "flixSidebarKinds" : {
+      "comment" : "Flix Files: sidebar section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kinds"
+          }
+        }
+      }
+    },
+    "flixSidebarSmartFilters" : {
+      "comment" : "Flix Files: sidebar section.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intelligente Filter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart Filters"
+          }
+        }
+      }
+    },
+    "flixSidebarThreads" : {
+      "comment" : "Flix Files: sidebar section of related activity grouped by intelligence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threads"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threads"
+          }
+        }
+      }
+    },
+    "flixSmartFilterAdd" : {
+      "comment" : "Flix Files: button adding a filter built by hand.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        }
+      }
+    },
+    "flixSmartFilterAddRule" : {
+      "comment" : "Flix Files: button adding a rule row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regel hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Rule"
+          }
+        }
+      }
+    },
+    "flixSmartFilterAddToSidebar" : {
+      "comment" : "Flix Files: button adding a generated filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zur Seitenleiste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Sidebar"
+          }
+        }
+      }
+    },
+    "flixSmartFilterDelete" : {
+      "comment" : "Flix Files: Smart Filter context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intelligenten Filter löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Smart Filter"
+          }
+        }
+      }
+    },
+    "flixSmartFilterDescribePlaceholder" : {
+      "comment" : "Flix Files: placeholder of the sentence field that generates a filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreiben: alles für einen Kunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describe it: everything for a client"
+          }
+        }
+      }
+    },
+    "flixSmartFilterEmoji" : {
+      "comment" : "Flix Files: VoiceOver label of the emoji field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        }
+      }
+    },
+    "flixSmartFilterFailed" : {
+      "comment" : "Flix Files: shown when no filter could be made from the sentence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daraus ließ sich kein Filter machen. Andere Wörter versuchen oder unten selbst bauen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't make a filter from that. Try other words, or build one below."
+          }
+        }
+      }
+    },
+    "flixSmartFilterMatchCount" : {
+      "comment" : "Flix Files: live count while building a filter. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Treffer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Treffer"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld matches now"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld match now"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixSmartFilterNamePlaceholder" : {
+      "comment" : "Flix Files: placeholder of the filter name field.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "flixSmartFilterProposalCount" : {
+      "comment" : "Flix Files: line under a generated filter's rules. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei passt. Neue kommen von selbst dazu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien passen. Neue kommen von selbst dazu."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld file matches now. New ones join by themselves."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld files match now. New ones join by themselves."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixSmartFilterRemoveRule" : {
+      "comment" : "Flix Files: VoiceOver label of a rule row's remove button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regel entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Rule"
+          }
+        }
+      }
+    },
+    "flixThreadDragHint" : {
+      "comment" : "Flix Files: hint on a Thread card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oder diese Karte ziehen, um alle mitzunehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or drag this card to carry all of them"
+          }
+        }
+      }
+    },
+    "flixThreadNamedByAppleIntelligence" : {
+      "comment" : "Flix Files: chip on a Thread card. Apple Intelligence is a product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "benannt von Apple Intelligence"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "named by Apple Intelligence"
+          }
+        }
+      }
+    },
+    "flixThreadOpenAll" : {
+      "comment" : "Flix Files: Thread card button. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld öffnen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Alle %lld öffnen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Open %lld"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Open All %lld"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTidy" : {
+      "comment" : "Flix Files: header button that opens Tidy.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufräumen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidy"
+          }
+        }
+      }
+    },
+    "flixTidyApply" : {
+      "comment" : "Flix Files: Tidy sheet button. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderung anwenden"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Änderungen anwenden"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Apply %lld Change"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Apply %lld Changes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTidyHelp" : {
+      "comment" : "Flix Files: help of the Tidy button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads und Namen aufräumen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidy Downloads and names"
+          }
+        }
+      }
+    },
+    "flixTidyMoveTo" : {
+      "comment" : "Flix Files: Tidy row detail. Markdown; the argument is a folder name in bold.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegen nach **%@**"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to **%@**"
+          }
+        }
+      }
+    },
+    "flixTidyNothing" : {
+      "comment" : "Flix Files: Tidy sheet when there is nothing to suggest.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts aufzuräumen. Downloads und Namen sehen gut aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to tidy. Downloads and names look good."
+          }
+        }
+      }
+    },
+    "flixTidyRenameTo" : {
+      "comment" : "Flix Files: Tidy row detail. Markdown; the argument is the new name in bold.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen in **%@**"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename to **%@**"
+          }
+        }
+      }
+    },
+    "flixTidySuggestionCount" : {
+      "comment" : "Flix Files: count in the Tidy sheet title. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Vorschlag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Vorschläge"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld suggestion"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld suggestions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTidyTitle" : {
+      "comment" : "Flix Files: Tidy sheet title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufräumen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidy up"
+          }
+        }
+      }
+    },
+    "flixTileFits" : {
+      "comment" : "Flix Files: VoiceOver value part for suggestions for the window in front. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt passt zum vorderen Fenster"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte passen zum vorderen Fenster"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld item fits the window in front"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items fit the window in front"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTileFitsPill" : {
+      "comment" : "Flix Files: pill above the dock tile. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "✦ %lld passt hier"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "✦ %lld passen hier"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "✦ %lld fits here"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "✦ %lld fit here"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTileHelp" : {
+      "comment" : "Flix Files: dock tile tooltip. The argument is the newest item's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files · ziehen, um „%@“ mitzunehmen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files · drag to take “%@”"
+          }
+        }
+      }
+    },
+    "flixTileHint" : {
+      "comment" : "Flix Files: VoiceOver hint of the dock tile.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet Flix Files. Die Kachel ziehen, um das neueste Objekt mitzunehmen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens Flix Files. Drag the tile to take the newest item."
+          }
+        }
+      }
+    },
+    "flixTileNewest" : {
+      "comment" : "Flix Files: VoiceOver value part naming the newest item. The argument is its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuestes: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newest: %@"
+          }
+        }
+      }
+    },
+    "flixTileOpen" : {
+      "comment" : "Flix Files: dock tile context menu item.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Flix Files"
+          }
+        }
+      }
+    },
+    "flixTimeMinutes" : {
+      "comment" : "Flix Files: row time in minutes ago, short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Min."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        }
+      }
+    },
+    "flixTimeNow" : {
+      "comment" : "Flix Files: row time for under a minute ago.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "now"
+          }
+        }
+      }
+    },
+    "flixTipMake" : {
+      "comment" : "Flix Files: tip card button that creates the offered Smart Filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make it"
+          }
+        }
+      }
+    },
+    "flixTipNotNow" : {
+      "comment" : "Flix Files: tip card button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        }
+      }
+    },
+    "flixTitleMoreLikeThis" : {
+      "comment" : "Flix Files: header title while showing similar items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr davon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More like this"
+          }
+        }
+      }
+    },
+    "flixTitleSearch" : {
+      "comment" : "Flix Files: header title while searching.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        }
+      }
+    },
+    "flixToastCopied" : {
+      "comment" : "Flix Files: toast. The argument names the items, such as a quoted file name or 3 items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ kopiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied %@."
+          }
+        }
+      }
+    },
+    "flixToastCopiedPath" : {
+      "comment" : "Flix Files: toast after copying paths. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pfad kopiert."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Pfade kopiert."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied the path."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied %lld paths."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixToastDragAgain" : {
+      "comment" : "Flix Files: toast after answering a drop question. The drag was stopped, so it has to be started again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Senden noch einmal ziehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag it again to send it."
+          }
+        }
+      }
+    },
+    "flixToastFavoriteAdded" : {
+      "comment" : "Flix Files: toast. The argument is a name or 3 items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ zu Favoriten hinzugefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added %@ to Favorites."
+          }
+        }
+      }
+    },
+    "flixToastFlagged" : {
+      "comment" : "Flix Files: toast. The argument names the items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ markiert. Bleibt dauerhaft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flagged %@. It won't age out."
+          }
+        }
+      }
+    },
+    "flixToastKept" : {
+      "comment" : "Flix Files: toast after dropping files or pages on Flix Files. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekt in Flix Files behalten."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Objekte in Flix Files behalten."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kept %lld item in Flix Files."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kept %lld items in Flix Files."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixToastMoved" : {
+      "comment" : "Flix Files: toast with Undo. First argument names the items, second is a folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ nach %2$@ bewegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved %1$@ to %2$@."
+          }
+        }
+      }
+    },
+    "flixToastPinned" : {
+      "comment" : "Flix Files: toast after pinning the panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files bleibt nach dem Herausziehen geöffnet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files stays open after you drag something out."
+          }
+        }
+      }
+    },
+    "flixToastRemoved" : {
+      "comment" : "Flix Files: toast with Undo. The argument names the items. The files themselves are untouched.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ aus Flix Files entfernt. Die Datei bleibt, wo sie ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed %@ from Flix Files. The file stays where it is."
+          }
+        }
+      }
+    },
+    "flixToastRenamed" : {
+      "comment" : "Flix Files: toast with Undo. The argument is the new name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „%@“ umbenannt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renamed to “%@”."
+          }
+        }
+      }
+    },
+    "flixToastShelf" : {
+      "comment" : "Flix Files: toast after Send to Shelf. The argument names the items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ auf die Ablage gelegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put %@ on the Shelf."
+          }
+        }
+      }
+    },
+    "flixToastShelfFailed" : {
+      "comment" : "Flix Files: toast when the Shelf refused the files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konnte nicht auf die Ablage gelegt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't put that on the Shelf."
+          }
+        }
+      }
+    },
+    "flixToastTidied" : {
+      "comment" : "Flix Files: toast with Undo after Tidy. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Datei aufgeräumt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Dateien aufgeräumt."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tidied %lld file."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tidied %lld files."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixToastTrashed" : {
+      "comment" : "Flix Files: toast after Move to Trash. The argument names the items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ in den Papierkorb gelegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved %@ to the Trash."
+          }
+        }
+      }
+    },
+    "flixToastUnflagged" : {
+      "comment" : "Flix Files: toast. The argument names the items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markierung von %@ entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unflagged %@."
+          }
+        }
+      }
+    },
+    "flixToastUnpinned" : {
+      "comment" : "Flix Files: toast after unpinning the panel.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files schließt nach dem Herausziehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Files closes after you drag something out."
+          }
+        }
+      }
+    },
+    "flixUnderstanding" : {
+      "comment" : "Flix Files: shown while a typed sentence is being understood.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird verstanden …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understanding…"
+          }
+        }
+      }
+    },
+    "flixUnderstoodAs" : {
+      "comment" : "Flix Files: label before the understood search tokens.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verstanden als"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Understood as"
+          }
+        }
+      }
+    },
+    "flixUndo" : {
+      "comment" : "Flix Files: toast button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "flixUnpinHelp" : {
+      "comment" : "Flix Files: help and VoiceOver label of the pin button while pinned.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach dem Ziehen schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close after dragging"
+          }
+        }
+      }
+    },
+    "flixUnseenCount" : {
+      "comment" : "Flix Files: VoiceOver value of the tile and menu bar item. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neues Objekt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld neue Objekte"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new items"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixVersionsCount" : {
+      "comment" : "Flix Files: pill on a document with older versions. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Version"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Versionen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld version"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld versions"
+                }
+              }
+            }
           }
         }
       }

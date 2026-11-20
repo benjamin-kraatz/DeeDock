@@ -39,12 +39,15 @@ struct DockSpringTarget {
 /// The trailing utility tiles an external drag can be dropped on.
 enum DockUtilityDropTarget {
     case shelf, trash
+    /// The Flix Files tile, which keeps dropped files as items.
+    case flix
 
     /// Trash reads differently for a reference the user is discarding than for real files.
     func message(removingFromShelf: Bool) -> LocalizedStringResource {
         switch self {
         case .shelf: .dragAddToShelf
         case .trash: removingFromShelf ? .dragRemoveFromShelf : .dragMoveToTrash
+        case .flix: .flixDragKeep
         }
     }
 }

@@ -7,7 +7,7 @@ struct DiscoveryProposal: Identifiable {
         /// it, and again on later launches until it is used, dismissed, or still snoozed.
         case launched
     }
-    enum Destination: String { case notificationFeed, islands, robi, harbor }
+    enum Destination: String { case notificationFeed, islands, robi, harbor, flix }
     /// What the callout still has to do after its destination handled the click.
     enum FollowUp { case none, openSettings }
     let id: String
@@ -44,5 +44,11 @@ struct DiscoveryProposal: Identifiable {
              title: .discoveryHarborTitle, message: .discoveryHarborMessage,
              action: .discoveryHarborOpen, destination: .harbor, snoozeInterval: 86_400,
              symbol: "rectangle.3.group.fill"),
+        // Announces Flix Files, on by default, which a person may not notice in the dock. Queued behind
+        // Radar. Opening Flix Files any way records use, so people who found it never see this.
+        Self(id: "flix", signal: .launched, threshold: 1, calmInterval: 180,
+             title: .discoveryFlixTitle, message: .discoveryFlixMessage,
+             action: .discoveryFlixOpen, destination: .flix, snoozeInterval: 86_400,
+             symbol: "tray.full.fill"),
     ]
 }

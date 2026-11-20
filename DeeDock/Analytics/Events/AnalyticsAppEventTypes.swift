@@ -6,7 +6,7 @@ import Foundation
 /// A Settings sidebar section. Displays are reported by role, never by name or identifier.
 nonisolated enum AnalyticsSettingsSection: String, AnalyticsToken {
     case general, dock, extras, windowsFocus = "windows_focus"
-    case suggestionsHistory = "suggestions_history", display, lookout, plugins
+    case suggestionsHistory = "suggestions_history", display, lookout, plugins, flix
 
     init(_ section: SettingsSection) {
         switch section {
@@ -17,6 +17,7 @@ nonisolated enum AnalyticsSettingsSection: String, AnalyticsToken {
         case .suggestionsHistory: self = .suggestionsHistory
         case .lookout: self = .lookout
         case .plugins: self = .plugins
+        case .flix: self = .flix
         case .display: self = .display
         }
     }
