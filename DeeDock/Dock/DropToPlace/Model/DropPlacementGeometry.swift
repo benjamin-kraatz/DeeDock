@@ -71,9 +71,10 @@ nonisolated enum DropPlacementGeometry {
         return CGSize(width: min(size.width, usable.width), height: min(size.height, usable.height))
     }
 
-    /// The Shift-draw anchor for a pointer: the pointer, held below the usable frame's top.
+    /// The Shift-draw anchor for a pointer: the pointer, held inside the usable frame, so a
+    /// draw started over a reserved dock strip or the menu bar begins at the usable edge.
     static func drawAnchor(pointer: CGPoint, usable: CGRect) -> CGPoint {
-        CGPoint(x: pointer.x, y: min(pointer.y, usable.maxY))
+        CGPoint(x: min(max(pointer.x, usable.minX), usable.maxX), y: min(max(pointer.y, usable.minY), usable.maxY))
     }
 
     /// The square the ghost grows out of when Place arms.

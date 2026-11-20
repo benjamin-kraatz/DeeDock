@@ -186,5 +186,10 @@ struct DropPlacementGeometryTests {
         #expect(drawn.kind == .draw)
         #expect(drawn.frame.maxX <= usable.maxX)
         #expect(drawn.frame.width == DropPlacementGeometry.minimumSize.width)
+        // Shift pressed over the left dock's reserved strip starts the draw at the usable edge,
+        // so the right edge follows the pointer.
+        let anchor = DropPlacementGeometry.drawAnchor(pointer: CGPoint(x: 10, y: 700), usable: usable)
+        #expect(anchor.x == usable.minX)
+        #expect(place(CGPoint(x: 500, y: 300), anchor: anchor).frame.maxX == 500)
     }
 }

@@ -28,10 +28,15 @@ actor DropPlacementAccessibility {
     ///
     /// Position is written first so the size is negotiated on the destination display, then size,
     /// then position again because some apps shift a window while resizing it.
-    /// - Returns: The frame the app accepted, or nil when there is no window or a write failed.
-    func setFrontWindowFrame(processIdentifier: pid_t, to frame: CGRect) throws -> CGRect? {
+    /// - Parameter deadline: When given, nothing is written once it has passed. Checked after the
+    ///   window lookup, which can itself wait for a busy app.
+    /// - Returns: The frame the app accepted, or nil when there is no window, the deadline passed,
+    ///   or a write failed.
+    func setFrontWindowFrame(processIdentifier: pid_t, to frame: CGRect,
+                             deadline: ContinuousClock.Instant? = nil) throws -> CGRect? {
         try Task.checkCancellation()
         guard AXIsProcessTrusted(), let window = frontWindow(processIdentifier) else { return nil }
+        if let deadline, ContinuousClock.now >= deadline { return nil }
         var origin = frame.origin, size = frame.size
         guard let position = AXValueCreate(.cgPoint, &origin), let extent = AXValueCreate(.cgSize, &size) else { return nil }
         let positionStatus = AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, position)

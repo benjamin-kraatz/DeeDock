@@ -100,8 +100,10 @@ final class DropPlacementService {
                     // A read that came back after the deadline must not move a window late.
                     guard ContinuousClock.now < deadline else { break }
                     let accepted = try? await accessibility.setFrontWindowFrame(processIdentifier: app.processIdentifier,
-                                                                               to: target)
-                    guard let accepted = accepted ?? nil else { return (.failed, nil) }
+                                                                               to: target, deadline: deadline)
+                    guard let accepted = accepted ?? nil else {
+                        return (ContinuousClock.now >= deadline ? .timedOut : .failed, nil)
+                    }
                     return (.placed, Self.appKit(accepted))
                 }
             }
