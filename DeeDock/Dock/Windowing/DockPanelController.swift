@@ -374,9 +374,9 @@ final class DockPanelController {
 
     /// Resting glass that windows should stay clear of, or nil while this dock auto-hides.
     /// Drop to Place trims it from the display's visible frame.
-    var placementReservedGlass: CGRect? {
+    var placementReservedDock: (glass: CGRect, edge: DockEdge)? {
         guard let settings = currentSettings, !settings.behavior.autoHide, !baseRestingFrame.isEmpty else { return nil }
-        return restingDragBounds
+        return (restingDragBounds, settings.edge)
     }
 
     func containsDragRegion(_ point: CGPoint) -> Bool {

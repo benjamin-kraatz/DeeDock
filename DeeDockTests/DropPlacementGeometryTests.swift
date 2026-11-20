@@ -157,12 +157,34 @@ struct DropPlacementGeometryTests {
     func usableFrame() {
         let visible = CGRect(x: 0, y: 0, width: 1440, height: 875)
         let bottomDock = CGRect(x: 400, y: 8, width: 640, height: 64)
-        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [bottomDock])
+        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [(bottomDock, .bottom)])
                 == CGRect(x: 0, y: 80, width: 1440, height: 795))
         let leftDock = CGRect(x: 8, y: 200, width: 64, height: 400)
-        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [leftDock])
+        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [(leftDock, .left)])
                 == CGRect(x: 80, y: 0, width: 1360, height: 875))
         let elsewhere = CGRect(x: -1000, y: 8, width: 640, height: 64)
-        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [elsewhere]) == visible)
+        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [(elsewhere, .bottom)]) == visible)
+        // A start-aligned bottom dock raised off the edge is nearer the left side, but is still
+        // trimmed from the bottom, the edge it is configured for.
+        let raisedStart = CGRect(x: 4, y: 60, width: 640, height: 64)
+        #expect(DropPlacementGeometry.usableFrame(visible: visible, docks: [(raisedStart, .bottom)])
+                == CGRect(x: 0, y: 132, width: 1440, height: 743))
+    }
+
+    @Test("Tiling bands follow the display edge, and a drawn frame stays on screen")
+    func boundsAndDraw() {
+        let visible = CGRect(x: 0, y: 0, width: 1440, height: 875)
+        let usable = CGRect(x: 80, y: 0, width: 1360, height: 875)
+        func place(_ pointer: CGPoint, anchor: CGPoint? = nil) -> DropPlacementTarget {
+            DropPlacementGeometry.target(.init(pointer: pointer, usable: usable, baseSize: CGSize(width: 400, height: 300),
+                                               memory: nil, drawAnchor: anchor, bounds: visible))
+        }
+        // Just right of a left dock's reserved strip is not the screen's left edge.
+        #expect(place(CGPoint(x: 84, y: 500)).kind == .free)
+        #expect(place(CGPoint(x: 4, y: 500)).kind == .left)
+        let drawn = place(CGPoint(x: 1440, y: 700), anchor: CGPoint(x: 1340, y: 700))
+        #expect(drawn.kind == .draw)
+        #expect(drawn.frame.maxX <= usable.maxX)
+        #expect(drawn.frame.width == DropPlacementGeometry.minimumSize.width)
     }
 }

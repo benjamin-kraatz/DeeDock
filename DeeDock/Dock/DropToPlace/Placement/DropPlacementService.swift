@@ -97,6 +97,8 @@ final class DropPlacementService {
                 observer.observe(app.processIdentifier)
                 if await accessibility.frontWindowFrame(processIdentifier: app.processIdentifier) != nil {
                     guard !Task.isCancelled else { return (.failed, nil) }
+                    // A read that came back after the deadline must not move a window late.
+                    guard ContinuousClock.now < deadline else { break }
                     let accepted = try? await accessibility.setFrontWindowFrame(processIdentifier: app.processIdentifier,
                                                                                to: target)
                     guard let accepted = accepted ?? nil else { return (.failed, nil) }

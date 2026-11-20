@@ -40,7 +40,7 @@ final class DropToPlaceController {
         let trusted: Bool
         let reduceMotion: Bool
         /// Each display's frame and usable frame, AppKit global coordinates.
-        let screens: [(frame: CGRect, usable: CGRect)]
+        let screens: [(frame: CGRect, visible: CGRect, usable: CGRect)]
         /// The remembered frame on a connected display, with that display's usable frame.
         /// Nil for running apps: the magnet only brings back closed apps.
         let memory: (frame: CGRect, usable: CGRect)?
@@ -49,6 +49,8 @@ final class DropToPlaceController {
         var runningFrame: CGRect?
         var armed = false
         var drawAnchor: CGPoint?
+        /// The usable frame of the display where Shift went down.
+        var drawUsable: CGRect?
         var springUntil = ContinuousClock.now
         var kind: DropPlacementKind?
         var target: DropPlacementTarget?
@@ -83,14 +85,15 @@ final class DropToPlaceController {
 
     /// Prepares a drag of `item`. Shows the remembered or current frame outline at once.
     /// - Parameter reservedDocks: Resting glass of every dock that keeps its space (not auto-hiding).
-    func beginDrag(_ item: DockItem, reservedDocks: [CGRect]) {
+    func beginDrag(_ item: DockItem, reservedDocks: [(glass: CGRect, edge: DockEdge)]) {
         endDrag()
         // Dragging the same app again replaces a placement that is still waiting.
         service.cancel(applicationID: item.id)
         fadePads(for: item.id)
         let workspace = NSWorkspace.shared
         let screens = NSScreen.screens.map {
-            (frame: $0.frame, usable: DropPlacementGeometry.usableFrame(visible: $0.visibleFrame, docks: reservedDocks))
+            (frame: $0.frame, visible: $0.visibleFrame,
+             usable: DropPlacementGeometry.usableFrame(visible: $0.visibleFrame, docks: reservedDocks))
         }
         let entry = item.reference.bundleIdentifier.flatMap(memory.entry(for:))
         let remembered: (frame: CGRect, usable: CGRect)? = entry.flatMap { entry in
@@ -217,17 +220,24 @@ final class DropToPlaceController {
     // MARK: Presentation
 
     private func resolve(_ session: inout Session, pointer: CGPoint, shift: Bool) -> DropPlacementTarget {
-        let usable = session.screens.first { Self.contains($0.frame, pointer) }?.usable
-            ?? session.screens.first?.usable ?? CGRect(origin: pointer, size: DropPlacementGeometry.defaultSize)
+        let screen = session.screens.first { Self.contains($0.frame, pointer) } ?? session.screens.first
+        var usable = screen?.usable ?? CGRect(origin: pointer, size: DropPlacementGeometry.defaultSize)
         if shift {
-            if session.drawAnchor == nil { session.drawAnchor = DropPlacementGeometry.drawAnchor(pointer: pointer, usable: usable) }
+            if session.drawAnchor == nil {
+                session.drawAnchor = DropPlacementGeometry.drawAnchor(pointer: pointer, usable: usable)
+                session.drawUsable = usable
+            }
+            // A drawn frame stays on the display where Shift went down.
+            usable = session.drawUsable ?? usable
         } else {
             session.drawAnchor = nil
+            session.drawUsable = nil
         }
         let base = DropPlacementGeometry.baseSize(running: session.runningFrame?.size, remembered: session.rememberedSize,
                                                   usable: usable)
         let target = DropPlacementGeometry.target(.init(pointer: pointer, usable: usable, baseSize: base,
-                                                         memory: session.memory, drawAnchor: session.drawAnchor))
+                                                         memory: session.memory, drawAnchor: session.drawAnchor,
+                                                         bounds: screen?.visible))
         session.target = target
         return target
     }

@@ -36,6 +36,9 @@ final class DropPlacementWindowObserver {
         }, &created)
         guard status == .success, let created else { return }
         let element = AXUIElementCreateApplication(processIdentifier)
+        // Registration and removal message the app synchronously on the main actor. Bound them,
+        // so an app that is still busy launching cannot stall the dock.
+        AXUIElementSetMessagingTimeout(element, 0.25)
         let context = Unmanaged.passUnretained(self).toOpaque()
         var registered = false
         for name in Self.notifications where AXObserverAddNotification(created, element, name as CFString, context) == .success {

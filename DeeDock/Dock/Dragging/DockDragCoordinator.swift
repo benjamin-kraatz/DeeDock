@@ -172,7 +172,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if let dropToPlace, let reference = pin.application,
            let item = panel.store.items.first(where: { $0.id == reference.id }), DropToPlaceController.canPlace(item) {
             placeItem = item
-            dropToPlace.beginDrag(item, reservedDocks: panels.values.compactMap(\.placementReservedGlass))
+            dropToPlace.beginDrag(item, reservedDocks: panels.values.compactMap(\.placementReservedDock))
         }
         installMonitor()
         nativeSession = view.beginDraggingSession(with: [dragItem], event: event, source: self)

@@ -39,6 +39,9 @@ nonisolated struct DropPlacementInput: Sendable {
     var memory: (frame: CGRect, usable: CGRect)?
     /// Top-left corner fixed when Shift went down; nil while Shift is up.
     var drawAnchor: CGPoint?
+    /// The display's visible frame. The tiling bands are measured from its edges, so a dock that
+    /// reserves a side does not move the band into the screen. Nil uses `usable`.
+    var bounds: CGRect? = nil
 }
 
 /// The geometry behind Drop to Place, matching `target()` in `docs/mockups/drop-to-place.html`.
@@ -86,19 +89,21 @@ nonisolated enum DropPlacementGeometry {
             // The anchor is the top-left corner; the pointer drags the bottom-right one.
             let width = max(minimum.width, min(pointer.x, usable.maxX) - anchor.x)
             let height = max(minimum.height, anchor.y - max(pointer.y, usable.minY))
-            return DropPlacementTarget(frame: CGRect(x: anchor.x, y: anchor.y - height, width: width, height: height),
-                                       kind: .draw)
+            // The minimum size can reach past the usable frame near its edges; keep it on screen.
+            let drawn = CGRect(x: anchor.x, y: anchor.y - height, width: width, height: height)
+            return DropPlacementTarget(frame: clamp(drawn, into: usable), kind: .draw)
         }
-        if pointer.x <= usable.minX + edgeBand {
+        let edges = input.bounds ?? usable
+        if pointer.x <= edges.minX + edgeBand {
             return DropPlacementTarget(frame: CGRect(x: usable.minX, y: usable.minY,
                                                      width: usable.width / 2, height: usable.height), kind: .left)
         }
-        if pointer.x >= usable.maxX - edgeBand {
+        if pointer.x >= edges.maxX - edgeBand {
             return DropPlacementTarget(frame: CGRect(x: usable.midX, y: usable.minY,
                                                      width: usable.width / 2, height: usable.height), kind: .right)
         }
         // AppKit's top is maxY; the menu bar sits above it, so a pointer there also fills.
-        if pointer.y >= usable.maxY - edgeBand {
+        if pointer.y >= edges.maxY - edgeBand {
             return DropPlacementTarget(frame: usable, kind: .fill)
         }
         if let memory = input.memory {
@@ -131,24 +136,22 @@ nonisolated enum DropPlacementGeometry {
     /// The part of a display's visible frame not covered by docks that keep their space.
     ///
     /// `visible` is `NSScreen.visibleFrame` (already without the menu bar and the macOS Dock).
-    /// Each rectangle in `docks` is a dock's resting glass. A dock is trimmed from the side it
-    /// is closest to, plus ``dockGap``. Auto-hiding docks must not be passed in.
-    static func usableFrame(visible: CGRect, docks: [CGRect]) -> CGRect {
+    /// Each dock is its resting glass and the screen edge it is configured for; it is trimmed
+    /// from that edge, plus ``dockGap``. Auto-hiding docks must not be passed in.
+    static func usableFrame(visible: CGRect, docks: [(glass: CGRect, edge: DockEdge)]) -> CGRect {
         var result = visible
-        for dock in docks where dock.intersects(visible) {
-            let gaps: [(CGFloat, Int)] = [(dock.minY - visible.minY, 0), (visible.maxY - dock.maxY, 1),
-                                          (dock.minX - visible.minX, 2), (visible.maxX - dock.maxX, 3)]
-            switch gaps.min(by: { $0.0 < $1.0 })?.1 {
-            case 0:
+        for (dock, edge) in docks where dock.intersects(visible) {
+            switch edge {
+            case .bottom:
                 let bottom = max(result.minY, dock.maxY + dockGap)
                 result = CGRect(x: result.minX, y: bottom, width: result.width, height: max(0, result.maxY - bottom))
-            case 1:
+            case .top:
                 let top = min(result.maxY, dock.minY - dockGap)
                 result = CGRect(x: result.minX, y: result.minY, width: result.width, height: max(0, top - result.minY))
-            case 2:
+            case .left:
                 let left = max(result.minX, dock.maxX + dockGap)
                 result = CGRect(x: left, y: result.minY, width: max(0, result.maxX - left), height: result.height)
-            default:
+            case .right:
                 let right = min(result.maxX, dock.minX - dockGap)
                 result = CGRect(x: result.minX, y: result.minY, width: max(0, right - result.minX), height: result.height)
             }
