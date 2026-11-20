@@ -238,6 +238,7 @@ launches, and reset when sent:
 | `spring_load_folder`, `spring_load_drive`, `spring_load_downloads` | spring-loaded opens |
 | `peek_enlarge` | Window Peek enlarge-on-hover |
 | `drag_to_eject_armed` | a dragged drive crossing the eject distance |
+| `pin_unpin_undone` | **Undo** clicked on the toast that follows dragging a pin off a dock |
 | `app_activated_<trigger>` | app tile activations, including the context menu's Open (`menu`) and Return in the focused dock (`keyboard`) |
 | `soap_bubble_burst` | bursts played |
 | `dock_group_expanded`, `dock_group_collapsed` | a collapsed app group opened or closed by click, keyboard, or VoiceOver |
@@ -418,6 +419,7 @@ their meaning, with `keyboard`, `menu`, and `voice_over` now reported where they
 | `app_menu_action` | `action` (`show_in_finder`, `hide`, `show`, `bring_all_to_front`, `quit`, `select_window`, `stop_running_in_background`), `outcome`, `trigger` (`menu`, `voice_over`). `select_window` comes only from a tile's VoiceOver window actions, with `trigger` `voice_over`; the context menu no longer lists windows, and Window Peek reports `peek_window_chosen` instead. `stop_running_in_background` is `succeeded` when DOKK asked the app's leftover processes to end and `failed` when the app was no longer running in background; neither shows a message. |
 | `background_apps_unavailable` | `reason` (`unsupported_system`, `missing_interface`, `unexpected_result`). DOKK could not read which apps macOS 27 runs in background and shows them as it did before. Sent at most once per launch. Never which app. |
 | `documents_opened` | `source` (`drop`, `picker`), `file_count`, `file_type`, `outcome`. A cancelled Open Files… picker is `outcome = canceled` with `file_count = 0`. |
+| `dock_app_placed` | `outcome` (`placed`, `moved`, `opened_unplaced`, `timed_out`, `failed`), `kind` (`free`, `memory`, `left`, `right`, `fill`, `draw`), `running`. Sent once per Drop to Place release: an app tile dropped 180 pt or more from its dock. `opened_unplaced` means Accessibility was off, so the app opened where macOS put it. Never which app, and never the window frame. |
 | `shortcut_run` | `source` (`tile`, `keyboard`, `drop`, `launcher`, `launcher_files`, `settings`), `file_count`, `outcome` (`succeeded`, `failed`, `canceled`), `duration` |
 | `shortcut_tile` | `action` (`pinned`, `unpinned`, `moved`, `accepts_files_on`, `accepts_files_off`, `reset`), `tile_count`. Never which Shortcut. |
 

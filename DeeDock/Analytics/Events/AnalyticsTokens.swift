@@ -34,3 +34,5 @@ extension UpdateOffer.Stage: AnalyticsToken {}
 extension UpdateIslandAnnouncement.Kind: AnalyticsToken {}
 extension SettingsPage: AnalyticsToken {}
 extension HubTab: AnalyticsToken {}
+extension DropPlacementOutcome: AnalyticsToken {}
+extension DropPlacementKind: AnalyticsToken {}

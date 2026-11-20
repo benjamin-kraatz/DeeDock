@@ -44,7 +44,9 @@ nonisolated enum DockPinEditing {
 /// Drag geometry is expressed in logical points, never backing pixels or magnified icon positions.
 enum DockDragGeometry {
     static let startDistance: CGFloat = 5
-    static let removalDistance: CGFloat = 64
+    nonisolated static let removalDistance: CGFloat = 64
+    /// From here outward an application drag arms Drop to Place instead of Unpin. See ``DockDragZone``.
+    nonisolated static let placeDistance: CGFloat = 180
     /// Point size of the artwork carried by a native file drag out of the dock.
     static let imageSize: CGFloat = 48
 

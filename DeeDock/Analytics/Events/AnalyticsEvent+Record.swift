@@ -69,6 +69,7 @@ extension AnalyticsEvent {
         case .appMenuAction: "app_menu_action"
         case .backgroundAppsUnavailable: "background_apps_unavailable"
         case .documentsOpened: "documents_opened"
+        case .dockAppPlaced: "dock_app_placed"
         case .shortcutRun: "shortcut_run"
         case .shortcutTile: "shortcut_tile"
         case .appMelt: "app_melt"
@@ -261,6 +262,8 @@ extension AnalyticsEvent {
         case let .documentsOpened(source, fileCount, fileType, outcome):
             ["source": .init(source), "file_count": .init(fileCount), "file_type": fileType.map(AnalyticsValue.init),
              "outcome": .init(outcome)]
+        case let .dockAppPlaced(outcome, kind, running):
+            ["outcome": .init(outcome), "kind": .init(kind), "running": .init(running)]
         case let .shortcutRun(source, fileCount, outcome, duration):
             ["source": .init(source), "file_count": .init(fileCount), "outcome": .init(outcome),
              "duration": .init(duration)]
