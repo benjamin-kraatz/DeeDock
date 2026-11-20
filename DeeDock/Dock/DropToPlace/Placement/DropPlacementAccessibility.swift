@@ -36,13 +36,19 @@ actor DropPlacementAccessibility {
                              deadline: ContinuousClock.Instant? = nil) throws -> CGRect? {
         try Task.checkCancellation()
         guard AXIsProcessTrusted(), let window = frontWindow(processIdentifier) else { return nil }
-        if let deadline, ContinuousClock.now >= deadline { return nil }
+        // Each AX message can wait for a busy app, so recheck before every write.
+        func mayWrite() throws -> Bool {
+            try Task.checkCancellation()
+            if let deadline { return ContinuousClock.now < deadline }
+            return true
+        }
         var origin = frame.origin, size = frame.size
-        guard let position = AXValueCreate(.cgPoint, &origin), let extent = AXValueCreate(.cgSize, &size) else { return nil }
+        guard let position = AXValueCreate(.cgPoint, &origin), let extent = AXValueCreate(.cgSize, &size),
+              try mayWrite() else { return nil }
         let positionStatus = AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, position)
-        try Task.checkCancellation()
+        guard try mayWrite() else { return nil }
         let sizeStatus = AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, extent)
-        if positionStatus == .success || sizeStatus == .success {
+        if positionStatus == .success || sizeStatus == .success, try mayWrite() {
             _ = AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, position)
         }
         guard positionStatus == .success || sizeStatus == .success else { return nil }

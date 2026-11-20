@@ -48,6 +48,9 @@ final class DropToPlaceController {
         let rememberedSize: CGSize?
         var runningFrame: CGRect?
         var armed = false
+        /// The latest pointer and Shift state, so a late running-window read can refresh the target.
+        var lastPointer: CGPoint?
+        var lastShift = false
         var drawAnchor: CGPoint?
         /// The usable frame of the display where Shift went down.
         var drawUsable: CGRect?
@@ -126,12 +129,18 @@ final class DropToPlaceController {
                 let frame = DropPlacementService.appKit(quartz)
                 self.session?.runningFrame = frame
                 showOutline(.init(frame: frame, label: String(localized: .dropPlaceNowHere), hot: false))
+                // Place may have armed with the fallback size before this read returned.
+                if let session = self.session, session.armed, let pointer = session.lastPointer {
+                    update(zone: .place, pointer: pointer, shift: session.lastShift)
+                }
             }
         }
     }
 
     /// Follows the pointer. Cheap enough for every drag event: geometry and model writes only.
     func update(zone: DockDragZone, pointer: CGPoint, shift: Bool) {
+        self.session?.lastPointer = pointer
+        self.session?.lastShift = shift
         guard var session else { return }
         guard zone == .place else {
             if session.armed { disarm() }

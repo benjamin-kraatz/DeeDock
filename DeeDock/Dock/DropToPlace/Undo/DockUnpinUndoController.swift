@@ -33,7 +33,12 @@ final class DockUnpinUndoController {
         self.undo = undo
         let panel = panel ?? makePanel()
         let size = CGSize(width: 440, height: 64)
-        panel.setFrame(Self.frame(size: size, glass: glass, edge: edge), display: false)
+        var frame = Self.frame(size: size, glass: glass, edge: edge)
+        // A dock near a corner would push part of the toast, and maybe Undo, off its display.
+        if let visible = NSScreen.screens.first(where: { $0.frame.intersects(glass) })?.visibleFrame {
+            frame = DropPlacementGeometry.clamp(frame, into: visible)
+        }
+        panel.setFrame(frame, display: false)
         panel.orderFrontRegardless()
         withAnimation(Self.animation) { model.offer = .init(token: UUID(), appName: appName) }
         dismissal?.cancel()

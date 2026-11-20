@@ -17,7 +17,7 @@ Validation on 2026-11-20: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock
 - Apps that ignore or constrain Accessibility moves (fixed-size windows, some Electron and Java apps, apps that reposition their window after launch) keep the frame they accept. DOKK reads the frame back but does not retry.
 - Apps that open several windows at launch: DOKK moves the first focused or main window it finds, which may be a splash screen, a document picker, or a restored window other than the intended one.
 - An app with no window that ignores the reopen event times out after about 10 seconds; the pad fades and the app stays open.
-- Left-half tiling is out of reach on a display whose dock sits on its left edge, and right-half tiling likewise on the right edge: the 8 pt band lies inside the 180 pt Place distance.
+- On a display whose dock sits on its left edge, left-half tiling is out of reach within 180 pt of the dock, because the 8 pt band there lies inside the Place distance. Farther along that edge it works. The same applies to right-half tiling with a right-edge dock.
 - The window may appear briefly at its default position before it moves, as the mockup's "flashes at default spot" option shows.
 
 ### Required hands-on acceptance

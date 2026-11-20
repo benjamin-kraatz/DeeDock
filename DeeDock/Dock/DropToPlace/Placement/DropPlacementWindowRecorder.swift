@@ -14,6 +14,8 @@ final class DropPlacementWindowRecorder {
     private var observers: [NSObjectProtocol] = []
     /// Reads in flight, by process, so a burst of notifications for one app reads once.
     private var reading: Set<pid_t> = []
+    /// Bumped by ``stop()``, so a read still in flight cannot save or clear state afterwards.
+    private var generation = 0
 
     init(memory: DropPlacementWindowMemory, accessibility: DropPlacementAccessibility,
          displays: @escaping () -> [DisplaySnapshot]) {
@@ -37,6 +39,7 @@ final class DropPlacementWindowRecorder {
         observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
         observers.removeAll()
         reading.removeAll()
+        generation += 1
     }
 
     private func record(_ app: NSRunningApplication) {
@@ -44,9 +47,10 @@ final class DropPlacementWindowRecorder {
         guard AXIsProcessTrusted(), pid != ProcessInfo.processInfo.processIdentifier,
               app.activationPolicy == .regular, let bundleIdentifier = app.bundleIdentifier,
               reading.insert(pid).inserted else { return }
+        let generation = generation
         Task { [weak self, accessibility] in
             let quartz = await accessibility.frontWindowFrame(processIdentifier: pid)
-            guard let self else { return }
+            guard let self, self.generation == generation else { return }
             reading.remove(pid)
             guard let quartz else { return }
             remember(DropPlacementService.appKit(quartz), for: bundleIdentifier)

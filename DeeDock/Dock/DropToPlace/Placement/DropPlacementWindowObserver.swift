@@ -52,7 +52,8 @@ final class DropPlacementWindowObserver {
     func next(timeout: Duration) async {
         if pending { pending = false; return }
         let timer = Task { [weak self] in
-            try? await Task.sleep(for: timeout)
+            // A cancelled timer means the wait already ended; signalling would wake the next one.
+            guard (try? await Task.sleep(for: timeout)) != nil else { return }
             self?.signal()
         }
         defer { timer.cancel() }
