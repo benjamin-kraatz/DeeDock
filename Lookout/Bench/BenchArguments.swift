@@ -46,6 +46,21 @@ struct BenchArguments {
         options[name]?.last.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) }
     }
 
+    /// Every file given as `--name`, in order.
+    func files(_ name: String) -> [URL] {
+        (options[name] ?? []).map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) }
+    }
+
+    /// Every text given as `--name`, in order.
+    func texts(_ name: String) -> [String] {
+        options[name] ?? []
+    }
+
+    /// The text given as `--name`, or nil when it's missing.
+    func text(_ name: String) -> String? {
+        options[name]?.last
+    }
+
     /// The number given as `--name`, or nil when it's missing.
     ///
     /// - Throws: `BenchFailure` when it isn't a number.
