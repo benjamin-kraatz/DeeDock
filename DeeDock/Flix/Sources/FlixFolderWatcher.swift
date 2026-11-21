@@ -11,10 +11,12 @@ import UniformTypeIdentifiers
 ///   sits in Downloads, a **screenshot** when `kMDItemIsScreenCapture` is set, otherwise **new**;
 /// - an older file that changed is **saved**.
 /// Partial downloads, hidden files, package internals, and noise are skipped here; the finished file
-/// arrives as its own event. Symbolic links are skipped too, and nothing here follows one: the
-/// resource values describe the link itself (`lstat` semantics) and extended attributes are read
-/// with `XATTR_NOFOLLOW`, so a link in a watched folder can never lead a read into a folder DOKK
-/// was not allowed.
+/// arrives as its own event. Symbolic links are skipped too, and nothing here follows one: every
+/// event path is checked against the read policy right before it is read (so a folder that became
+/// a link since the stream started is not read through), the resource values describe the item
+/// itself (`lstat` semantics), and extended attributes are read with `XATTR_NOFOLLOW`, so a link in
+/// a watched folder can never lead a read into a folder DOKK was not allowed. Each file's identity
+/// (`FlixFileIdentity`) is read here too, so its row can tell a later replacement apart.
 ///
 /// The stream runs on a private queue and is invalidated by ``stop()``; nothing polls.
 nonisolated final class FlixFolderWatcher: @unchecked Sendable {
@@ -29,16 +31,20 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
     private var flushScheduled = false
     private var roots: [String] = []
     private var downloads = FlixPaths.downloads()
+    private var policy = FlixReadPolicy(allowedRoots: [])
     private var deliver: (@Sendable ([FlixActivityEvent]) -> Void)?
 
     init() {}
 
     /// Watches `folders` (standardized, readable) and reports settled events through `deliver`, on
     /// the main actor. Replaces any earlier stream; an empty list just stops.
-    func start(folders: [String], deliver: @escaping @MainActor @Sendable ([FlixActivityEvent]) -> Void) {
+    /// - Parameter policy: Checked again for every event path before it is read.
+    func start(folders: [String], policy: FlixReadPolicy,
+               deliver: @escaping @MainActor @Sendable ([FlixActivityEvent]) -> Void) {
         queue.async { [self] in
             stopOnQueue()
             roots = folders
+            self.policy = policy
             guard !folders.isEmpty else { return }
             self.deliver = { events in
                 DispatchQueue.main.async { MainActor.assumeIsolated { deliver(events) } }
@@ -101,6 +107,8 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
 
     /// Reads one settled path. Nil when it is gone, hidden, or not worth a row.
     private func classify(_ path: String, flags: FSEventStreamEventFlags, now: Date) -> FlixActivityEvent? {
+        // FSEvents reports real paths, but a folder on the way may have become a link since.
+        guard policy.canRead(path) else { return nil }
         let url = URL(fileURLWithPath: path)
         let keys: Set<URLResourceKey> = [.isDirectoryKey, .isPackageKey, .isHiddenKey, .creationDateKey,
                                          .contentModificationDateKey, .contentTypeKey, .fileSizeKey,
@@ -131,7 +139,8 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
                                  activity: activity, date: min(date, now),
                                  sourcePage: FlixPaths.sourcePage(fromWhereFroms: whereFroms),
                                  contentTypeIdentifier: type?.identifier,
-                                 byteSize: values.fileSize.map(Int64.init))
+                                 byteSize: values.fileSize.map(Int64.init),
+                                 fileIdentity: FlixFileIdentity.of(url))
     }
 
     /// Hidden components, package internals, partial downloads, and noise never become events.

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Phase B1's drag hooks: converted copies for windows with type or size limits, and the sensitive
-/// file question for outside targets.
+/// file question for every drag of a flagged file.
 ///
 /// Both answer synchronously from work already done — conversions ``FlixConversionStore`` prepared,
 /// verdicts ``FlixSensitiveGuard`` cached — because they run at drag start. A conversion that is not
@@ -38,11 +38,20 @@ final class FlixDragInterceptor: FlixDragIntercepting {
         return plan
     }
 
+    /// The sensitive question for a drag holding a flagged file, whatever app is in front.
+    ///
+    /// macOS never tells a drag source where the drop will land, and the window in front when the
+    /// panel opened is only a guess: with Finder in front the file can still end up in a browser
+    /// or a chat. So every drag of a flagged file asks first (the coordinator lets the next drag of
+    /// the same items go ahead for 30 seconds after an answer, and **Not Sensitive** stops the
+    /// asking for that file). The question names the window in front only when it is a browser,
+    /// mail, or chat, where an upload is the likely destination.
     func confirmation(for items: [FlixItem], context: FlixFrontmostContext?) -> FlixDropConfirmation? {
-        guard settings().guardsSensitiveFiles, FlixAppCategory.of(context).isOutside,
+        guard settings().guardsSensitiveFiles,
               let item = items.first(where: { sensitive.verdict(for: $0) != nil }) else { return nil }
+        let destination = FlixAppCategory.of(context).isOutside ? destinationLabel(context) : nil
         // The dialog says what kind of file it is; the reason would repeat it.
-        return .sensitive(itemID: item.id, reason: nil, destination: destinationLabel(context))
+        return .sensitive(itemID: item.id, reason: nil, destination: destination)
     }
 
     // MARK: For the Fits rows

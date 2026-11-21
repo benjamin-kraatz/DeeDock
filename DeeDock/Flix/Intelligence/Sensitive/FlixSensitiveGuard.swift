@@ -26,7 +26,7 @@ nonisolated struct FlixSensitiveDocument: Codable, Sendable {
 }
 
 /// The sensitive file guard: checks files once in the background, blurs what looks like an ID,
-/// bank details, or a key, and asks before such a file leaves for a browser, mail, or chat.
+/// bank details, or a key, and asks before such a file is dragged out of Flix Files.
 ///
 /// - **When**: every history change hands over the items (``update(items:policy:)``); new and
 ///   changed files join a queue, newest first, at most ``passLimit`` per pass. Verdicts are cached by
@@ -59,6 +59,9 @@ final class FlixSensitiveGuard {
     private var reported: [FlixItem.ID: FlixSensitiveKind?] = [:]
     private var loaded = false
     private(set) var isEnabled = false
+    /// The read policy of the latest update, handed to each check so the worker re-validates every
+    /// file when it reads it, not only when it was queued.
+    private var policy = FlixReadPolicy(allowedRoots: [])
 
     /// - Parameter folder: Where `sensitive.json` lives; nil keeps verdicts in memory.
     init(folder: URL?) {
@@ -83,9 +86,12 @@ final class FlixSensitiveGuard {
     func update(items: [FlixItem], policy: FlixReadPolicy) {
         guard isEnabled else { return }
         loadIfNeeded()
+        self.policy = policy
         var added = 0
         for item in items {
-            guard added < Self.passLimit, let path = item.path, Self.isCandidate(item), policy.canRead(path) else { continue }
+            guard let path = item.path, Self.isCandidate(item) else { continue }
+            // A cached verdict is reported without touching the disk; only files to check are
+            // looked at with the policy (the worker checks it again when it opens them).
             if let entry = document.entries[path] {
                 report(item, kind: document.cleared.contains(path) ? nil : entry.kind)
                 // A file written after its check is checked again; the worker compares the real
@@ -93,6 +99,7 @@ final class FlixSensitiveGuard {
                 let written = item.activity == .saved || item.activity == .created || item.activity == .downloaded
                 guard written, let checked = entry.modified, item.date.timeIntervalSince(checked) > 1 else { continue }
             }
+            guard added < Self.passLimit, policy.canRead(path) else { continue }
             if queued.insert(path).inserted {
                 queue.append(item)
                 added += 1
@@ -152,7 +159,7 @@ final class FlixSensitiveGuard {
                 queued.remove(path)
                 let previous = document.entries[path]
                 let type = item.contentType ?? UTType(filenameExtension: (path as NSString).pathExtension)
-                let outcome = await Self.check(path: path, type: type, kind: item.kind, byteSize: item.byteSize,
+                let outcome = await Self.check(path: path, type: type, kind: item.kind, policy: policy,
                                                previous: previous)
                 guard !Task.isCancelled else { break }
                 guard let outcome else { continue }
@@ -166,16 +173,18 @@ final class FlixSensitiveGuard {
         }
     }
 
-    /// Reads the file's date and, when it is new or changed, scans it. Nil when the file is gone.
+    /// Opens the file through ``FlixSafeFile`` (the policy is checked again here, at the point of
+    /// use, and no link is followed) and, when it is new or changed, scans it. Nil when the file is
+    /// gone or the policy no longer allows it.
     @concurrent
-    private static func check(path: String, type: UTType?, kind: FlixItemKind, byteSize: Int64?,
+    private static func check(path: String, type: UTType?, kind: FlixItemKind, policy: FlixReadPolicy,
                               previous: FlixSensitiveDocument.Entry?) async -> FlixSensitiveDocument.Entry? {
-        guard let attributes = try? FileManager.default.attributesOfItem(atPath: path) else { return nil }
-        let modified = attributes[.modificationDate] as? Date
-        if let previous, previous.modified == modified { return previous }
-        let size = (attributes[.size] as? NSNumber)?.int64Value ?? byteSize
-        let verdict = await FlixSensitiveScanner.scan(URL(fileURLWithPath: path), type: type, kind: kind, byteSize: size)
-        return FlixSensitiveDocument.Entry(modified: modified, kind: verdict)
+        guard let file = FlixSafeFile.open(path, policy: policy) else { return nil }
+        if let previous, let checked = previous.modified, abs(checked.timeIntervalSince(file.modified)) < 0.001 {
+            return previous
+        }
+        let verdict = await FlixSensitiveScanner.scan(file, name: (path as NSString).lastPathComponent, type: type, kind: kind)
+        return FlixSensitiveDocument.Entry(modified: file.modified, kind: verdict)
     }
 
     private func loadIfNeeded() {

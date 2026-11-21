@@ -35,9 +35,14 @@ nonisolated struct FlixBrowserWindowEvidence: Equatable, Sendable {
     /// A web area's `AXURL`, or an address field's value, was found.
     var foundAddress = false
     /// The address field sat in a toolbar (`AXToolbar`), and that whole toolbar was visited: every
-    /// descendant read, every child list read without an error, within the budget. That toolbar is
+    /// descendant read, and every privacy-relevant read inside it (role, title, description, help,
+    /// child list) answered without an error, within the budget and the label cap. That toolbar is
     /// where Chromium browsers show their private-window badge.
     var addressToolbarComplete = false
+    /// Reading the window's own title failed (rather than the window having none). The title is
+    /// where Firefox says "Private Browsing" and may carry another browser's marker, so a failed
+    /// read is no evidence.
+    var titleReadFailed = false
 }
 
 /// Reads a browser window's address, title, and private state through Accessibility.
@@ -59,8 +64,10 @@ nonisolated struct FlixBrowserWindowEvidence: Equatable, Sendable {
 ///   - **Firefox** and its forks: the toolbar holding the URL bar, and the window title, which
 ///     Firefox ends with "Private Browsing" in a private window.
 ///   - **Safari and other browsers**: never; their private windows carry no marker DOKK could verify.
-///   Anything less — a walk cut short by the budget, a toolbar whose children could not be read, an
-///   address outside a toolbar, no title — is unknown, and automatic tracking treats unknown as private.
+///   Anything less — a walk cut short by the budget, a toolbar element whose role, labels, or
+///   children could not be read (each read keeps its Accessibility status, ``attribute(_:_:)``), a
+///   label skipped at the cap, an address outside a toolbar, a title that could not be read, no
+///   title for Firefox — is unknown, and automatic tracking treats unknown as private.
 ///
 /// It never sets `AXEnhancedUserInterface`; callers that need a web tree switch it on for the
 /// duration of one read and restore it.
@@ -96,17 +103,23 @@ nonisolated enum FlixBrowserPageReader {
         AXUIElementSetMessagingTimeout(window, messagingTimeout)
         let deadline = Date().addingTimeInterval(budget)
         let walk = walk(from: window, limit: elementLimit, expired: { Date() >= deadline },
-                        role: { RobiAX.value($0, kAXRoleAttribute) as? String ?? "" },
-                        labels: { element in
-                            [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute].compactMap {
-                                (RobiAX.value(element, $0) as? String).flatMap { $0.isEmpty ? nil : $0 }
+                        role: { element in
+                            switch attribute(element, kAXRoleAttribute) {
+                            case .value(let value): value as? String ?? ""
+                            case .absent: ""
+                            case .failed: nil
                             }
                         },
+                        labels: labels(of:),
                         value: { RobiAX.value($0, kAXValueAttribute) as? String },
                         webURL: { RobiAX.value($0, "AXURL") as? URL },
                         children: children(of:))
         var evidence = walk.evidence
-        evidence.title = RobiAX.value(window, kAXTitleAttribute) as? String
+        switch attribute(window, kAXTitleAttribute) {
+        case .value(let value): evidence.title = value as? String
+        case .absent: evidence.title = nil
+        case .failed: evidence.titleReadFailed = true
+        }
         guard let raw = walk.webURL ?? walk.address.flatMap(url(fromAddress:)) else { return nil }
         let cleaned = FlixURLSanitizer.clean(raw)
         guard let url = cleaned.url else {
@@ -116,6 +129,38 @@ nonisolated enum FlixBrowserPageReader {
         }
         return FlixBrowserPage(url: url, title: cleanTitle(evidence.title), privacy: privacy(family: family, evidence: evidence),
                                browserBundleIdentifier: bundleIdentifier, removedSecrets: cleaned.removedSecrets)
+    }
+
+    /// One attribute read that keeps the difference between "the element has none" and "the read
+    /// failed" (a timeout, a dead element, a busy app), which the private-window decision needs.
+    enum AttributeRead {
+        case value(CFTypeRef)
+        /// The element has no value for it, or does not support it.
+        case absent
+        case failed
+    }
+
+    static func attribute(_ element: AXUIElement, _ name: String) -> AttributeRead {
+        var value: CFTypeRef?
+        switch AXUIElementCopyAttributeValue(element, name as CFString, &value) {
+        case .success: return value.map(AttributeRead.value) ?? .absent
+        case .noValue, .attributeUnsupported: return .absent
+        default: return .failed
+        }
+    }
+
+    /// An element's title, description, and help texts, or nil when any of those reads failed.
+    static func labels(of element: AXUIElement) -> [String]? {
+        var found: [String] = []
+        for name in [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute] {
+            switch attribute(element, name) {
+            case .value(let value):
+                if let text = value as? String, !text.isEmpty { found.append(text) }
+            case .absent: continue
+            case .failed: return nil
+            }
+        }
+        return found
     }
 
     /// The children of an element, or nil when reading them failed (a timeout, a dead element), so
@@ -145,10 +190,14 @@ nonisolated enum FlixBrowserPageReader {
     ///
     /// Breadth-first from `root`, skipping the inside of web areas (the page itself is not read). A
     /// toolbar is walked to its end the moment it is found (depth-first, same limits), so a budget
-    /// cut-off lands in the rest of the window rather than in the toolbar. `children` returns nil
-    /// when a child list could not be read; inside a toolbar that makes the toolbar incomplete.
+    /// cut-off lands in the rest of the window rather than in the toolbar. `role`, `labels`, and
+    /// `children` return nil when their read failed. In a toolbar (the toolbar element included),
+    /// any failed read, an element whose role could not be read (its children are then not read
+    /// either), a web area (whose inside is not read), or the budget or element limit running out
+    /// makes the toolbar incomplete, so the window's privacy stays unknown. Labels are capped at 300
+    /// outside toolbars only.
     static func walk<Element>(from root: Element, limit: Int, expired: () -> Bool,
-                              role: (Element) -> String, labels: (Element) -> [String],
+                              role: (Element) -> String?, labels: (Element) -> [String]?,
                               value: (Element) -> String?, webURL: (Element) -> URL?,
                               children: (Element) -> [Element]?) -> Walk {
         var result = Walk()
@@ -157,18 +206,21 @@ nonisolated enum FlixBrowserPageReader {
         var visited = 0
         var labelCount = 0
 
-        /// Reads one element. Returns its children to visit, whether reading them failed, and whether
-        /// it is a toolbar.
-        func visit(_ element: Element) -> (children: [Element], failed: Bool, isToolbar: Bool) {
+        /// Reads one element. Returns its children to visit, whether any privacy-relevant read
+        /// failed or was skipped, and whether it is a toolbar.
+        func visit(_ element: Element, inToolbar: Bool) -> (children: [Element], failed: Bool, isToolbar: Bool) {
             visited += 1
-            let elementRole = role(element)
+            guard let elementRole = role(element) else {
+                // Without its role the element cannot be placed; its children are not read either.
+                return ([], true, false)
+            }
             if elementRole == "AXWebArea" {
                 if result.webURL == nil, let url = webURL(element), url.scheme?.hasPrefix("http") == true {
                     result.webURL = url
                     result.evidence.foundAddress = true
                 }
-                // The page itself is not read.
-                return ([], false, false)
+                // The page itself is not read: inside a toolbar that is a part left unseen.
+                return ([], true, false)
             }
             let isToolbar = elementRole == kAXToolbarRole
             if elementRole == kAXTextFieldRole || elementRole == kAXComboBoxRole, result.address == nil,
@@ -176,13 +228,19 @@ nonisolated enum FlixBrowserPageReader {
                 result.address = text
                 result.evidence.foundAddress = true
             }
-            if labelCount < 300 {
-                let found = labels(element)
-                result.evidence.labels += found
-                labelCount += found.count
+            var failed = false
+            // Labels outside toolbars are capped; a toolbar's are always read, since a skipped one
+            // could be the private badge.
+            if labelCount < 300 || inToolbar || isToolbar {
+                if let found = labels(element) {
+                    result.evidence.labels += found
+                    labelCount += found.count
+                } else {
+                    failed = true
+                }
             }
             guard let kids = children(element) else { return ([], true, isToolbar) }
-            return (kids, false, isToolbar)
+            return (kids, failed, isToolbar)
         }
 
         /// Walks a toolbar's whole subtree. Returns whether it finished and whether the address
@@ -193,7 +251,7 @@ nonisolated enum FlixBrowserPageReader {
             var complete = true
             while let element = stack.popLast() {
                 guard visited < limit, !expired() else { return (false, !hadAddress && result.address != nil) }
-                let read = visit(element)
+                let read = visit(element, inToolbar: true)
                 if read.failed { complete = false }
                 stack.append(contentsOf: read.children.reversed())
             }
@@ -203,9 +261,11 @@ nonisolated enum FlixBrowserPageReader {
         while index < queue.count, visited < limit, !expired() {
             let element = queue[index]
             index += 1
-            let read = visit(element)
+            let read = visit(element, inToolbar: false)
             if read.isToolbar {
-                let toolbar = walkToolbar(read.children)
+                // The toolbar's own reads count too: a failed child list or label read leaves it unseen.
+                var toolbar = walkToolbar(read.children)
+                if read.failed { toolbar.complete = false }
                 if toolbar.holdsAddress { result.evidence.addressToolbarComplete = toolbar.complete }
                 continue
             }
@@ -219,6 +279,7 @@ nonisolated enum FlixBrowserPageReader {
     static func privacy(family: FlixBrowserFamily, evidence: FlixBrowserWindowEvidence) -> FlixBrowserPage.Privacy {
         let texts = ([evidence.title].compactMap { $0 } + evidence.labels).map { $0.lowercased() }
         if texts.contains(where: isPrivateMarker) { return .private }
+        if evidence.titleReadFailed { return .unknown }
         switch family {
         case .chromium:
             return evidence.addressToolbarComplete ? .normal : .unknown

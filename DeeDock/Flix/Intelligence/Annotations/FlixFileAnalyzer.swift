@@ -58,7 +58,7 @@ enum FlixFileAnalyzer {
             return FlixAnalysisRecord(stamp: stamp, analyzedAt: now)
         }
         guard let content = await FlixContentReader.read(path: path, kind: item.kind, contentType: item.contentTypeIdentifier,
-                                                         wantsPicture: isPicture && seesPictures,
+                                                         policy: policy, wantsPicture: isPicture && seesPictures,
                                                          recognizesText: isPicture && !seesPictures) else { return nil }
         var record = FlixAnalysisRecord(stamp: stamp, analyzedAt: now)
         if !isPicture {
@@ -104,7 +104,7 @@ enum FlixFileAnalyzer {
         guard cryptic else { return record }
         record.caption = caption.map(clean).flatMap { $0.isEmpty ? nil : String($0.prefix(90)) }
         if let fileName, let folder = item.url?.deletingLastPathComponent().path, policy.canRead(folder) {
-            let taken = await FlixContentReader.names(in: folder)
+            let taken = await FlixContentReader.names(in: folder, policy: policy)
             record.suggestedName = FlixFileNaming.sanitizedName(fileName, keepingExtensionOf: item.name, taken: taken)
         }
         return record

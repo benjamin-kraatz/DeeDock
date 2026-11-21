@@ -22,8 +22,14 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
     /// When Flix Files first recorded the item.
     var firstSeen: Date
     /// The page a download came from (`kMDItemWhereFroms`), cleaned by `FlixURLSanitizer`. Kept
-    /// only while web links are on and the site is not excluded (``FlixSourcePolicy``).
+    /// only while web links are on, the site is not excluded (``FlixSourcePolicy``), and the
+    /// download's window was verified as a normal one (``sourcePageIsVerified``). Set only through
+    /// `FlixHistoryDocument.attachVerifiedSource(_:toPath:)`; source events never store it.
     var sourcePage: URL?
+    /// True when ``sourcePage`` was stored after the link tracker verified the download came from
+    /// a normal (not private) browser window showing that very page. A stored page without it
+    /// (saved by an earlier version) is stripped to its host (``FlixSourcePolicy``).
+    var sourcePageIsVerified: Bool?
     /// The download page's host without `www.`, for "Downloaded from billing.example.com". Kept
     /// when the page itself is not (web links off); nil for an excluded site.
     var sourceHost: String?
@@ -34,12 +40,16 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
     var isFlagged: Bool
     /// Set for apps, so reopening and icons do not depend on the path.
     var bundleIdentifier: String?
+    /// Which file the row lists: recorded with the event that saw it, or captured in the background
+    /// soon after. Destructive commands act only while the file at ``path`` still matches
+    /// (``FlixFileOperations/check(_:)``). Nil for links and for rows not checked yet.
+    var fileIdentity: FlixFileIdentity?
 
     /// - Parameter sourceHost: Defaults to `sourcePage`'s host.
     init(id: UUID = UUID(), path: String? = nil, link: FlixLink? = nil, name: String, kind: FlixItemKind,
          activity: FlixActivity, date: Date, firstSeen: Date? = nil, sourcePage: URL? = nil, sourceHost: String? = nil,
          contentTypeIdentifier: String? = nil, byteSize: Int64? = nil, isFlagged: Bool = false,
-         bundleIdentifier: String? = nil) {
+         bundleIdentifier: String? = nil, fileIdentity: FlixFileIdentity? = nil) {
         self.id = id
         self.path = path
         self.link = link
@@ -54,6 +64,7 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
         self.byteSize = byteSize
         self.isFlagged = isFlagged
         self.bundleIdentifier = bundleIdentifier
+        self.fileIdentity = fileIdentity
     }
 
     /// The file URL for a file, folder, or app item.
@@ -101,17 +112,21 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
     var kind: FlixItemKind
     var activity: FlixActivity
     var date: Date
-    /// The download page as the source read it. ``FlixSourcePolicy`` decides what of it is kept.
+    /// The download page as the source read it. The history never stores it from an event: only
+    /// the link tracker's verified check attaches a page to a file (``FlixItem/sourcePageIsVerified``).
+    /// ``FlixSourcePolicy`` decides what of it the tracker may look at.
     var sourcePage: URL?
     var sourceHost: String?
     var contentTypeIdentifier: String?
     var byteSize: Int64?
     var bundleIdentifier: String?
+    /// The file as the source saw it, when the source read it from disk (the folder watcher).
+    var fileIdentity: FlixFileIdentity?
 
     /// - Parameter sourceHost: Defaults to `sourcePage`'s host.
     init(path: String? = nil, link: FlixLink? = nil, name: String, kind: FlixItemKind, activity: FlixActivity,
          date: Date, sourcePage: URL? = nil, sourceHost: String? = nil, contentTypeIdentifier: String? = nil,
-         byteSize: Int64? = nil, bundleIdentifier: String? = nil) {
+         byteSize: Int64? = nil, bundleIdentifier: String? = nil, fileIdentity: FlixFileIdentity? = nil) {
         self.path = path.map(FlixPaths.standardized)
         self.link = link
         self.name = name
@@ -123,6 +138,7 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
         self.contentTypeIdentifier = contentTypeIdentifier
         self.byteSize = byteSize
         self.bundleIdentifier = bundleIdentifier
+        self.fileIdentity = fileIdentity
     }
 
     var key: String { FlixItem.key(path: path, link: link?.url) }

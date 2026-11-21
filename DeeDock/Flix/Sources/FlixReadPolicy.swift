@@ -14,15 +14,34 @@ import Foundation
 /// because every read through it (metadata, extended attributes, thumbnails, file contents,
 /// conversions) would reach the protected folder. See ``canRead(_:)``.
 ///
+/// Protected folders and allowed roots are compared without regard to letter case or Unicode
+/// normalization (``FlixPaths/folded(_:)``): APFS and HFS+ volumes are case-insensitive by default,
+/// so `~/documents/tax.pdf` and a decomposed `Downloads` reach the protected folder too. Folding can
+/// only make more paths protected, never fewer, which is the safe direction.
+///
+/// The check is a moment in time: a link can change after it. Background readers therefore
+/// re-validate at the point of use — ``readableURL(_:)`` right before a URL-based API, and
+/// ``FlixSafeFile`` (which opens the resolved path with `O_NOFOLLOW_ANY`) for direct reads — so a
+/// link swapped in after an item was queued is never followed.
+///
 /// A value snapshot, safe to hand to background work. Rebuilt when settings change.
 nonisolated struct FlixReadPolicy: Equatable, Sendable {
     let home: String
     /// Standardized roots known to be readable.
     let allowedRoots: [String]
+    /// The folders macOS protects (the ones `LookoutFolderChoice.needsPrompt` lists), folded for
+    /// comparison (``FlixPaths/folded(_:)``).
+    private let foldedProtectedRoots: [String]
+    private let foldedAllowedRoots: [String]
 
     init(home: String = NSHomeDirectory(), allowedRoots: [String]) {
-        self.home = FlixPaths.standardized(home)
+        let home = FlixPaths.standardized(home)
+        self.home = home
         self.allowedRoots = allowedRoots.map(FlixPaths.standardized)
+        let protected = ["Desktop", "Documents", "Downloads", "Library/Mobile Documents", "Library/CloudStorage"]
+            .map { home + "/" + $0 } + ["/Volumes"]
+        foldedProtectedRoots = protected.map(FlixPaths.folded)
+        foldedAllowedRoots = self.allowedRoots.map(FlixPaths.folded)
     }
 
     /// From Flix's own grants plus Lookout's indexed folders.
@@ -31,12 +50,27 @@ nonisolated struct FlixReadPolicy: Equatable, Sendable {
         self.init(home: home, allowedRoots: flix + lookoutFolders)
     }
 
-    /// Whether reading `path` may make macOS show its prompt.
+    /// Whether reading `path` may make macOS show its prompt. Compared case- and
+    /// normalization-insensitively; when in doubt, a path is protected.
     func isProtected(_ path: String) -> Bool {
-        LookoutFolderChoice.needsPrompt(path, home: home)
+        if LookoutFolderChoice.needsPrompt(path, home: home) { return true }
+        let folded = FlixPaths.folded(FlixPaths.standardized(path))
+        return foldedProtectedRoots.contains { folded == $0 || folded.hasPrefix($0 + "/") }
     }
 
     /// Whether `path` can be read without a prompt, following any symbolic links on the way.
+    /// See ``resolve(_:)`` for the walk.
+    func canRead(_ path: String) -> Bool { resolve(path) != nil }
+
+    /// `path` resolved to a file URL without symbolic links, when it can be read without a prompt;
+    /// nil otherwise. Call it right before handing the URL to an API that opens the file (Quick
+    /// Look thumbnails, PDFKit, ImageIO, AppKit's importers), so the URL is the place just checked.
+    func readableURL(_ path: String) -> URL? {
+        resolve(path).map { URL(fileURLWithPath: $0) }
+    }
+
+    /// `path` with every symbolic link resolved, when it can be read without a prompt; nil when it
+    /// cannot.
     ///
     /// The spelling is checked first, without touching the disk. Then the path is resolved one
     /// component at a time, as `realpath` would, but each component is examined with `lstat` only
@@ -47,14 +81,14 @@ nonisolated struct FlixReadPolicy: Equatable, Sendable {
     /// examined. ".." is resolved against the components already examined, which are real
     /// directories. At most ``maximumLinkHops`` links are followed. A component that cannot be
     /// examined (permission denied) makes the path unreadable; a missing one ends the walk, since
-    /// nothing further can be followed and the spelling decides.
-    func canRead(_ path: String) -> Bool {
-        guard path.hasPrefix("/") else { return false }
+    /// nothing further can be followed and the spelling decides (the rest is returned as spelled).
+    func resolve(_ path: String) -> String? {
+        guard path.hasPrefix("/") else { return nil }
         var pending = Array(path.split(separator: "/").map(String.init).reversed())
         var resolved: [String] = []
         var hops = 0
         var destination = Self.lexical(resolved + pending.reversed())
-        guard spellingIsReadable(destination) else { return false }
+        guard spellingIsReadable(destination) else { return nil }
         while let component = pending.popLast() {
             if component == "." { continue }
             if component == ".." {
@@ -63,28 +97,34 @@ nonisolated struct FlixReadPolicy: Equatable, Sendable {
             }
             let candidate = "/" + (resolved + [component]).joined(separator: "/")
             guard spellingIsReadable(candidate) || destination == candidate || destination.hasPrefix(candidate + "/")
-            else { return false }
+            else { return nil }
             var info = stat()
-            guard lstat(candidate, &info) == 0 else { return errno == ENOENT || errno == ENOTDIR }
+            guard lstat(candidate, &info) == 0 else {
+                guard errno == ENOENT || errno == ENOTDIR else { return nil }
+                return Self.lexical(resolved + [component] + pending.reversed())
+            }
             guard info.st_mode & S_IFMT == S_IFLNK else {
                 resolved.append(component)
                 continue
             }
             hops += 1
-            guard hops <= Self.maximumLinkHops, let target = Self.linkTarget(candidate) else { return false }
+            guard hops <= Self.maximumLinkHops, let target = Self.linkTarget(candidate) else { return nil }
             if target.hasPrefix("/") { resolved = [] }
             pending.append(contentsOf: target.split(separator: "/").map(String.init).reversed())
             destination = Self.lexical(resolved + pending.reversed())
-            guard spellingIsReadable(destination) else { return false }
+            guard spellingIsReadable(destination) else { return nil }
         }
-        return true
+        return "/" + resolved.joined(separator: "/")
     }
 
     /// Whether the spelling of `path` alone may be read, without looking at the disk.
     func spellingIsReadable(_ path: String) -> Bool {
         let path = FlixPaths.standardized(path)
         guard isProtected(path) else { return true }
-        return allowedRoots.contains { path == $0 || path.hasPrefix($0.hasSuffix("/") ? $0 : $0 + "/") }
+        let folded = FlixPaths.folded(path)
+        return foldedAllowedRoots.contains { root in
+            folded == root || folded.hasPrefix(root.hasSuffix("/") ? root : root + "/")
+        }
     }
 
     /// Links followed before a path counts as unreadable (a loop, or a chain too long to trust).

@@ -9,7 +9,12 @@ import UniformTypeIdentifiers
 /// macOS ask for folder access.
 ///
 /// The first gather seeds the history with the newest ``seedLimit`` results; later updates report
-/// only what Spotlight says changed. Notification observers and the query are removed by ``stop()``.
+/// only what Spotlight says changed. Each gather or update is delivered as one batch, which the
+/// history merges in a single pass (`FlixHistoryDocument.record(batch:)`), so a busy query never
+/// rescans the whole history per result. Reading a result touches only the query's in-memory
+/// attributes, never the file system, so it stays on the main actor where the query delivers.
+/// Rows recorded from Spotlight carry no file identity; the coordinator's background pass reads it
+/// off the main actor. Notification observers and the query are removed by ``stop()``.
 @MainActor
 final class FlixSpotlightSource {
     /// How far back the query looks.

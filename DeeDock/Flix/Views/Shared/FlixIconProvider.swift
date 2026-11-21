@@ -21,9 +21,10 @@ enum FlixIconProvider {
         return cached("type:" + type.identifier) { NSWorkspace.shared.icon(for: type) }
     }
 
-    /// The file's own icon when `policy` allows reading it, otherwise the type icon.
+    /// The file's own icon when `policy` allows reading it, otherwise the type icon. The icon is
+    /// read at the path the policy just resolved, never through a link.
     static func icon(for item: FlixItem, policy: FlixReadPolicy) -> NSImage {
-        guard let url = item.url, let path = item.path, item.kind != .app, policy.canRead(path) else {
+        guard item.kind != .app, let path = item.path, let url = policy.readableURL(path) else {
             return typeIcon(for: item)
         }
         return HubThumbnailCache.shared.icon(for: url)

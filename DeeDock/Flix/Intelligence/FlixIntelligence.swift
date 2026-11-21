@@ -372,8 +372,8 @@ final class FlixIntelligence {
     ///
     /// Phase A's own rules run when no provider answers: an annotated sensitive item (while the
     /// sensitive guard is on), then an older version of a document with a newer one in the history.
-    /// With a drag provider installed (phase B1), the provider alone decides the sensitive question,
-    /// because it asks only for outside targets (a browser, mail, a chat).
+    /// With a drag provider installed (phase B1), the provider alone decides the sensitive question;
+    /// it asks for every drag of a flagged file, since the destination is unknown at drag start.
     func dropConfirmation(for items: [FlixItem], context: FlixFrontmostContext?) -> FlixDropConfirmation? {
         if let answer = providers.drag?.confirmation(for: items, context: context) { return answer }
         if settings.guardsSensitiveFiles, providers.drag == nil,

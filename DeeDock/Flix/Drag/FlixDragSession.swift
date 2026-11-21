@@ -10,9 +10,10 @@ import AppKit
 ///
 /// Converted upload copies (phase B1) stand in for originals on the pasteboard, because a browser
 /// reads the file URLs it is handed. They are meant for that upload only: DOKK's own destinations
-/// (the Shelf, the Trash, folder and drive tiles, app tiles) map them back to the originals with
-/// ``originalURLs(for:on:)`` while the drag is in flight, so a temporary copy is never staged,
-/// trashed, or moved, and Flix's cleanup of its copies can never delete something DOKK kept.
+/// (the Shelf, the Trash, folder and drive tiles, app tiles, window handoff, Hub Files, Hub Apps,
+/// Vapor) map them back to the originals with ``originalURLs(for:on:)`` or ``fileURLs(on:)`` while
+/// the drag is in flight, so a temporary copy is never staged, trashed, moved, or copied, and Flix's
+/// cleanup of its copies can never delete something DOKK kept.
 @MainActor
 final class FlixDragSession: NSObject, NSDraggingSource {
     static let pasteboardType = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.flix-drag")
@@ -95,6 +96,21 @@ final class FlixDragSession: NSObject, NSDraggingSource {
     static func originalURLs(for urls: [URL], on pasteboard: NSPasteboard) -> [URL] {
         guard let current, !current.originals.isEmpty, pasteboard.string(forType: pasteboardType) != nil else { return urls }
         return urls.map { current.originals[$0.standardizedFileURL] ?? $0 }
+    }
+
+    /// The file URLs a drag pasteboard carries, with converted copies replaced by their originals:
+    /// what every DOKK destination that takes files from a drag reads (Hub Files panes, sidebar,
+    /// and pictures search; Hub Apps; Vapor), so a temporary upload copy is never moved, copied,
+    /// adopted, or deleted in place of the file the person dragged.
+    static func fileURLs(on pasteboard: NSPasteboard) -> [URL] {
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        return originalURLs(for: urls, on: pasteboard)
+    }
+
+    /// ``originalURLs(for:on:)`` on the drag pasteboard, for SwiftUI drop handlers that receive URLs
+    /// without the pasteboard they came from.
+    static func originalURLs(forDropped urls: [URL]) -> [URL] {
+        originalURLs(for: urls, on: NSPasteboard(name: .drag))
     }
 
     /// The Flix item identifiers on a pasteboard, empty for any other drag.

@@ -28,9 +28,12 @@ nonisolated struct FlixFileStamp: Codable, Equatable, Sendable {
 
 /// Reads bounded text and pictures from files, off the main actor.
 ///
-/// Only call it for paths `FlixReadPolicy.canRead` allows: reading a protected folder DOKK was not
-/// granted would make macOS ask. Every method checks for cancellation between steps, reads at most
-/// the first pages of a PDF and the first 64 KB of a text file, and never loads a whole large file.
+/// Every read takes the read policy and re-validates at the point of use: files are opened through
+/// ``FlixSafeFile`` (resolved again, opened without following any link, checked once more), and
+/// metadata is read at the resolved, link-free path. So a protected folder DOKK was not granted is
+/// never read, even through a link that appeared after the item was queued. Every method checks
+/// for cancellation between steps, reads at most the first pages of a PDF and the first 64 KB of a
+/// text file, and never decodes a whole large picture.
 nonisolated enum FlixContentReader {
     /// The most text one file contributes to a caption or facts.
     static let textLimit = 6_000
@@ -38,14 +41,16 @@ nonisolated enum FlixContentReader {
     static let pictureSide = 1_024
     /// PDF pages read for text.
     static let pdfPages = 4
+    /// The largest picture or PDF mapped for reading.
+    static let maximumMappedBytes: Int64 = 200_000_000
 
-    /// The modification date and size of each path that exists.
-    @concurrent static func stamps(_ paths: [String]) async -> [String: FlixFileStamp] {
+    /// The modification date and size of each path that exists and the policy lets Flix read.
+    @concurrent static func stamps(_ paths: [String], policy: FlixReadPolicy) async -> [String: FlixFileStamp] {
         var stamps: [String: FlixFileStamp] = [:]
         let keys: Set<URLResourceKey> = [.contentModificationDateKey, .fileSizeKey, .totalFileSizeKey]
         for path in paths {
             guard !Task.isCancelled else { break }
-            guard let values = try? URL(fileURLWithPath: path).resourceValues(forKeys: keys) else { continue }
+            guard let url = policy.readableURL(path), let values = try? url.resourceValues(forKeys: keys) else { continue }
             stamps[path] = FlixFileStamp(modified: values.contentModificationDate,
                                          size: (values.fileSize ?? values.totalFileSize).map(Int64.init))
         }
@@ -53,47 +58,47 @@ nonisolated enum FlixContentReader {
     }
 
     /// The names in `folder`, for picking a rename that doesn't collide. Empty when unreadable.
-    @concurrent static func names(in folder: String) async -> Set<String> {
-        Set((try? FileManager.default.contentsOfDirectory(atPath: folder)) ?? [])
+    @concurrent static func names(in folder: String, policy: FlixReadPolicy) async -> Set<String> {
+        guard let url = policy.readableURL(folder) else { return [] }
+        return Set((try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? [])
     }
 
-    /// Reads `path`. Returns nil when it is gone or unreadable.
+    /// Reads `path`. Returns nil when it is gone, unreadable, or the policy does not allow it.
     ///
     /// - Parameters:
     ///   - limit: The most text to return.
     ///   - wantsPicture: Load a downscaled picture for images and screenshots.
     ///   - recognizesText: Run Vision text recognition on that picture (when no model reads images,
     ///     or for Ask Robi). The first recognition in a process loads Vision's models and is slow.
-    @concurrent static func read(path: String, kind: FlixItemKind, contentType: String?, limit: Int = textLimit,
-                                 wantsPicture: Bool, recognizesText: Bool) async -> FlixFileContent? {
-        let url = URL(fileURLWithPath: path)
-        guard FileManager.default.isReadableFile(atPath: path) else { return nil }
-        let type = contentType.flatMap(UTType.init) ?? UTType(filenameExtension: url.pathExtension)
+    @concurrent static func read(path: String, kind: FlixItemKind, contentType: String?, policy: FlixReadPolicy,
+                                 limit: Int = textLimit, wantsPicture: Bool, recognizesText: Bool) async -> FlixFileContent? {
+        guard let file = FlixSafeFile.open(path, policy: policy) else { return nil }
+        let type = contentType.flatMap(UTType.init) ?? UTType(filenameExtension: (path as NSString).pathExtension)
         var content = FlixFileContent()
         content.isPresentation = type?.conforms(to: .presentation) == true
         content.isSpreadsheet = type?.conforms(to: .spreadsheet) == true
         if kind == .image || kind == .screenshot || type?.conforms(to: .image) == true {
-            guard wantsPicture || recognizesText, let image = picture(at: url) else { return content }
+            guard wantsPicture || recognizesText, let image = picture(in: file) else { return content }
             if wantsPicture { content.image = image }
             if recognizesText, !Task.isCancelled { content.text = String(await recognizeText(image).prefix(limit)) }
             return content
         }
         if type?.conforms(to: .pdf) == true {
-            readPDF(url, limit: limit, into: &content)
+            readPDF(file, limit: limit, into: &content)
         } else if let type, type.conforms(to: .plainText) || type.conforms(to: .sourceCode) || type.conforms(to: .json)
                     || type.conforms(to: .commaSeparatedText) || type.conforms(to: .xml) {
-            content.text = plainText(url, limit: limit)
-        } else if let type, let text = FlixDocumentImport.attributedString(at: url, type: type)?.string {
+            content.text = String(String(decoding: file.read(upTo: 64 * 1_024), as: UTF8.self).prefix(limit))
+        } else if let type, let text = FlixDocumentImport.attributedString(file, type: type)?.string {
             // Office and RTF documents through AppKit's importers, typed so nothing is read as
             // HTML: that importer loads WebKit and external resources.
             content.text = String(text.prefix(limit))
         }
-        if content.pageCount == nil { content.pageCount = spotlightPageCount(path) }
+        if content.pageCount == nil { content.pageCount = spotlightPageCount(file.path) }
         return content
     }
 
-    private static func readPDF(_ url: URL, limit: Int, into content: inout FlixFileContent) {
-        guard let document = PDFDocument(url: url) else { return }
+    private static func readPDF(_ file: FlixSafeFile, limit: Int, into content: inout FlixFileContent) {
+        guard let data = file.mapped(maximumBytes: maximumMappedBytes), let document = PDFDocument(data: data) else { return }
         content.pageCount = document.pageCount
         var text = ""
         for index in 0..<min(document.pageCount, pdfPages) {
@@ -103,21 +108,15 @@ nonisolated enum FlixContentReader {
         content.text = String(text.prefix(limit))
     }
 
-    private static func plainText(_ url: URL, limit: Int) -> String {
-        guard let handle = try? FileHandle(forReadingFrom: url) else { return "" }
-        defer { try? handle.close() }
-        let data = (try? handle.read(upToCount: 64 * 1_024)) ?? Data()
-        return String(String(decoding: data, as: UTF8.self).prefix(limit))
-    }
-
     /// A downscaled picture, decoded through ImageIO's thumbnail path so a 50-megapixel photo never
-    /// decodes at full size.
-    static func picture(at url: URL) -> CGImage? {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+    /// decodes at full size. The bytes come from the descriptor that was checked.
+    static func picture(in file: FlixSafeFile, side: Int = pictureSide) -> CGImage? {
+        guard let data = file.mapped(maximumBytes: maximumMappedBytes),
+              let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: pictureSide,
+            kCGImageSourceThumbnailMaxPixelSize: side,
         ]
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
     }

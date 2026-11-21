@@ -8,7 +8,10 @@ import Foundation
 ///   as `#access_token=…`), and the whole query. A query is kept only for the few web-document
 ///   addresses that need it to name the document (``documentQueryKeys``: OneDrive's `resid`,
 ///   SharePoint's `sourcedoc`, Confluence's `pageId`), and then only those keys.
-/// - **Never stored at all** (``Cleaned/skipped``): addresses whose path is a credential-bearing
+/// - **Never stored at all** (``Cleaned/skipped``): invitation, meeting, short-link, and
+///   share-secret addresses on the services ``FlixShareLinkDenylist`` lists (Discord, Telegram,
+///   WhatsApp, Signal, Zoom, Meet, Teams, Slack, bit.ly and other shorteners, WeTransfer, DocSend,
+///   iCloud and Drive shares, …), checked before anything else; addresses whose path is a credential-bearing
 ///   route — password resets, email verification, invitations, magic links, sign-in, OAuth
 ///   callbacks, tokens, unsubscribe and activation links, share links (``credentialWords``) — and
 ///   addresses with a high-entropy path segment that looks like a secret (``looksLikeSecret(_:)``).
@@ -112,6 +115,9 @@ nonisolated enum FlixURLSanitizer {
         // (OneDrive names its documents there).
         let isDocument = FlixWebDocuments.isWebDocument(url)
         let segments = components.path.split(separator: "/").map { $0.removingPercentEncoding ?? String($0) }
+        // Invitations, meetings, short links, and share secrets first: not even a web document on
+        // one of those services is stored.
+        if FlixShareLinkDenylist.isDenied(host: host, segments: segments, query: items) { return .skipped }
         if isDocument {
             if segments.contains(where: { documentRouteWords.contains($0.lowercased()) }) { return .skipped }
         } else if segments.contains(where: isCredentialRoute) || segments.contains(where: looksLikeSecret)
@@ -130,6 +136,10 @@ nonisolated enum FlixURLSanitizer {
         let kept = isDocument ? items.filter { allowed.contains($0.name.lowercased()) } : []
         components.queryItems = kept.isEmpty ? nil : kept
         if components.path.isEmpty { components.path = "/" }
+        // A Google Drive file is kept as the file alone: `/file/d/<id>`.
+        if FlixSiteExclusions.host(host, isWithin: "drive.google.com"), segments.count > 3 {
+            components.path = "/" + segments.prefix(3).joined(separator: "/")
+        }
         guard let cleaned = components.url else { return .notWeb }
         return .kept(cleaned, removedSecrets: removed)
     }

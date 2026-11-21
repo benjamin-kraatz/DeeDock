@@ -97,10 +97,15 @@ struct FlixLinkRulesTests {
         #expect(bank.page == nil && bank.host == nil)
     }
 
-    @Test func downloadsOnlyVouchedForBySameSitePages() {
-        #expect(FlixLinkTracker.sameSite(URL(string: "https://www.example.com/a")!, URL(string: "https://example.com/b")!))
-        #expect(FlixLinkTracker.sameSite(URL(string: "https://cdn.example.com/f")!, URL(string: "https://example.com/")!))
-        #expect(!FlixLinkTracker.sameSite(URL(string: "https://example.org/a")!, URL(string: "https://example.com/")!))
+    @Test func downloadsAreVouchedForOnlyByTheirOwnPage() {
+        #expect(FlixLinkTracker.samePage(URL(string: "https://www.example.com/invoices")!,
+                                         URL(string: "https://example.com/invoices/")!))
+        // Another page on the same site, in another window, cannot vouch for the download.
+        #expect(!FlixLinkTracker.samePage(URL(string: "https://example.com/a")!, URL(string: "https://example.com/b")!))
+        #expect(!FlixLinkTracker.samePage(URL(string: "https://cdn.example.com/f")!, URL(string: "https://example.com/f")!))
+        #expect(!FlixLinkTracker.samePage(URL(string: "https://example.org/a")!, URL(string: "https://example.com/a")!))
+        #expect(!FlixLinkTracker.samePage(URL(string: "https://onedrive.live.com/?resid=1")!,
+                                          URL(string: "https://onedrive.live.com/?resid=2")!))
     }
 
     // MARK: Excluded sites
@@ -184,11 +189,13 @@ struct FlixLinkRulesTests {
     /// A tiny accessibility tree for the walk: a role, labels, a value, and children (nil when
     /// reading them fails).
     private final class Node {
-        let role: String
-        var labels: [String]
+        /// Nil when reading the role fails.
+        let role: String?
+        /// Nil when reading a label fails.
+        var labels: [String]?
         var value: String?
         var children: [Node]?
-        init(_ role: String, labels: [String] = [], value: String? = nil, children: [Node]? = []) {
+        init(_ role: String?, labels: [String]? = [], value: String? = nil, children: [Node]? = []) {
             self.role = role
             self.labels = labels
             self.value = value
@@ -224,6 +231,55 @@ struct FlixLinkRulesTests {
         // The budget ran out inside the toolbar.
         let cut = walk(chromeWindow(toolbarChildren: [omnibox] + (0..<20).map { _ in Node("AXButton") }), limit: 8)
         #expect(!cut.evidence.addressToolbarComplete)
+    }
+
+    @Test func failedReadsInTheToolbarAreNoEvidence() {
+        let omnibox = Node("AXTextField", value: "example.com/page")
+        func toolbarComplete(_ extra: Node) -> Bool {
+            walk(chromeWindow(toolbarChildren: [omnibox, extra])).evidence.addressToolbarComplete
+        }
+        #expect(toolbarComplete(Node("AXButton", labels: ["Profile"])))
+        // The role of the element where the badge may sit could not be read.
+        #expect(!toolbarComplete(Node(nil, labels: ["Incognito"])))
+        // Its title or description could not be read.
+        #expect(!toolbarComplete(Node("AXButton", labels: nil)))
+        // A web area in the toolbar is skipped, so that part stays unseen.
+        #expect(!toolbarComplete(Node("AXWebArea")))
+        // The toolbar's own child list or labels failed.
+        let unreadToolbar = Node("AXWindow", children: [Node("AXToolbar", labels: nil, children: [omnibox])])
+        #expect(!walk(unreadToolbar).evidence.addressToolbarComplete)
+    }
+
+    @Test func aWalkThatExpiresInTheToolbarIsNoEvidence() {
+        let omnibox = Node("AXTextField", value: "example.com/page")
+        var reads = 0
+        let window = chromeWindow(toolbarChildren: [omnibox, Node("AXButton"), Node("AXButton", labels: ["Profile"])])
+        let result = FlixBrowserPageReader.walk(from: window, limit: 700, expired: {
+            reads += 1
+            return reads > 6
+        }, role: \.role, labels: \.labels, value: \.value, webURL: { _ in nil }, children: \.children)
+        #expect(result.address != nil && !result.evidence.addressToolbarComplete)
+    }
+
+    @Test func manyTabsDoNotCrowdOutTheToolbarsLabels() {
+        // 400 tabs put the window past the label cap before the toolbar is reached; the toolbar's
+        // labels are still read, so the badge is seen.
+        let omnibox = Node("AXTextField", value: "example.com/page")
+        let tabs = (0..<400).map { Node("AXRadioButton", labels: ["Tab \($0)"]) }
+        let window = Node("AXWindow", children: [Node("AXGroup", children: tabs),
+                                                 Node("AXGroup", children: [Node("AXToolbar", children: [
+                                                     omnibox, Node("AXButton", labels: ["Incognito"])])])])
+        let result = walk(window)
+        #expect(result.evidence.addressToolbarComplete)
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: result.evidence) == .private)
+    }
+
+    @Test func aTitleThatCouldNotBeReadIsNoEvidence() {
+        var evidence = FlixBrowserWindowEvidence(title: nil, labels: [], foundAddress: true, addressToolbarComplete: true)
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence) == .normal)
+        evidence.titleReadFailed = true
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence) == .unknown)
+        #expect(FlixBrowserPageReader.privacy(family: .firefox, evidence: evidence) == .unknown)
     }
 
     @Test func anAddressOutsideAToolbarIsNoEvidence() {

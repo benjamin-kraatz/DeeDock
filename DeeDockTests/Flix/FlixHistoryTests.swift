@@ -36,7 +36,9 @@ struct FlixHistoryTests {
         #expect(document.items.count == 1)
         #expect(document.items[0].activity == .opened)
         #expect(document.items[0].date == t0.addingTimeInterval(50))
-        #expect(document.items[0].sourcePage?.host() == "example.com")
+        #expect(document.items[0].sourceHost == "example.com")
+        // A page is never stored from an event; only a verified one is attached.
+        #expect(document.items[0].sourcePage == nil)
     }
 
     @Test func aDownloadWinsATieWithNew() {
@@ -126,7 +128,7 @@ struct FlixHistoryTests {
         document.record(event("/d/a.pdf", at: 0))
         document.record(event("/e/a.pdf", at: 1))
         let moving = document.items.first { $0.path == "/d/a.pdf" }!.id
-        document.relocate(moving, to: "/e/a.pdf", name: "a.pdf")
+        document.relocate(moving, to: "/e/a.pdf", name: "a.pdf", identity: nil)
         #expect(document.items.count == 1)
         #expect(document.items[0].id == moving)
         #expect(document.items[0].path == "/e/a.pdf")
@@ -222,12 +224,10 @@ struct FlixHistoryTests {
 
     @Test func storedDownloadPagesAreStrippedToTheirHostWhenWebLinksAreOff() {
         var document = FlixHistoryDocument()
-        var download = event("/a/invoice.pdf", .downloaded, at: 0)
-        download.sourcePage = URL(string: "https://billing.example.com/invoices/2026")
-        document.record(download)
-        var bank = event("/a/statement.pdf", .downloaded, at: 1)
-        bank.sourcePage = URL(string: "https://www.paypal.com/statements")
-        document.record(bank)
+        document.record(event("/a/invoice.pdf", .downloaded, at: 0))
+        document.attachVerifiedSource(URL(string: "https://billing.example.com/invoices/2026")!, toPath: "/a/invoice.pdf")
+        document.record(event("/a/statement.pdf", .downloaded, at: 1))
+        document.attachVerifiedSource(URL(string: "https://www.paypal.com/statements")!, toPath: "/a/statement.pdf")
         var settings = FlixSettings()
         settings.tracksLinks = false
         let stripped = document.applySourcePolicy(settings)

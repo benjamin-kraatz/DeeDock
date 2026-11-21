@@ -9,6 +9,14 @@ nonisolated enum FlixPaths {
         return standardized.count > 1 && standardized.hasSuffix("/") ? String(standardized.dropLast()) : standardized
     }
 
+    /// `path` for comparisons that must match the way macOS's default volumes do: case-insensitive
+    /// and normalization-insensitive (`Documents`, `documents`, and a decomposed spelling are one
+    /// folder). Never stored or shown; only compared.
+    static func folded(_ path: String) -> String {
+        path.precomposedStringWithCanonicalMapping.folding(options: [.caseInsensitive], locale: nil)
+            .precomposedStringWithCanonicalMapping
+    }
+
     /// The page a download came from, cleaned by ``FlixURLSanitizer`` (no query, fragment, or
     /// sign-in details; nothing at all for a credential-bearing address). `whereFroms` is
     /// `kMDItemWhereFroms`: the file's own address first, then the page that linked to it. The page

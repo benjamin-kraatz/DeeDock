@@ -120,12 +120,13 @@ final class FlixRobiProvider: FlixRobiProviding {
                 file.text = [link.title, link.url.absoluteString].compactMap { $0 }.joined(separator: "\n")
             } else if let path = item.path, policy.canRead(path) {
                 if item.kind == .folder {
-                    let names = await FlixContentReader.names(in: path).sorted().prefix(60)
+                    let names = await FlixContentReader.names(in: path, policy: policy).sorted().prefix(60)
                     file.text = names.joined(separator: "\n")
                 } else if item.kind != .app {
                     let picture = item.kind == .image || item.kind == .screenshot
                     let content = await FlixContentReader.read(path: path, kind: item.kind,
-                                                               contentType: item.contentTypeIdentifier, limit: limit,
+                                                               contentType: item.contentTypeIdentifier, policy: policy,
+                                                               limit: limit,
                                                                wantsPicture: picture, recognizesText: picture && compact)
                     file.text = content?.text ?? ""
                     if let image = content?.image, !compact { file.images = [image] }

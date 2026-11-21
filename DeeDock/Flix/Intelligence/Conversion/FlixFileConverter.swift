@@ -12,13 +12,22 @@ import UniformTypeIdentifiers
 /// ``maximumCharacters`` is refused rather than laid out on thousands of pages. HTML and web
 /// archives are never converted: AppKit's HTML importer needs the main thread and loads a page's
 /// external resources (`FlixDocumentImport`). Text documents are laid out with Core Text on A4
-/// pages with 54-point margins; images embedded in RTFD or Word files are not drawn. The original
-/// is never changed.
+/// pages with 54-point margins. The original is never changed, and is opened through
+/// ``FlixSafeFile`` so a link swapped in after the conversion was queued is never followed.
+///
+/// A copy is written only when it shows everything the original does (`FlixConversionFidelity`):
+/// a multi-page TIFF or multi-image HEIC becomes one PDF page per frame (up to
+/// `FlixConversionPlanner.maximumPictureFrames`), and the converter declines
+/// (``ConversionError/wouldOmitContent``) an animation, several frames for JPEG or PNG, and a text
+/// document with pictures, attachments, embedded objects, headers, or footers the text layout would
+/// drop. A declined file goes out unchanged.
 nonisolated enum FlixFileConverter {
-    enum ConversionError: Error {
+    enum ConversionError: Error, Equatable {
         case unreadable
         case unsupported
         case tooLarge
+        /// The copy would leave out part of the original (see the type's notes).
+        case wouldOmitContent(FlixConversionFidelity.Reason)
     }
 
     /// The longest side a converted picture keeps before any size limit applies.
@@ -27,17 +36,21 @@ nonisolated enum FlixFileConverter {
     static let maximumTextBytes: Int64 = 4_000_000
     /// The longest text laid out as a PDF.
     static let maximumCharacters = 2_000_000
+    /// The largest picture read for a conversion.
+    static let maximumPictureBytes: Int64 = 200_000_000
 
-    /// Converts `source` into `folder`, named after `name` with the new extension.
+    /// Converts the file at `path` into `folder`, named after `name` with the new extension.
     /// - Returns: The copy's URL and its size in bytes.
-    @concurrent static func convert(_ source: URL, type: UTType, recipe: FlixConversionRecipe, name: String,
-                        into folder: URL) async throws -> (url: URL, bytes: Int64) {
+    /// - Throws: ``ConversionError``; `wouldOmitContent` when a faithful copy is not possible.
+    @concurrent static func convert(_ path: String, policy: FlixReadPolicy, type: UTType, recipe: FlixConversionRecipe,
+                                    name: String, into folder: URL) async throws -> (url: URL, bytes: Int64) {
         try Task.checkCancellation()
+        guard let file = FlixSafeFile.open(path, policy: policy) else { throw ConversionError.unreadable }
         let data: Data
         if FlixConversionPlanner.isImage(type) {
-            data = try imageData(source, recipe: recipe)
-        } else if FlixConversionPlanner.isText(type), recipe.format == .pdf {
-            let text = try attributedText(source, type: type)
+            data = try imageData(file, type: type, recipe: recipe)
+        } else if FlixConversionPlanner.isConvertibleText(type), recipe.format == .pdf {
+            let text = try attributedText(file, type: type)
             guard text.length <= maximumCharacters else { throw ConversionError.tooLarge }
             try Task.checkCancellation()
             data = try pdf(from: text)
@@ -52,33 +65,73 @@ nonisolated enum FlixFileConverter {
 
     // MARK: Pictures
 
-    private static func imageData(_ source: URL, recipe: FlixConversionRecipe) throws -> Data {
-        guard let imageSource = CGImageSourceCreateWithURL(source as CFURL, nil) else { throw ConversionError.unreadable }
-        let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any]
+    private static func imageData(_ file: FlixSafeFile, type: UTType, recipe: FlixConversionRecipe) throws -> Data {
+        guard let bytes = file.mapped(maximumBytes: maximumPictureBytes),
+              let imageSource = CGImageSourceCreateWithData(bytes as CFData, nil) else { throw ConversionError.unreadable }
+        let frames = CGImageSourceGetCount(imageSource)
+        switch FlixConversionPlanner.picture(frameCount: frames, isAnimated: isAnimation(imageSource, type: type, frames: frames),
+                                             format: recipe.format) {
+        case .declined(let reason): throw ConversionError.wouldOmitContent(reason)
+        case .faithful(let pages) where pages > 1:
+            // A PDF wrapper costs a few kilobytes per page on top of the JPEGs inside it.
+            let budget = recipe.maximumBytes.map { max(0, $0 - 16_000 * Int64(pages)) / Int64(pages) }
+            let encoded = try (0..<pages).map { index in
+                try Task.checkCancellation()
+                return try jpegFrame(imageSource, index: index, budget: budget)
+            }
+            return try pdf(wrappingJPEGs: encoded)
+        case .faithful:
+            break
+        }
+        // A PDF wrapper costs a few kilobytes on top of the JPEG inside it.
+        let budget = recipe.maximumBytes.map { recipe.format == .pdf ? max(0, $0 - 16_000) : $0 }
+        let encoded = try frame(imageSource, index: 0, as: recipe.format == .png ? .png : .jpeg, budget: budget)
+        return recipe.format == .pdf ? try pdf(wrappingJPEGs: [encoded]) : encoded.data
+    }
+
+    /// Whether a source's frames are an animation rather than pages.
+    private static func isAnimation(_ source: CGImageSource, type: UTType, frames: Int) -> Bool {
+        guard frames > 1 else { return false }
+        if type.conforms(to: .gif) { return true }
+        let properties = CGImageSourceCopyProperties(source, nil) as? [CFString: Any] ?? [:]
+        if properties[kCGImagePropertyHEICSDictionary] != nil || properties[kCGImagePropertyWebPDictionary] != nil {
+            return true
+        }
+        if let png = properties[kCGImagePropertyPNGDictionary] as? [CFString: Any], png[kCGImagePropertyAPNGLoopCount] != nil {
+            return true
+        }
+        // Animated PNG and WebP files with several frames are animations even without the keys.
+        return type.conforms(to: .png) || type.identifier == "org.webmproject.webp"
+    }
+
+    private static func jpegFrame(_ source: CGImageSource, index: Int, budget: Int64?) throws -> (data: Data, image: CGImage) {
+        try frame(source, index: index, as: .jpeg, budget: budget)
+    }
+
+    /// One frame encoded at the largest scale and quality that fits `budget`, else the smallest
+    /// encoding tried, rather than the original.
+    private static func frame(_ source: CGImageSource, index: Int, as format: UTType,
+                              budget: Int64?) throws -> (data: Data, image: CGImage) {
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let width = (properties?[kCGImagePropertyPixelWidth] as? CGFloat) ?? maximumPixels
         let height = (properties?[kCGImagePropertyPixelHeight] as? CGFloat) ?? maximumPixels
         let longest = min(maximumPixels, max(width, height))
-        // A PDF wrapper costs a few kilobytes on top of the JPEG inside it.
-        let budget = recipe.maximumBytes.map { recipe.format == .pdf ? max(0, $0 - 16_000) : $0 }
         let scales: [CGFloat] = [1, 0.8, 0.64, 0.5, 0.4, 0.32, 0.25, 0.18]
-        let qualities: [CGFloat] = recipe.format == .png ? [1] : [0.85, 0.72, 0.6, 0.5]
+        let qualities: [CGFloat] = format == .png ? [1] : [0.85, 0.72, 0.6, 0.5]
         var smallest: (data: Data, image: CGImage)?
         for scale in scales {
-            guard let image = thumbnail(imageSource, longestSide: max(64, longest * scale)) else { continue }
+            guard let image = thumbnail(source, index: index, longestSide: max(64, longest * scale)) else { continue }
             for quality in qualities {
-                guard let data = encode(image, as: recipe.format == .png ? .png : .jpeg, quality: quality) else { continue }
+                guard let data = encode(image, as: format, quality: quality) else { continue }
                 if smallest == nil || data.count < smallest!.data.count { smallest = (data, image) }
-                if budget.map({ Int64(data.count) <= $0 }) ?? true {
-                    return recipe.format == .pdf ? try pdf(wrappingJPEG: data, size: image) : data
-                }
+                if budget.map({ Int64(data.count) <= $0 }) ?? true { return (data, image) }
             }
         }
         guard let smallest else { throw ConversionError.unreadable }
-        // Nothing reached the limit; hand over the smallest copy rather than the original.
-        return recipe.format == .pdf ? try pdf(wrappingJPEG: smallest.data, size: smallest.image) : smallest.data
+        return smallest
     }
 
-    private static func thumbnail(_ source: CGImageSource, longestSide: CGFloat) -> CGImage? {
+    private static func thumbnail(_ source: CGImageSource, index: Int, longestSide: CGFloat) -> CGImage? {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
@@ -86,7 +139,7 @@ nonisolated enum FlixFileConverter {
             kCGImageSourceThumbnailMaxPixelSize: FlixNumbers.int(longestSide, in: 1...Int(maximumPixels)) ?? Int(maximumPixels),
             kCGImageSourceShouldCacheImmediately: true,
         ]
-        return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+        return CGImageSourceCreateThumbnailAtIndex(source, index, options as CFDictionary)
     }
 
     private static func encode(_ image: CGImage, as type: UTType, quality: CGFloat) -> Data? {
@@ -98,52 +151,64 @@ nonisolated enum FlixFileConverter {
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }
 
-    /// One page the picture's shape, longest side 842 points (A4's height). The JPEG passes through
-    /// unchanged, so the PDF is barely larger than the picture.
-    private static func pdf(wrappingJPEG jpeg: Data, size image: CGImage) throws -> Data {
-        guard let provider = CGDataProvider(data: jpeg as CFData),
-              let embedded = CGImage(jpegDataProviderSource: provider, decode: nil, shouldInterpolate: true,
-                                     intent: .defaultIntent) else { throw ConversionError.unreadable }
-        let aspect = CGFloat(image.width) / CGFloat(max(1, image.height))
-        let page = aspect >= 1 ? CGSize(width: 842, height: 842 / aspect) : CGSize(width: 842 * aspect, height: 842)
+    /// One page per picture, each the picture's shape, longest side 842 points (A4's height). The
+    /// JPEGs pass through unchanged, so the PDF is barely larger than the pictures.
+    private static func pdf(wrappingJPEGs pictures: [(data: Data, image: CGImage)]) throws -> Data {
         let output = NSMutableData()
-        var box = CGRect(origin: .zero, size: page)
-        guard let consumer = CGDataConsumer(data: output), let context = CGContext(consumer: consumer, mediaBox: &box, nil)
+        guard let consumer = CGDataConsumer(data: output), let context = CGContext(consumer: consumer, mediaBox: nil, nil)
         else { throw ConversionError.unreadable }
-        context.beginPDFPage(nil)
-        context.draw(embedded, in: box)
-        context.endPDFPage()
+        for picture in pictures {
+            guard let provider = CGDataProvider(data: picture.data as CFData),
+                  let embedded = CGImage(jpegDataProviderSource: provider, decode: nil, shouldInterpolate: true,
+                                         intent: .defaultIntent) else { throw ConversionError.unreadable }
+            let aspect = CGFloat(picture.image.width) / CGFloat(max(1, picture.image.height))
+            let size = aspect >= 1 ? CGSize(width: 842, height: 842 / aspect) : CGSize(width: 842 * aspect, height: 842)
+            var box = CGRect(origin: .zero, size: size)
+            let pageInfo = [kCGPDFContextMediaBox as String: Data(bytes: &box, count: MemoryLayout<CGRect>.size)] as CFDictionary
+            context.beginPDFPage(pageInfo)
+            context.draw(embedded, in: box)
+            context.endPDFPage()
+        }
         context.closePDF()
         return output as Data
     }
 
     // MARK: Text
 
-    private static func attributedText(_ source: URL, type: UTType) throws -> NSAttributedString {
+    /// The document as attributed text, once it is known that the text layout keeps all of it.
+    private static func attributedText(_ file: FlixSafeFile, type: UTType) throws -> NSAttributedString {
         // Never HTML or a web archive, even when the planner was handed one (see the type's notes).
         if type.conforms(to: .html) || type.conforms(to: .webArchive) { throw ConversionError.unsupported }
         if let markdown = UTType("net.daringfireball.markdown"), type.conforms(to: markdown) {
-            return try markdownText(source)
+            return try markdownText(boundedText(file))
         }
         if type.conforms(to: .plainText) {
-            let string = try boundedText(source)
-            return NSAttributedString(string: string, attributes: [.font: bodyFont])
+            return NSAttributedString(string: try boundedText(file), attributes: [.font: bodyFont])
         }
-        guard let text = FlixDocumentImport.attributedString(at: source, type: type) else { throw ConversionError.unreadable }
+        if !file.isDirectory, let bytes = file.mapped(maximumBytes: FlixDocumentImport.maximumBytes),
+           case .declined(let reason) = FlixConversionPlanner.documentParts(in: bytes, type: type) {
+            throw ConversionError.wouldOmitContent(reason)
+        }
+        guard let text = FlixDocumentImport.attributedString(file, type: type) else { throw ConversionError.unreadable }
+        var attachments = 0
+        text.enumerateAttribute(.attachment, in: NSRange(location: 0, length: text.length)) { value, _, _ in
+            if value != nil { attachments += 1 }
+        }
+        if case .declined(let reason) = FlixConversionPlanner.text(attachmentCount: attachments) {
+            throw ConversionError.wouldOmitContent(reason)
+        }
         return text
     }
 
     /// A UTF-8 text file, refused above ``maximumTextBytes``.
-    private static func boundedText(_ source: URL) throws -> String {
-        let size = (try? source.resourceValues(forKeys: [.fileSizeKey]).fileSize).map(Int64.init) ?? 0
-        guard size <= maximumTextBytes else { throw ConversionError.tooLarge }
-        return try String(contentsOf: source, encoding: .utf8)
+    private static func boundedText(_ file: FlixSafeFile) throws -> String {
+        guard file.size <= maximumTextBytes else { throw ConversionError.tooLarge }
+        return String(decoding: file.read(upTo: Int(maximumTextBytes)), as: UTF8.self)
     }
 
     /// Markdown's inline styles (bold, italic, code) become fonts; block syntax such as headings
     /// stays as written.
-    private static func markdownText(_ source: URL) throws -> NSAttributedString {
-        let string = try boundedText(source)
+    private static func markdownText(_ string: String) throws -> NSAttributedString {
         let parsed = (try? AttributedString(markdown: string, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
             ?? AttributedString(string)
         let output = NSMutableAttributedString()

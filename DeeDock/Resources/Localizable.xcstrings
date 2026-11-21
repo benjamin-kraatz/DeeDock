@@ -8234,13 +8234,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwischt Ausweise, Bankdaten und Schlüssel und fragt, bevor sie in einen Browser, eine Mail oder einen Chat gehen."
+            "value" : "Verwischt Ausweise, Bankdaten und Schlüssel und fragt, bevor eines davon aus Flix Files gezogen wird."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blurs IDs, bank details, and keys, and asks before they go to a browser, mail, or chat."
+            "value" : "Blurs IDs, bank details, and keys, and asks before you drag one out of Flix Files."
           }
         }
       }
@@ -9943,6 +9943,24 @@
         }
       }
     },
+    "flixToastChangedSince" : {
+      "comment" : "Flix Files: toast when Trash, Move, or Rename left files alone because the file at their place is no longer the one the row listed (replaced, saved again, or gone). The row was refreshed; doing it again acts on the file as it is now. The argument names the items (“Invoice.pdf” or “2 items”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hat sich seit der Auflistung geändert, daher wurde nichts getan. Erneut versuchen, um den aktuellen Stand zu verwenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ changed since it was listed, so nothing was done. Try again to use it as it is now."
+          }
+        }
+      }
+    },
     "flixToastCopied" : {
       "comment" : "Flix Files: toast. The argument names the items, such as a quoted file name or 3 items.",
       "extractionState" : "manual",
@@ -10135,6 +10153,42 @@
         }
       }
     },
+    "flixToastMoving" : {
+      "comment" : "Flix Files: toast while a move into a folder is still running (another volume, a network share). The argument names the items (“Invoice.pdf” or “2 items”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wird bewegt …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving %@…"
+          }
+        }
+      }
+    },
+    "flixToastNotCheckedYet" : {
+      "comment" : "Flix Files: toast when Trash, Move, or Rename left files alone because Flix Files had not yet recorded which file the row is (a brand-new row). It has checked now; doing it again goes ahead. The argument names the items (“Invoice.pdf” or “2 items”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wurde gerade erst geprüft, daher wurde noch nichts getan. Erneut versuchen, um fortzufahren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ was just checked, so nothing was done yet. Try again to go ahead."
+          }
+        }
+      }
+    },
     "flixToastNotMoved" : {
       "comment" : "Flix Files: toast sentence after a move into a folder when some files stayed where they were. The argument names those items (“Invoice.pdf” or “2 items”). May follow the “Moved … to …” sentence.",
       "extractionState" : "manual",
@@ -10299,6 +10353,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "flixToastTidying" : {
+      "comment" : "Flix Files: toast while Tidy is still moving and renaming files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird aufgeräumt …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidying up…"
           }
         }
       }

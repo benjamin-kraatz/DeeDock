@@ -48,7 +48,8 @@ struct FlixThumbnailView: View {
         }
         .accessibilityHidden(true)
         .task(id: item.path) {
-            guard wantsThumbnail, let url = item.url, let path = item.path, policy.canRead(path) else { return }
+            // Resolved right before the request, so Quick Look reads the place the policy checked.
+            guard wantsThumbnail, let path = item.path, let url = policy.readableURL(path) else { return }
             thumbnail = await HubThumbnailCache.shared.thumbnail(for: url, size: CGSize(width: size, height: size),
                                                                  scale: scale)
         }

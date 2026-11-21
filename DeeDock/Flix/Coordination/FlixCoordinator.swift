@@ -70,6 +70,8 @@ final class FlixCoordinator {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var appSeen: [String: Date] = [:]
     @ObservationIgnored private var watchedRoots: [String] = []
+    /// The read policy the watcher was started with; it re-checks every event path against it.
+    @ObservationIgnored private var watchedPolicy = FlixReadPolicy(allowedRoots: [])
     @ObservationIgnored private var nowTimer: Timer?
     /// Items confirmed by a drop question, so the next drag of them goes ahead. Expires quickly.
     @ObservationIgnored private var confirmedDrag: (ids: Set<FlixItem.ID>, until: Date)?
@@ -80,6 +82,11 @@ final class FlixCoordinator {
     /// The last shortcut a registration was reported for, so only changes report again.
     @ObservationIgnored private var reportedShortcut: FlixShortcutCombo?
     @ObservationIgnored private var lookoutFolders: () -> [String]
+    /// The background pass that records identities for rows without one (``captureMissingIdentities()``).
+    @ObservationIgnored private var identityTask: Task<Void, Never>?
+    /// Rows the pass already looked at, by path and date, so a file that cannot be read is not
+    /// looked at again until it has new activity.
+    @ObservationIgnored private var identityAttempted = Set<String>()
     /// Phase B1's window reading, conversions, sensitive guard, and web links. Set by ``live()``;
     /// nil in previews and tests, where Flix Files runs without them.
     @ObservationIgnored var contextServices: FlixContextServices?
@@ -141,6 +148,9 @@ final class FlixCoordinator {
         statusItem = nil
         nowTimer?.invalidate()
         nowTimer = nil
+        identityTask?.cancel()
+        identityTask = nil
+        identityAttempted = []
         contextServices?.stop()
         intelligence.stop()
         for stopProvider in stopProviders { stopProvider() }
@@ -184,6 +194,10 @@ final class FlixCoordinator {
     /// Sources and observers stop through ``apply(_:previous:)``; providers' caches stay for later.
     private func suspendBackgroundWork() {
         close(restoreFocus: false, animated: false)
+        identityTask?.cancel()
+        identityTask = nil
+        identityAttempted = []
+        tile.suspend()
         intelligence.stop()
         for pause in pauseProviders { pause() }
         contextServices?.suspend()
@@ -216,9 +230,10 @@ final class FlixCoordinator {
     private func restartWatcher() {
         let roots = settings.isEnabled && settings.tracksWatchedFolders
             ? settings.enabledWatchedFolders.map(\.path).filter(readPolicy.canRead) : []
-        guard roots != watchedRoots else { return }
+        guard roots != watchedRoots || readPolicy != watchedPolicy else { return }
         watchedRoots = roots
-        watcher.start(folders: roots) { [weak self] events in self?.receive(events) }
+        watchedPolicy = readPolicy
+        watcher.start(folders: roots, policy: readPolicy) { [weak self] events in self?.receive(events) }
     }
 
     private func configurePanelState() {
@@ -243,6 +258,10 @@ final class FlixCoordinator {
 
     /// Merges events, dropping what the settings do not track and download pages they do not
     /// allow (``FlixSourcePolicy``), before anything reaches the history or the link tracker.
+    ///
+    /// The history takes only a download's host: a full page address reaches a file row only once
+    /// the link tracker verified the download came from a normal window showing that page
+    /// (`FlixLinkTracker.recorded(_:)`), which then attaches it.
     private func receive(_ events: [FlixActivityEvent]) {
         let settings = settings
         // A source stopped by the master switch may still deliver its last batch.
@@ -254,7 +273,11 @@ final class FlixCoordinator {
         }.map { FlixSourcePolicy.apply(to: $0, settings: settings) }
         guard !kept.isEmpty else { return }
         countRecorded(kept)
-        history.record(kept)
+        history.record(kept.map { event in
+            var stored = event
+            stored.sourcePage = nil
+            return stored
+        })
         contextServices?.recorded(kept)
     }
 
@@ -297,14 +320,53 @@ final class FlixCoordinator {
 
     private func historyDidChange() {
         refreshTile()
-        // No analysis, guard pass, or link index while Flix Files is off.
+        // No analysis, guard pass, identity pass, or link index while Flix Files is off.
         guard settings.isEnabled else { return }
         intelligence.historyChanged(items: history.items)
         contextServices?.historyChanged(history.items)
+        captureMissingIdentities()
+    }
+
+    /// Rows read per identity pass.
+    static let identityBatch = 300
+
+    /// Records the file identity of rows that have none yet (Spotlight's rows, and rows whose file
+    /// had new activity), so Trash, Move, and Rename can tell a replaced file apart
+    /// (``FlixFileOperations/check(_:)``). Off the main actor on the file worker, only for paths
+    /// the read policy allows, at most ``identityBatch`` rows per pass; storing them changes the
+    /// history, which starts the next pass until every readable row has one.
+    private func captureMissingIdentities() {
+        guard identityTask == nil else { return }
+        var pending: [(id: FlixItem.ID, path: String)] = []
+        for item in history.items where item.fileIdentity == nil && item.link == nil {
+            guard let path = item.path else { continue }
+            guard identityAttempted.insert(path + "|\(item.date.timeIntervalSinceReferenceDate)").inserted else { continue }
+            pending.append((item.id, path))
+            if pending.count >= Self.identityBatch { break }
+        }
+        guard !pending.isEmpty else { return }
+        let policy = readPolicy
+        let paths = pending.map(\.path)
+        identityTask = Task { [weak self] in
+            let found = await FlixFileWorker.shared.run { FlixFileOperations.identities(of: paths, policy: policy) }
+            guard let self, !Task.isCancelled else { return }
+            identityTask = nil
+            history.setIdentities(pending.compactMap { entry in
+                found[entry.path].map { (entry.id, entry.path, $0) }
+            })
+        }
     }
 
     /// Redraws the tile (and the menu bar item) from the history and the intelligence slots.
+    ///
+    /// While Flix Files is off the tile is hidden: nothing is read, no thumbnail is requested, and
+    /// the read policy is never consulted. Turning it back on refreshes the tile from scratch.
     func refreshTile() {
+        guard settings.isEnabled else {
+            tile.suspend()
+            statusItem?.update()
+            return
+        }
         let hiding = settings.hidesNoise
         let newest = history.newest(hidingNoise: hiding)
         let guarded = settings.guardsSensitiveFiles
@@ -520,9 +582,9 @@ final class FlixCoordinator {
     /// Starts a drag of rows or a thread card from the panel.
     ///
     /// The drop questions (a sensitive file, an older version) run here, before the drag starts:
-    /// macOS never tells a drag source where the drop will land, so Flix asks about the window that
-    /// was in front when it opened. Answering lets the next drag of the same items go ahead for 30
-    /// seconds. Phase B1's conversions replace files on the pasteboard through the plan, but only
+    /// macOS never tells a drag source where the drop will land. A flagged file is asked about on
+    /// every drag, whichever app is in front (`FlixDragInterceptor.confirmation(for:context:)`).
+    /// Answering lets the next drag of the same items go ahead for 30 seconds. Phase B1's conversions replace files on the pasteboard through the plan, but only
     /// while the window the panel read is still the one in front: the copies are for that upload.
     func beginDrag(_ ids: [FlixItem.ID], from view: NSView, event: NSEvent, origin: FlixActionOrigin = .list) {
         let items = ids.compactMap(history.item)

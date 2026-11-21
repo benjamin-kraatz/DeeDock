@@ -32,42 +32,41 @@ private enum GeneratedPictureKind {
 ///    Intelligence when it is available and accepts images: an ID photographed at an angle often
 ///    defeats the keyword rules.
 ///
-/// It reads only what the caller allows (see `FlixSensitiveGuard`), never sends anything off the
-/// Mac, and keeps nothing but the verdict.
+/// It reads only what the caller allows (see `FlixSensitiveGuard`), through a ``FlixSafeFile`` opened
+/// right before the scan, never sends anything off the Mac, and keeps nothing but the verdict.
 nonisolated enum FlixSensitiveScanner {
     static let maximumTextBytes = 256 * 1_024
     static let maximumDocumentBytes: Int64 = 8_000_000
     static let maximumImageBytes: Int64 = 60_000_000
 
-    @concurrent static func scan(_ url: URL, type: UTType?, kind: FlixItemKind, byteSize: Int64?) async -> FlixSensitiveKind? {
-        if let verdict = FlixSensitiveRules.kind(forFileName: url.lastPathComponent) { return verdict }
+    /// Scans the opened file. The caller opened it through ``FlixSafeFile``, so every read below
+    /// goes through that checked descriptor and never follows a link.
+    @concurrent static func scan(_ file: FlixSafeFile, name: String, type: UTType?, kind: FlixItemKind) async -> FlixSensitiveKind? {
+        if let verdict = FlixSensitiveRules.kind(forFileName: name) { return verdict }
         guard let type else { return nil }
-        let size = byteSize ?? 0
+        let size = file.size
         if type.conforms(to: .pdf) {
             guard size <= maximumImageBytes else { return nil }
-            return await scanPDF(url)
+            return await scanPDF(file)
         }
         if type.conforms(to: .image) {
-            guard size <= maximumImageBytes, let image = picture(url) else { return nil }
+            guard size <= maximumImageBytes, let image = FlixContentReader.picture(in: file, side: 1_600) else { return nil }
             return await scanPicture(image)
         }
         if type.conforms(to: .plainText) || type.conforms(to: .sourceCode) || type.conforms(to: .json)
             || type.conforms(to: .xml) || type.conforms(to: .propertyList) {
-            guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
-            defer { try? handle.close() }
-            let data = (try? handle.read(upToCount: maximumTextBytes)) ?? Data()
-            return FlixSensitiveRules.kind(forText: String(decoding: data, as: UTF8.self))
+            return FlixSensitiveRules.kind(forText: String(decoding: file.read(upTo: maximumTextBytes), as: UTF8.self))
         }
-        if FlixConversionPlanner.isText(type), size <= maximumDocumentBytes {
+        if FlixConversionPlanner.isText(type), file.isDirectory || size <= maximumDocumentBytes {
             // Typed import only: never HTML or a web archive, which would load WebKit off the main thread.
-            let text = FlixDocumentImport.attributedString(at: url, type: type, byteSize: size)?.string ?? ""
+            let text = FlixDocumentImport.attributedString(file, type: type)?.string ?? ""
             return FlixSensitiveRules.kind(forText: String(text.prefix(maximumTextBytes)))
         }
         return nil
     }
 
-    private static func scanPDF(_ url: URL) async -> FlixSensitiveKind? {
-        guard let document = PDFDocument(url: url) else { return nil }
+    private static func scanPDF(_ file: FlixSafeFile) async -> FlixSensitiveKind? {
+        guard let data = file.mapped(maximumBytes: maximumImageBytes), let document = PDFDocument(data: data) else { return nil }
         // A locked PDF cannot be read without its password.
         guard !document.isLocked else { return nil }
         var text = ""
@@ -87,16 +86,6 @@ nonisolated enum FlixSensitiveScanner {
         if let verdict = FlixSensitiveRules.kind(forText: lines.joined(separator: "\n")) { return verdict }
         guard lines.count >= 2, FlixWindowReader.canSeeImages else { return nil }
         return await classify(image)
-    }
-
-    private static func picture(_ url: URL) -> CGImage? {
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
-        let options: [CFString: Any] = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 1_600,
-        ]
-        return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
     }
 
     private static func recognize(_ image: CGImage) async -> [String] {

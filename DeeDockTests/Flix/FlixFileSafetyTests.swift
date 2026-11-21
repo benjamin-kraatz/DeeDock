@@ -58,57 +58,63 @@ struct FlixFileSafetyTests {
 
     // MARK: Moves and Undo
 
+    /// A row for `url` that recorded the file as it is now, as the history would.
     private func item(_ url: URL) -> FlixItem {
-        FlixItem(path: url.path, name: url.lastPathComponent, kind: .document, activity: .opened, date: .now)
+        FlixItem(path: url.path, name: url.lastPathComponent, kind: .document, activity: .opened, date: .now,
+                 fileIdentity: FlixFileIdentity.of(url))
     }
 
-    @MainActor @Test func aPartialMoveReportsEachFile() throws {
+    @Test func aPartialMoveReportsEachFile() throws {
         let home = try makeHome()
         defer { try? FileManager.default.removeItem(at: home) }
         let target = home.appending(path: "Projects/Archive", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
         let present = item(home.appending(path: "Projects/main.swift"))
         let missing = item(home.appending(path: "Projects/gone.swift"))
-        let report = FlixFileActions.move([missing, present], into: target)
+        let report = FlixFileOperations.move([missing, present], into: target)
         #expect(report.moved.map(\.item.id) == [present.id])
-        #expect(report.failed.map(\.item.id) == [missing.id])
+        // Nothing is at the missing row's path, so it is reported as changed, not attempted.
+        #expect(report.stale.map(\.item.id) == [missing.id] && report.stale.first?.current == nil)
         #expect(report.moved.first?.identity != nil)
         #expect(FileManager.default.fileExists(atPath: target.appending(path: "main.swift").path))
     }
 
-    @MainActor @Test func undoPutsBackOnlyTheFileThatWasMoved() throws {
+    @Test func undoPutsBackOnlyTheFileThatWasMoved() throws {
         let home = try makeHome()
         defer { try? FileManager.default.removeItem(at: home) }
         let target = home.appending(path: "Projects/Archive", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
         let original = home.appending(path: "Projects/main.swift")
-        let report = FlixFileActions.move([item(original)], into: target)
+        let report = FlixFileOperations.move([item(original)], into: target)
         let move = try #require(report.moved.first)
 
         // Something else took the moved file's place: Undo leaves it alone.
         try FileManager.default.removeItem(at: move.to)
         try Data("replacement".utf8).write(to: move.to)
-        let refused = FlixFileActions.moveBack([move])
+        let refused = FlixFileOperations.moveBack([move])
         #expect(refused.restored.isEmpty && refused.skipped.count == 1)
         #expect(!FileManager.default.fileExists(atPath: original.path))
         #expect(FileManager.default.fileExists(atPath: move.to.path))
     }
 
-    @MainActor @Test func undoRestoresAnUntouchedMove() throws {
+    @Test func undoRestoresAnUntouchedMove() throws {
         let home = try makeHome()
         defer { try? FileManager.default.removeItem(at: home) }
         let target = home.appending(path: "Projects/Archive", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
         let original = home.appending(path: "Projects/main.swift")
-        let move = try #require(FlixFileActions.move([item(original)], into: target).moved.first)
-        let undone = FlixFileActions.moveBack([move])
+        let move = try #require(FlixFileOperations.move([item(original)], into: target).moved.first)
+        let undone = FlixFileOperations.moveBack([move])
         #expect(undone.restored.map(\.url.path) == [original.path])
         #expect(FileManager.default.fileExists(atPath: original.path))
 
         // A rename whose old name was taken meanwhile is not undone either.
-        let rename = try #require(try FlixFileActions.rename(item(original), to: "app.swift"))
+        guard case .renamed(let rename) = FlixFileOperations.rename(item(original), to: "app.swift") else {
+            Issue.record("rename failed")
+            return
+        }
         try Data("new".utf8).write(to: original)
-        #expect(FlixFileActions.undo(rename) == nil)
+        #expect(FlixFileOperations.undo(rename) == nil)
         #expect(FileManager.default.fileExists(atPath: rename.to.path))
     }
 

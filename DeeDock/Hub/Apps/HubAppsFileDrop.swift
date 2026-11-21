@@ -24,7 +24,8 @@ struct HubAppsFileDrop: ViewModifier {
             }
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: isTargeted)
             .dropDestination(for: URL.self) { urls, _ in
-                let files = urls.filter(\.isFileURL)
+                // A Flix drag may carry converted upload copies; file actions take the originals.
+                let files = FlixDragSession.originalURLs(forDropped: urls.filter(\.isFileURL))
                 guard !files.isEmpty else { return false }
                 // Reuse an in-process lease (a drag from a DOKK stack, Shelf, or the Files tab) so
                 // nested items keep their parent folder's security scope; otherwise take a new grant.

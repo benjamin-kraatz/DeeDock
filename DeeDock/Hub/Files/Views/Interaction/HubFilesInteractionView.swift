@@ -421,7 +421,8 @@ final class HubFilesInteractionView: NSView, NSDraggingSource, NSSpringLoadingDe
     private func sources(_ info: NSDraggingInfo) -> [URL] {
         let pasteboard = info.draggingPasteboard
         if let cachedSources, cachedSources.changeCount == pasteboard.changeCount { return cachedSources.urls }
-        let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        // A Flix drag may carry converted upload copies; a transfer always takes the originals.
+        let urls = FlixDragSession.fileURLs(on: pasteboard)
         cachedSources = (pasteboard.changeCount, urls)
         return urls
     }

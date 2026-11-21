@@ -129,6 +129,8 @@ final class FlixPanelState {
 
     @ObservationIgnored private var searchTask: Task<Void, Never>?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
+    /// The "Moving…" toast on screen while a slow file command runs, so its end can take it away.
+    @ObservationIgnored var progressToastID: FlixToast.ID?
 
     init(history: FlixHistory, intelligence: FlixIntelligence, settingsStore: FlixSettingsStore) {
         self.history = history

@@ -46,7 +46,9 @@ final class FlixTileState {
         thumbnailTask?.cancel()
         guard let item else { thumbnail = nil; return }
         thumbnail = FlixIconProvider.typeIcon(for: item)
-        guard let url = item.url, let path = item.path, policy.canRead(path) else { return }
+        // Resolved now, right before the request, so the thumbnail reads the file the policy
+        // checked and never follows a link into a folder DOKK was not allowed.
+        guard let path = item.path, let url = policy.readableURL(path) else { return }
         thumbnailTask = Task { [weak self] in
             let image = await HubThumbnailCache.shared.thumbnail(for: url, size: CGSize(width: 64, height: 64),
                                                                  scale: NSScreen.main?.backingScaleFactor ?? 2)
@@ -58,5 +60,16 @@ final class FlixTileState {
     func stop() {
         thumbnailTask?.cancel()
         thumbnailTask = nil
+    }
+
+    /// Flix Files was switched off: cancels the thumbnail request and forgets what the tile showed,
+    /// so turning it back on loads the newest item afresh.
+    func suspend() {
+        stop()
+        newest = nil
+        thumbnail = nil
+        unseenCount = 0
+        fitCount = nil
+        newestIsSensitive = false
     }
 }

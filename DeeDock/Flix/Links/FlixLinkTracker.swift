@@ -7,9 +7,13 @@ import CoreGraphics
 /// - **Downloads**: the page a download came from (`kMDItemWhereFroms`, cleaned and already
 ///   allowed by ``FlixSourcePolicy``), recorded when the file arrives — but only when the download's
 ///   privacy can be verified: it arrived within ``downloadWindow`` while a browser with a
-///   private-window check was in front, that window reads as normal, and its page is on the
-///   download's site. macOS does not record whether a download came from a private window, so
-///   anything less keeps just the host on the file's row. Its row then reads "Source of “Invoice.pdf”".
+///   private-window check was in front, that window reads as normal, and the window shows the very
+///   page the download names as its source (``samePage(_:_:)``; another page on the same site is
+///   not enough, since a normal window must not vouch for a private window's download). macOS does
+///   not record whether a download came from a private window, so anything less keeps just the host
+///   on the file's row. A verified page is also stored on the file's row
+///   (`FlixHistory.attachVerifiedSource(_:toPath:)`, the only way a full address reaches one), and
+///   the link row reads "Source of “Invoice.pdf”".
 /// - **Drops**: after a Flix file is dropped outside while a browser was the window in front, that
 ///   browser's page; its row reads "↑ You sent 2 files here".
 /// - **Web documents** (``FlixWebDocuments``) that stay in front for 30 seconds.
@@ -79,14 +83,15 @@ final class FlixLinkTracker {
         }
     }
 
-    /// Files arrived. A download's page becomes a link item only when the browser in front vouches
-    /// for it (see the type's documentation); the check reads that browser's window once, off the
-    /// main actor.
+    /// Files arrived. A download's page becomes a link item, and is stored on the file's row, only
+    /// when the browser in front vouches for it (see the type's documentation); the check reads that
+    /// browser's window once, off the main actor.
     func recorded(_ events: [FlixActivityEvent]) {
         guard isTracking else { return }
         let now = Date.now
         let downloads = events.filter { event in
-            event.activity == .downloaded && event.sourcePage != nil && now.timeIntervalSince(event.date) <= Self.downloadWindow
+            event.activity == .downloaded && event.sourcePage != nil && event.path != nil
+                && now.timeIntervalSince(event.date) <= Self.downloadWindow
         }
         guard !downloads.isEmpty, let app = NSWorkspace.shared.frontmostApplication,
               let family = FlixBrowserCatalog.family(of: app), family.tracksAutomatically else { return }
@@ -101,21 +106,29 @@ final class FlixLinkTracker {
             }
             let exclusions = FlixSiteExclusions(settings: settings)
             for event in downloads {
-                guard let source = event.sourcePage, Self.sameSite(source, front.url) else { continue }
+                guard let source = event.sourcePage, let path = event.path, Self.samePage(source, front.url) else { continue }
                 guard !exclusions.excludes(source) else {
                     Analytics.count(.linksExcludedSkipped)
                     continue
                 }
+                history.attachVerifiedSource(source, toPath: path)
                 record(source, title: nil, browser: front.browserBundleIdentifier, date: event.date,
                        trigger: .downloadSource, removedSecrets: 0)
             }
         }
     }
 
-    /// Whether two pages are on the same site: one host is the other or a subdomain of it.
-    static func sameSite(_ a: URL, _ b: URL) -> Bool {
-        guard let first = FlixPaths.displayHost(of: a), let second = FlixPaths.displayHost(of: b) else { return false }
-        return FlixSiteExclusions.host(first, isWithin: second) || FlixSiteExclusions.host(second, isWithin: first)
+    /// Whether two cleaned addresses name the same page: the same host (ignoring `www.`), the same
+    /// path (ignoring a trailing slash), and the same kept query. Both come from
+    /// ``FlixURLSanitizer``, so tokens and fragments are already gone.
+    static func samePage(_ a: URL, _ b: URL) -> Bool {
+        guard let first = FlixPaths.displayHost(of: a), let second = FlixPaths.displayHost(of: b), first == second
+        else { return false }
+        func path(_ url: URL) -> String {
+            let path = url.path(percentEncoded: false)
+            return path.count > 1 && path.hasSuffix("/") ? String(path.dropLast()) : (path.isEmpty ? "/" : path)
+        }
+        return path(a) == path(b) && (a.query ?? "") == (b.query ?? "")
     }
 
     /// Flix items were dropped outside while `context`'s app was in front. A normal browser window's

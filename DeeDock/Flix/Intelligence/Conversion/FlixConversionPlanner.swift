@@ -26,6 +26,30 @@ nonisolated enum FlixConversionFormat: String, Codable, Sendable {
     var displayName: String { rawValue.uppercased() }
 }
 
+/// Whether a converted copy can show everything the original holds.
+nonisolated enum FlixConversionFidelity: Equatable, Sendable {
+    /// Safe to convert; `pages` is how many pages a picture becomes (0 for text, laid out later).
+    case faithful(pages: Int)
+    /// The copy would leave something out, so the original is sent instead.
+    case declined(Reason)
+
+    enum Reason: Equatable, Sendable {
+        /// An animation, which a PDF or a still picture cannot show.
+        case animation
+        /// Several pages for a format that holds one (JPEG, PNG).
+        case multiplePages
+        /// More pages than a copy is made for.
+        case tooManyPages
+        /// Pictures or other attachments the text export does not draw.
+        case attachments
+        /// Pictures, objects, headers, or footers the importer drops.
+        case unsupportedParts
+        case unreadable
+    }
+
+    var isFaithful: Bool { if case .faithful = self { true } else { false } }
+}
+
 /// How to make one file acceptable to the window in front.
 nonisolated struct FlixConversionRecipe: Hashable, Sendable {
     var format: FlixConversionFormat
@@ -51,11 +75,18 @@ nonisolated enum FlixConversionDecision: Hashable, Sendable {
 ///   accepted, else a JPEG, else a PNG. A picture over the size limit is scaled down (JPEG, or PNG
 ///   when only PNG is accepted).
 /// - Text documents that `NSAttributedString` reads off the main thread (RTF, RTFD, plain text,
-///   Markdown, Word `.docx`/`.doc`, OpenDocument text) become a PDF when PDFs are accepted. HTML and
-///   web archives are not converted: their importer needs the main thread and loads external
-///   resources (`FlixDocumentImport`).
+///   Markdown, Word `.docx`, OpenDocument text) become a PDF when PDFs are accepted. HTML and web
+///   archives are not converted: their importer needs the main thread and loads external resources
+///   (`FlixDocumentImport`). Legacy Word `.doc` is not converted either: its binary format cannot be
+///   checked for pictures or headers the text export would drop.
 /// - Everything else is unconvertible: iWork files (Pages, Numbers, Keynote) and other formats
 ///   need their own app to export, and a PDF or document over the limit cannot be made smaller here.
+///
+/// The type alone cannot say whether a copy would be faithful, so the converter checks the content
+/// before writing one (``picture(frameCount:isAnimated:format:)``, ``text(attachmentCount:)``,
+/// ``documentParts(in:type:)``). When a copy would leave something out — a page of a multi-page
+/// TIFF, a picture in a Word file, a header — it declines, and the original goes out unchanged:
+/// a portal refusing the file is better than one silently receiving less than the person sent.
 nonisolated enum FlixConversionPlanner {
     /// The text types Flix Files imports with `NSAttributedString` off the main thread.
     static let textTypes: [UTType] = [
@@ -99,10 +130,53 @@ nonisolated enum FlixConversionPlanner {
             if demand.accepts(.pdf) { return .convert(FlixConversionRecipe(format: .pdf, maximumBytes: limit)) }
             return .unconvertible
         }
-        if !accepted, isText(type), demand.accepts(.pdf) {
+        if !accepted, isConvertibleText(type), demand.accepts(.pdf) {
             return .convert(FlixConversionRecipe(format: .pdf, maximumBytes: limit))
         }
         return .unconvertible
+    }
+
+    /// Text types read for scanning and captions that are never converted (``isConvertibleText(_:)``).
+    static let unconvertedTextTypes: [UTType] = [UTType("com.microsoft.word.doc")].compactMap { $0 }
+
+    /// The most pages a multi-page picture (TIFF, multi-image HEIC) becomes; more is declined.
+    static let maximumPictureFrames = 30
+
+    /// Whether a converted copy of a picture with `frameCount` frames would show all of it.
+    /// - Parameter isAnimated: The frames are an animation (GIF, animated PNG or WebP, HEIC
+    ///   sequence), which no PDF or still picture can show.
+    static func picture(frameCount: Int, isAnimated: Bool, format: FlixConversionFormat) -> FlixConversionFidelity {
+        guard frameCount > 1 else { return frameCount == 1 ? .faithful(pages: 1) : .declined(.unreadable) }
+        if isAnimated { return .declined(.animation) }
+        guard format == .pdf else { return .declined(.multiplePages) }
+        guard frameCount <= maximumPictureFrames else { return .declined(.tooManyPages) }
+        return .faithful(pages: frameCount)
+    }
+
+    /// Whether the text export keeps everything: attachments (pictures, files, drawings) are not
+    /// drawn by the Core Text layout, so a document with any is declined.
+    static func text(attachmentCount: Int) -> FlixConversionFidelity {
+        attachmentCount == 0 ? .faithful(pages: 0) : .declined(.attachments)
+    }
+
+    /// Whether a flat document holds parts the importer or the text export leaves out, from its raw
+    /// bytes: pictures, embedded objects, and headers or footers. Word and OpenDocument files are
+    /// ZIP archives whose part names are stored uncompressed, so their names are enough; RTF names
+    /// them as control words. Other types (plain text, Markdown) have no such parts.
+    static func documentParts(in data: Data, type: UTType) -> FlixConversionFidelity {
+        let markers: [String]
+        if let docx = UTType("org.openxmlformats.wordprocessingml.document"), type.conforms(to: docx) {
+            markers = ["word/media/", "word/charts/", "word/embeddings/", "word/diagrams/", "word/header",
+                       "word/footer", "word/comments.xml"]
+        } else if let odt = UTType("org.oasis-open.opendocument.text"), type.conforms(to: odt) {
+            markers = ["Pictures/", "Object ", "ObjectReplacements/"]
+        } else if type.conforms(to: .rtf) && !type.conforms(to: .rtfd) {
+            markers = ["\\pict", "\\object", "\\header", "\\footer", "\\shp"]
+        } else {
+            return .faithful(pages: 0)
+        }
+        for marker in markers where data.range(of: Data(marker.utf8)) != nil { return .declined(.unsupportedParts) }
+        return .faithful(pages: 0)
     }
 
     static func isImage(_ type: UTType) -> Bool {
@@ -112,6 +186,11 @@ nonisolated enum FlixConversionPlanner {
     static func isText(_ type: UTType) -> Bool {
         guard !type.conforms(to: .html), !type.conforms(to: .webArchive) else { return false }
         return textTypes.contains { type.conforms(to: $0) }
+    }
+
+    /// Text types the converter turns into a PDF: ``isText(_:)`` without legacy Word.
+    static func isConvertibleText(_ type: UTType) -> Bool {
+        isText(type) && !unconvertedTextTypes.contains { type.conforms(to: $0) }
     }
 
     /// The copy's file name: the original's name with the new extension ("Scan.heic" → "Scan.pdf").

@@ -1,13 +1,20 @@
 import Foundation
 
-/// Which file sits at a path, so Undo moves back the file Flix Files moved and never one that took
-/// its place.
+/// Which file sits at a path, so a command acts on the file a row lists, and Undo moves back the file
+/// Flix Files moved, never one that took its place.
 ///
 /// Read with `lstat` (a link is described, not followed): the volume and inode, which a move within
 /// a volume keeps and nothing else shares, and for files also the size and modification time, so a
 /// file that was replaced in place, or rewritten after the move, no longer matches. A folder is
 /// matched by volume and inode only, because adding a file to it changes its own dates.
-nonisolated struct FlixFileIdentity: Equatable, Sendable {
+///
+/// History items carry one (`FlixItem.fileIdentity`), recorded with the event that saw the file or
+/// captured in the background soon after, and every destructive command (Trash, Move, Rename,
+/// Tidy, a ✦ suggestion, a drop on a folder favorite) compares it with what is at the path right
+/// before it acts (``FlixFileOperations/check(_:)``). An app saving with a safe save replaces the
+/// file, so an edited file no longer matches: the command refuses once, the row takes the new
+/// identity, and doing it again acts on the file as it is now.
+nonisolated struct FlixFileIdentity: Codable, Hashable, Sendable {
     var device: Int64
     var inode: UInt64
     var isDirectory: Bool
@@ -40,15 +47,27 @@ nonisolated struct FlixFileMove: Sendable {
     var identity: FlixFileIdentity?
 }
 
+/// A file whose row no longer describes what is at its path: the identity changed, or the row had
+/// none yet. The command left it alone; `current` is what is there now (nil when nothing is).
+nonisolated struct FlixStaleFile: Sendable {
+    var item: FlixItem
+    var current: FlixFileIdentity?
+    /// The row had no identity yet, so Flix Files could not tell whether the file changed.
+    var wasUnchecked: Bool
+}
+
 /// The outcome of moving several files: each one moved, or why not.
 nonisolated struct FlixMoveReport: Sendable {
     var moved: [FlixFileMove] = []
     /// Items that stayed where they were, with the reason.
     var failed: [(item: FlixItem, message: String)] = []
+    /// Items left alone because the file at their path is not the one the row lists.
+    var stale: [FlixStaleFile] = []
 }
 
 /// The outcome of an Undo: what went back, and what was left alone because it changed or moved.
 nonisolated struct FlixUndoReport: Sendable {
-    var restored: [(item: FlixItem, url: URL)] = []
+    /// Files put back, with their identity (a move keeps it, so it is the one recorded after the move).
+    var restored: [(item: FlixItem, url: URL, identity: FlixFileIdentity?)] = []
     var skipped: [FlixFileMove] = []
 }

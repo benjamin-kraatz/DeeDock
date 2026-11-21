@@ -70,7 +70,7 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             : []
 
         let readable = recent.compactMap(\.path).filter(policy.canRead)
-        let stamps = await FlixContentReader.stamps(readable)
+        let stamps = await FlixContentReader.stamps(readable, policy: policy)
         guard !Task.isCancelled else { return [:] }
 
         var result: [FlixItem.ID: FlixItemAnnotation] = [:]
@@ -146,7 +146,7 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             guard services.settings.isEnabled else { break }
             guard services.settings.writesCaptions, let item = services.item(id), let path = item.path,
                   services.readPolicy.canRead(path),
-                  let stamp = await FlixContentReader.stamps([path])[path] else { continue }
+                  let stamp = await FlixContentReader.stamps([path], policy: services.readPolicy)[path] else { continue }
             guard needsAnalysis(item, record: services.analyses[path], stamp: stamp) else {
                 // Read meanwhile (an earlier pass queued it twice): the cached analysis stands.
                 Analytics.count(.aiCacheHits)

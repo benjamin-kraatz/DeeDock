@@ -3826,3 +3826,39 @@ Fixes for the cross-model review of PR #432, on the same branch. Details in [FLI
 - [ ] Clear History, quit, and relaunch: the files you opened before the clear do not reappear.
 - [ ] Switch quickly between a hung app and others: the dock stays responsive.
 
+### Review fixes (R2)
+
+Fixes for the second cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- Trash, Move, Rename, Tidy, **✦ Move to …**, and drops on folder favorites check that the file at a row's path is still the one the row recorded (`FlixItem.fileIdentity`: volume and inode, plus size and modification time for files). A replaced, re-saved, or missing file is left alone, its row refreshed, and a toast says so; a row without an identity yet is checked and refused once. Identities come with the folder watcher's events and from a background pass for everything else.
+- Moves, renames, Tidy, Undo, and the Trash's identity check run on a serial background worker (`FlixFileWorker`) in order; results are applied to the history on the main actor. A slow move shows "Moving …".
+- Upload conversions never leave content out: multi-page TIFF and HEIC files become one PDF page per frame (up to 30); animations, multi-frame pictures for JPEG or PNG, and text documents with attachments, pictures, embedded objects, headers, or footers are declined and go out unchanged. Legacy `.doc` files are no longer converted.
+- A download's full page reaches its file row only after the link tracker verified it: a normal window of an automatic-tracking browser showed that very page (not just the same site) when the download arrived. Pages stored without that verification are scrubbed to their host at launch.
+- The browser walk keeps each Accessibility read's status: a failed role, label, or child-list read in the toolbar, a web area inside it, an expired walk, or an unreadable window title makes the window's privacy unknown. Toolbar labels are no longer dropped by the label cap.
+- Invitation, meeting, short-link, and share-secret addresses are never stored (`FlixShareLinkDenylist`, best-effort): Discord, Telegram, WhatsApp, Signal, Zoom, Meet, Teams, Slack, Calendly, URL shorteners, WeTransfer, DocSend, OneDrive and Drive shares, iCloud shares, Box, Dropbox, MEGA, Notion sites, SharePoint sharing links.
+- A drag of a flagged file always asks first, whichever app is in front (also Finder), with the 30-second grace after an answer and **Not Sensitive**. The Settings help says so.
+- Protected folders are compared case- and normalization-insensitively. Background reads re-check the policy when they open a file (`FlixSafeFile`: resolved again, opened with `O_NOFOLLOW_ANY`, checked by real path, FIFOs refused) and decode the checked descriptor; thumbnails, icons, stamps, and listings use the path resolved right before the call; the folder watcher re-checks every event path.
+- Hub Files (panes, sidebar, picture search), Hub Apps, and Vapor map converted upload copies back to the originals before anything is moved, copied, adopted, or deleted.
+- Spotlight's gathers and updates and the folder watcher's batches merge in one pass (`record(batch:)`), with the same result as merging each event. The sensitive guard reports cached verdicts without touching the disk.
+- While Flix Files is off the tile reads nothing and requests no thumbnail; turning it off cancels the thumbnail request, and turning it on refreshes the tile.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R2`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixFileCommandSafetyTests` (identity-checked move, rename, Trash, Tidy, the identity pass, history identity rules, the worker), `FlixHistoryBatchTests` (batch merge equals sequential merging; capacity; verified download pages and the migration), `FlixConversionFidelityTests` (planner decisions; a three-page TIFF, a GIF, an RTFD with an attachment, an RTF with a picture), `FlixShareLinkDenylistTests`, `FlixSafeReadTests` (case aliases, link swaps after queueing, FIFOs), `FlixGatingTests` (the sensitive question with Finder in front, the tile while off), and additions to `FlixLinkRulesTests` (toolbar read failures, expiry, many tabs, title read failure) and `FlixFileSafetyTests`.
+- The drop-site mapping for Hub Files, Hub Apps, and Vapor needs a live drag and has no unit test.
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] Download `Invoice.pdf`, then download another file with the same name so it replaces the first (or replace it in Finder). Move to Trash on the old row: nothing is trashed, the toast says it changed, and a second Move to Trash trashes the new file.
+- [ ] Edit a listed document in TextEdit and save, then rename it from Flix Files: the first attempt is refused with the "changed" toast, the second renames it.
+- [ ] Move a large folder to a favorite on an external or network disk: the dock and panel stay responsive, "Moving …" shows, and Undo afterwards puts it back.
+- [ ] Drag a three-page TIFF onto a PDF-only upload form: the PDF copy has three pages. Drag a Word file with a picture or a header onto it: no "Upload as PDF" label, and the original goes out.
+- [ ] With web links on, download a file from a normal Chrome window, then switch to another tab of the same site before the download finishes: the row says "Downloaded from <host>", no "Source of" link row appears, and `history.json` holds no page address.
+- [ ] Save a Zoom, Meet, Discord, or bit.ly page with **Save this page**: nothing is kept.
+- [ ] Mark a file as sensitive (a `.pem` key), open Flix Files with Finder in front, and drag it to the Desktop: the question appears.
+- [ ] Drag a converted Fits row into Hub Files, onto the Hub Apps tab, and onto Vapor: each gets the original.
+- [ ] Turn Flix Files off: the tile disappears and no Quick Look thumbnail is requested (no `quicklookd` activity for the newest file); turn it on: the tile shows the newest item again.

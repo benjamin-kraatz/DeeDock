@@ -84,22 +84,33 @@ extension FlixPanelState {
     }
 
     /// Moves files to the Trash. Undo is Finder's Put Back, so the toast offers none.
+    ///
+    /// The file worker first checks each file is still the one its row lists; one that changed is
+    /// left alone, its row refreshed, and the toast says so (``reportStale(_:)``).
     func trash(_ items: [FlixItem]? = nil) {
         let items = (items ?? selectedItems).filter { $0.url != nil }
         guard !items.isEmpty else { return }
         reportAction(.trash, items, origin: nil)
-        let message = String(localized: .flixToastTrashed(label(for: items)))
         Task { [weak self] in
+            let checked = await FlixFileWorker.shared.run { FlixFileOperations.trashable(items) }
+            guard let self else { return }
+            refreshStale(checked.stale)
+            guard !checked.ready.isEmpty else {
+                showToast(staleMessage(checked.stale))
+                return
+            }
             do {
-                _ = try await FlixFileActions.trash(items)
-                guard let self else { return }
-                let next = rowAfterRemoving(Set(items.map(\.id)))
-                history.forget(Set(items.map(\.id)))
+                _ = try await FlixFileActions.trash(checked.ready)
+                let ids = Set(checked.ready.map(\.id))
+                let next = rowAfterRemoving(ids)
+                history.forget(ids)
                 selection = next.map { [$0] } ?? []
                 cursor = next
+                var message = String(localized: .flixToastTrashed(label(for: checked.ready)))
+                if !checked.stale.isEmpty { message += " " + staleMessage(checked.stale) }
                 showToast(message)
             } catch {
-                self?.showToast(error.localizedDescription)
+                showToast(error.localizedDescription)
             }
         }
     }
@@ -119,54 +130,132 @@ extension FlixPanelState {
     /// Moves files into a folder, with Undo for the ones that moved. Their history entries follow
     /// them; a file that could not be moved keeps its entry, and the toast says so. `undone` runs
     /// when the toast's Undo is pressed.
+    ///
+    /// The move runs on the file worker, off the main actor, after checking each file is still the
+    /// one its row lists. A move that takes a moment (another volume, a network share) shows a
+    /// "Moving…" toast until it finishes.
     func move(_ items: [FlixItem], into folder: URL, undone: (() -> Void)? = nil) {
-        let report = FlixFileActions.move(items, into: folder)
+        let files = items.filter { $0.url != nil }
+        guard !files.isEmpty else { return }
+        let progress = showProgressSoon(String(localized: .flixToastMoving(label(for: files))))
+        Task { [weak self] in
+            let report = await FlixFileWorker.shared.run { FlixFileOperations.move(files, into: folder) }
+            progress.cancel()
+            self?.finishMove(report, into: folder, undone: undone)
+        }
+    }
+
+    private func finishMove(_ report: FlixMoveReport, into folder: URL, undone: (() -> Void)?) {
+        for move in report.moved {
+            history.relocate(move.item.id, to: move.to.path, name: move.to.lastPathComponent, identity: move.identity)
+        }
         let failedLabel = report.failed.isEmpty ? nil : label(for: report.failed.map(\.item))
         guard !report.moved.isEmpty else {
-            if report.failed.count == 1 { showToast(report.failed[0].message) }
+            if !report.stale.isEmpty { reportStale(report.stale) }
+            else if report.failed.count == 1 { showToast(report.failed[0].message) }
             else if let failedLabel { showToast(String(localized: .flixToastNotMoved(failedLabel))) }
+            else { clearProgressToast() }
             return
         }
+        refreshStale(report.stale)
         let movedItems = report.moved.map(\.item)
         reportAction(.other, movedItems, origin: nil)
-        for move in report.moved { history.relocate(move.item.id, to: move.to.path, name: move.to.lastPathComponent) }
         let folderName = FileManager.default.displayName(atPath: folder.path)
         var message = String(localized: .flixToastMoved(label(for: movedItems), folderName))
         if let failedLabel { message += " " + String(localized: .flixToastNotMoved(failedLabel)) }
+        if !report.stale.isEmpty { message += " " + staleMessage(report.stale) }
         showToast(message) { [weak self] in
             undone?()
             self?.undoMoves(report.moved)
         }
     }
 
-    /// Renames one file, with Undo. `undone` runs when the toast's Undo is pressed.
+    /// Renames one file, with Undo. `undone` runs when the toast's Undo is pressed. Runs on the file
+    /// worker after checking the file is still the one the row lists.
     func rename(_ item: FlixItem, to name: String, undone: (() -> Void)? = nil) {
-        do {
-            guard let rename = try FlixFileActions.rename(item, to: name) else { return }
-            reportAction(.other, [item], origin: nil)
-            history.relocate(item.id, to: rename.to.path, name: rename.to.lastPathComponent)
-            showToast(String(localized: .flixToastRenamed(rename.to.lastPathComponent))) { [weak self] in
-                undone?()
-                self?.undoMoves([rename])
+        guard item.url != nil else { return }
+        Task { [weak self] in
+            let outcome = await FlixFileWorker.shared.run { FlixFileOperations.rename(item, to: name) }
+            guard let self else { return }
+            switch outcome {
+            case .renamed(let rename):
+                reportAction(.other, [item], origin: nil)
+                history.relocate(item.id, to: rename.to.path, name: rename.to.lastPathComponent, identity: rename.identity)
+                showToast(String(localized: .flixToastRenamed(rename.to.lastPathComponent))) { [weak self] in
+                    undone?()
+                    self?.undoMoves([rename])
+                }
+            case .stale(let stale):
+                reportStale([stale])
+            case .failed(let message):
+                showToast(message)
             }
-        } catch {
-            showToast(error.localizedDescription)
         }
     }
 
     /// Puts moved or renamed files back and points their history entries at them again. A file
     /// that changed, moved, or was replaced since stays put with its entry unchanged, and a toast
-    /// names it.
+    /// names it. Runs on the file worker, behind the move it undoes.
     func undoMoves(_ moves: [FlixFileMove]) {
         // Only a move whose history entry still points at the moved file is undone; anything the
         // person moved again inside Flix Files since is left alone.
         let current = moves.filter { history.item($0.item.id)?.path == FlixPaths.standardized($0.to.path) }
-        let report = FlixFileActions.moveBack(current)
-        for restored in report.restored {
-            history.relocate(restored.item.id, to: restored.url.path, name: restored.url.lastPathComponent)
+        let elsewhere = moves.filter { move in !current.contains { $0.to == move.to } }.map(\.item)
+        Task { [weak self] in
+            let report = await FlixFileWorker.shared.run { FlixFileOperations.moveBack(current) }
+            guard let self else { return }
+            for restored in report.restored {
+                history.relocate(restored.item.id, to: restored.url.path, name: restored.url.lastPathComponent,
+                                 identity: restored.identity)
+            }
+            let skipped = report.skipped.map(\.item) + elsewhere
+            if !skipped.isEmpty { showToast(String(localized: .flixToastUndoSkipped(label(for: skipped)))) }
         }
-        let skipped = report.skipped.map(\.item) + moves.filter { move in !current.contains { $0.to == move.to } }.map(\.item)
-        if !skipped.isEmpty { showToast(String(localized: .flixToastUndoSkipped(label(for: skipped)))) }
+    }
+
+    // MARK: Changed files
+
+    /// Files a command left alone because they are not what their rows list: refreshes the rows and
+    /// says so in a toast.
+    func reportStale(_ stale: [FlixStaleFile]) {
+        guard !stale.isEmpty else { return }
+        refreshStale(stale)
+        showToast(staleMessage(stale))
+    }
+
+    /// Refreshes rows whose files changed: a row whose file is gone leaves the history (as after the
+    /// Trash); any other takes the identity of what is there now, so the next command acts on it.
+    private func refreshStale(_ stale: [FlixStaleFile]) {
+        let gone = Set(stale.filter { $0.current == nil }.map(\.item.id))
+        if !gone.isEmpty { history.forget(gone) }
+        history.setIdentities(stale.compactMap { entry in
+            guard entry.current != nil, let path = entry.item.path else { return nil }
+            return (entry.item.id, path, entry.current)
+        })
+    }
+
+    private func staleMessage(_ stale: [FlixStaleFile]) -> String {
+        let named = label(for: stale.map(\.item))
+        return stale.allSatisfy(\.wasUnchecked) ? String(localized: .flixToastNotCheckedYet(named))
+            : String(localized: .flixToastChangedSince(named))
+    }
+
+    /// Shows `message` as a toast if the work it describes is still running after a moment, so a
+    /// quick move shows only its result. Cancel the returned task when the work ends.
+    private func showProgressSoon(_ message: String) -> Task<Void, Never> {
+        Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard let self, !Task.isCancelled else { return }
+            showToast(message)
+            progressToastID = toast?.id
+        }
+    }
+
+    /// Hides the "Moving…" toast when the work finished with nothing to report.
+    private func clearProgressToast() {
+        guard let id = progressToastID, toast?.id == id else { return }
+        toast = nil
+        progressToastID = nil
     }
 
     /// Opens files with an app, for a drop on an app favorite.
@@ -182,13 +271,15 @@ extension FlixPanelState {
         var kept = 0
         for url in files where url.isFileURL {
             let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey, .contentTypeKey, .localizedNameKey])
+            // The person handed this file over, so reading what it is now is theirs to ask for.
             history.record(FlixActivityEvent(path: url.path, name: values?.localizedName ?? url.lastPathComponent,
                                              kind: FlixItemKind.classify(contentType: values?.contentType,
                                                                          isDirectory: values?.isDirectory == true,
                                                                          isPackage: values?.isPackage == true,
                                                                          isScreenshot: false),
                                              activity: .kept, date: now,
-                                             contentTypeIdentifier: values?.contentType?.identifier))
+                                             contentTypeIdentifier: values?.contentType?.identifier,
+                                             fileIdentity: FlixFileIdentity.of(url)))
             kept += 1
         }
         for original in links where !original.isFileURL {
@@ -256,42 +347,51 @@ extension FlixPanelState {
         sheet = .tidy
     }
 
-    /// Applies the checked Tidy suggestions with one Undo.
+    /// Applies the checked Tidy suggestions with one Undo, on the file worker. Each file is checked
+    /// once before its rename and move; one that changed is left alone and named in the toast.
     func applyTidy(_ suggestions: [FlixTidySuggestion]) {
         let shown = intelligence.tidy.filter { history.item($0.itemID) != nil }
         var report = AnalyticsFlixTidy(shownMoves: shown.count { $0.moveTo != nil },
                                        shownRenames: shown.count { $0.rename != nil })
         report.unchecked = max(0, shown.count - suggestions.count)
+        tidyApplied = true
+        sheet = nil
+        let work = suggestions.compactMap { suggestion in
+            history.item(suggestion.itemID).map { (item: $0, rename: suggestion.rename, moveTo: suggestion.moveTo) }
+        }
+        let progress = showProgressSoon(String(localized: .flixToastTidying))
+        Task { [weak self] in
+            let outcomes = await FlixFileWorker.shared.run {
+                work.map { FlixFileOperations.tidy($0.item, rename: $0.rename, moveTo: $0.moveTo) }
+            }
+            progress.cancel()
+            self?.finishTidy(outcomes, report: report)
+        }
+    }
+
+    private func finishTidy(_ outcomes: [FlixFileOperations.TidyOutcome], report: AnalyticsFlixTidy) {
+        var report = report
         // One combined move per file, from where it was to where Tidy left it, so Undo checks the
         // file's identity once and puts it straight back.
         var undo: [FlixFileMove] = []
-        for suggestion in suggestions {
-            guard var item = history.item(suggestion.itemID), let original = item.url else { continue }
-            let before = item
-            var last: FlixFileMove?
-            if let name = suggestion.rename, let renamed = try? FlixFileActions.rename(item, to: name) {
-                history.relocate(item.id, to: renamed.to.path, name: renamed.to.lastPathComponent)
-                item.path = renamed.to.path
-                last = renamed
-                report.appliedRenames += 1
+        for outcome in outcomes {
+            if outcome.renamed != nil { report.appliedRenames += 1 }
+            if outcome.moved != nil { report.appliedMoves += 1 }
+            if let last = outcome.moved ?? outcome.renamed {
+                history.relocate(outcome.itemID, to: last.to.path, name: last.to.lastPathComponent, identity: last.identity)
             }
-            if let folder = suggestion.moveTo,
-               let move = FlixFileActions.move([item], into: URL(fileURLWithPath: folder)).moved.first {
-                history.relocate(item.id, to: move.to.path, name: move.to.lastPathComponent)
-                last = move
-                report.appliedMoves += 1
-            }
-            if let last, last.to != original {
-                undo.append(FlixFileMove(item: before, from: original, to: last.to, identity: last.identity))
-            }
+            if let move = outcome.undo { undo.append(move) }
         }
-        tidyApplied = true
-        sheet = nil
+        let stale = outcomes.compactMap(\.stale)
+        refreshStale(stale)
         guard !undo.isEmpty else {
             Analytics.track(.flixTidy(report))
+            if !stale.isEmpty { showToast(staleMessage(stale)) } else { clearProgressToast() }
             return
         }
-        showToast(String(localized: .flixToastTidied(undo.count))) { [weak self] in self?.undoMoves(undo) }
+        var message = String(localized: .flixToastTidied(undo.count))
+        if !stale.isEmpty { message += " " + staleMessage(stale) }
+        showToast(message) { [weak self] in self?.undoMoves(undo) }
         // After the toast: Undo, a newer toast, or its timeout settles it (`settleTidy(undone:)`).
         pendingTidy = report
     }

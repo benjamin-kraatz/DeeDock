@@ -72,11 +72,11 @@ final class FlixHistory {
         saveHistory()
     }
 
-    /// Merges a batch with one save, for Spotlight's first gather.
+    /// Merges a batch with one sort, one capacity pass, and one save: Spotlight's gather and
+    /// updates, and the folder watcher's coalesced batches (``FlixHistoryDocument/record(batch:)``).
     func record(_ events: [FlixActivityEvent]) {
-        var changed = false
-        for event in events where document.record(event) { changed = true }
-        if changed { saveHistory() }
+        guard document.record(batch: events) else { return }
+        saveHistory()
     }
 
     func item(_ id: FlixItem.ID) -> FlixItem? { document.items.first { $0.id == id } }
@@ -109,8 +109,25 @@ final class FlixHistory {
         saveHistory()
     }
 
-    func relocate(_ id: FlixItem.ID, to path: String, name: String) {
-        document.relocate(id, to: path, name: name)
+    func relocate(_ id: FlixItem.ID, to path: String, name: String, identity: FlixFileIdentity?) {
+        document.relocate(id, to: path, name: name, identity: identity)
+        saveHistory()
+    }
+
+    /// Stores file identities by item, each only while the item still has the path it was read
+    /// for. See ``FlixHistoryDocument/setIdentity(_:for:path:)``.
+    func setIdentities(_ identities: [(id: FlixItem.ID, path: String, identity: FlixFileIdentity?)]) {
+        var changed = false
+        for entry in identities where document.setIdentity(entry.identity, for: entry.id, path: entry.path) {
+            changed = true
+        }
+        if changed { saveHistory() }
+    }
+
+    /// Stores a verified download page on a file's row. See
+    /// ``FlixHistoryDocument/attachVerifiedSource(_:toPath:)``.
+    func attachVerifiedSource(_ page: URL, toPath path: String) {
+        guard document.attachVerifiedSource(page, toPath: path) else { return }
         saveHistory()
     }
 
