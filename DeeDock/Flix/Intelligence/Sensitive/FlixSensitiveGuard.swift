@@ -13,6 +13,12 @@ nonisolated struct FlixSensitiveDocument: Codable, Sendable {
     var entries: [String: Entry] = [:]
     /// Paths marked **Not Sensitive**. They stay unmarked even when the file changes.
     var cleared: Set<String> = []
+    /// The rules the verdicts were made with; nil in files from before versions existed.
+    var version: Int? = FlixSensitiveDocument.currentVersion
+
+    /// Bump when the rules change, so every file is checked again (``cleared`` is kept).
+    /// 2: invoices and receipts are no longer flagged for the bank details they print.
+    static let currentVersion = 2
 
     /// Keeps the file bounded. Past this many entries, clean verdicts are dropped (in no particular
     /// order) and sensitive ones kept; a dropped file is simply checked again when it shows up.
@@ -205,7 +211,13 @@ final class FlixSensitiveGuard {
         guard !loaded else { return }
         loaded = true
         do {
-            if let saved = try file?.load() { document = saved }
+            if var saved = try file?.load() {
+                if saved.version != FlixSensitiveDocument.currentVersion {
+                    saved.entries = [:]
+                    saved.version = FlixSensitiveDocument.currentVersion
+                }
+                document = saved
+            }
         } catch {
             file?.quarantine()
         }

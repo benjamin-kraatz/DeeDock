@@ -26,7 +26,11 @@ nonisolated enum FlixSensitiveKind: String, Codable, Sendable {
 ///   "Personalausweis", "Staatsangehörigkeit", …). One word alone is common in ordinary mail.
 /// - **Bank details**: an IBAN that passes its mod-97 check, or two of the bank words ("account
 ///   number", "routing number", "sort code", "BIC", "SWIFT", "Kontonummer", "BLZ", …), or a card
-///   number that passes the Luhn check next to "card".
+///   number that passes the Luhn check next to "card". Invoices, receipts, quotes, and reminders
+///   (``paymentWords``) are not flagged for an IBAN or bank words: they print the seller's account
+///   to be paid, or the customer's masked mandate, and are made to be passed on (to an accountant,
+///   to an expense report). Statements of an account (``accountWords``) still are, and so is a
+///   card number anywhere.
 /// - **Secrets**: PEM blocks (`-----BEGIN … PRIVATE KEY-----`, `BEGIN CERTIFICATE`), OpenSSH and PGP
 ///   private keys, and files whose extension is a key or password store (`.pem`, `.key`, `.p12`,
 ///   `.pfx`, `.kdbx`, `.keychain-db`, `.ovpn`, `.asc`, `.gpg`, `.ppk`…) or whose name is a password
@@ -51,6 +55,18 @@ nonisolated enum FlixSensitiveRules {
         "kontonummer", "bankleitzahl", "blz", "kontoinhaber", "card number", "cvv", "kartennummer",
     ]
 
+    /// Documents that ask for or confirm a payment. Matched anywhere, so "Stromrechnung" counts.
+    static let paymentWords = [
+        "rechnung", "invoice", "receipt", "quittung", "angebot", "quote", "kostenvoranschlag", "mahnung",
+        "zahlungserinnerung", "payment reminder", "auftragsbestätigung", "order confirmation", "gutschrift", "credit note",
+    ]
+    /// Documents about one's own account, which stay sensitive even when they read like a bill
+    /// ("Kreditkartenabrechnung" contains "rechnung").
+    static let accountWords = [
+        "kontoauszug", "bank statement", "account statement", "kontostand", "kreditkartenabrechnung", "card statement",
+        "depotauszug", "kontoeröffnung", "account details", "kontodaten",
+    ]
+
     /// The verdict from a file's name alone, before anything is read.
     static func kind(forFileName name: String) -> FlixSensitiveKind? {
         let lower = name.lowercased()
@@ -67,8 +83,11 @@ nonisolated enum FlixSensitiveRules {
         if containsMRZ(text) { return .identity }
         let lower = text.lowercased()
         if identityWords.filter({ lower.contains($0) }).count >= 2 { return .identity }
-        if containsValidIBAN(text) { return .bank }
-        if bankWords.filter({ containsWord($0, in: lower) }).count >= 2 { return .bank }
+        let asksForPayment = paymentWords.contains(where: lower.contains) && !accountWords.contains(where: lower.contains)
+        if !asksForPayment {
+            if containsValidIBAN(text) { return .bank }
+            if bankWords.filter({ containsWord($0, in: lower) }).count >= 2 { return .bank }
+        }
         if lower.contains("card"), containsCardNumber(text) { return .bank }
         return nil
     }

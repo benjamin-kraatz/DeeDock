@@ -194,7 +194,9 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             FlixFact(text: String(localized: .flixFactValidUntil(date.formatted(.dateTime.month(.abbreviated).day()))),
                      style: .due, help: String(localized: .flixFactHelpValidUntil))
         case .amount(let value, let currency):
-            FlixFact(text: value.formatted(.currency(code: currency).precision(.fractionLength(0...2))), style: .money,
+            // Whole amounts without cents ("€1,240"), others with both digits ("14,90 €", not "14,9 €").
+            FlixFact(text: value.formatted(.currency(code: currency)
+                         .precision(.fractionLength(value.rounded() == value ? 0...0 : 2...2))), style: .money,
                      help: String(localized: .flixFactHelpAmount))
         case .pages(let count): FlixFact(text: String(localized: .flixFactPages(count)), help: String(localized: .flixFactHelpPages))
         case .slides(let count):

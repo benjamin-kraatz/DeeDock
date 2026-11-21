@@ -102,6 +102,8 @@ struct FlixConversionAndSensitiveTests {
     @Test func validIBANsAreBankDetails() {
         #expect(FlixSensitiveRules.kind(forText: "Please pay to DE89 3704 0044 0532 0130 00 by Friday") == .bank)
         #expect(FlixSensitiveRules.kind(forText: "IBAN: GB82WEST12345698765432") == .bank)
+        // An invoice prints the account to pay; that alone doesn't make it sensitive.
+        #expect(FlixSensitiveRules.kind(forText: "Rechnung 4711\nIBAN DE89 3704 0044 0532 0130 00\nBIC COBADEFFXXX") == nil)
         // Same shape, wrong check digits.
         #expect(!FlixSensitiveRules.containsValidIBAN("Order DE00 3704 0044 0532 0130 00"))
     }
