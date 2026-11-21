@@ -188,17 +188,22 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
     static func fact(_ value: FlixFactValue) -> FlixFact {
         switch value {
         case .due(let date):
-            FlixFact(text: String(localized: .flixFactDue(date.formatted(.dateTime.month(.abbreviated).day()))), style: .due)
+            FlixFact(text: String(localized: .flixFactDue(date.formatted(.dateTime.month(.abbreviated).day()))), style: .due,
+                     help: String(localized: .flixFactHelpDue))
         case .validUntil(let date):
             FlixFact(text: String(localized: .flixFactValidUntil(date.formatted(.dateTime.month(.abbreviated).day()))),
-                     style: .due)
+                     style: .due, help: String(localized: .flixFactHelpValidUntil))
         case .amount(let value, let currency):
-            FlixFact(text: value.formatted(.currency(code: currency).precision(.fractionLength(0...2))), style: .money)
-        case .pages(let count): FlixFact(text: String(localized: .flixFactPages(count)))
-        case .slides(let count): FlixFact(text: String(localized: .flixFactSlides(count)))
-        case .needsSignature: FlixFact(text: String(localized: .flixFactNeedsSignature), style: .signature)
-        case .signed: FlixFact(text: String(localized: .flixFactSigned), style: .money)
-        case .paid: FlixFact(text: String(localized: .flixFactPaid))
+            FlixFact(text: value.formatted(.currency(code: currency).precision(.fractionLength(0...2))), style: .money,
+                     help: String(localized: .flixFactHelpAmount))
+        case .pages(let count): FlixFact(text: String(localized: .flixFactPages(count)), help: String(localized: .flixFactHelpPages))
+        case .slides(let count):
+            FlixFact(text: String(localized: .flixFactSlides(count)), help: String(localized: .flixFactHelpSlides))
+        case .needsSignature:
+            FlixFact(text: String(localized: .flixFactNeedsSignature), style: .signature,
+                     help: String(localized: .flixFactHelpNeedsSignature))
+        case .signed: FlixFact(text: String(localized: .flixFactSigned), style: .money, help: String(localized: .flixFactHelpSigned))
+        case .paid: FlixFact(text: String(localized: .flixFactPaid), help: String(localized: .flixFactHelpPaid))
         }
     }
 }

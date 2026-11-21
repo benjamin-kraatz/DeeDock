@@ -106,6 +106,8 @@ nonisolated struct FlixFact: Hashable, Sendable {
     nonisolated enum Style: String, Sendable { case plain, due, signature, money }
     var text: String
     var style: Style = .plain
+    /// The chip's tooltip: what the fact is and where it came from.
+    var help: String?
 }
 
 /// What phase B knows about one item. Every field is optional; the row shows what is there.

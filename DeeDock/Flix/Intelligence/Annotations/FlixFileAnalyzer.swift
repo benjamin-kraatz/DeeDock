@@ -32,8 +32,8 @@ nonisolated struct FlixGeneratedPicture {
 /// structured facts for documents that look like they have some.
 ///
 /// The person's files are untrusted data: the instructions say never to follow what they contain,
-/// and model facts are kept only when the text backs them (a total's digits appear in it; a
-/// signature fact needs signature words). Pictures go to the model only when it reads images
+/// and model facts are kept only when the text backs them (``merge(_:with:text:pageCount:isPresentation:)``).
+/// Data and code files (`FlixFactExtractor.readsFacts`) get no facts at all. Pictures go to the model only when it reads images
 /// (`FlixLanguageModel.readsImages`); otherwise screenshots are read with Vision text recognition
 /// first. Main actor for the model call; reading runs off it (`FlixContentReader`).
 @MainActor
@@ -61,13 +61,14 @@ enum FlixFileAnalyzer {
                                                          policy: policy, wantsPicture: isPicture && seesPictures,
                                                          recognizesText: isPicture && !seesPictures) else { return nil }
         var record = FlixAnalysisRecord(stamp: stamp, analyzedAt: now)
-        if !isPicture {
+        let readsFacts = !isPicture && FlixFactExtractor.readsFacts(contentType: item.contentTypeIdentifier, name: item.name)
+        if readsFacts {
             record.facts = FlixFactExtractor.facts(text: content.text, name: item.name, pageCount: content.pageCount,
                                                    isPresentation: content.isPresentation)
         }
         guard useModel, !Task.isCancelled else { return record }
         let hasText = content.text.trimmingCharacters(in: .whitespacesAndNewlines).count >= 40
-        let worthAsking = cryptic || (!isPicture && hasText && looksFactual(item, text: content.text))
+        let worthAsking = cryptic || (readsFacts && hasText && looksFactual(item, text: content.text))
         guard worthAsking, content.image != nil || hasText else { return record }
         record.usedAppleIntelligence = true
         let instructions = """
@@ -98,8 +99,10 @@ enum FlixFileAnalyzer {
                 return record
             }
             (caption, fileName) = (document.caption, document.fileName)
-            record.facts = merge(record.facts, with: document, text: content.text, pageCount: content.pageCount,
-                                 isPresentation: content.isPresentation)
+            if readsFacts {
+                record.facts = merge(record.facts, with: document, text: content.text, pageCount: content.pageCount,
+                                     isPresentation: content.isPresentation)
+            }
         }
         guard cryptic else { return record }
         record.caption = caption.map(clean).flatMap { $0.isEmpty ? nil : String($0.prefix(90)) }
@@ -116,27 +119,32 @@ enum FlixFileAnalyzer {
     private static func looksFactual(_ item: FlixItem, text: String) -> Bool {
         guard item.kind == .document else { return false }
         let folded = (item.name + " " + text.prefix(1_500)).folding(options: [.caseInsensitive, .diacriticInsensitive],
-                                                                   locale: nil)
-        let words = ["invoice", "rechnung", "receipt", "quittung", "quote", "angebot", "contract", "vertrag", "agreement",
-                     "vereinbarung", "due", "fallig", "total", "gesamt", "signature", "unterschrift", "form", "formular"]
-        return words.contains(where: folded.contains)
+                                                                   locale: nil) as NSString
+        let words = ["invoice", "rechnung*", "receipt", "quittung*", "quote", "angebot*", "contract", "vertrag*", "agreement",
+                     "vereinbarung*", "due", "fallig*", "total", "gesamt*", "signature", "unterschrift*", "form", "formular*"]
+        return words.contains { !FlixFactExtractor.wordRanges(of: $0, in: folded).isEmpty }
     }
 
     /// Adds the model's facts that the deterministic pass missed and the text backs.
+    ///
+    /// The model reads dates and numbers everywhere (a timestamp, a size, an order number), so each
+    /// fact needs the text's own evidence: a due date is kept only when the text speaks of one and
+    /// writes that day out; a total only when the text shows that amount with a currency, whose
+    /// currency then wins over the model's.
     static func merge(_ facts: [FlixFactValue], with document: FlixGeneratedDocument, text: String,
                       pageCount: Int?, isPresentation: Bool) -> [FlixFactValue] {
         var facts = facts
         let folded = text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
-        let digits = String(folded.filter(\.isNumber))
+        let calendar = Calendar(identifier: .gregorian)
         if !facts.contains(where: { if case .due = $0 { true } else { false } }), let raw = document.dueDate,
-           let due = isoDay(raw) {
+           let due = isoDay(raw), FlixFactExtractor.mentionsDueDate(text),
+           FlixFactExtractor.dates(in: text, calendar: calendar).contains(where: { calendar.isDate($0.date, inSameDayAs: due) }) {
             facts.insert(.due(due), at: 0)
         }
-        // The model's total is untrusted: only a finite, bounded value is converted to digits.
         if !facts.contains(where: { if case .amount = $0 { true } else { false } }),
            let total = FlixNumbers.amount(document.total),
-           let whole = FlixNumbers.int64(total, in: 0...Int64.max), digits.contains(String(whole)) {
-            facts.append(.amount(total, currency: (document.currency ?? "EUR").uppercased()))
+           let shown = FlixFactExtractor.amounts(in: text).first(where: { abs($0.value - total) < 0.005 }) {
+            facts.append(.amount(shown.value, currency: shown.currency))
         }
         let mentionsSignature = ["sign", "unterschr", "unterzeichn", "signatur"].contains(where: folded.contains)
         if mentionsSignature, !facts.contains(.signed), !facts.contains(.needsSignature) {

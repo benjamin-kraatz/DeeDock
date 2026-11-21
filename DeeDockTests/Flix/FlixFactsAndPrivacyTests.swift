@@ -42,8 +42,18 @@ struct FlixFactsAndPrivacyTests {
                                              currency: "EUR", needsSignature: true, isSigned: false)
         let merged = FlixFileAnalyzer.merge([.pages(3)], with: document, text: "Quote for packaging, 3 options",
                                             pageCount: 3, isPresentation: false)
-        // The due date is taken; the total isn't in the text and no signature is mentioned.
-        #expect(merged == [.due(day(2026, 12, 15)), .pages(3)])
+        // The text names no due date, shows no total, and mentions no signature.
+        #expect(merged == [.pages(3)])
+    }
+
+    /// A data file's timestamp and counts are never a due date and a total (seen on a manifest.json).
+    @Test func numbersAndTimestampsInDataAreNotFacts() {
+        let manifest = #"{"format": 2, "platform": "mac", "modified": "2026-11-21T09:12:00Z", "totalSize": 16581}"#
+        let document = FlixGeneratedDocument(caption: "Manifest", fileName: "Manifest", dueDate: "2026-11-21", total: 16_581,
+                                             currency: "", needsSignature: false, isSigned: false)
+        #expect(FlixFileAnalyzer.merge([], with: document, text: manifest, pageCount: nil, isPresentation: false).isEmpty)
+        #expect(!FlixFactExtractor.readsFacts(contentType: "public.json", name: "manifest.json"))
+        #expect(FlixFactExtractor.readsFacts(contentType: "com.adobe.pdf", name: "Invoice.pdf"))
     }
 
     // MARK: AI observability

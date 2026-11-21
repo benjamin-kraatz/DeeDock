@@ -5161,6 +5161,150 @@
         }
       }
     },
+    "flixFactHelpAmount" : {
+      "comment" : "Flix Files: tooltip on the green amount chip of a row, such as \"€1,240\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtbetrag, aus dem Text der Datei gelesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total amount, read from the file’s text"
+          }
+        }
+      }
+    },
+    "flixFactHelpDue" : {
+      "comment" : "Flix Files: tooltip on the orange \"Due Dec 4\" chip of a row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsfrist, aus dem Text der Datei gelesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment due date, read from the file’s text"
+          }
+        }
+      }
+    },
+    "flixFactHelpNeedsSignature" : {
+      "comment" : "Flix Files: tooltip on the red \"Needs signature\" chip of a row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Text der Datei bittet um eine Unterschrift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file’s text asks for a signature"
+          }
+        }
+      }
+    },
+    "flixFactHelpPages" : {
+      "comment" : "Flix Files: tooltip on the \"12 pages\" chip of a row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Seiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of pages"
+          }
+        }
+      }
+    },
+    "flixFactHelpPaid" : {
+      "comment" : "Flix Files: tooltip on the \"Paid\" chip of a row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laut Text der Datei bereits bezahlt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file’s text says it’s paid"
+          }
+        }
+      }
+    },
+    "flixFactHelpSigned" : {
+      "comment" : "Flix Files: tooltip on the \"Signed\" chip of a row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name oder Text der Datei sagen, dass sie unterschrieben ist"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file’s name or text says it’s signed"
+          }
+        }
+      }
+    },
+    "flixFactHelpSlides" : {
+      "comment" : "Flix Files: tooltip on the \"12 slides\" chip of a presentation's row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Folien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of slides"
+          }
+        }
+      }
+    },
+    "flixFactHelpValidUntil" : {
+      "comment" : "Flix Files: tooltip on the \"Valid until …\" chip of a row (a quote's or offer's expiry).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gültig bis zu diesem Datum, aus dem Text der Datei gelesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valid until this date, read from the file’s text"
+          }
+        }
+      }
+    },
     "flixFactNeedsSignature" : {
       "comment" : "Flix Files: key fact chip on a row, the document asks to be signed.",
       "extractionState" : "manual",

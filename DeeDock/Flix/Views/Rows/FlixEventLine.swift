@@ -45,7 +45,8 @@ struct FlixCompactLabelStyle: LabelStyle {
     }
 }
 
-/// A short fact chip: "Due Dec 4" in orange, "€1,240" in green, "Needs signature" in red.
+/// A short fact chip: "Due Dec 4" in orange, "€1,240" in green, "Needs signature" in red. Its
+/// tooltip says what the fact is and that it was read from the file (``FlixFact/help``).
 struct FlixFactChip: View {
     let fact: FlixFact
     var selected = false
@@ -69,6 +70,7 @@ struct FlixFactChip: View {
             .background(selected ? Color.white.opacity(0.2) : (tint?.opacity(0.15) ?? FlixStyle.chip),
                         in: RoundedRectangle(cornerRadius: FlixStyle.chipRadius, style: .continuous))
             .fixedSize()
+            .help(fact.help ?? "")
     }
 }
 

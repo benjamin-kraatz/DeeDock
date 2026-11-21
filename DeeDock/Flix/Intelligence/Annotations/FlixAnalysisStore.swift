@@ -6,7 +6,8 @@ import Foundation
 /// sent to Apple Intelligence once per version, not on every history pass.
 nonisolated struct FlixAnalysisRecord: Codable, Equatable, Sendable {
     /// Bump to analyze every file again after the analysis changes.
-    static let currentVersion = 1
+    /// 2: no facts from data and code files; key words as whole words; model facts need the text.
+    static let currentVersion = 2
 
     var version = FlixAnalysisRecord.currentVersion
     var stamp: FlixFileStamp

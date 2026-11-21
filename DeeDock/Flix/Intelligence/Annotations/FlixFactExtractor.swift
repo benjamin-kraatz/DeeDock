@@ -1,4 +1,5 @@
 import Foundation
+import UniformTypeIdentifiers
 
 /// One key fact about a file, as data. Persisted in the analysis cache; turned into a localized
 /// chip (`FlixFact`) only when the row draws it, so a language change needs no new analysis.
@@ -16,11 +17,81 @@ nonisolated enum FlixFactValue: Codable, Hashable, Sendable {
 /// Finds key facts in a file's text and metadata without a model: due dates, totals with their
 /// currency, "needs signature" or "signed", "paid", and page or slide counts.
 ///
-/// English and German wording. Deterministic and cheap, so it runs for every readable document;
-/// Apple Intelligence's structured facts (`FlixDocumentAnalysis`) only fill what this leaves out.
+/// English and German wording. Deterministic and cheap, so it runs for every readable document a
+/// person reads (``readsFacts(contentType:name:)``); Apple Intelligence's structured facts
+/// (`FlixFileAnalyzer.merge`) only fill what this leaves out. Key words count only as whole words
+/// (``wordRanges(of:in:)``): "format" is not "form", "totally" is not "total", "residue" is not "due".
+/// German stems end in `*` and match inside words, since German builds compounds around them
+/// ("Stromrechnung", "Gesamtbetrag", "Zahlungsfälligkeit").
 nonisolated enum FlixFactExtractor {
     /// The most chips one row shows.
     static let limit = 3
+
+    /// Whether a file is a document a person reads (a letter, invoice, contract, note, or table),
+    /// not data or code: in JSON, XML, property lists, YAML, logs, configuration, and source code,
+    /// dates are timestamps and numbers are sizes and identifiers, never a due date or a total.
+    ///
+    /// - Parameters:
+    ///   - contentType: The item's uniform type identifier, when known; else the name's extension decides.
+    static func readsFacts(contentType: String?, name: String) -> Bool {
+        let pathExtension = (name as NSString).pathExtension.lowercased()
+        if machineExtensions.contains(pathExtension) { return false }
+        guard let type = contentType.flatMap(UTType.init) ?? UTType(filenameExtension: pathExtension) else { return true }
+        return !machineTypes.contains { type.conforms(to: $0) }
+    }
+
+    private static let machineTypes: [UTType] = [.sourceCode, .script, .json, .xml, .propertyList, .yaml, .log]
+    /// Data and configuration files macOS has no type for.
+    private static let machineExtensions: Set<String> = ["toml", "ini", "cfg", "conf", "env", "lock", "manifest",
+                                                         "jsonl", "ndjson", "geojson", "har", "map"]
+
+    /// Whether the text speaks of a payment due date ("due", "fällig", "zahlbar bis", …), as a whole word.
+    static func mentionsDueDate(_ text: String) -> Bool {
+        let folded = fold(text) as NSString
+        return dueWords.contains { !wordRanges(of: $0, in: folded).isEmpty }
+    }
+
+    /// Where `word` stands in `text` as a whole word: no letter or digit right before it, and none
+    /// right after it unless the word ends in punctuation ("due:"). A word ending in `*` is a stem
+    /// and matches anywhere, inside compounds too ("rechnung*" in "Stromrechnung"). `text` and
+    /// `word` are compared as given, so fold or lowercase both first.
+    static func wordRanges(of word: String, in text: NSString) -> [NSRange] {
+        if word.hasSuffix("*") {
+            let stem = String(word.dropLast())
+            var ranges: [NSRange] = []
+            var search = NSRange(location: 0, length: text.length)
+            while true {
+                let found = text.range(of: stem, options: [], range: search)
+                guard found.location != NSNotFound else { break }
+                ranges.append(found)
+                let end = found.location + found.length
+                search = NSRange(location: end, length: text.length - end)
+            }
+            return ranges
+        }
+        var ranges: [NSRange] = []
+        var search = NSRange(location: 0, length: text.length)
+        let checksEnd = word.last.map { $0.isLetter || $0.isNumber } ?? false
+        while true {
+            let found = text.range(of: word, options: [], range: search)
+            guard found.location != NSNotFound else { break }
+            let end = found.location + found.length
+            let startsWord = found.location == 0 || !isWordCharacter(text.character(at: found.location - 1))
+            let endsWord = !checksEnd || end >= text.length || !isWordCharacter(text.character(at: end))
+            if startsWord && endsWord { ranges.append(found) }
+            search = NSRange(location: end, length: text.length - end)
+        }
+        return ranges
+    }
+
+    private static func isWordCharacter(_ unit: unichar) -> Bool {
+        guard let scalar = Unicode.Scalar(unit) else { return true }
+        return CharacterSet.alphanumerics.contains(scalar)
+    }
+
+    private static func containsWord(_ word: String, in folded: String) -> Bool {
+        !wordRanges(of: word, in: folded as NSString).isEmpty
+    }
 
     /// The facts for one document, most useful first.
     ///
@@ -36,11 +107,12 @@ nonisolated enum FlixFactExtractor {
             facts.append(.amount(total.value, currency: total.currency))
         }
         let foldedName = fold(name)
-        if signedNameWords.contains(where: foldedName.contains) || signedWords.contains(where: folded.contains) {
+        if signedNameWords.contains(where: { containsWord($0, in: foldedName) })
+            || signedWords.contains(where: { containsWord($0, in: folded) }) {
             facts.append(.signed)
-        } else if signatureWords.contains(where: folded.contains) {
+        } else if signatureWords.contains(where: { containsWord($0, in: folded) }) {
             facts.append(.needsSignature)
-        } else if paidWords.contains(where: folded.contains) {
+        } else if paidWords.contains(where: { containsWord($0, in: folded) }) {
             facts.append(.paid)
         }
         if let pageCount, pageCount > 1 { facts.append(isPresentation ? .slides(pageCount) : .pages(pageCount)) }
@@ -53,10 +125,10 @@ nonisolated enum FlixFactExtractor {
     private static let numberPattern = #"(?:\d{1,3}(?:[.,' ]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?)"#
     private static let prefixed = try! NSRegularExpression(pattern: "(\(currencyPattern))\\s?(\(numberPattern))")
     private static let suffixed = try! NSRegularExpression(pattern: "(\(numberPattern))\\s?(\(currencyPattern))(?![A-Za-z])")
-    private static let totalWords = ["total", "gesamt", "summe", "amount due", "balance due", "betrag", "zu zahlen",
-                                     "endbetrag", "grand total", "zahlbetrag"]
-    private static let financialWords = ["invoice", "rechnung", "receipt", "quittung", "quote", "angebot", "bill",
-                                         "beleg", "order", "bestellung", "payment", "zahlung", "kostenvoranschlag",
+    private static let totalWords = ["total", "gesamt*", "summe", "endsumme*", "amount due", "balance due", "betrag*",
+                                     "zu zahlen", "grand total"]
+    private static let financialWords = ["invoice", "rechnung*", "receipt", "quittung*", "quote", "angebot*", "bill",
+                                         "beleg", "order", "bestellung*", "payment", "zahlung*", "kostenvoranschlag*",
                                          "estimate", "statement"]
 
     /// Every money amount in `text` with its ISO currency code and where it sits.
@@ -84,13 +156,9 @@ nonisolated enum FlixFactExtractor {
         let lowered = text.lowercased() as NSString
         var nearTotal: [(value: Double, currency: String, location: Int)] = []
         for word in totalWords {
-            var search = NSRange(location: 0, length: lowered.length)
-            while true {
-                let found = lowered.range(of: word, options: [], range: search)
-                guard found.location != NSNotFound else { break }
+            for found in wordRanges(of: word, in: lowered) {
                 let end = found.location + found.length
                 nearTotal += amounts.filter { $0.location >= end && $0.location - end <= 60 }
-                search = NSRange(location: end, length: lowered.length - end)
             }
         }
         let best = (nearTotal.isEmpty ? amounts : nearTotal).max { $0.value < $1.value }
@@ -126,29 +194,29 @@ nonisolated enum FlixFactExtractor {
 
     private static func looksFinancial(_ folded: String, name: String) -> Bool {
         let foldedName = fold(name)
-        return financialWords.contains { folded.contains($0) || foldedName.contains($0) }
-            || totalWords.contains(where: folded.contains)
+        return financialWords.contains { containsWord($0, in: folded) || containsWord($0, in: foldedName) }
+            || totalWords.contains { containsWord($0, in: folded) }
     }
 
     // MARK: Dates
 
     private static let dueWords = ["payment due", "due date", "due on", "due by", "pay by", "payable by", "due:",
-                                   "fallig am", "fallig bis", "fallig:", "fallig", "zahlbar bis", "zahlungsziel",
-                                   "falligkeitsdatum", "zahlen sie bis", "due"]
+                                   "fallig am*", "fallig bis*", "fallig:*", "falligkeitsdatum*", "falligkeit*", "fallig*",
+                                   "zahlbar bis*", "zahlungsziel*", "zahlen sie bis*", "due"]
     private static let validWords = ["valid until", "valid till", "valid through", "expires on", "expires",
-                                     "gultig bis", "gultigkeit bis", "befristet bis"]
+                                     "gultig bis*", "gultigkeit bis*", "befristet bis*"]
     private static let signatureWords = ["please sign", "sign here", "signature required", "requires your signature",
-                                         "awaiting signature", "for your signature", "bitte unterschreiben",
-                                         "unterschrift erforderlich", "zur unterschrift", "bitte unterzeichnen",
-                                         "bitte unterschrieben zuruck"]
+                                         "awaiting signature", "for your signature", "bitte unterschreiben*",
+                                         "unterschrift erforderlich*", "zur unterschrift*", "bitte unterzeichnen*",
+                                         "bitte unterschrieben zuruck*"]
     /// In the text, only phrases that report a signature already made: "to be signed" or "bitte
     /// unterschrieben zurück" ask for one.
-    private static let signedWords = ["signed by", "electronically signed", "digitally signed", "unterzeichnet von",
-                                      "signiert von", "elektronisch signiert"]
+    private static let signedWords = ["signed by", "electronically signed", "digitally signed", "unterzeichnet von*",
+                                      "signiert von*", "elektronisch signiert*"]
     /// In a file name, the word alone is enough: "Signed contract.pdf", "Vertrag_unterschrieben.pdf".
-    private static let signedNameWords = ["signed", "unterschrieben", "signiert"]
-    private static let paidWords = ["paid in full", "payment received", "status: paid", "already paid", "bereits bezahlt",
-                                    "zahlung erhalten", "betrag erhalten"]
+    private static let signedNameWords = ["signed", "unterschrieben*", "signiert*"]
+    private static let paidWords = ["paid in full", "payment received", "status: paid", "already paid", "bereits bezahlt*",
+                                    "zahlung erhalten*", "betrag erhalten*"]
 
     private static let months: [String: Int] = [
         "january": 1, "jan": 1, "januar": 1, "february": 2, "feb": 2, "februar": 2, "march": 3, "mar": 3, "marz": 3,
@@ -195,13 +263,9 @@ nonisolated enum FlixFactExtractor {
         let dates = dates(in: text)
         guard !dates.isEmpty else { return nil }
         for word in words {
-            var search = NSRange(location: 0, length: folded.length)
-            while true {
-                let found = folded.range(of: word, options: [], range: search)
-                guard found.location != NSNotFound else { break }
+            for found in wordRanges(of: word, in: folded) {
                 let end = found.location + found.length
                 if let date = dates.first(where: { $0.location >= end && $0.location - end <= 50 }) { return date.date }
-                search = NSRange(location: end, length: folded.length - end)
             }
         }
         return nil
