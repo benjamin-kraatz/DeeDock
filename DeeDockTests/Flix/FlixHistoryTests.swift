@@ -30,9 +30,9 @@ struct FlixHistoryTests {
     @Test func olderEventsOnlyFillInDetails() {
         var document = FlixHistoryDocument()
         document.record(event("/a/report.pdf", .opened, at: 50))
-        var older = event("/a/report.pdf", .downloaded, at: 10)
-        older.sourcePage = URL(string: "https://example.com/files")
-        document.record(older)
+        // The host is derived from the page when the event is made, as the download source does.
+        document.record(FlixActivityEvent(path: "/a/report.pdf", name: "report.pdf", kind: .document, activity: .downloaded,
+                                          date: t0.addingTimeInterval(10), sourcePage: URL(string: "https://example.com/files")))
         #expect(document.items.count == 1)
         #expect(document.items[0].activity == .opened)
         #expect(document.items[0].date == t0.addingTimeInterval(50))
