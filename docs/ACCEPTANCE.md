@@ -3928,3 +3928,41 @@ Fixes for the third cross-model review of PR #432, on the same branch. Details i
 - [ ] Drag a `.docx` onto a PDF-only upload form: no "Upload as PDF" label, and the Word file goes out. Drag an RTF with a footnote: likewise. Drag a Markdown file: the PDF shows the Markdown as written, links included.
 - [ ] Open Flix Files while a network share with listed files is disconnecting: the dock and panel stay responsive, rows show type icons, and DOKK does not crash while captions or the sensitive guard read files from it.
 - [ ] Save `https://www.mediafire.com/file/<key>/x.pdf/file` with **Save this page**: nothing is kept.
+
+### Flix Pick (DEE-164)
+
+Built on `codex/dee-163-flix-files` after the approved mockup `docs/mockups/flix-pick.html` (style Tuck, name Flix Pick, both ⌥-click and double-click open). A rail beside other apps' Open and Save pickers lists the files or folders the app most likely wants; click selects in the picker, ⌥-click and double-click also press its default button, and rows drag in. Architecture, routes, ranking, learning, and limits are in [FLIX.md](FLIX.md#flix-pick).
+
+#### Implemented
+
+- Detection of `open-panel` and `save-panel` windows and sheets in the frontmost app with one `AXObserver` on `FlixAXThread`, no polling; DOKK's own pickers and apps under **Not in** are never observed. Nothing is read from any other window beyond its identifier and its children's roles.
+- The routes: already there, listed row (`AXSelectedRows`), Go to Folder (⇧⌘G, `PathTextField`, Return to the HID event tap, after modifiers are released and with the picker's app frontmost and focused; never with Secure Event Input), and confirm (`OKButton`, only after the selection or folder was read back).
+- Ranking from the history, the app's declared document types, Threads, drag memory, and earlier picks; Save pickers list folders.
+- Learning from the picker's close: Flix Pick's own confirm, a press on `OKButton`, or a double-click in the list counts; Cancel never does; keyboard closes are unknown. Stored in `memory.json` with drag memory, capped, cleared by **Forget**.
+- The panel: non-activating, never key, Tuck rail that opens on hover, flips to the picker's left at the screen edge, follows the picker, the ⋯ menu (**Not in**, **Flix Pick Settings…**), Reduce Motion and Reduce Transparency paths, VoiceOver actions on every row.
+- Settings → Flix Files → **Flix Pick**: the switch (on), the Accessibility note, and the hidden apps with **Show Again**.
+- Analytics: `flix_pick_shown`, `flix_pick_used`, `flix_pick_picker_closed`, `flix_pick_disabled_for_app`, and `shows_flix_pick` and `flix_pick_excluded_app_count` in `setting_changed`; categories and counts only ([ANALYTICS.md](ANALYTICS.md#flix-files)).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` (scheme DeeDock, Debug) with an isolated derived-data folder: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix Pick or the files it touched.
+- Two tests in `DeeDockTests/Flix/FlixPickTests.swift` compile, **not run**: the rail flipping to the picker's left at the screen edge, and earlier picks outranking a file opened a minute ago.
+- The app was not launched. Nothing below has been seen on screen.
+
+#### Hands-on acceptance
+
+- [ ] Pages, File › Open: the rail appears to the right of the picker within a moment, its top 8 points below the picker's top, with Pages documents only. Hover opens it with names, coloured reasons, places, and times; leaving closes it.
+- [ ] Click a row whose file is in the folder the picker shows: it is selected without anything flashing. Click one elsewhere: Go to Folder flashes and the file is selected. Pages stays in front, and typing goes to the picker.
+- [ ] ⌥-click and double-click a row: the file opens. Hold ⌥ for a while before letting go: nothing is typed until it is released.
+- [ ] Pages, File › Save (a sheet): folders are listed; click one and the picker goes there with the typed name kept; ⌥-click saves there.
+- [ ] Drag a row into the picker: it goes to the file.
+- [ ] Move the picker by its toolbar: the rail follows. Move it to the right screen edge and reopen it: the rail is on its left and opens away from it.
+- [ ] Open a file through Flix Pick twice, then reopen the picker: the row says **Picked here 2×** in green and moves up. Pick a file in the picker itself with the Open button: it is counted too. Cancel: nothing is counted. **Forget** in Settings clears the counts.
+- [ ] ⋯ › **Not in Pages**: the rail disappears and stays away in Pages; Settings lists Pages with **Show Again**, which brings it back.
+- [ ] Turn off Accessibility for DOKK: no rail anywhere, and the Settings card shows the note. Turn off Flix Pick or Flix Files: no rail.
+- [ ] A password field focused in another app's sheet (Secure Event Input): a click on a row says to drag instead.
+- [ ] Switch away from the app with the picker open: the rail hides, and comes back when you return. Change the display arrangement: it hides.
+- [ ] Reduce Motion: the rail fades in and opens without a slide or spring. Reduce Transparency: a solid panel. VoiceOver: each row reads its name, reason, and place, and offers Select in Picker and Open (or Go There and Save Here).
+- [ ] DOKK's own Open panels (Settings → Add Folder…): no rail.
+- [ ] Not yet covered by any probe: Chrome and Electron pickers, the column and icon views (a click should still go to the file; ⌥-click should not press Open), a picker on a second display or one with a negative origin, and a picker over a full-screen app.
+- [ ] With the debug menu's sending on: `flix_pick_shown`, `flix_pick_used` with `route` and `trigger`, and `flix_pick_picker_closed` with `outcome`, and no app name, path, or file name anywhere.

@@ -119,6 +119,15 @@ nonisolated struct FlixSearchReport: Equatable, Sendable {
     func likelyItem(for context: FlixFrontmostContext?, among items: [FlixItem]) -> FlixItem.ID?
     /// Settings' **Forget**.
     func forget()
+    /// Flix Pick: the paths picked in `app`'s (a bundle identifier) Open and Save pickers. Empty
+    /// while learning is off.
+    func pickerPicks(for app: String) -> [String: FlixPickMemory.Entry]
+    /// Flix Pick: counts a pick of `path` in `app`'s picker. Ignored while learning is off.
+    func recordPickerPick(_ path: String, isFolder: Bool, app: String)
+    /// Flix Pick: forgets a picked path that is gone.
+    func forgetPickerPick(_ path: String, app: String)
+    /// Drops on `destination` by kind (``FlixDragMemory/kindClass(of:)``). Empty while learning is off.
+    func dropCounts(for destination: String) -> [String: Int]
 }
 
 /// Hooks phase B1 uses to change a drag before it leaves Flix Files.

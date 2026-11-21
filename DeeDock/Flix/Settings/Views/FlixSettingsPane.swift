@@ -53,6 +53,7 @@ struct FlixSettingsContent: View {
                 FlixPlacementCard(settings: $store.settings, shortcutStatus: shortcutStatus,
                                   recordingChanged: recordingChanged)
                 FlixBehaviorCard(settings: $store.settings)
+                FlixPickCard(settings: $store.settings)
                 FlixTrackingCard(settings: $store.settings)
                 FlixWatchedFoldersCard(store: store, requestingAccess: requestingAccess,
                                        requestAccess: requestAccess, addFolder: addFolder)

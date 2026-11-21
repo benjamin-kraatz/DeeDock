@@ -5,7 +5,7 @@ import SwiftUI
 /// Flix Files' owner, held by `DockCoordinator` for the app's lifetime.
 ///
 /// It owns the history, the settings, the intelligence slots, the shared tile state, the sources,
-/// the shortcut, the menu bar item, and the one panel. `DockCoordinator` supplies the few things
+/// the shortcut, the menu bar item, the one panel, and Flix Pick (``pick``). `DockCoordinator` supplies the few things
 /// only it knows through closures: where a display's tile is, which app was in front, how to close
 /// the other popovers, and how to reach the Shelf.
 ///
@@ -91,6 +91,9 @@ final class FlixCoordinator {
     /// Phase B1's window reading, conversions, sensitive guard, and web links. Set by ``live()``;
     /// nil in previews and tests, where Flix Files runs without them.
     @ObservationIgnored var contextServices: FlixContextServices?
+    /// Flix Pick beside other apps' Open and Save pickers. Set by ``live()``; nil in previews and
+    /// tests, so they never observe another app.
+    @ObservationIgnored var pick: FlixPickCoordinator?
 
     /// - Parameters:
     ///   - lookoutFolders: Folders Lookout's setup read with permission; DOKK may read them too.
@@ -114,6 +117,7 @@ final class FlixCoordinator {
             return lookout.setupCompleted ? lookout.folders : []
         }
         coordinator.contextServices = FlixContextServices(history: history, folder: FlixStorageLocation.folder())
+        coordinator.pick = FlixPickCoordinator()
         return coordinator
     }
 
@@ -132,6 +136,7 @@ final class FlixCoordinator {
         settingsStore.changed = { [weak self] old, new in self?.apply(new, previous: old) }
         configurePanelState()
         contextServices?.start(with: self)
+        pick?.start(with: self)
         apply(settings, previous: nil)
     }
 
@@ -153,6 +158,7 @@ final class FlixCoordinator {
         identityTask = nil
         identityAttempted = []
         contextServices?.stop()
+        pick?.stop()
         intelligence.stop()
         for stopProvider in stopProviders { stopProvider() }
         tile.stop()
@@ -173,6 +179,7 @@ final class FlixCoordinator {
             Task { await FlixFolderNames.warm(policy: policy) }
         }
         contextServices?.apply(new)
+        pick?.apply(new)
         // At launch this also migrates download pages stored under the earlier, looser policy.
         if old == nil || old?.isEnabled != new.isEnabled || old?.tracksLinks != new.tracksLinks
             || old?.excludedSites != new.excludedSites || old?.excludesSensitiveSites != new.excludesSensitiveSites {

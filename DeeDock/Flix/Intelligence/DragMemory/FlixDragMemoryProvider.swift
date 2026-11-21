@@ -12,6 +12,9 @@ import Foundation
 /// A folder opened in the same part of the day on three different days of the last two weeks earns
 /// one tip, "You open **Oak & Ash** files most mornings", offered once and never repeated.
 ///
+/// **Picks** (Flix Pick): what was picked in other apps' Open and Save pickers, by app and path
+/// (``FlixPickMemory``), stored in the same file.
+///
 /// Everything is counts in `memory.json` in Flix Files' Application Support folder; **Forget**
 /// empties it. Only runs while `learnsDragDestinations` is on: `FlixIntelligence` asks nothing
 /// otherwise, and ``observe(_:)`` checks it too. Main actor.
@@ -88,6 +91,32 @@ final class FlixDragMemoryProvider: FlixDragMemoryProviding {
         save()
     }
 
+    // MARK: Flix Pick
+
+    func pickerPicks(for app: String) -> [String: FlixPickMemory.Entry] {
+        guard services.settings.learnsDragDestinations else { return [:] }
+        return memory.picks?.picks(for: app) ?? [:]
+    }
+
+    func recordPickerPick(_ path: String, isFolder: Bool, app: String) {
+        guard services.settings.learnsDragDestinations else { return }
+        var picks = memory.picks ?? FlixPickMemory()
+        picks.record(path, isFolder: isFolder, app: app, at: .now)
+        memory.picks = picks
+        save()
+    }
+
+    func forgetPickerPick(_ path: String, app: String) {
+        guard memory.picks?.picks(for: app)[FlixPaths.standardized(path)] != nil else { return }
+        memory.picks?.forget(path, app: app)
+        save()
+    }
+
+    func dropCounts(for destination: String) -> [String: Int] {
+        guard services.settings.learnsDragDestinations else { return [:] }
+        return memory.drops.compactMapValues { $0[destination] }
+    }
+
     private func save() { file?.schedule(memory) }
 
     /// Where a drop is counted: the app in front, by bundle identifier.
@@ -95,7 +124,8 @@ final class FlixDragMemoryProvider: FlixDragMemoryProviding {
         context?.bundleIdentifier ?? context?.applicationName
     }
 
-    private static func kindName(_ kind: String) -> String {
+    /// The plural name of a drag memory kind (``FlixDragMemory/kindClass(of:)``): "PDFs", "pictures".
+    static func kindName(_ kind: String) -> String {
         switch kind {
         case "pdf": String(localized: .flixDragKindPDFs)
         case "image": String(localized: .flixDragKindPictures)

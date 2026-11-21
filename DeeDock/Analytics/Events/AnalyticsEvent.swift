@@ -262,6 +262,14 @@ enum AnalyticsEvent {
     case flixShortcutRegistration(AnalyticsFlixShortcutResult, customized: Bool, combo: AnalyticsShortcutCombo)
     case flixTipShown(AnalyticsFlixTip)
     case flixTipActed(AnalyticsFlixTip, action: AnalyticsFlixTipAction)
+    /// Flix Pick appeared beside another app's Open or Save picker. The app as a category only.
+    case flixPickShown(picker: AnalyticsFlixPickerKind, appCategory: FlixAppCategory, candidateCount: Int)
+    /// A Flix Pick row was used. Never the file, the folder, or the app.
+    case flixPickUsed(AnalyticsFlixPickUse)
+    /// A picker Flix Pick sat beside closed. `chosenRank` only when the chosen file was a row.
+    case flixPickPickerClosed(picker: AnalyticsFlixPickerKind, outcome: AnalyticsFlixPickOutcome, chosenRank: Int?)
+    /// **Not in <App>** in Flix Pick's menu.
+    case flixPickDisabledForApp(appCategory: FlixAppCategory)
 
     // Focus Dock
     case focusDockEntered(trigger: AnalyticsTrigger)

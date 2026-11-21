@@ -492,6 +492,22 @@ The ✦ features run on this Mac. Apple Intelligence writes captions, names, and
 - **Learning where you drag things.** Rows of a kind you dropped on the app in front before say "↺ you've sent PDFs here before". After a few drops Flix Files says what it noticed. It also notices folders you open at the same time of day and offers a Smart Filter for them once in the sidebar. These counts stay on this Mac; **Forget** in Settings erases them.
 - **Ask Robi.** Select files and press Command-R (or **Ask Robi…** in the context menu). Robi suggests questions for the selection (totals and due dates for invoices, what changed between versions) or answers your own. Robi answers with the model chosen in Robi's settings: Claude with your API key sends the question and the selected files' contents to Anthropic; the on-device model keeps everything on this Mac. With Claude chosen and no key saved, the sheet says to add one in Robi's settings. Robi can't act on the files from here.
 
+### Flix Pick
+
+When another app shows an **Open** or **Save** window (a picker), **Flix Pick** puts the files that app most likely wants right beside it: a narrow rail of file icons next to the picker, which opens on hover to show up to five rows. Each row has the file's icon and name, why it is suggested, where it is, and when it was last used. Beside a Save picker the rows are folders.
+
+- **Click** a row to select the file in the picker (a folder: the picker goes there). The app stays in front and its picker keeps the keyboard.
+- **Option-click** or **double-click** also presses the picker's button (Open, Import, Save). A Save picker keeps the name you typed.
+- **Drag** a row into the picker, as from Flix Files.
+
+The reason line says what stood out: green **Picked here 3×** for what you chose in this app's picker before, purple **Part of …** for a file in the same thread as your last pick, orange **New in Downloads** for something that just arrived, and blue for kinds you drag to this app and files you used lately. Beside an Open picker only files of the types the app says it opens are listed (any file when it says nothing). Beside a Save picker you see the folders you saved to through it before, the folders of your recent files for that app, and folders you worked in lately. Files the sensitive guard flagged are never suggested.
+
+When nothing fits, no rail appears. The **⋯** menu has **Not in** followed by the app's name, which hides Flix Pick for that app, and **Flix Pick Settings…**. In **Settings → Flix Files**, the **Flix Pick** card turns it off and lists the apps you hid it in, each with **Show Again**.
+
+A file that is already listed in the picker is selected in place. Otherwise Flix Pick opens the picker's **Go to Folder** with the file's path, so that sheet flashes for a moment. It waits until you let go of Option, and does nothing if the app or the picker is no longer in front. While a password field has the keyboard it cannot type, and the footer says to drag the row in instead. In a picker's column or icon view, a click still goes to the file, but Option-click and double-click do not press the button, because Flix Pick cannot see what is selected there.
+
+Flix Pick needs Accessibility permission for DOKK; without it, it stays hidden and the Settings card says so. It reads only the Open and Save windows themselves, never other windows. What you pick in them is counted on this Mac with **Learn where I drag things**, and **Forget** clears it. Reduce Motion replaces the slide and spring with fades; Reduce Transparency draws a solid panel. Flix Pick hides when the picker closes, when you switch apps, and when displays change.
+
 ## App badges
 
 Enable **Settings → Features → App badges → Show app badges**, then allow Accessibility access using the controls in that card. The setting is off by default and applies to every display. Screen Recording is not required.

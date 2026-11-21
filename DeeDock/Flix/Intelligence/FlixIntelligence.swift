@@ -418,6 +418,28 @@ final class FlixIntelligence {
 
     func forgetDragMemory() { providers.dragMemory?.forget() }
 
+    // MARK: Flix Pick
+
+    /// What was picked in `app`'s pickers (a bundle identifier). Empty while learning is off.
+    func pickerPicks(for app: String) -> [String: FlixPickMemory.Entry] {
+        guard settings.learnsDragDestinations else { return [:] }
+        return providers.dragMemory?.pickerPicks(for: app) ?? [:]
+    }
+
+    /// Counts a pick in `app`'s picker. Nothing is recorded while learning is off.
+    func recordPickerPick(_ path: String, isFolder: Bool, app: String) {
+        guard settings.learnsDragDestinations else { return }
+        providers.dragMemory?.recordPickerPick(path, isFolder: isFolder, app: app)
+    }
+
+    func forgetPickerPick(_ path: String, app: String) { providers.dragMemory?.forgetPickerPick(path, app: app) }
+
+    /// Drops on `app` by kind, for Flix Pick's ranking. Empty while learning is off.
+    func dropCounts(for app: String) -> [String: Int] {
+        guard settings.learnsDragDestinations else { return [:] }
+        return providers.dragMemory?.dropCounts(for: app) ?? [:]
+    }
+
     #if DEBUG
     /// Debug builds only: lets "Where were you?" appear again on the next open of the panel, as if
     /// today had not shown it yet. Clears both gates: this session's ``lastMorningDay`` and the day

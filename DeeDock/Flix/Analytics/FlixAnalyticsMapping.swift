@@ -190,6 +190,7 @@ extension FlixSettings {
         var properties = AnalyticsProperties(reflecting: self)
         properties.renameKey("watched_folders_count", to: "watched_folder_count")
         properties.renameKey("excluded_sites_count", to: "excluded_site_count")
+        properties.renameKey("flix_pick_excluded_apps_count", to: "flix_pick_excluded_app_count")
         properties["shortcut_customized"] = AnalyticsValue(shortcut != .default)
         properties["shortcut_combo"] = AnalyticsValue(AnalyticsShortcutCombo(shortcut))
         return properties

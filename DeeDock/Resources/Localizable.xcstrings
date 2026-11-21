@@ -7003,6 +7003,546 @@
         }
       }
     },
+    "flixPickActionGoThere" : {
+      "comment" : "Flix Pick: accessibility action on a folder row beside a Save picker; moves the picker to that folder.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dorthin wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go There"
+          }
+        }
+      }
+    },
+    "flixPickActionOpen" : {
+      "comment" : "Flix Pick: accessibility action on a row beside an Open picker; selects the file and presses the picker's default button.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "flixPickActionSaveHere" : {
+      "comment" : "Flix Pick: accessibility action on a folder row beside a Save picker; moves there and presses Save.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Here"
+          }
+        }
+      }
+    },
+    "flixPickActionSelect" : {
+      "comment" : "Flix Pick: accessibility action on a row beside an Open picker; selects the file in the picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Auswahl markieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select in Picker"
+          }
+        }
+      }
+    },
+    "flixPickEmpty" : {
+      "comment" : "Flix Pick: shown in place of rows when nothing fits. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts Passendes für %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing likely for %@ yet"
+          }
+        }
+      }
+    },
+    "flixPickFailed" : {
+      "comment" : "Flix Pick: footer note when a click could not reach the other app's picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Auswahl hat nicht reagiert. Zieh es stattdessen hinein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The picker didn't respond. Drag it in instead."
+          }
+        }
+      }
+    },
+    "flixPickFailedSecureInput" : {
+      "comment" : "Flix Pick: footer note when a password field has the keyboard, so no keys can be sent to the picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Passwortfeld hat die Tastatur. Zieh es stattdessen hinein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A password field has the keyboard. Drag it in instead."
+          }
+        }
+      }
+    },
+    "flixPickHintOpen" : {
+      "comment" : "Flix Pick: footer hint beside an Open picker. ⌥ is the Option key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klick wählt aus · ⌥-Klick öffnet · oder hineinziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click selects · ⌥-click opens · or drag it in"
+          }
+        }
+      }
+    },
+    "flixPickHintSave" : {
+      "comment" : "Flix Pick: footer hint beside a Save picker. ⌥ is the Option key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klick geht dorthin · ⌥-Klick sichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click goes there · ⌥-click saves"
+          }
+        }
+      }
+    },
+    "flixPickLocationICloud" : {
+      "comment" : "Flix Pick: the iCloud Drive folder's name in a row's location line, as Finder names it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Drive"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Drive"
+          }
+        }
+      }
+    },
+    "flixPickMore" : {
+      "comment" : "Flix Pick: help and accessibility label of the ⋯ menu button in the panel's header.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "flixPickName" : {
+      "comment" : "Flix Pick: the feature's name, shown in its panel's header, the panel's accessibility label, and Settings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick"
+          }
+        }
+      }
+    },
+    "flixPickNotInApp" : {
+      "comment" : "Flix Pick: menu item that hides Flix Pick for one app. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not in %@"
+          }
+        }
+      }
+    },
+    "flixPickReasonAdded" : {
+      "comment" : "Flix Pick: why a file is suggested: it appeared in a watched folder some days ago.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich hinzugekommen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added recently"
+          }
+        }
+      }
+    },
+    "flixPickReasonDownloaded" : {
+      "comment" : "Flix Pick: why a file is suggested: downloaded some days ago.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded recently"
+          }
+        }
+      }
+    },
+    "flixPickReasonEdited" : {
+      "comment" : "Flix Pick: why a file is suggested: saved lately.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich bearbeitet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edited recently"
+          }
+        }
+      }
+    },
+    "flixPickReasonFits" : {
+      "comment" : "Flix Pick: why a file is suggested when nothing else stands out. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ öffnet solche Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ opens files like this"
+          }
+        }
+      }
+    },
+    "flixPickReasonFolderFits" : {
+      "comment" : "Flix Pick: why a folder is suggested beside a Save picker: it holds recent files the app works with. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier liegen deine neuen %@-Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where your recent %@ files are"
+          }
+        }
+      }
+    },
+    "flixPickReasonFolderSaved" : {
+      "comment" : "Flix Pick: why a folder is suggested beside a Save picker: files were saved or created in it lately.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier hast du kürzlich gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You saved files here recently"
+          }
+        }
+      }
+    },
+    "flixPickReasonKept" : {
+      "comment" : "Flix Pick: why a file is suggested: it was dropped on Flix Files to keep it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Flix Files behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept in Flix Files"
+          }
+        }
+      }
+    },
+    "flixPickReasonNew" : {
+      "comment" : "Flix Pick: why a file is suggested: it was downloaded or created in the last two days. %@ is the folder's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New in %@"
+          }
+        }
+      }
+    },
+    "flixPickReasonOpened" : {
+      "comment" : "Flix Pick: why a file or folder is suggested: opened lately.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kürzlich geöffnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened recently"
+          }
+        }
+      }
+    },
+    "flixPickReasonPicked" : {
+      "comment" : "Flix Pick: why a file is suggested, learned from earlier picks in this app's picker. %lld is how often.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier %lld× gewählt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picked here %lld×"
+          }
+        }
+      }
+    },
+    "flixPickReasonSavedHere" : {
+      "comment" : "Flix Pick: why a folder is suggested, learned from earlier saves in this app's picker. %lld is how often.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier %lld× gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved here %lld×"
+          }
+        }
+      }
+    },
+    "flixPickReasonSendsKind" : {
+      "comment" : "Flix Pick: why a file is suggested: files of its kind were dragged to this app before. %@ is a plural kind such as PDFs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du schickst %@ hierher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You send %@ here"
+          }
+        }
+      }
+    },
+    "flixPickReasonThread" : {
+      "comment" : "Flix Pick: why a file is suggested: it is in the same Flix Files thread as the last file picked in this app. %@ is the thread's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gehört zu %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Part of %@"
+          }
+        }
+      }
+    },
+    "flixPickSettings" : {
+      "comment" : "Flix Pick: menu item that opens Settings at Flix Files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick-Einstellungen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick Settings…"
+          }
+        }
+      }
+    },
+    "flixPickSubtitleOpen" : {
+      "comment" : "Flix Pick: header subtitle beside an Open picker. %1$@ is the app's name as macOS supplies it; %2$@ is the picker's default button title as the app shows it, such as Open or Import.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passend für %1$@ · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likely for %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "flixPickSubtitleOpenPlain" : {
+      "comment" : "Flix Pick: header subtitle beside an Open picker whose button title could not be read. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passend für %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likely for %@"
+          }
+        }
+      }
+    },
+    "flixPickSubtitleSave" : {
+      "comment" : "Flix Pick: header subtitle beside a Save picker. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passende Ordner für %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likely folders for %@"
+          }
+        }
+      }
+    },
     "flixPinHelp" : {
       "comment" : "Flix Files: help and VoiceOver label of the pin button.",
       "extractionState" : "manual",
@@ -8817,6 +9357,132 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Any page that stays in front for two minutes or more."
+          }
+        }
+      }
+    },
+    "flixSettingsPick" : {
+      "comment" : "Flix Files Settings: card title and toggle for Flix Pick.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick"
+          }
+        }
+      }
+    },
+    "flixSettingsPickHelp" : {
+      "comment" : "Flix Files Settings: what Flix Pick does. ⌥ is the Option key.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt neben den Öffnen- und Sichern-Fenstern anderer Apps die Dateien und Ordner, die sie wahrscheinlich brauchen. Klick wählt aus, ⌥-Klick öffnet oder sichert, oder du ziehst es hinein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beside other apps' Open and Save pickers, lists the files and folders they most likely want. Click one to select it, ⌥-click to open or save, or drag it in."
+          }
+        }
+      }
+    },
+    "flixSettingsPickHiddenIn" : {
+      "comment" : "Flix Files Settings: a row for an app where Flix Pick is hidden. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeblendet in %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden in %@"
+          }
+        }
+      }
+    },
+    "flixSettingsPickNeedsAccess" : {
+      "comment" : "Flix Files Settings: note while DOKK has no Accessibility permission.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick braucht Bedienungshilfen für DOKK in den Systemeinstellungen › Datenschutz & Sicherheit. Bis dahin bleibt es ausgeblendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick needs Accessibility for DOKK in System Settings › Privacy & Security. Until then it stays hidden."
+          }
+        }
+      }
+    },
+    "flixSettingsPickPrivacy" : {
+      "comment" : "Flix Files Settings: footnote under Flix Pick explaining what it reads and keeps.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick liest nur die Öffnen- und Sichern-Fenster selbst, nie andere Fenster. Was du dort wählst, wird mit „Lernen, wohin ich ziehe“ auf diesem Mac gezählt, und „Vergessen“ löscht es."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick reads only the Open and Save pickers themselves, never other windows. What you pick in them is counted on this Mac with Learn where I drag things, and Forget clears it."
+          }
+        }
+      }
+    },
+    "flixSettingsPickShowAgain" : {
+      "comment" : "Flix Files Settings: button that shows Flix Pick in an app again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wieder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Again"
+          }
+        }
+      }
+    },
+    "flixSettingsPickShowAgainIn" : {
+      "comment" : "Flix Files Settings: accessibility label of the Show Again button. %@ is the app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick in %@ wieder zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Flix Pick in %@ again"
           }
         }
       }

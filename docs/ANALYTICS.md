@@ -532,6 +532,10 @@ the window in front is off), or `no_permission` (neither Accessibility nor Scree
 | `flix_folder_access` | macOS answered an explicit request for a watched folder. `result` (`granted`, `denied`), `folder` (`desktop`, `documents`, `downloads`, `icloud_drive`, `other`) |
 | `flix_shortcut_registration` | At launch only when the combination is taken, and after every change. `result` (`registered`, `unavailable`), `customized`, `combo` |
 | `flix_tip_shown`, `flix_tip_acted` | `tip` (`smart_filter` for the sidebar tip, `discovery` for Flix Files' Discovery callout, which also sends `discovery_callout`); `flix_tip_acted` adds `action` (`accepted`, `dismissed`; a snoozed callout counts as dismissed) |
+| `flix_pick_shown` | Flix Pick appeared beside another app's picker, once per picker. `picker_kind` (`open`, `save`), `app_category` (the picker's app as a category, as above), `candidate_count` (rows shown, 1–5) |
+| `flix_pick_used` | A row was used. `picker_kind`, `rank` (1-based), `trigger` (`click`, `option_click`, `double_click`, `drag`, `accessibility` for a VoiceOver action), `route` (`listed_row`, `go_to_folder`, `drag`, `already_there`), `confirmed` (the picker's default button was pressed), `result` (`selected`, `failed`), `failure_reason` (`secure_input`, `modifiers_held`, `not_frontmost`, `no_path_field`, `not_verified`, `picker_closed`; with `result = selected` only `not_verified`, when the jump worked but the button was not pressed; absent when nothing went wrong), `duration_ms`. A double-click reports once, as `double_click` |
+| `flix_pick_picker_closed` | A picker Flix Pick showed beside closed. `picker_kind`, `outcome` (`picked_via_flix_pick`, `picked_elsewhere`, `cancelled`, `unknown` for a close by the keyboard or anything Flix Pick cannot tell apart), `chosen_rank` (only when the chosen file or folder was a row) |
+| `flix_pick_disabled_for_app` | **Not in** from Flix Pick's menu. `app_category` |
 
 `combo` is a token such as `ctrl_opt_cmd_f`: the modifiers in the order `ctrl`, `opt`, `shift`,
 `cmd`, then the key's name from a fixed list (letters, digits, `space`, `f1`–`f20`, arrows, and
@@ -541,7 +545,8 @@ from the character a layout types, and `AnalyticsShortcutCombo` refuses any othe
 `setting_changed` with `area = flix` reflects `FlixSettings`: every switch and choice by its
 property name (`is_enabled`, `shows_dock_tile`, `tracks_links`, `on_open`, …), the watched
 folders as `watched_folder_count` and the excluded sites as `excluded_site_count` (never a path or
-a host), and the shortcut as `shortcut_customized` and `shortcut_combo`.
+a host), Flix Pick as `shows_flix_pick` and its hidden apps as `flix_pick_excluded_app_count` (never
+a bundle ID), and the shortcut as `shortcut_customized` and `shortcut_combo`.
 
 Counters in `usage_summary`:
 

@@ -432,6 +432,92 @@ nonisolated struct AnalyticsFlixRobi: Equatable, Sendable {
     }
 }
 
+// MARK: - Flix Pick
+
+/// Which system picker Flix Pick sat beside.
+nonisolated enum AnalyticsFlixPickerKind: String, AnalyticsToken {
+    case open, save
+
+    init(_ kind: FlixPickPickerKind) {
+        switch kind {
+        case .open: self = .open
+        case .save: self = .save
+        }
+    }
+}
+
+/// How a Flix Pick row was used: a click selects, ⌥-click and double-click also press the
+/// picker's default button, a drag drops it in, and a VoiceOver action does either.
+nonisolated enum AnalyticsFlixPickTrigger: String, AnalyticsToken {
+    case click, optionClick = "option_click", doubleClick = "double_click", drag, accessibility
+
+    init(_ trigger: FlixPickTrigger) {
+        switch trigger {
+        case .click: self = .click
+        case .optionClick: self = .optionClick
+        case .doubleClick: self = .doubleClick
+        case .drag: self = .drag
+        case .accessibility: self = .accessibility
+        }
+    }
+}
+
+/// How the pick reached the picker: the listed row selected in place, Go to Folder, a drop, or
+/// nothing to do because the picker already showed it.
+nonisolated enum AnalyticsFlixPickRoute: String, AnalyticsToken {
+    case listedRow = "listed_row", goToFolder = "go_to_folder", drag, alreadyThere = "already_there"
+}
+
+nonisolated enum AnalyticsFlixPickResult: String, AnalyticsToken {
+    case selected, failed
+}
+
+/// Why a pick did not reach the picker, or was selected without pressing the default button.
+nonisolated enum AnalyticsFlixPickFailure: String, AnalyticsToken {
+    /// A password field had the keyboard (Secure Event Input), so no key could be sent.
+    case secureInput = "secure_input"
+    /// A modifier was still held two seconds after the click.
+    case modifiersHeld = "modifiers_held"
+    /// The picker's app was no longer in front, or the picker lost focus.
+    case notFrontmost = "not_frontmost"
+    /// Go to Folder did not open, or its field could not be filled.
+    case noPathField = "no_path_field"
+    /// The picker did not show the file or folder afterwards (a missing path, or a view whose
+    /// selection cannot be read), so the default button was not pressed.
+    case notVerified = "not_verified"
+    case pickerClosed = "picker_closed"
+}
+
+/// How a picker Flix Pick sat beside was closed.
+nonisolated enum AnalyticsFlixPickOutcome: String, AnalyticsToken {
+    /// Confirmed with a file or folder Flix Pick put there.
+    case pickedViaFlixPick = "picked_via_flix_pick"
+    /// Confirmed with something chosen in the picker itself.
+    case pickedElsewhere = "picked_elsewhere"
+    case cancelled
+    /// Closed by the keyboard or another way Flix Pick cannot tell apart.
+    case unknown
+}
+
+/// `flix_pick_used`: one click, ⌥-click, double-click, drag, or VoiceOver action on a row.
+nonisolated struct AnalyticsFlixPickUse: Equatable, Sendable {
+    var picker: AnalyticsFlixPickerKind
+    /// 1-based.
+    var rank: Int
+    var trigger: AnalyticsFlixPickTrigger
+    var route: AnalyticsFlixPickRoute
+    var confirmed: Bool
+    var result: AnalyticsFlixPickResult
+    var failure: AnalyticsFlixPickFailure?
+    var durationMs: Int
+
+    var properties: AnalyticsProperties {
+        ["picker_kind": .init(picker), "rank": .init(rank), "trigger": .init(trigger), "route": .init(route),
+         "confirmed": .init(confirmed), "result": .init(result), "failure_reason": failure.map(AnalyticsValue.init),
+         "duration_ms": .init(durationMs)]
+    }
+}
+
 // MARK: - Counters
 
 /// Flix Files' counters in `usage_summary`. `_sum`/`_count`/`_max` triples give averages and the

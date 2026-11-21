@@ -1,8 +1,8 @@
 import Foundation
 
-/// What Flix Files learned on this Mac: which kinds of file go to which app, and which folders
-/// get opened at which time of day. Plain counts, persisted in `memory.json`; Settings' **Forget**
-/// empties it.
+/// What Flix Files learned on this Mac: which kinds of file go to which app, which folders get
+/// opened at which time of day, and what Flix Pick saw picked in other apps' pickers. Plain counts,
+/// persisted in `memory.json`; Settings' **Forget** empties it.
 ///
 /// Pure value type: the provider (`FlixDragMemoryProvider`) owns it, saves it, and turns it into
 /// localized text.
@@ -33,6 +33,9 @@ nonisolated struct FlixDragMemory: Codable, Equatable, Sendable {
     var countedOpens: [String: Date] = [:]
     /// Filter tips already offered; each is offered once.
     var offeredTips: Set<String> = []
+    /// Flix Pick: what was picked in other apps' Open and Save pickers. Optional so a `memory.json`
+    /// written before Flix Pick still decodes (synthesized decoding skips a missing optional).
+    var picks: FlixPickMemory?
 
     /// Drops of one kind to one app before Flix Files says it noticed.
     static let noticeAfter = 3

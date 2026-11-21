@@ -5,9 +5,9 @@ import Foundation
 ///
 /// Keys missing from saved data decode to their defaults, so adding a field never loses the rest.
 /// Defaults: Flix Files on with its dock tile, the menu bar item off, Control-Option-Command-F,
-/// web links and "pages you read" off. Intelligence switches default on but do nothing until phase
-/// B's providers exist and their engines are available; they never send anything off the Mac except
-/// Ask Robi, which only runs when asked.
+/// web links and "pages you read" off, Flix Pick on. Intelligence switches default on but do
+/// nothing until phase B's providers exist and their engines are available; they never send
+/// anything off the Mac except Ask Robi, which only runs when asked.
 nonisolated struct FlixSettings: Codable, Equatable, Sendable {
     // MARK: Where it lives
     var isEnabled = true
@@ -48,6 +48,12 @@ nonisolated struct FlixSettings: Codable, Equatable, Sendable {
     var hidesNoise = true
     var learnsDragDestinations = true
 
+    // MARK: Flix Pick
+    /// Shows Flix Pick beside other apps' Open and Save pickers. Needs Accessibility permission.
+    var showsFlixPick = true
+    /// Bundle identifiers of apps where Flix Pick stays hidden ("Not in <App>").
+    var flixPickExcludedApps: [String] = []
+
     init() {}
 
     /// The watched folders that are switched on.
@@ -59,6 +65,7 @@ nonisolated struct FlixSettings: Codable, Equatable, Sendable {
         case tracksLinks, tracksPagesYouRead, excludesSensitiveSites, excludedSites, fetchesSiteIcons
         case suggestsForFrontWindow, showsFitsOnTile, writesCaptions, groupsThreads, suggestsFolders
         case guardsSensitiveFiles, hidesNoise, learnsDragDestinations
+        case showsFlixPick, flixPickExcludedApps
     }
 
     init(from decoder: Decoder) throws {
@@ -92,6 +99,9 @@ nonisolated struct FlixSettings: Codable, Equatable, Sendable {
         hidesNoise = try c.decodeIfPresent(Bool.self, forKey: .hidesNoise) ?? d.hidesNoise
         learnsDragDestinations = try c.decodeIfPresent(Bool.self, forKey: .learnsDragDestinations)
             ?? d.learnsDragDestinations
+        showsFlixPick = try c.decodeIfPresent(Bool.self, forKey: .showsFlixPick) ?? d.showsFlixPick
+        flixPickExcludedApps = try c.decodeIfPresent([String].self, forKey: .flixPickExcludedApps)
+            ?? d.flixPickExcludedApps
     }
 }
 
