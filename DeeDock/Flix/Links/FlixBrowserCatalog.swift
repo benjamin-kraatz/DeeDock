@@ -17,7 +17,8 @@ nonisolated enum FlixBrowserFamily: String, Sendable {
     ///
     /// Only families with a private-window check (``FlixBrowserPageReader``) qualify. Safari exposes
     /// no private-window signal in its accessibility tree that DOKK could verify, so Safari pages
-    /// are kept only when you save them ("Save this page", a dropped URL) or download from them.
+    /// are kept only when you save them ("Save this page", a dropped URL); its downloads keep only
+    /// their host on the file's row.
     var tracksAutomatically: Bool {
         switch self {
         case .chromium, .firefox: true

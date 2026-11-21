@@ -34,6 +34,10 @@ nonisolated struct FlixWindowDemand: Equatable, Sendable {
     var acceptedTypes: [UTType] = []
     /// The largest file accepted, in bytes.
     var maximumBytes: Int64?
+
+    /// The largest size limit Flix Files believes a window states (1 TB). A larger number read from
+    /// window text or a model is treated as no limit.
+    static let largestSizeLimit: Int64 = 1_000_000_000_000
     var pageKind: PageKind = .other
 
     /// Whether the window limits what it takes, so drags may need converting.

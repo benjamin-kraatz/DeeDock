@@ -8630,13 +8630,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Safari zeigt nicht, welche seiner Fenster privat sind. Seiten aus Safari bleiben deshalb nur, wenn sie gesichert werden oder ein Download von ihnen stammt."
+            "value" : "Safari zeigt nicht, welche seiner Fenster privat sind. Seiten aus Safari bleiben deshalb nur, wenn sie gesichert werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Safari does not show which of its windows are private, so Safari pages are kept only when you save them or download from them."
+            "value" : "Safari does not show which of its windows are private, so Safari pages are kept only when you save them."
           }
         }
       }
@@ -10135,6 +10135,24 @@
         }
       }
     },
+    "flixToastNotMoved" : {
+      "comment" : "Flix Files: toast sentence after a move into a folder when some files stayed where they were. The argument names those items (“Invoice.pdf” or “2 items”). May follow the “Moved … to …” sentence.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht bewegt: %@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not moved: %@."
+          }
+        }
+      }
+    },
     "flixToastPageSaved" : {
       "comment" : "Flix Files: toast after a page was saved. %@ is the page title or host.",
       "extractionState" : "manual",
@@ -10299,6 +10317,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moved %@ to the Trash."
+          }
+        }
+      }
+    },
+    "flixToastUndoSkipped" : {
+      "comment" : "Flix Files: toast after Undo when some files were left alone because they changed, moved, or were replaced since. The argument names those items (“Invoice.pdf” or “2 items”).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht rückgängig gemacht, inzwischen geändert oder bewegt: %@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not undone, changed or moved since: %@."
           }
         }
       }

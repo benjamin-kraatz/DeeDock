@@ -26,26 +26,49 @@ nonisolated struct FlixBrowserPage: Equatable, Sendable {
     }
 }
 
+/// What one walk of a browser window saw, for the private-window decision.
+nonisolated struct FlixBrowserWindowEvidence: Equatable, Sendable {
+    /// The window's own title.
+    var title: String?
+    /// Titles, descriptions, and help texts of the elements visited outside the page itself.
+    var labels: [String] = []
+    /// A web area's `AXURL`, or an address field's value, was found.
+    var foundAddress = false
+    /// The address field sat in a toolbar (`AXToolbar`), and that whole toolbar was visited: every
+    /// descendant read, every child list read without an error, within the budget. That toolbar is
+    /// where Chromium browsers show their private-window badge.
+    var addressToolbarComplete = false
+}
+
 /// Reads a browser window's address, title, and private state through Accessibility.
 ///
 /// No extension and no Apple Events (which would ask for Automation permission). One bounded
 /// breadth-first walk of the window, at most ``elementLimit`` elements or ``budget`` seconds, off
-/// the main actor:
+/// the main actor, with a messaging timeout on every call. A toolbar is walked to its end as soon
+/// as it is found, before the rest of the window, so the region that carries the private badge is
+/// covered first.
 /// - **Address**: a web area's `AXURL` (Safari always; Chromium and Firefox when their web tree is
 ///   already built), else the first text field whose value looks like an address (the omnibox or
 ///   URL bar, which Chromium and Firefox expose without turning on their web tree).
-/// - **Private state**: a private marker ("Incognito", "InPrivate", "Private Browsing", "Privater
-///   Modus", "Privat", …) in the title or any toolbar label means private. Chromium and Firefox
-///   count as normal only when the walk read the toolbar (at least ``evidenceLimit`` elements and an
-///   address field or web area) without a marker; anything less is unknown. Safari and other
-///   browsers are always unknown: their private windows carry no marker DOKK could verify.
+/// - **Private state** needs positive evidence (``privacy(family:evidence:)``). A private marker
+///   ("Incognito", "InPrivate", "Private Browsing", "Privater Modus", "Privat", …) in the title or
+///   any label means private. A window counts as normal only when the region where its browser
+///   shows the private indicator was read completely:
+///   - **Chromium** (Chrome, Edge, Brave, Vivaldi, Opera, Arc, …): the toolbar holding the omnibox,
+///     where the Incognito, InPrivate, or Private badge sits next to the profile button.
+///   - **Firefox** and its forks: the toolbar holding the URL bar, and the window title, which
+///     Firefox ends with "Private Browsing" in a private window.
+///   - **Safari and other browsers**: never; their private windows carry no marker DOKK could verify.
+///   Anything less — a walk cut short by the budget, a toolbar whose children could not be read, an
+///   address outside a toolbar, no title — is unknown, and automatic tracking treats unknown as private.
 ///
-/// It never sets `AXEnhancedUserInterface`; callers that need a web tree use
-/// `RobiWebAccessibility.enable` for the duration of one read and restore it.
+/// It never sets `AXEnhancedUserInterface`; callers that need a web tree switch it on for the
+/// duration of one read and restore it.
 nonisolated enum FlixBrowserPageReader {
     static let elementLimit = 700
     static let budget: TimeInterval = 0.3
-    static let evidenceLimit = 12
+    /// The per-call Accessibility timeout, so one busy browser cannot hold the walk.
+    static let messagingTimeout: Float = 0.15
 
     static let privateMarkers = [
         "incognito", "inkognito", "inprivate", "private browsing", "privates surfen", "privater modus",
@@ -67,51 +90,144 @@ nonisolated enum FlixBrowserPageReader {
     static func readNow(processIdentifier: pid_t, family: FlixBrowserFamily, bundleIdentifier: String?) -> FlixBrowserPage? {
         guard AXIsProcessTrusted() else { return nil }
         let application = AXUIElementCreateApplication(processIdentifier)
-        AXUIElementSetMessagingTimeout(application, 0.15)
+        AXUIElementSetMessagingTimeout(application, messagingTimeout)
         guard let window = RobiAX.element(application, kAXFocusedWindowAttribute)
                 ?? RobiAX.element(application, kAXMainWindowAttribute) else { return nil }
-        let title = RobiAX.value(window, kAXTitleAttribute) as? String
+        AXUIElementSetMessagingTimeout(window, messagingTimeout)
         let deadline = Date().addingTimeInterval(budget)
-        var queue: [AXUIElement] = [window]
-        var index = 0
-        var webURL: URL?
-        var address: String?
-        var labels: [String] = []
-        while index < queue.count, index < elementLimit, Date() < deadline {
-            let element = queue[index]
-            index += 1
-            let role = RobiAX.value(element, kAXRoleAttribute) as? String ?? ""
-            if role == "AXWebArea" {
-                if webURL == nil, let url = RobiAX.value(element, "AXURL") as? URL, url.scheme?.hasPrefix("http") == true {
-                    webURL = url
-                }
-                // The page itself is not read.
-                continue
-            }
-            if role == kAXTextFieldRole || role == kAXComboBoxRole, address == nil,
-               let value = RobiAX.value(element, kAXValueAttribute) as? String, looksLikeAddress(value) {
-                address = value
-            }
-            if labels.count < 300 {
-                for key in [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute] {
-                    if let text = RobiAX.value(element, key) as? String, !text.isEmpty { labels.append(text) }
-                }
-            }
-            queue.append(contentsOf: RobiAX.children(element))
+        let walk = walk(from: window, limit: elementLimit, expired: { Date() >= deadline },
+                        role: { RobiAX.value($0, kAXRoleAttribute) as? String ?? "" },
+                        labels: { element in
+                            [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute].compactMap {
+                                (RobiAX.value(element, $0) as? String).flatMap { $0.isEmpty ? nil : $0 }
+                            }
+                        },
+                        value: { RobiAX.value($0, kAXValueAttribute) as? String },
+                        webURL: { RobiAX.value($0, "AXURL") as? URL },
+                        children: children(of:))
+        var evidence = walk.evidence
+        evidence.title = RobiAX.value(window, kAXTitleAttribute) as? String
+        guard let raw = walk.webURL ?? walk.address.flatMap(url(fromAddress:)) else { return nil }
+        let cleaned = FlixURLSanitizer.clean(raw)
+        guard let url = cleaned.url else {
+            // A credential-bearing address is never stored; it still counts as stripped.
+            if cleaned == .skipped { Task { @MainActor in Analytics.count(.linkTokensStripped) } }
+            return nil
         }
-        guard let raw = webURL ?? address.flatMap(url(fromAddress:)), let url = FlixURLSanitizer.sanitize(raw) else { return nil }
-        let privacy = privacy(family: family, title: title, labels: labels, scanned: index,
-                              foundAddress: webURL != nil || address != nil)
-        return FlixBrowserPage(url: url, title: cleanTitle(title), privacy: privacy, browserBundleIdentifier: bundleIdentifier,
-                               removedSecrets: FlixURLSanitizer.removedSecretCount(raw))
+        return FlixBrowserPage(url: url, title: cleanTitle(evidence.title), privacy: privacy(family: family, evidence: evidence),
+                               browserBundleIdentifier: bundleIdentifier, removedSecrets: cleaned.removedSecrets)
     }
 
-    static func privacy(family: FlixBrowserFamily, title: String?, labels: [String], scanned: Int,
-                        foundAddress: Bool) -> FlixBrowserPage.Privacy {
-        let texts = ([title].compactMap { $0 } + labels).map { $0.lowercased() }
+    /// The children of an element, or nil when reading them failed (a timeout, a dead element), so
+    /// the walk knows it did not see that part. An element without children reads as empty. Each
+    /// child gets the walk's messaging timeout before anything is asked of it.
+    static func children(of element: AXUIElement) -> [AXUIElement]? {
+        var value: CFTypeRef?
+        switch AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &value) {
+        case .success:
+            let children = value as? [AXUIElement] ?? []
+            for child in children { AXUIElementSetMessagingTimeout(child, messagingTimeout) }
+            return children
+        case .noValue, .attributeUnsupported: return []
+        default: return nil
+        }
+    }
+
+    /// What a walk found: the evidence (without the title, which the caller reads), the web area's
+    /// address, and the address field's value.
+    struct Walk {
+        var evidence = FlixBrowserWindowEvidence()
+        var webURL: URL?
+        var address: String?
+    }
+
+    /// The walk, over any tree, so its rules are testable without a browser.
+    ///
+    /// Breadth-first from `root`, skipping the inside of web areas (the page itself is not read). A
+    /// toolbar is walked to its end the moment it is found (depth-first, same limits), so a budget
+    /// cut-off lands in the rest of the window rather than in the toolbar. `children` returns nil
+    /// when a child list could not be read; inside a toolbar that makes the toolbar incomplete.
+    static func walk<Element>(from root: Element, limit: Int, expired: () -> Bool,
+                              role: (Element) -> String, labels: (Element) -> [String],
+                              value: (Element) -> String?, webURL: (Element) -> URL?,
+                              children: (Element) -> [Element]?) -> Walk {
+        var result = Walk()
+        var queue: [Element] = [root]
+        var index = 0
+        var visited = 0
+        var labelCount = 0
+
+        /// Reads one element. Returns its children to visit, whether reading them failed, and whether
+        /// it is a toolbar.
+        func visit(_ element: Element) -> (children: [Element], failed: Bool, isToolbar: Bool) {
+            visited += 1
+            let elementRole = role(element)
+            if elementRole == "AXWebArea" {
+                if result.webURL == nil, let url = webURL(element), url.scheme?.hasPrefix("http") == true {
+                    result.webURL = url
+                    result.evidence.foundAddress = true
+                }
+                // The page itself is not read.
+                return ([], false, false)
+            }
+            let isToolbar = elementRole == kAXToolbarRole
+            if elementRole == kAXTextFieldRole || elementRole == kAXComboBoxRole, result.address == nil,
+               let text = value(element), looksLikeAddress(text) {
+                result.address = text
+                result.evidence.foundAddress = true
+            }
+            if labelCount < 300 {
+                let found = labels(element)
+                result.evidence.labels += found
+                labelCount += found.count
+            }
+            guard let kids = children(element) else { return ([], true, isToolbar) }
+            return (kids, false, isToolbar)
+        }
+
+        /// Walks a toolbar's whole subtree. Returns whether it finished and whether the address
+        /// field was found inside it.
+        func walkToolbar(_ toolbarChildren: [Element]) -> (complete: Bool, holdsAddress: Bool) {
+            let hadAddress = result.address != nil
+            var stack = Array(toolbarChildren.reversed())
+            var complete = true
+            while let element = stack.popLast() {
+                guard visited < limit, !expired() else { return (false, !hadAddress && result.address != nil) }
+                let read = visit(element)
+                if read.failed { complete = false }
+                stack.append(contentsOf: read.children.reversed())
+            }
+            return (complete, !hadAddress && result.address != nil)
+        }
+
+        while index < queue.count, visited < limit, !expired() {
+            let element = queue[index]
+            index += 1
+            let read = visit(element)
+            if read.isToolbar {
+                let toolbar = walkToolbar(read.children)
+                if toolbar.holdsAddress { result.evidence.addressToolbarComplete = toolbar.complete }
+                continue
+            }
+            queue.append(contentsOf: read.children)
+        }
+        return result
+    }
+
+    /// The private-window decision for a family, from what the walk saw. See the type's
+    /// documentation for what counts as evidence per browser.
+    static func privacy(family: FlixBrowserFamily, evidence: FlixBrowserWindowEvidence) -> FlixBrowserPage.Privacy {
+        let texts = ([evidence.title].compactMap { $0 } + evidence.labels).map { $0.lowercased() }
         if texts.contains(where: isPrivateMarker) { return .private }
-        guard family.tracksAutomatically else { return .unknown }
-        return scanned >= evidenceLimit && foundAddress ? .normal : .unknown
+        switch family {
+        case .chromium:
+            return evidence.addressToolbarComplete ? .normal : .unknown
+        case .firefox:
+            let hasTitle = evidence.title.map { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? false
+            return evidence.addressToolbarComplete && hasTitle ? .normal : .unknown
+        case .safari, .other:
+            return .unknown
+        }
     }
 
     static func isPrivateMarker(_ text: String) -> Bool {

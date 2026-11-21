@@ -194,4 +194,63 @@ struct FlixHistoryTests {
                 == "https://cdn.example.com/f.pdf")
         #expect(FlixPaths.sourcePage(fromWhereFroms: ["file:///tmp/x"]) == nil)
     }
+
+    // MARK: Clear History
+
+    @Test func clearedHistoryRejectsEventsFromBeforeTheClear() throws {
+        var document = FlixHistoryDocument.cleared(at: t0.addingTimeInterval(100))
+        // Spotlight's next gather replays files opened before the clear: they stay gone.
+        let old = document.record(event("/a/old.pdf", at: 50))
+        let sameMoment = document.record(event("/a/same-moment.pdf", at: 100))
+        let new = document.record(event("/a/new.pdf", at: 101))
+        #expect(!old && !sameMoment && new)
+        #expect(document.items.map(\.name) == ["new.pdf"])
+        // The cutoff survives a round trip, unlike tombstones.
+        let decoded = try JSONDecoder().decode(FlixHistoryDocument.self, from: JSONEncoder().encode(document))
+        #expect(decoded.clearedAt == t0.addingTimeInterval(100))
+    }
+
+    @MainActor @Test func clearingTheLiveHistoryKeepsTheCutoff() {
+        let history = FlixHistory(folder: nil)
+        history.record(event("/a/report.pdf", at: 0))
+        history.clear(at: t0.addingTimeInterval(10))
+        history.record([event("/a/report.pdf", at: 5), event("/a/notes.txt", at: 20)])
+        #expect(history.items.map(\.name) == ["notes.txt"])
+    }
+
+    // MARK: Download pages
+
+    @Test func storedDownloadPagesAreStrippedToTheirHostWhenWebLinksAreOff() {
+        var document = FlixHistoryDocument()
+        var download = event("/a/invoice.pdf", .downloaded, at: 0)
+        download.sourcePage = URL(string: "https://billing.example.com/invoices/2026")
+        document.record(download)
+        var bank = event("/a/statement.pdf", .downloaded, at: 1)
+        bank.sourcePage = URL(string: "https://www.paypal.com/statements")
+        document.record(bank)
+        var settings = FlixSettings()
+        settings.tracksLinks = false
+        let stripped = document.applySourcePolicy(settings)
+        #expect(stripped)
+        let invoice = document.items.first { $0.name == "invoice.pdf" }
+        #expect(invoice?.sourcePage == nil)
+        #expect(invoice?.sourceHost == "billing.example.com")
+        // An excluded site keeps nothing, not even the host.
+        let statement = document.items.first { $0.name == "statement.pdf" }
+        #expect(statement?.sourcePage == nil && statement?.sourceHost == nil)
+        let again = document.applySourcePolicy(settings)
+        #expect(!again)
+    }
+
+    @Test func oldHistoriesDecodeAndMigrate() throws {
+        // A file written before hosts were stored: the page only.
+        let json = #"{"items":[{"id":"\#(UUID().uuidString)","path":"/a/f.pdf","name":"f.pdf","kind":"document","activity":"downloaded","date":0,"firstSeen":0,"sourcePage":"https://www.example.com/reset/abc","isFlagged":false}]}"#
+        var document = try JSONDecoder().decode(FlixHistoryDocument.self, from: Data(json.utf8))
+        var settings = FlixSettings()
+        settings.tracksLinks = true
+        document.applySourcePolicy(settings)
+        // The stricter cleaning applies to what was stored before: a reset link is not kept.
+        #expect(document.items[0].sourcePage == nil)
+        #expect(document.items[0].sourceHost == "example.com")
+    }
 }

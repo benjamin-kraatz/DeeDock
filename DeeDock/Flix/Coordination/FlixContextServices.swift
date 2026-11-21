@@ -82,7 +82,17 @@ final class FlixContextServices {
         pageTask = nil
     }
 
-    /// Starts and stops what the settings call for.
+    /// Flix Files was switched off: cancels running conversions (removing their copies), the
+    /// Save-this-page read, and the Fits cache. Observers, the guard, and link timers stop through
+    /// ``apply(_:)``.
+    func suspend() {
+        conversions.stop()
+        pageTask?.cancel()
+        pageTask = nil
+        fits.reset()
+    }
+
+    /// Starts and stops what the settings call for. Everything here is off while Flix Files is.
     func apply(_ settings: FlixSettings) {
         let enabled = settings.isEnabled
         let watchesWindows = enabled && (settings.showsFitsOnTile || settings.tracksLinks)
@@ -135,7 +145,7 @@ final class FlixContextServices {
 
     /// Converts ahead of a drag: the Fits rows, the selection, and the first rows of the list.
     private func prepareConversions(_ context: FlixFrontmostContext, _ demand: FlixWindowDemand, _ fitIDs: [FlixItem.ID]) {
-        guard demand.hasLimits, let coordinator else { return }
+        guard demand.hasLimits, let coordinator, coordinator.settings.isEnabled else { return }
         let panel = coordinator.panelState
         var ids = fitIDs
         if coordinator.isPanelOpen, panel.frontmost == context {

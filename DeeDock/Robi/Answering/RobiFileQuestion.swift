@@ -30,7 +30,9 @@ extension RobiAgent {
     /// ``maximumFilePictures``.
     ///
     /// Observability records metadata only (`includesContent: false`): the model, latency, token
-    /// counts and an error message, never the question, the files or the answer.
+    /// counts and a closed error code (`AIObservability.ErrorCode`), never the question, the files,
+    /// the answer, or an error's own text, which can carry a server message or a host name. The
+    /// localized message for the person comes from `message(for:)` at the call site.
     ///
     /// - Throws: `CancellationError` when the calling task is cancelled, and model errors.
     func answer(question: String, about files: [RobiFileContext], model: Model,
@@ -40,18 +42,18 @@ extension RobiAgent {
             let system = SystemLanguageModel.default
             let budget = max(1_200, (system.contextSize - 2_000) * 5 / 2)
             try await answerFiles(system, budget: budget, question: question, files: files,
-                                  observed: ("apple_foundation_models", "apple"), secret: nil, update: update)
+                                  observed: ("apple_foundation_models", "apple"), update: update)
         case let .claude(choice, key, effort):
             let name = choice.claudeModel
             let claude = ClaudeLanguageModel(name: name, auth: .apiKey(key),
                                              fixedEffort: effort == .high ? .high : .medium, timeout: 90)
             try await answerFiles(claude, budget: 60_000, question: question, files: files,
-                                  observed: (name.id, "anthropic"), secret: key, update: update)
+                                  observed: (name.id, "anthropic"), update: update)
         }
     }
 
     private func answerFiles<Model: LanguageModel>(_ model: Model, budget: Int, question: String, files: [RobiFileContext],
-                                                  observed: (model: String, provider: String), secret: String?,
+                                                  observed: (model: String, provider: String),
                                                   update: @escaping @MainActor (String) -> Void) async throws {
         let instructions = """
             You are Robi, a small helper on the person's Mac. The person picked files in Flix Files and asks about them. \
@@ -78,11 +80,9 @@ extension RobiAgent {
         }
         let started = Date()
         func observe(_ error: Error?) {
-            let failure = error.flatMap { error -> String? in
+            let failure = error.flatMap { error -> AIObservability.ErrorCode? in
                 guard !(error is CancellationError), !Task.isCancelled else { return nil }
-                let message = Self.message(for: error)
-                guard let secret, !secret.isEmpty else { return message }
-                return message.replacingOccurrences(of: secret, with: "[API key]")
+                return AIObservability.ErrorCode(error)
             }
             let usage = session.usage
             let tokens = usage.input.totalTokenCount == 0 && usage.output.totalTokenCount == 0 ? nil
@@ -92,7 +92,7 @@ extension RobiAgent {
                 await AIObservability.capture(trace: AIObservability.makeTrace(), name: "flix_ask_robi", input: "",
                                               startedAt: started, maximumResponseTokens: limit, stream: true,
                                               model: observed.model, provider: observed.provider, usage: tokens,
-                                              error: failure, includesContent: false)
+                                              errorCode: failure, includesContent: false)
             }
         }
         do {

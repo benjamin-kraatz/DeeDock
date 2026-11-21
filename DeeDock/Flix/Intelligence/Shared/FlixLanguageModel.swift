@@ -7,7 +7,7 @@ import FoundationModels
 ///
 /// The prompts carry file names and file contents, so each call reports metadata only to AI
 /// observability (`AIObservability.capture(…, includesContent: false)`): the span name, latency,
-/// token limit, and an error message. Callers treat a nil result as "no answer" and use their rule
+/// token limit, and a closed error code (`AIObservability.ErrorCode`), never an error's text. Callers treat a nil result as "no answer" and use their rule
 /// fallback; nothing is retried. Each such fallback counts toward `flix_ai_failures`.
 ///
 /// Main actor: sessions are created and awaited here; the model itself runs out of process.
@@ -72,8 +72,8 @@ enum FlixLanguageModel {
     }
 
     private static func observe(span: String, started: Date, limit: Int, error: Error?) async {
-        let failure = error.flatMap { $0 is CancellationError ? nil : String(describing: type(of: $0)) }
+        let failure = error.flatMap { $0 is CancellationError ? nil : AIObservability.ErrorCode($0) }
         await AIObservability.capture(trace: AIObservability.makeTrace(), name: span, input: "", startedAt: started,
-                                      maximumResponseTokens: limit, error: failure, includesContent: false)
+                                      maximumResponseTokens: limit, errorCode: failure, includesContent: false)
     }
 }

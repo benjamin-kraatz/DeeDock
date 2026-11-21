@@ -6,9 +6,14 @@ import UniformTypeIdentifiers
 /// Writes converted copies of files for an upload: pictures to PDF, JPEG, or PNG (scaled down to a
 /// size limit), and text documents to PDF.
 ///
-/// Runs off the main actor, except HTML import, which AppKit requires on the main thread (and which
-/// is limited to small files). Text documents are laid out with Core Text on A4 pages with 54-point
-/// margins; images embedded in RTFD or Word files are not drawn. The original is never changed.
+/// Runs entirely off the main actor (`@concurrent`) and is bounded: pictures decode through
+/// ImageIO's thumbnail path at most ``maximumPixels`` long, plain text and Markdown are read only up
+/// to ``maximumTextBytes``, documents only up to `FlixDocumentImport.maximumBytes`, and a text over
+/// ``maximumCharacters`` is refused rather than laid out on thousands of pages. HTML and web
+/// archives are never converted: AppKit's HTML importer needs the main thread and loads a page's
+/// external resources (`FlixDocumentImport`). Text documents are laid out with Core Text on A4
+/// pages with 54-point margins; images embedded in RTFD or Word files are not drawn. The original
+/// is never changed.
 nonisolated enum FlixFileConverter {
     enum ConversionError: Error {
         case unreadable
@@ -18,8 +23,10 @@ nonisolated enum FlixFileConverter {
 
     /// The longest side a converted picture keeps before any size limit applies.
     static let maximumPixels: CGFloat = 4_096
-    /// HTML is imported on the main thread, so only small pages are converted.
-    static let maximumHTMLBytes = 1_500_000
+    /// The largest plain-text or Markdown file converted.
+    static let maximumTextBytes: Int64 = 4_000_000
+    /// The longest text laid out as a PDF.
+    static let maximumCharacters = 2_000_000
 
     /// Converts `source` into `folder`, named after `name` with the new extension.
     /// - Returns: The copy's URL and its size in bytes.
@@ -30,7 +37,8 @@ nonisolated enum FlixFileConverter {
         if FlixConversionPlanner.isImage(type) {
             data = try imageData(source, recipe: recipe)
         } else if FlixConversionPlanner.isText(type), recipe.format == .pdf {
-            let text = try await attributedText(source, type: type)
+            let text = try attributedText(source, type: type)
+            guard text.length <= maximumCharacters else { throw ConversionError.tooLarge }
             try Task.checkCancellation()
             data = try pdf(from: text)
         } else {
@@ -74,7 +82,8 @@ nonisolated enum FlixFileConverter {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: Int(longestSide),
+            // The size comes from the file's own metadata, so it is bounded before conversion.
+            kCGImageSourceThumbnailMaxPixelSize: FlixNumbers.int(longestSide, in: 1...Int(maximumPixels)) ?? Int(maximumPixels),
             kCGImageSourceShouldCacheImmediately: true,
         ]
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
@@ -110,35 +119,31 @@ nonisolated enum FlixFileConverter {
 
     // MARK: Text
 
-    private static func attributedText(_ source: URL, type: UTType) async throws -> NSAttributedString {
-        if type.conforms(to: .html) {
-            let size = (try? source.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
-            guard size <= maximumHTMLBytes else { throw ConversionError.tooLarge }
-            // AppKit's HTML importer must run on the main thread. It hands back RTF data, which is
-            // Sendable, and the layout happens here again.
-            let rtf = try await MainActor.run { () throws -> Data in
-                let html = try NSAttributedString(url: source, options: [.documentType: NSAttributedString.DocumentType.html],
-                                                  documentAttributes: nil)
-                return try html.data(from: NSRange(location: 0, length: html.length),
-                                     documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
-            }
-            return try NSAttributedString(data: rtf, options: [.documentType: NSAttributedString.DocumentType.rtf],
-                                          documentAttributes: nil)
-        }
+    private static func attributedText(_ source: URL, type: UTType) throws -> NSAttributedString {
+        // Never HTML or a web archive, even when the planner was handed one (see the type's notes).
+        if type.conforms(to: .html) || type.conforms(to: .webArchive) { throw ConversionError.unsupported }
         if let markdown = UTType("net.daringfireball.markdown"), type.conforms(to: markdown) {
             return try markdownText(source)
         }
         if type.conforms(to: .plainText) {
-            let string = try String(contentsOf: source, encoding: .utf8)
+            let string = try boundedText(source)
             return NSAttributedString(string: string, attributes: [.font: bodyFont])
         }
-        return try NSAttributedString(url: source, options: [:], documentAttributes: nil)
+        guard let text = FlixDocumentImport.attributedString(at: source, type: type) else { throw ConversionError.unreadable }
+        return text
+    }
+
+    /// A UTF-8 text file, refused above ``maximumTextBytes``.
+    private static func boundedText(_ source: URL) throws -> String {
+        let size = (try? source.resourceValues(forKeys: [.fileSizeKey]).fileSize).map(Int64.init) ?? 0
+        guard size <= maximumTextBytes else { throw ConversionError.tooLarge }
+        return try String(contentsOf: source, encoding: .utf8)
     }
 
     /// Markdown's inline styles (bold, italic, code) become fonts; block syntax such as headings
     /// stays as written.
     private static func markdownText(_ source: URL) throws -> NSAttributedString {
-        let string = try String(contentsOf: source, encoding: .utf8)
+        let string = try boundedText(source)
         let parsed = (try? AttributedString(markdown: string, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
             ?? AttributedString(string)
         let output = NSMutableAttributedString()

@@ -49,7 +49,7 @@ final class FlixThreadProvider: FlixThreadProviding {
     }
 
     func threads(for items: [FlixItem]) async -> [FlixThread] {
-        guard services.settings.groupsThreads else { return [] }
+        guard services.settings.isEnabled, services.settings.groupsThreads else { return [] }
         let now = Date.now
         let catchAll = FlixThreadClusterer.catchAllFolders()
         let recent = items.filter { item in
@@ -119,7 +119,8 @@ final class FlixThreadProvider: FlixThreadProviding {
         while !Task.isCancelled, !queue.isEmpty {
             let id = queue.removeFirst()
             await services.waitWhileDragging()
-            guard !Task.isCancelled, services.settings.groupsThreads,
+            guard !Task.isCancelled, services.settings.isEnabled else { break }
+            guard services.settings.groupsThreads,
                   let record = records.first(where: { $0.id == id }), needsName(record) else { continue }
             let byID = Dictionary(services.items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
             let members = record.memberIDs

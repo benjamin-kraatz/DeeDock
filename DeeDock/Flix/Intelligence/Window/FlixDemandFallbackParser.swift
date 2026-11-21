@@ -84,7 +84,9 @@ nonisolated enum FlixDemandFallbackParser {
             case "gb": 1_000_000_000
             default: 1_000_000
             }
-            return Int64(value * multiplier)
+            // Window text is untrusted: "1e400 MB" or a 400-digit number must not trap.
+            guard let bytes = FlixNumbers.int64(value * multiplier, in: 1...FlixWindowDemand.largestSizeLimit) else { continue }
+            return bytes
         }
         return nil
     }

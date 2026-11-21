@@ -423,7 +423,7 @@ The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved
 
 - **Select** with a click, Command-click to add or remove, Shift-click for a range. Up and Down move the selection; Shift extends it.
 - **Drag** one row or the whole selection out of the panel. As the pointer leaves the panel it fades aside so you can reach the window underneath. After a drop outside, the panel closes; pin it with the header's pin button (or choose **Stay open** in Settings) to keep it open. A cancelled drag brings it back.
-- **Favorites** take drops of rows: a folder moves the files there, with **Undo** in the footer; an app opens them with that app. A folder favorite also filters the list to what is inside it.
+- **Favorites** take drops of rows: a folder moves the files there, with **Undo** in the footer; an app opens them with that app. A folder favorite also filters the list to what is inside it. When some files cannot be moved, the others still move and the toast names the ones that stayed. Undo puts back only files that are still the ones Flix Files moved: a file changed, moved, or replaced since stays where it is, and the toast says so.
 - **Search** with Command-F, the search button, or just by typing. It matches names, and understands whole sentences (see [Intelligence](#intelligence)).
 - **Smart Filters** are saved rules: name contains, folder contains, downloaded from, extension, kind, activity, recent days, or flagged. **New Smart Filter…** builds one; new items join by themselves.
 - **Noise** (autosaves, build products, partial downloads, temporary files) is hidden. The footer says how many and offers **Show**.
@@ -431,14 +431,16 @@ The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved
 
 Keys: Return opens, Command-Return shows in Finder, Space opens Quick Look, Command-C copies, Option-Command-C copies the path, Command-K flags, Command-D adds to Favorites, Command-F searches, Delete removes from Flix Files, Command-Delete moves to the Trash, and Escape steps back (search, then the panel).
 
-The context menu offers **Open**, **Show in Finder**, **Rename…**, **Copy**, **Copy Path**, **Send to Shelf**, **Flag**, **Add to Favorites**, **Remove from Flix Files**, and **Move to Trash**. Removing an item never touches the file, and **Undo** brings it back. Flagged items never age out of the history, which keeps up to 5,000 items.
+The context menu offers **Open**, **Show in Finder**, **Rename…**, **Copy**, **Copy Path**, **Send to Shelf**, **Flag**, **Add to Favorites**, **Remove from Flix Files**, and **Move to Trash**. Removing an item never touches the file, and **Undo** brings it back. Flagged items never age out of the history, which keeps up to 5,000 items. **Clear History…** in Settings empties it for good: files you opened before the clear do not come back.
+
+Turning Flix Files off in Settings stops everything it does in the background, from watching folders to reading files for captions; nothing of it starts again until you turn it back on.
 
 Reduce Motion replaces the springs with crossfades. Reduce Transparency draws a solid panel.
 
 ### What it tracks
 
 - **Files you open**, from Spotlight's recent-use dates, including folders. This works without any folder access.
-- **New, saved, and downloaded files** in the watched folders: Desktop, Documents, Downloads, and iCloud Drive by default. Downloads carry the page they came from. macOS asks before DOKK may read these folders, so Flix Files waits for you: the panel shows a card with **Allow…** buttons, and **Settings → Flix Files** lists each folder with its own button. Nothing is read before you press one. Folders Lookout already reads with your permission are watched without asking again.
+- **New, saved, and downloaded files** in the watched folders: Desktop, Documents, Downloads, and iCloud Drive by default. A download's row says which site it came from ("Downloaded from example.com"); the full page address is kept only while **Track web links** is on, and banking, health, and your excluded sites leave no trace at all. Symbolic links in watched folders are not listed. macOS asks before DOKK may read these folders, so Flix Files waits for you: the panel shows a card with **Allow…** buttons, and **Settings → Flix Files** lists each folder with its own button. Nothing is read before you press one. Folders Lookout already reads with your permission are watched without asking again.
 - **Apps** you bring to the front, at most once every five minutes per app.
 
 ### Fits this window
@@ -451,7 +453,7 @@ Flix Files needs Accessibility permission to read a window's text and Screen Rec
 
 ### Uploads that fit
 
-When the window in front states limits ("PDF only · max 5 MB"), Flix Files prepares copies that fit before you drag: pictures (including HEIC) become a PDF or a JPEG, RTF, plain text, Markdown, HTML, and Word documents become a PDF, and pictures over the limit are scaled down. A Fits row shows the copy ("as PDF · 1.2 MB"), and the drag picture says **✦ Upload as PDF · 1.2 MB**. The copy keeps the original's name with its new extension; the original never changes. Pages, Numbers, Keynote, and other formats go out unchanged. A copy that is not ready yet when the drag starts is skipped too.
+When the window in front states limits ("PDF only · max 5 MB"), Flix Files prepares copies that fit before you drag: pictures (including HEIC) become a PDF or a JPEG, RTF, plain text, Markdown, and Word documents become a PDF, and pictures over the limit are scaled down. A Fits row shows the copy ("as PDF · 1.2 MB"), and the drag picture says **✦ Upload as PDF · 1.2 MB**. The copy keeps the original's name with its new extension; the original never changes. HTML pages, web archives, Pages, Numbers, Keynote, and other formats go out unchanged. A copy that is not ready yet when the drag starts is skipped too, and so is every copy once you switched to another window. Dropping on the Shelf, the Trash, or a folder or app in the dock always uses the original file.
 
 ### Sensitive files
 
@@ -459,9 +461,9 @@ With **Sensitive file guard** on, Flix Files checks each file once in the backgr
 
 ### Web links
 
-**Settings → Flix Files → Track web links** (off by default) keeps the pages around your files: the page a download came from ("Source of “Invoice.pdf”"), a page you dropped a Flix file into ("↑ You sent 2 files here"), and web documents such as Google Docs, Figma, Notion, Linear, Office, and Atlassian pages that stay in front for 30 seconds. **Pages you read**, a separate switch, also keeps any page that stays in front for two minutes while you use the Mac. With a browser in front, **Save this page** at the top of the panel keeps its page, and a web address dragged onto the panel is kept too.
+**Settings → Flix Files → Track web links** (off by default) keeps the pages around your files: the page a download came from ("Source of “Invoice.pdf”", when the download finished while that page was in front in a normal browser window), a page you dropped a Flix file into ("↑ You sent 2 files here"), and web documents such as Google Docs, Figma, Notion, Linear, Office, and Atlassian pages that stay in front for 30 seconds. **Pages you read**, a separate switch, also keeps any page that stays in front for two minutes while you use the Mac. With a browser in front, **Save this page** at the top of the panel keeps its page, and a web address dragged onto the panel is kept too.
 
-Private and incognito windows are never tracked. Safari does not show which of its windows are private, so Safari pages are kept only when you save them or download from them. Banking and health sites are left out (**Leave out banking and health sites**), and you can add your own sites. Flix Files keeps only the address, title, and time, with sign-in tokens and session codes removed. Link rows show the site's first letter, or its icon with **Load site icons** on; they open in the browser they came from and drag out as a web address (a `.webloc` in Finder).
+Private and incognito windows are never tracked: a window counts as normal only when Flix Files could read the part of the browser where the private badge would be, and is skipped otherwise. Safari does not show which of its windows are private, so Safari pages are kept only when you save them. Banking and health sites are left out (**Leave out banking and health sites**), and you can add your own sites. Flix Files keeps only the address without its query, the title, and the time; sign-in, password reset, invitation, and share links are not kept at all, even when you save them. Link rows show the site's first letter, or its icon with **Load site icons** on; they open in the browser they came from and drag out as a web address (a `.webloc` in Finder).
 
 ### Intelligence
 

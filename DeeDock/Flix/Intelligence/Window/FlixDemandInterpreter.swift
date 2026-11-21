@@ -106,8 +106,9 @@ nonisolated enum FlixDemandInterpreter {
                 demand.acceptedTypes.append(type)
             }
         }
-        if generated.maximumMegabytes > 0, generated.maximumMegabytes < 100_000 {
-            demand.maximumBytes = Int64(generated.maximumMegabytes * 1_000_000)
+        // The model's number is untrusted: NaN, infinity, or a huge value means no limit.
+        if let megabytes = FlixNumbers.finite(generated.maximumMegabytes, in: 0...100_000), megabytes > 0 {
+            demand.maximumBytes = FlixNumbers.int64(megabytes * 1_000_000, in: 1...FlixWindowDemand.largestSizeLimit)
         }
         demand.pageKind = switch generated.pageKind {
         case .upload: .upload

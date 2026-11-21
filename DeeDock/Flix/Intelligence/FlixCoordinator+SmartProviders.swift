@@ -45,6 +45,12 @@ extension FlixCoordinator {
         let engines = FlixEngineMonitor(intelligence: intelligence, lookout: lookout, robi: robi)
         engines.start()
 
+        // Flix Files switched off: cancel running work, keep the caches.
+        pauseProviders.append {
+            annotations.stop()
+            threads.stop()
+            similarity.stop()
+        }
         stopProviders.append {
             engines.stop()
             annotations.stop()

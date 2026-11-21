@@ -60,6 +60,25 @@ nonisolated enum AIObservability {
         let missedInputTokens: Int
     }
 
+    /// Why a generation failed, as a closed set of values. A generation that withholds its content
+    /// (`includesContent: false`) reports only this: an error's own text can carry a server
+    /// message, a host name, or words from the prompt. Map an `Error` with
+    /// `AIObservability.ErrorCode(_:)` (in `AIObservabilityErrorCode.swift`).
+    nonisolated enum ErrorCode: String, Sendable, CaseIterable {
+        case contextExceeded = "context_exceeded"
+        case rateLimited = "rate_limited"
+        case guardrail
+        case refusal
+        case unsupportedLanguage = "unsupported_language"
+        case unsupported
+        case timeout
+        case offline
+        case network
+        case credential
+        case unavailable
+        case other
+    }
+
     /// Sends one `$ai_generation`. Defaults describe Apple's on-device model; a caller using
     /// another model passes its own `model` and `provider`. Credentials are never part of a
     /// generation: callers pass only the prompt, the instructions and the answer, and anything in
@@ -69,33 +88,36 @@ nonisolated enum AIObservability {
     ///   - instructions: The session's instructions, sent as a system message before `input`.
     ///   - usage: Token counts, when the model reports them.
     ///   - cacheDiagnostics: The cache comparison, for a request that opted in to one.
-    ///   - error: A message safe to show the person, for a generation that failed.
-    ///   - includesContent: False leaves the instructions, the prompt and the answer out of this one
-    ///     generation, whatever `capturesContent` says: only metadata (model, latency, token
-    ///     counts, the error message) is sent. Flix Files passes false for every call, because its
-    ///     prompts carry file names and file contents.
+    ///   - error: A message safe to show the person, for a generation that failed. Sent only when
+    ///     `includesContent` is true.
+    ///   - errorCode: Why the generation failed, from a closed set. With `includesContent` false
+    ///     this is the only error value sent; a free-form `error` is replaced by it, or by `other`.
+    ///   - includesContent: False leaves the instructions, the prompt, the answer, and any
+    ///     free-form error text out of this one generation, whatever `capturesContent` says: only
+    ///     metadata (model, latency, token counts, the error code) is sent. Flix Files passes false
+    ///     for every call, because its prompts carry file names and file contents.
     static func capture(trace: Trace, name: String, input: String, output: String? = nil,
                         startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
                         model: String = "apple_foundation_models", provider: String = "apple",
                         instructions: String? = nil, usage: Usage? = nil,
                         cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil,
-                        includesContent: Bool = true) async {
+                        errorCode: ErrorCode? = nil, includesContent: Bool = true) async {
         let properties = properties(trace: trace, name: name, input: input, output: output, startedAt: startedAt,
                                     maximumResponseTokens: maximumResponseTokens, stream: stream, model: model,
                                     provider: provider, instructions: instructions, usage: usage,
-                                    cacheDiagnostics: cacheDiagnostics, error: error,
+                                    cacheDiagnostics: cacheDiagnostics, error: error, errorCode: errorCode,
                                     includesContent: includesContent)
         await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))
     }
 
-    /// The `$ai_generation` properties ``capture(trace:name:input:output:startedAt:maximumResponseTokens:stream:model:provider:instructions:usage:cacheDiagnostics:error:includesContent:)``
+    /// The `$ai_generation` properties ``capture(trace:name:input:output:startedAt:maximumResponseTokens:stream:model:provider:instructions:usage:cacheDiagnostics:error:errorCode:includesContent:)``
     /// sends, built apart from sending so the content opt-out can be checked without a backend.
     static func properties(trace: Trace, name: String, input: String, output: String? = nil,
                            startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
                            model: String = "apple_foundation_models", provider: String = "apple",
                            instructions: String? = nil, usage: Usage? = nil,
                            cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil,
-                           includesContent: Bool = true) -> [String: Any] {
+                           errorCode: ErrorCode? = nil, includesContent: Bool = true) -> [String: Any] {
         var properties: [String: Any] = [
             "$ai_trace_id": trace.id,
             "$ai_session_id": sessionID,
@@ -117,9 +139,14 @@ nonisolated enum AIObservability {
             properties["cache_diagnostics"] = cacheDiagnostics.outcomes
             properties["cache_missed_input_tokens"] = cacheDiagnostics.missedInputTokens
         }
-        if let error {
+        if error != nil || errorCode != nil {
             properties["$ai_is_error"] = true
-            properties["$ai_error"] = redacted(error)
+            // Withheld content withholds error text too: only the closed code leaves the Mac.
+            if includesContent, let error {
+                properties["$ai_error"] = redacted(error)
+            } else {
+                properties["$ai_error"] = (errorCode ?? .other).rawValue
+            }
         }
         if capturesContent, includesContent {
             var messages: [[String: String]] = []

@@ -11,7 +11,10 @@ import UniformTypeIdentifiers
 ///   sits in Downloads, a **screenshot** when `kMDItemIsScreenCapture` is set, otherwise **new**;
 /// - an older file that changed is **saved**.
 /// Partial downloads, hidden files, package internals, and noise are skipped here; the finished file
-/// arrives as its own event.
+/// arrives as its own event. Symbolic links are skipped too, and nothing here follows one: the
+/// resource values describe the link itself (`lstat` semantics) and extended attributes are read
+/// with `XATTR_NOFOLLOW`, so a link in a watched folder can never lead a read into a folder DOKK
+/// was not allowed.
 ///
 /// The stream runs on a private queue and is invalidated by ``stop()``; nothing polls.
 nonisolated final class FlixFolderWatcher: @unchecked Sendable {
@@ -101,8 +104,9 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
         let url = URL(fileURLWithPath: path)
         let keys: Set<URLResourceKey> = [.isDirectoryKey, .isPackageKey, .isHiddenKey, .creationDateKey,
                                          .contentModificationDateKey, .contentTypeKey, .fileSizeKey,
-                                         .localizedNameKey]
-        guard let values = try? url.resourceValues(forKeys: keys), values.isHidden != true else { return nil }
+                                         .localizedNameKey, .isSymbolicLinkKey]
+        guard let values = try? url.resourceValues(forKeys: keys), values.isHidden != true,
+              values.isSymbolicLink != true else { return nil }
         let isDirectory = values.isDirectory == true
         let isPackage = values.isPackage == true
         // A folder's own modification only means its contents changed; those report themselves.
@@ -155,11 +159,12 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
         return (value as? Bool) ?? ((value as? NSNumber)?.boolValue ?? false)
     }
 
+    /// One extended attribute of the item at `path` itself, never of what a link points to.
     private static func attribute(_ name: String, at path: String) -> Data? {
-        let length = getxattr(path, name, nil, 0, 0, 0)
-        guard length > 0 else { return nil }
+        let length = getxattr(path, name, nil, 0, 0, XATTR_NOFOLLOW)
+        guard length > 0, length <= 1_048_576 else { return nil }
         var data = Data(count: length)
-        let read = data.withUnsafeMutableBytes { getxattr(path, name, $0.baseAddress, length, 0, 0) }
+        let read = data.withUnsafeMutableBytes { getxattr(path, name, $0.baseAddress, length, 0, XATTR_NOFOLLOW) }
         return read == length ? data : nil
     }
 }

@@ -18,9 +18,14 @@ final class FlixIntelligence {
     var providers = FlixIntelligenceProviders() {
         didSet { clearMissingSlots() }
     }
-    /// The Flix settings the slots obey (`suggestsForFrontWindow`, `writesCaptions`, …).
+    /// The Flix settings the slots obey (`suggestsForFrontWindow`, `writesCaptions`, …). With
+    /// `isEnabled` off nothing runs: every task is cancelled and no pass starts.
     var settings = FlixSettings() {
-        didSet { if settings != oldValue { clearDisabledSlots() } }
+        didSet {
+            guard settings != oldValue else { return }
+            if !settings.isEnabled { stop() }
+            clearDisabledSlots()
+        }
     }
     /// Settings' "What powers it" rows, kept current by `FlixEngineMonitor`.
     var engines = FlixEngineStatus()
@@ -176,7 +181,7 @@ final class FlixIntelligence {
     /// The window in front changed while the panel is closed: refreshes the tile pill.
     func frontWindowChanged(_ context: FlixFrontmostContext?, items: [FlixItem]) {
         tileTask?.cancel()
-        guard settings.showsFitsOnTile, let provider = providers.fits, let context else {
+        guard settings.isEnabled, settings.showsFitsOnTile, let provider = providers.fits, let context else {
             tileFitCount = nil
             return
         }
@@ -187,9 +192,10 @@ final class FlixIntelligence {
         }
     }
 
-    /// The history changed. Refreshes annotations and threads in the background, coalesced.
+    /// The history changed. Refreshes annotations and threads in the background, coalesced. Does
+    /// nothing while Flix Files is off.
     func historyChanged(items: [FlixItem]) {
-        guard providers.annotations != nil || providers.threads != nil else { return }
+        guard settings.isEnabled, providers.annotations != nil || providers.threads != nil else { return }
         backgroundTask?.cancel()
         let annotations = providers.annotations
         let threads = settings.groupsThreads ? providers.threads : nil
@@ -197,7 +203,7 @@ final class FlixIntelligence {
         backgroundTask = Task { [weak self] in
             // Coalesces bursts, such as a Spotlight gather, into one pass.
             try? await Task.sleep(for: .seconds(2))
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled, self?.settings.isEnabled == true else { return }
             if let annotations {
                 let fresh = await annotations.annotations(for: items, known: known)
                 guard let self, !Task.isCancelled else { return }
@@ -405,6 +411,10 @@ final class FlixIntelligence {
         backgroundTask?.cancel(); backgroundTask = nil
         tileFitCount = nil
     }
+
+    /// Whether a coalesced annotation and Threads pass was scheduled and not cancelled since (it
+    /// stays set once it finished). For tests of the master switch.
+    var isBackgroundPassPending: Bool { backgroundTask != nil }
 
     #if DEBUG
     /// Fills slots directly, for previews. Never called in a running app.

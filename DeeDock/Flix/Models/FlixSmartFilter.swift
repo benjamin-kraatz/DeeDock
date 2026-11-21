@@ -88,7 +88,8 @@ nonisolated enum FlixSmartFilterRule: Codable, Hashable, Sendable {
 
     /// The amount in a topic made by ``amountTopic(_:)``, or nil for an ordinary topic.
     static func amount(inTopic topic: String) -> Double? {
-        topic.hasPrefix(amountTopicPrefix) ? Double(topic.dropFirst(amountTopicPrefix.count)) : nil
+        guard topic.hasPrefix(amountTopicPrefix) else { return nil }
+        return FlixNumbers.finite(Double(topic.dropFirst(amountTopicPrefix.count)), in: 0...FlixNumbers.maximumAmount)
     }
 
     private static let amountTopicPrefix = "\u{1}amount>"

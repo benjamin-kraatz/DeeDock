@@ -27,4 +27,14 @@ extension FlixFrontmostContext {
                                     windowTitle: window?[kCGWindowName as String] as? String,
                                     capturedAt: .now)
     }
+
+    /// Whether this app and window are still the ones in front, as a fresh ``capture(fallback:)``
+    /// sees them. Converted upload copies are meant for this window only, so a drag carries them
+    /// only while it is still the upload target. The window is compared when both captures name one.
+    @MainActor
+    func isStillInFront(fallback: NSRunningApplication?) -> Bool {
+        guard let now = Self.capture(fallback: fallback), now.processIdentifier == processIdentifier else { return false }
+        guard let windowID, let current = now.windowID else { return true }
+        return windowID == current
+    }
 }

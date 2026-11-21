@@ -35,7 +35,7 @@ struct FlixConversionAndSensitiveTests {
             == .convert(FlixConversionRecipe(format: .jpeg, maximumBytes: 5_000_000, isResizeOnly: false)))
     }
 
-    @Test(arguments: [UTType.rtf, .rtfd, .plainText, .html, UTType("net.daringfireball.markdown")!,
+    @Test(arguments: [UTType.rtf, .rtfd, .plainText, UTType("net.daringfireball.markdown")!,
                       UTType("org.openxmlformats.wordprocessingml.document")!])
     func textDocumentsBecomePDF(type: UTType) {
         #expect(FlixConversionPlanner.decision(type: type, byteSize: 40_000, isFile: true, demand: demand([.pdf]))

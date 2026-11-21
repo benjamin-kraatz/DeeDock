@@ -9,7 +9,8 @@ enum FolderFileDrop {
               let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
                 options: [.urlReadingFileURLsOnly: true]) as? [URL], !urls.isEmpty,
               urls.count == info.draggingPasteboard.pasteboardItems?.count else { return nil }
-        return urls
+        // A Flix drag may carry converted upload copies; a folder or drive gets the originals.
+        return FlixDragSession.originalURLs(for: urls, on: info.draggingPasteboard)
     }
 
     /// The operation a drop performs: copy, or move while Shift is held where moving is offered.

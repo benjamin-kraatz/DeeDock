@@ -99,14 +99,20 @@ nonisolated enum FlixFactExtractor {
 
     /// "1,240.50", "1.240,50", "3 980", "1'240" and "12,5" as numbers. A separator followed by
     /// exactly three digits groups thousands; one followed by one or two digits is the decimal mark.
+    /// The text is untrusted (OCR, file contents, typed queries), so a value that is not finite or
+    /// exceeds ``FlixNumbers/maximumAmount`` is nil rather than infinity.
     static func parseNumber(_ raw: String) -> Double? {
         let compact = raw.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: "'", with: "")
             .replacingOccurrences(of: "\u{00A0}", with: "")
-        guard let last = compact.lastIndex(where: { $0 == "," || $0 == "." }) else { return Double(compact) }
-        let tail = compact[compact.index(after: last)...]
-        let head = compact[..<last].filter(\.isNumber)
-        if tail.count == 3 { return Double(head + tail) }
-        return Double(head + "." + tail)
+        let parsed: Double?
+        if let last = compact.lastIndex(where: { $0 == "," || $0 == "." }) {
+            let tail = compact[compact.index(after: last)...]
+            let head = compact[..<last].filter(\.isNumber)
+            parsed = tail.count == 3 ? Double(head + tail) : Double(head + "." + tail)
+        } else {
+            parsed = Double(compact)
+        }
+        return FlixNumbers.finite(parsed, in: 0...FlixNumbers.maximumAmount)
     }
 
     private static func currencyCode(_ symbol: String) -> String {

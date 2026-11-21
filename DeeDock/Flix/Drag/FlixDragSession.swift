@@ -7,6 +7,12 @@ import AppKit
 /// DOKK can tell its own drag from a Finder one (the dock tile refuses a drop of its own items).
 /// The session reports pointer movement, so the panel can step aside, and its end, with whether the
 /// destination accepted it. It keeps itself alive until AppKit ends it.
+///
+/// Converted upload copies (phase B1) stand in for originals on the pasteboard, because a browser
+/// reads the file URLs it is handed. They are meant for that upload only: DOKK's own destinations
+/// (the Shelf, the Trash, folder and drive tiles, app tiles) map them back to the originals with
+/// ``originalURLs(for:on:)`` while the drag is in flight, so a temporary copy is never staged,
+/// trashed, or moved, and Flix's cleanup of its copies can never delete something DOKK kept.
 @MainActor
 final class FlixDragSession: NSObject, NSDraggingSource {
     static let pasteboardType = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.flix-drag")
@@ -14,6 +20,8 @@ final class FlixDragSession: NSObject, NSDraggingSource {
     private let moved: (CGPoint) -> Void
     private let ended: (_ accepted: Bool, _ point: CGPoint) -> Void
     private var retained: FlixDragSession?
+    /// Each converted copy on the pasteboard, standardized, with the original it stands in for.
+    private var originals: [URL: URL] = [:]
     /// The session in flight, if any. One drag at a time is all AppKit allows.
     private(set) static weak var current: FlixDragSession?
 
@@ -39,6 +47,11 @@ final class FlixDragSession: NSObject, NSDraggingSource {
         let draggable = items.filter { substitutions[$0.id] != nil || $0.shareURL != nil }
         guard !draggable.isEmpty else { return false }
         let session = FlixDragSession(moved: moved, ended: ended)
+        for item in draggable {
+            if let copy = substitutions[item.id], let original = item.url {
+                session.originals[copy.standardizedFileURL] = original
+            }
+        }
         let origin = view.convert(event.locationInWindow, from: nil)
         let size: CGFloat = 52
         var dragItems: [NSDraggingItem] = []
@@ -74,6 +87,14 @@ final class FlixDragSession: NSObject, NSDraggingSource {
         session.retained = session
         current = session
         return true
+    }
+
+    /// `urls` read from a Flix drag's pasteboard, with every converted copy replaced by its
+    /// original, for DOKK's own destinations. Any other drag, or one that has ended, is returned
+    /// unchanged.
+    static func originalURLs(for urls: [URL], on pasteboard: NSPasteboard) -> [URL] {
+        guard let current, !current.originals.isEmpty, pasteboard.string(forType: pasteboardType) != nil else { return urls }
+        return urls.map { current.originals[$0.standardizedFileURL] ?? $0 }
     }
 
     /// The Flix item identifiers on a pasteboard, empty for any other drag.

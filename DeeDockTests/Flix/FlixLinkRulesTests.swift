@@ -4,33 +4,103 @@ import Testing
 
 /// Web link rules: token stripping, excluded sites, web documents, and private-window markers.
 struct FlixLinkRulesTests {
-    // MARK: Token stripping
+    // MARK: Cleaning addresses
 
     @Test(arguments: [
-        ("https://app.example.com/reset?token=abc123&lang=en", "https://app.example.com/reset?lang=en"),
-        ("https://example.com/cb?code=xyz&state=s1", "https://example.com/cb"),
-        ("https://Example.COM:443/a?utm_source=news&id=7#section", "https://example.com/a?id=7"),
+        // User info, fragment, and the whole query go.
+        ("https://Example.COM:443/a?utm_source=news&id=7#section", "https://example.com/a"),
         ("https://user:pw@example.com/path?sid=1&SessionID=2", "https://example.com/path"),
         ("https://bucket.s3.amazonaws.com/f.pdf?X-Amz-Algorithm=AWS4&X-Amz-Signature=deadbeef&X-Amz-Expires=300",
          "https://bucket.s3.amazonaws.com/f.pdf"),
         ("https://acct.blob.core.windows.net/c/f.pdf?sv=2021&se=2024&sp=r&sig=abc", "https://acct.blob.core.windows.net/c/f.pdf"),
-        ("https://d1.cloudfront.net/f.pdf?Expires=1&Signature=x&Key-Pair-Id=k", "https://d1.cloudfront.net/f.pdf"),
+        ("https://example.com/search?sp=1&q=boots", "https://example.com/search"),
         ("https://example.com", "https://example.com/"),
         ("https://example.com/#access_token=secret", "https://example.com/"),
+        // Ordinary slugs mixing words and digits are names, not secrets.
+        ("https://blog.example.com/2024/how-to-fix-error-404-in-nginx-2024", "https://blog.example.com/2024/how-to-fix-error-404-in-nginx-2024"),
     ])
-    func sanitizerStripsSecrets(input: String, expected: String) {
+    func sanitizerKeepsOnlySchemeHostAndPath(input: String, expected: String) {
         #expect(FlixURLSanitizer.sanitize(input)?.absoluteString == expected)
     }
 
-    @Test func sanitizerKeepsAzureLikeKeysWithoutASignature() {
-        // `sv` and `sp` are ordinary parameters when no signature is present.
-        #expect(FlixURLSanitizer.sanitize("https://example.com/search?sp=1&q=boots")?.absoluteString
-            == "https://example.com/search?sp=1&q=boots")
+    @Test(arguments: [
+        "https://app.example.com/reset/8f3kQ2", "https://app.example.com/password-reset?token=abc",
+        "https://example.com/account/verify-email/abc", "https://example.com/users/confirm/1",
+        "https://team.example.com/invite/xyz", "https://example.com/magic-link/abc", "https://example.com/login",
+        "https://example.com/sign-in", "https://example.com/oauth2/callback", "https://example.com/auth/complete",
+        "https://example.com/api/token", "https://news.example.com/unsubscribe/42", "https://example.com/activate/7",
+        "https://www.dropbox.com/s/abc123def456ghi/Report.pdf", "https://example.com/share/board-1",
+    ])
+    func credentialRoutesAreNeverStored(input: String) {
+        #expect(FlixURLSanitizer.clean(URL(string: input)!) == .skipped)
+        #expect(FlixURLSanitizer.sanitize(input) == nil)
+    }
+
+    @Test(arguments: [
+        "https://files.example.com/d/9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08/report.pdf",
+        "https://portal.example.com/downloads/3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+        "https://example.com/x/Ab3dE6gH9jK2mN5pQ8rS1tU4",
+    ])
+    func highEntropySegmentsAreNeverStored(input: String) {
+        #expect(FlixURLSanitizer.clean(URL(string: input)!) == .skipped)
+    }
+
+    @Test(arguments: [
+        ("https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit?usp=sharing#heading=h.1",
+         "https://docs.google.com/document/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit"),
+        ("https://www.notion.so/team/Reset-Password-Flow-0123456789abcdef0123456789abcdef",
+         "https://www.notion.so/team/Reset-Password-Flow-0123456789abcdef0123456789abcdef"),
+        ("https://linear.app/dokk/issue/DEE-163/invite-flow", "https://linear.app/dokk/issue/DEE-163/invite-flow"),
+        ("https://onedrive.live.com/edit.aspx?resid=ABC123!456&cid=789&authkey=SECRET",
+         "https://onedrive.live.com/edit.aspx?resid=ABC123!456&cid=789"),
+    ])
+    func webDocumentsKeepTheirDocumentPath(input: String, expected: String) {
+        #expect(FlixURLSanitizer.sanitize(input)?.absoluteString == expected)
+    }
+
+    @Test func webDocumentShareRoutesAreStillLeftOut() {
+        #expect(FlixURLSanitizer.sanitize("https://www.notion.so/invite/0123456789abcdef0123456789abcdef") == nil)
+    }
+
+    @Test func cleaningCountsWhatItRemovesAndSkips() {
+        #expect(FlixURLSanitizer.clean(URL(string: "https://example.com/reset/abc")!).removedSecrets == 1)
+        #expect(FlixURLSanitizer.removedSecretCount(URL(string: "https://u:p@example.com/a?code=1&page=2#t=1")!) == 3)
     }
 
     @Test(arguments: ["file:///Users/x/a.pdf", "mailto:a@example.com", "javascript:alert(1)", "ftp://example.com/f"])
     func sanitizerRefusesNonWebAddresses(input: String) {
         #expect(FlixURLSanitizer.sanitize(input) == nil)
+        #expect(FlixURLSanitizer.clean(URL(string: input)!) == .notWeb)
+    }
+
+    // MARK: Download pages
+
+    private func settings(tracksLinks: Bool, excluded: [String] = []) -> FlixSettings {
+        var settings = FlixSettings()
+        settings.tracksLinks = tracksLinks
+        settings.excludedSites = excluded
+        return settings
+    }
+
+    @Test func downloadPagesFollowTheWebLinkSettings() {
+        let page = URL(string: "https://billing.example.com/invoices")!
+        let on = FlixSourcePolicy.allowed(page: page, host: nil, settings: settings(tracksLinks: true))
+        #expect(on.page == page && on.host == "billing.example.com")
+        let off = FlixSourcePolicy.allowed(page: page, host: nil, settings: settings(tracksLinks: false))
+        #expect(off.page == nil && off.host == "billing.example.com")
+        let excluded = FlixSourcePolicy.allowed(page: page, host: nil,
+                                                settings: settings(tracksLinks: true, excluded: ["example.com"]))
+        #expect(excluded.page == nil && excluded.host == nil)
+        // Banking is left out by default, host and all, whether web links are on or off.
+        let bank = FlixSourcePolicy.allowed(page: URL(string: "https://www.paypal.com/activity")!, host: nil,
+                                            settings: settings(tracksLinks: false))
+        #expect(bank.page == nil && bank.host == nil)
+    }
+
+    @Test func downloadsOnlyVouchedForBySameSitePages() {
+        #expect(FlixLinkTracker.sameSite(URL(string: "https://www.example.com/a")!, URL(string: "https://example.com/b")!))
+        #expect(FlixLinkTracker.sameSite(URL(string: "https://cdn.example.com/f")!, URL(string: "https://example.com/")!))
+        #expect(!FlixLinkTracker.sameSite(URL(string: "https://example.org/a")!, URL(string: "https://example.com/")!))
     }
 
     // MARK: Excluded sites
@@ -80,30 +150,86 @@ struct FlixLinkRulesTests {
 
     // MARK: Private windows
 
-    @Test func privateMarkersMakeAWindowPrivate() {
-        #expect(FlixBrowserPageReader.privacy(family: .chromium, title: "Inbox", labels: ["Back", "Incognito"],
-                                              scanned: 50, foundAddress: true) == .private)
-        #expect(FlixBrowserPageReader.privacy(family: .firefox, title: "News — Private Browsing", labels: [],
-                                              scanned: 50, foundAddress: true) == .private)
-        #expect(FlixBrowserPageReader.privacy(family: .chromium, title: "Neuer Tab", labels: ["Inkognito"],
-                                              scanned: 50, foundAddress: true) == .private)
+    private func evidence(title: String? = "Docs", labels: [String] = ["Back", "Reload"], complete: Bool = true)
+        -> FlixBrowserWindowEvidence {
+        FlixBrowserWindowEvidence(title: title, labels: labels, foundAddress: true, addressToolbarComplete: complete)
     }
 
-    @Test func chromiumIsNormalOnlyWithEvidence() {
-        #expect(FlixBrowserPageReader.privacy(family: .chromium, title: "Docs", labels: ["Back", "Reload"],
-                                              scanned: 50, foundAddress: true) == .normal)
-        // Too little of the window was read to rule a private window out.
-        #expect(FlixBrowserPageReader.privacy(family: .chromium, title: "Docs", labels: [],
-                                              scanned: 3, foundAddress: true) == .unknown)
-        #expect(FlixBrowserPageReader.privacy(family: .chromium, title: "Docs", labels: ["Back"],
-                                              scanned: 50, foundAddress: false) == .unknown)
+    @Test func privateMarkersMakeAWindowPrivate() {
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence(title: "Inbox", labels: ["Back", "Incognito"])) == .private)
+        #expect(FlixBrowserPageReader.privacy(family: .firefox, evidence: evidence(title: "News — Private Browsing", labels: [])) == .private)
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence(title: "Neuer Tab", labels: ["Inkognito"])) == .private)
+        // A marker wins even when the toolbar was not read to its end.
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence(labels: ["InPrivate"], complete: false)) == .private)
+    }
+
+    @Test func normalNeedsTheIndicatorRegionReadCompletely() {
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence()) == .normal)
+        // The toolbar holding the address was cut short or not found: unknown.
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: evidence(complete: false)) == .unknown)
+        #expect(FlixBrowserPageReader.privacy(family: .chromium, evidence: FlixBrowserWindowEvidence(title: "Docs")) == .unknown)
+        // Firefox also needs the title, where it says "Private Browsing".
+        #expect(FlixBrowserPageReader.privacy(family: .firefox, evidence: evidence()) == .normal)
+        #expect(FlixBrowserPageReader.privacy(family: .firefox, evidence: evidence(title: nil)) == .unknown)
+        #expect(FlixBrowserPageReader.privacy(family: .firefox, evidence: evidence(title: " ")) == .unknown)
     }
 
     @Test func safariIsNeverTrackedAutomatically() {
-        #expect(FlixBrowserPageReader.privacy(family: .safari, title: "Docs", labels: ["Back", "Reload"],
-                                              scanned: 80, foundAddress: true) == .unknown)
+        #expect(FlixBrowserPageReader.privacy(family: .safari, evidence: evidence()) == .unknown)
+        #expect(FlixBrowserPageReader.privacy(family: .other, evidence: evidence()) == .unknown)
         #expect(!FlixBrowserFamily.safari.tracksAutomatically)
         #expect(!FlixBrowserFamily.other.tracksAutomatically)
+    }
+
+    /// A tiny accessibility tree for the walk: a role, labels, a value, and children (nil when
+    /// reading them fails).
+    private final class Node {
+        let role: String
+        var labels: [String]
+        var value: String?
+        var children: [Node]?
+        init(_ role: String, labels: [String] = [], value: String? = nil, children: [Node]? = []) {
+            self.role = role
+            self.labels = labels
+            self.value = value
+            self.children = children
+        }
+    }
+
+    private func walk(_ root: Node, limit: Int = 700) -> FlixBrowserPageReader.Walk {
+        FlixBrowserPageReader.walk(from: root, limit: limit, expired: { false }, role: \.role, labels: \.labels,
+                                   value: \.value, webURL: { _ in nil }, children: \.children)
+    }
+
+    private func chromeWindow(toolbarChildren: [Node]?, tabs: Int = 0) -> Node {
+        let tabStrip = Node("AXGroup", children: (0..<tabs).map { Node("AXRadioButton", labels: ["Tab \($0)"]) })
+        let toolbar = Node("AXToolbar", children: toolbarChildren)
+        return Node("AXWindow", children: [Node("AXGroup", children: [tabStrip, toolbar]), Node("AXWebArea", children: nil)])
+    }
+
+    @Test func theWalkReadsTheWholeToolbarHoldingTheAddress() {
+        let omnibox = Node("AXTextField", value: "example.com/page")
+        let result = walk(chromeWindow(toolbarChildren: [Node("AXButton", labels: ["Back"]), omnibox,
+                                                         Node("AXGroup", children: [Node("AXButton", labels: ["Profile"])])]))
+        #expect(result.address == "example.com/page")
+        #expect(result.evidence.addressToolbarComplete)
+        #expect(result.evidence.labels.contains("Profile"))
+    }
+
+    @Test func aToolbarThatCannotBeReadToItsEndIsNoEvidence() {
+        let omnibox = Node("AXTextField", value: "example.com/page")
+        // The profile button's group could not be read: the badge may sit there.
+        let failed = walk(chromeWindow(toolbarChildren: [omnibox, Node("AXGroup", children: nil)]))
+        #expect(failed.address != nil && !failed.evidence.addressToolbarComplete)
+        // The budget ran out inside the toolbar.
+        let cut = walk(chromeWindow(toolbarChildren: [omnibox] + (0..<20).map { _ in Node("AXButton") }), limit: 8)
+        #expect(!cut.evidence.addressToolbarComplete)
+    }
+
+    @Test func anAddressOutsideAToolbarIsNoEvidence() {
+        let window = Node("AXWindow", children: [Node("AXGroup", children: [Node("AXTextField", value: "example.com")])])
+        let result = walk(window)
+        #expect(result.evidence.foundAddress && !result.evidence.addressToolbarComplete)
     }
 
     @Test(arguments: [("example.com/path", true), ("https://example.com", true), ("Search or type URL", false),

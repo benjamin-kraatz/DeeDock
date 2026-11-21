@@ -3723,17 +3723,17 @@ Built on `codex/dee-163-b1` and merged. How each part works, the per-browser tab
 - [ ] Tile pill: switch between the upload tab and another tab, then to another app: the pill appears and disappears within a second, without any capture (no Screen Recording indicator) and without focus moving.
 - [ ] Turning off **Suggest files for the window in front** hides the card; turning off **Show "fits here" on the tile** hides the pill and stops the observer.
 - [ ] Drag a HEIC photo from the Fits card into the PDF-only portal: the drag picture says **✦ Upload as PDF · …**, the portal receives `<name>.pdf`, and the original is unchanged. A 12 MB JPEG for a 5 MB limit arrives smaller. A `.pages` file goes out unchanged.
-- [ ] Drag an RTF, a Markdown file, an HTML file, and a `.docx` into the portal: each arrives as a readable PDF.
+- [ ] Drag an RTF, a Markdown file, and a `.docx` into the portal: each arrives as a readable PDF. An HTML file goes out unchanged.
 - [ ] Converted copies sit in `…/T/DOKK Flix Conversions/` and are gone after quitting DOKK.
 - [ ] A passport scan, an IBAN screenshot, and a `.pem` file in an allowed folder are blurred in the panel and, when newest, on the tile, within a minute of arriving. A protected folder that was not allowed is never read and never prompts.
 - [ ] Drag the passport scan into a browser: the question appears with **Send Anyway**, **Not Sensitive**, and **Cancel**. Into Finder or Preview: no question. **Not Sensitive** removes the blur and the question for good, also after a relaunch.
 - [ ] Turning the sensitive guard off removes every blur.
-- [ ] Track web links on: a download from Chrome adds a link row "Source of “<file>”"; dropping a Flix file into a Chrome page adds "↑ You sent 1 file here".
+- [ ] Track web links on: a download from Chrome, finishing while its page is in front, adds a link row "Source of “<file>”"; dropping a Flix file into a Chrome page adds "↑ You sent 1 file here".
 - [ ] A Google Doc in Chrome kept in front for 30 seconds is kept and listed under **Web documents**; switching tabs before 30 seconds keeps nothing.
 - [ ] **Pages you read** on: a page read for two minutes is kept; a page left in front while away from the Mac is not.
 - [ ] An Incognito window in Chrome, an InPrivate window in Edge, a Private window in Brave and Firefox, and Arc's incognito: nothing is kept automatically. Repeat with the browser's UI in German. Safari: nothing is kept automatically from any window.
 - [ ] Banking and health sites (a bank's login, a patient portal) and a site on the user's list are never kept automatically.
-- [ ] A page whose address carries `?token=…`, `?code=…&state=…`, or a signed S3 link is stored without those parameters.
+- [ ] A page whose address carries `?token=…`, `?code=…&state=…`, or a signed S3 link is stored without its query.
 - [ ] With a browser in front, **Save this page** keeps the page and turns into **Saved**; it also works in Safari and in a private window, because it is deliberate.
 - [ ] Link rows show a monogram; with **Load site icons** on, the site's icon after a moment and no request while it is off. A click opens the page in the browser it came from; dragging a link into Finder makes a `.webloc`, into a browser opens the page.
 - [ ] VoiceOver reads the Fits rows with their conversion, the sensitive reason, link relation lines, and the Save this page card. Reduce Motion: the card and chips appear without animation beyond a fade.
@@ -3787,3 +3787,42 @@ Analytics after the approved spec: `flix_session_ended` once per open, `flix_dro
 - [ ] With Lookout reading a folder of contracts, a window asking for "the signed agreement" suggests a scanned contract whose name shares no word with it; with Lookout off, only name matches appear.
 - [ ] Settings → Flix Files → What powers it: with Robi on the on-device model and no key, the Robi row says **On this Mac**; switching Robi to Claude without a key changes it to **Not set up** at once, and saving a key to **Claude**. Turning Lookout off or on updates its row without reopening Settings.
 - [ ] Drag a blurred (sensitive) row and the tile when its newest item is sensitive: the drag picture is blurred with a lock.
+
+### Review fixes (R1)
+
+Fixes for the cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- Numbers from window text, OCR, files, and model output are checked for finiteness and bounds before every integer conversion (`FlixNumbers`).
+- AI observability sends only a closed error code (`AIObservability.ErrorCode`) for calls with `includesContent: false`, whatever the caller passes; Ask Robi and every `FlixLanguageModel` call pass codes.
+- A browser window counts as normal only when the toolbar holding its address (and, for Firefox, its title) was read completely within the budget; anything less is unknown.
+- Download pages follow the web-link settings (`FlixSourcePolicy`): full page only while tracking is on, host only while it is off, nothing for excluded sites; stored histories are migrated at launch. A download becomes a link row only when a normal window of the browser in front shows a page on its site.
+- Stored addresses lose their whole query (except a document key for OneDrive, SharePoint, and Confluence); credential routes, share links, and secret-looking path segments are not stored at all, except the document paths of known web-document services.
+- Turning Flix Files off cancels and blocks every background pass, worker, observer, and conversion; nothing starts at launch while it is off.
+- The read policy follows symbolic links without touching what they point to first; the folder watcher skips links and reads attributes with `XATTR_NOFOLLOW`.
+- DOKK's own drop targets (Shelf, Trash, folder, drive, and app tiles) get originals instead of converted upload copies; copies are substituted only while the window the panel read is still in front.
+- Moves report each file; the ones that moved get Undo, the rest are named in the toast. Undo of moves, renames, and Tidy verifies the file's identity and leaves changed or replaced files alone.
+- Clear History keeps a cutoff date that no source event can cross.
+- The front-window observer's Accessibility calls run on a dedicated thread with timeouts, after the switch settles; the web-tree switch for window reading runs detached.
+- HTML and web archives are no longer converted; document imports are typed and bounded, also for the sensitive scanner and captions.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R1`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixUntrustedInputTests` (numbers, observability codes, the master switch), `FlixFileSafetyTests` (symbolic links, partial moves, identity-checked Undo, HTML conversions), `FlixLinkRulesTests` (address policy, download-page policy, private-window evidence and the toolbar walk), `FlixHistoryTests` (clear cutoff, migration).
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] In Chrome, open an Incognito window and a normal one with many tabs: the Incognito window is never tracked; the normal one is tracked once its toolbar is read. With a slow, busy Chrome, nothing is tracked rather than a guess.
+- [ ] With **Track web links** off, download a file: its row says "Downloaded from <host>" and `history.json` holds no page address for it. Download from a bank's site: no host either.
+- [ ] With web links on, download from a page in a private window while a normal window is in front on another site: no "Source of" link row appears.
+- [ ] Save a password-reset or invitation page with **Save this page**: nothing is kept.
+- [ ] Turn Flix Files off while captions are being written: no file is read afterwards (Activity Monitor's disk reads for DOKK settle), and nothing starts after a relaunch.
+- [ ] In an allowed folder, make a symbolic link to `~/Documents` (not allowed): no Files and Folders prompt appears, and the link's files show type icons only.
+- [ ] Drag a converted Fits row onto the dock's Shelf, Trash, and a folder tile: each gets the original, not the PDF copy; the copy still goes to the portal when dropped there.
+- [ ] Move three files to a folder favorite where one name is locked: two move, the toast names the third, and Undo returns the two. Replace a moved file in Finder, then press Undo: it stays, and the toast says so.
+- [ ] Clear History, quit, and relaunch: the files you opened before the clear do not reappear.
+- [ ] Switch quickly between a hung app and others: the dock stays responsive.
+

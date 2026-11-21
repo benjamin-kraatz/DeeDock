@@ -13,6 +13,11 @@ import SwiftUI
 /// re-applies only what changed; ``stop()`` closes the panel, stops every source and observer, and
 /// writes the history. Background sources never read a protected folder that was not allowed (see
 /// `FlixReadPolicy`), so nothing here can make macOS ask for access on its own.
+///
+/// The master switch (`FlixSettings.isEnabled`) gates everything that runs in the background:
+/// while it is off no source, observer, provider pass, worker, or conversion starts, including at
+/// launch, and turning it off cancels what is running (``suspendBackgroundWork()``). The history
+/// stays on disk and the tile simply disappears.
 @MainActor @Observable
 final class FlixCoordinator {
     let settingsStore: FlixSettingsStore
@@ -51,6 +56,9 @@ final class FlixCoordinator {
     /// Stops phase B providers' own background work and flushes their caches; whoever installs
     /// providers appends here (see `installSmartProviders(lookout:robi:)`). Run by ``stop()``.
     @ObservationIgnored var stopProviders: [() -> Void] = []
+    /// Cancels phase B providers' running work without tearing them down, for when Flix Files is
+    /// switched off. Their next pass starts it again once it is back on.
+    @ObservationIgnored var pauseProviders: [() -> Void] = []
 
     @ObservationIgnored private let spotlight = FlixSpotlightSource()
     @ObservationIgnored private let watcher = FlixFolderWatcher()
@@ -144,10 +152,16 @@ final class FlixCoordinator {
 
     /// Re-applies what changed between two settings values.
     private func apply(_ new: FlixSettings, previous old: FlixSettings?) {
+        let enabled = new.isEnabled
+        if !enabled, old?.isEnabled != false { suspendBackgroundWork() }
         intelligence.settings = new
         readPolicy = FlixReadPolicy(settings: new, lookoutFolders: lookoutFolders())
         contextServices?.apply(new)
-        let enabled = new.isEnabled
+        // At launch this also migrates download pages stored under the earlier, looser policy.
+        if old == nil || old?.isEnabled != new.isEnabled || old?.tracksLinks != new.tracksLinks
+            || old?.excludedSites != new.excludedSites || old?.excludesSensitiveSites != new.excludesSensitiveSites {
+            history.applySourcePolicy(new)
+        }
         if enabled, new.tracksOpenedFiles { spotlight.start(includingFolders: new.tracksFolders) } else { spotlight.stop() }
         restartWatcher()
         applyShortcut()
@@ -164,6 +178,15 @@ final class FlixCoordinator {
             tileVisibilityChanged?()
         }
         historyDidChange()
+    }
+
+    /// Flix Files was switched off: cancels every pass, worker, and timer that runs on its own.
+    /// Sources and observers stop through ``apply(_:previous:)``; providers' caches stay for later.
+    private func suspendBackgroundWork() {
+        close(restoreFocus: false, animated: false)
+        intelligence.stop()
+        for pause in pauseProviders { pause() }
+        contextServices?.suspend()
     }
 
     private func applyShortcut() {
@@ -218,14 +241,17 @@ final class FlixCoordinator {
 
     // MARK: Sources
 
-    /// Merges events, dropping what the settings do not track.
+    /// Merges events, dropping what the settings do not track and download pages they do not
+    /// allow (``FlixSourcePolicy``), before anything reaches the history or the link tracker.
     private func receive(_ events: [FlixActivityEvent]) {
         let settings = settings
+        // A source stopped by the master switch may still deliver its last batch.
+        guard settings.isEnabled else { return }
         let kept = events.filter { event in
             if event.kind == .folder, !settings.tracksFolders { return false }
             if event.kind == .app, !settings.tracksApps { return false }
             return true
-        }
+        }.map { FlixSourcePolicy.apply(to: $0, settings: settings) }
         guard !kept.isEmpty else { return }
         countRecorded(kept)
         history.record(kept)
@@ -271,6 +297,8 @@ final class FlixCoordinator {
 
     private func historyDidChange() {
         refreshTile()
+        // No analysis, guard pass, or link index while Flix Files is off.
+        guard settings.isEnabled else { return }
         intelligence.historyChanged(items: history.items)
         contextServices?.historyChanged(history.items)
     }
@@ -494,7 +522,8 @@ final class FlixCoordinator {
     /// The drop questions (a sensitive file, an older version) run here, before the drag starts:
     /// macOS never tells a drag source where the drop will land, so Flix asks about the window that
     /// was in front when it opened. Answering lets the next drag of the same items go ahead for 30
-    /// seconds. Phase B1's conversions replace files on the pasteboard through the plan.
+    /// seconds. Phase B1's conversions replace files on the pasteboard through the plan, but only
+    /// while the window the panel read is still the one in front: the copies are for that upload.
     func beginDrag(_ ids: [FlixItem.ID], from view: NSView, event: NSEvent, origin: FlixActionOrigin = .list) {
         let items = ids.compactMap(history.item)
         guard !items.isEmpty else { return }
@@ -506,7 +535,8 @@ final class FlixCoordinator {
             panelState.confirmation = FlixPendingConfirmation(confirmation: question, itemIDs: ids)
             return
         }
-        let plan = intelligence.dragPlan(for: items, context: panelState.frontmost)
+        let stillInFront = panelState.frontmost?.isStillInFront(fallback: previous ?? previousApplication?()) == true
+        let plan = stillInFront ? intelligence.dragPlan(for: items, context: panelState.frontmost) : nil
         let icons = Dictionary(uniqueKeysWithValues: items.map {
             ($0.id, dragIcon(for: $0, base: FlixIconProvider.icon(for: $0, policy: readPolicy)))
         })

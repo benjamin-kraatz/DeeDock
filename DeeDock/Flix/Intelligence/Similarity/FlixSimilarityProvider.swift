@@ -77,7 +77,7 @@ final class FlixSimilarityProvider: FlixSimilarityProviding {
     /// their lists and counts can match by meaning. Called on each history pass; topics are asked
     /// again after ten minutes at most (`FlixTopicCache`).
     func warmSmartFilters() {
-        guard services.semantic.isAvailable, warmTask == nil else { return }
+        guard services.settings.isEnabled, services.semantic.isAvailable, warmTask == nil else { return }
         let topics = services.smartFilters.flatMap(\.rules).compactMap { rule -> String? in
             if case .about(let topic) = rule { topic } else { nil }
         }

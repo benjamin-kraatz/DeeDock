@@ -548,7 +548,7 @@ Counters in `usage_summary`:
 | `flix_items_opened`, `flix_items_downloaded`, `flix_items_new`, `flix_items_saved`, `flix_items_app` | events the sources recorded, by activity (a file kept by dropping it counts as saved) |
 | `flix_links_recorded` | link items recorded or refreshed |
 | `flix_links_private_skipped`, `flix_links_excluded_skipped` | pages a trigger read that were skipped as private (or unknown) or as an excluded site |
-| `flix_link_tokens_stripped` | credentials removed from recorded addresses: a user name or password, a token in the fragment, and each secret or signing query key |
+| `flix_link_tokens_stripped` | credentials removed from recorded addresses (a user name or password, a fragment with a value, and each secret or signing query key), plus one for each address not stored because its path is a credential route or looks like a secret |
 | `flix_noise_filtered` | recorded events that are noise and hidden while **Hide noise** is on |
 | `flix_captions_generated` | file analyses that produced a caption |
 | `flix_ai_cache_hits` | a window's reading reused on a reopen, and an analysis already done when the worker reached a file |
@@ -712,9 +712,13 @@ prompt or answer contains:
 Flix Files' calls are the exception: every `FlixLanguageModel` call (`flix_caption_picture`,
 `flix_caption_document`, `flix_search_understand`, `flix_thread_name`, `flix_smart_filter`,
 `flix_morning`) and Ask Robi (`flix_ask_robi`) pass `includesContent: false`, so their
-`$ai_generation` carries the span, model, provider, latency, token limit, token counts, and an
-error type, and never `$ai_input` or `$ai_output_choices`: those prompts hold file names and file
-contents. The global `capturesContent` stays `true` for everything else. Reading the window for
+`$ai_generation` carries the span, model, provider, latency, token limit, token counts, and, for a
+failure, a closed error code in `$ai_error` (`context_exceeded`, `rate_limited`, `guardrail`,
+`refusal`, `unsupported_language`, `unsupported`, `timeout`, `offline`, `network`, `credential`,
+`unavailable`, `other`; `AIObservability.ErrorCode`), and never `$ai_input`,
+`$ai_output_choices`, or an error's own text: those prompts hold file names and file contents, and
+an error message can carry a server's words or a host name. With `includesContent: false`,
+`AIObservability` itself replaces any free-form error with a code. The global `capturesContent` stays `true` for everything else. Reading the window for
 Fits this window (`FlixDemandInterpreter`) and the sensitive guard's look at a picture send no
 `$ai_generation` at all.
 

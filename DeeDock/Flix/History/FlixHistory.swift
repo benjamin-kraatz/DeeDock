@@ -129,10 +129,18 @@ final class FlixHistory {
         document.items.first { !(hidingNoise && FlixNoiseRules.isNoise(path: $0.path)) }
     }
 
-    /// Forgets every item. The library stays.
-    func clear() {
-        document = FlixHistoryDocument()
-        document.lastSeen = .now
+    /// Forgets every item. The library stays. Sources cannot bring back anything dated before now
+    /// (``FlixHistoryDocument/clearedAt``).
+    func clear(at date: Date = .now) {
+        document = .cleared(at: date)
+        saveHistory()
+    }
+
+    /// Strips stored download pages the settings no longer allow (``FlixSourcePolicy``). Called at
+    /// launch, which migrates histories saved under the earlier policy, and when web-link settings
+    /// change.
+    func applySourcePolicy(_ settings: FlixSettings) {
+        guard document.applySourcePolicy(settings) else { return }
         saveHistory()
     }
 

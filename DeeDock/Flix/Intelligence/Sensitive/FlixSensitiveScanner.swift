@@ -58,8 +58,9 @@ nonisolated enum FlixSensitiveScanner {
             let data = (try? handle.read(upToCount: maximumTextBytes)) ?? Data()
             return FlixSensitiveRules.kind(forText: String(decoding: data, as: UTF8.self))
         }
-        if FlixConversionPlanner.isText(type), !type.conforms(to: .html), size <= maximumDocumentBytes {
-            let text = (try? NSAttributedString(url: url, options: [:], documentAttributes: nil))?.string ?? ""
+        if FlixConversionPlanner.isText(type), size <= maximumDocumentBytes {
+            // Typed import only: never HTML or a web archive, which would load WebKit off the main thread.
+            let text = FlixDocumentImport.attributedString(at: url, type: type, byteSize: size)?.string ?? ""
             return FlixSensitiveRules.kind(forText: String(text.prefix(maximumTextBytes)))
         }
         return nil

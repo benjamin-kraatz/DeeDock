@@ -1,6 +1,7 @@
 import AppKit
 import ApplicationServices
 import FoundationModels
+import Synchronization
 
 /// The window in front, read for "Fits this window".
 nonisolated struct FlixWindowReading: @unchecked Sendable {
@@ -31,16 +32,16 @@ nonisolated struct FlixWindowKey: Hashable, Sendable {
 ///
 /// A later reader runs only when the earlier one found less than ``FlixWindowTextPolicy`` asks for.
 /// - Accessibility needs DOKK's Accessibility permission; without it the chain starts at Vision.
-///   For Electron and Chromium apps the web tree is switched on with
-///   `RobiWebAccessibility.enable` for this one read and always restored afterwards, even when the
-///   read is cancelled.
+///   For Electron and Chromium apps the web tree is switched on (``FlixWebTree``) for this one read
+///   and always restored afterwards, even when the read is cancelled.
 /// - Vision needs Screen Recording; without it (`CGPreflightScreenCaptureAccess`, which never asks)
 ///   the step is skipped. Only that one window is captured, and the picture stays in memory.
 /// - Apple Intelligence gets the picture only when the system model is available and reports the
 ///   `.vision` capability.
 ///
-/// Heavy work runs off the main actor (`RobiWindowText` and `RobiCapture` do their own); only the
-/// web-accessibility switch, which AppKit's running-application object needs, touches the main actor.
+/// Every call to the other app runs off the main actor with a messaging timeout (`RobiWindowText`
+/// and `RobiCapture` do their own; the web-tree switch and the window lookups run detached), so a
+/// busy app cannot stall the dock.
 @MainActor
 final class FlixWindowReader {
     private let capture = RobiCapture()
@@ -85,12 +86,12 @@ final class FlixWindowReader {
         if AXIsProcessTrusted() {
             chain.steps.append(.accessibility)
             step(chain)
-            let change = NSRunningApplication(processIdentifier: context.processIdentifier)
-                .map(RobiWebAccessibility.enable(for:)) ?? .none
+            let bundleURL = NSRunningApplication(processIdentifier: context.processIdentifier)?.bundleURL
+            let change = await FlixWebTree.enable(processIdentifier: context.processIdentifier, bundleURL: bundleURL)
             text = await RobiWindowText.read(processIdentifier: context.processIdentifier, budget: 0.6, limit: 12_000,
                                              landmarkLimit: 0).text
-            // Restored even after cancellation: the flag must never stay on.
-            RobiWebAccessibility.restore(change)
+            // Restored even after cancellation (a detached task ignores it): the flag must never stay on.
+            await FlixWebTree.restore(change)
             axWords = FlixWindowReading.wordCount(text)
             if FlixWindowTextPolicy.isEnough(text) {
                 chain.succeeded = true
@@ -141,5 +142,56 @@ final class FlixWindowReader {
                 && abs(rect.width - frame.width) < 2 && abs(rect.height - frame.height) < 2
         }
         return (match?[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? context.windowID
+    }
+}
+
+/// Switches on an Electron or Chromium app's web accessibility tree for one read, off the main
+/// actor. The same rules as Robi's `RobiWebAccessibility`: Electron's `AXManualAccessibility` when
+/// it is accepted, else Chromium's `AXEnhancedUserInterface`, which must be switched off again.
+/// Every call is IPC to that app, so each runs in a detached task with a messaging timeout.
+nonisolated enum FlixWebTree {
+    /// What was switched on, so it can be switched off again.
+    enum Change: Sendable {
+        case none
+        case enhancedInterface(pid_t)
+    }
+
+    static let messagingTimeout: Float = 0.2
+    private static let chromiumBundles = Mutex<[URL: Bool]>([:])
+
+    static func enable(processIdentifier pid: pid_t, bundleURL: URL?) async -> Change {
+        await Task.detached(priority: .userInitiated) { () -> Change in
+            let element = AXUIElementCreateApplication(pid)
+            AXUIElementSetMessagingTimeout(element, messagingTimeout)
+            if AXUIElementSetAttributeValue(element, "AXManualAccessibility" as CFString, kCFBooleanTrue) == .success {
+                return .none
+            }
+            guard isChromium(bundleURL) else { return .none }
+            AXUIElementSetAttributeValue(element, "AXEnhancedUserInterface" as CFString, kCFBooleanTrue)
+            return .enhancedInterface(pid)
+        }.value
+    }
+
+    static func restore(_ change: Change) async {
+        guard case let .enhancedInterface(pid) = change else { return }
+        await Task.detached(priority: .userInitiated) {
+            let element = AXUIElementCreateApplication(pid)
+            AXUIElementSetMessagingTimeout(element, messagingTimeout)
+            AXUIElementSetAttributeValue(element, "AXEnhancedUserInterface" as CFString, kCFBooleanFalse)
+        }.value
+    }
+
+    /// Chromium-based apps ship `chrome_100_percent.pak` inside a framework. Cached per bundle.
+    private static func isChromium(_ bundle: URL?) -> Bool {
+        guard let bundle else { return false }
+        if let known = chromiumBundles.withLock({ $0[bundle] }) { return known }
+        let frameworks = bundle.appending(path: "Contents/Frameworks")
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: frameworks.path)) ?? []
+        let found = names.contains { name in
+            name.hasSuffix(".framework") && FileManager.default.fileExists(
+                atPath: frameworks.appending(path: "\(name)/Resources/chrome_100_percent.pak").path)
+        }
+        chromiumBundles.withLock { $0[bundle] = found }
+        return found
     }
 }

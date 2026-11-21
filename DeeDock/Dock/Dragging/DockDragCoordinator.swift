@@ -434,8 +434,11 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         // Never accept a stale or fabricated internal token as a Finder payload.
         guard pasteboard.string(forType: Self.pasteboardType) == nil else { return }
         cancel()
-        guard let objects = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
-              !objects.isEmpty else { return }
+        guard let read = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
+              !read.isEmpty else { return }
+        // A Flix drag may carry converted upload copies; the Shelf, the Trash, app tiles, and
+        // actions get the originals, so a temporary copy is never staged, trashed, or opened.
+        let objects = FlixDragSession.originalURLs(for: read, on: pasteboard)
         pasteboardChange = pasteboard.changeCount; active = true; completion = DockDragCompletion(); importSession = DockSession()
         shelfSourceIDs = (pasteboard.string(forType: ShelfDragSession.pasteboardType) ?? "")
             .split(separator: ",").compactMap { UUID(uuidString: String($0)) }

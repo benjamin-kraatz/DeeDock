@@ -45,7 +45,10 @@ enum FlixFileAnalyzer {
     ///
     /// - Parameters:
     ///   - useModel: Apple Intelligence may be asked (captions are on and the model is ready).
-    static func analyze(_ item: FlixItem, stamp: FlixFileStamp, useModel: Bool, now: Date = .now) async -> FlixAnalysisRecord? {
+    ///   - policy: Checked again before the folder is listed for a free name: the file's folder can
+    ///     be protected even when the file is readable.
+    static func analyze(_ item: FlixItem, stamp: FlixFileStamp, useModel: Bool, policy: FlixReadPolicy,
+                        now: Date = .now) async -> FlixAnalysisRecord? {
         guard let path = item.path else { return nil }
         let cryptic = FlixFileNaming.isCryptic(item.name)
         let isPicture = item.kind == .image || item.kind == .screenshot
@@ -100,7 +103,7 @@ enum FlixFileAnalyzer {
         }
         guard cryptic else { return record }
         record.caption = caption.map(clean).flatMap { $0.isEmpty ? nil : String($0.prefix(90)) }
-        if let fileName, let folder = item.url?.deletingLastPathComponent().path {
+        if let fileName, let folder = item.url?.deletingLastPathComponent().path, policy.canRead(folder) {
             let taken = await FlixContentReader.names(in: folder)
             record.suggestedName = FlixFileNaming.sanitizedName(fileName, keepingExtensionOf: item.name, taken: taken)
         }
@@ -128,8 +131,10 @@ enum FlixFileAnalyzer {
            let due = isoDay(raw) {
             facts.insert(.due(due), at: 0)
         }
-        if !facts.contains(where: { if case .amount = $0 { true } else { false } }), let total = document.total, total > 0,
-           digits.contains(String(Int(total.rounded(.down)))) {
+        // The model's total is untrusted: only a finite, bounded value is converted to digits.
+        if !facts.contains(where: { if case .amount = $0 { true } else { false } }),
+           let total = FlixNumbers.amount(document.total),
+           let whole = FlixNumbers.int64(total, in: 0...Int64.max), digits.contains(String(whole)) {
             facts.append(.amount(total, currency: (document.currency ?? "EUR").uppercased()))
         }
         let mentionsSignature = ["sign", "unterschr", "unterzeichn", "signatur"].contains(where: folded.contains)

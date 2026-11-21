@@ -6,8 +6,9 @@ import Foundation
 /// Matching is by host suffix on label boundaries: `bank.example.com` also excludes
 /// `login.bank.example.com`, never `notbank.example.com`. The built-in category also matches host
 /// labels that contain a banking or health word (`onlinebanking-…`, `mychart.…`, `…klinik…`),
-/// which errs toward leaving a page out. The exclusions apply to automatic tracking; a page you
-/// save yourself ("Save this page", a dropped URL) is kept, because that is a deliberate choice.
+/// which errs toward leaving a page out. The exclusions apply to automatic tracking and to the pages
+/// downloads came from (`FlixSourcePolicy`, which keeps not even the host); a page you save
+/// yourself ("Save this page", a dropped URL) is kept, because that is a deliberate choice.
 nonisolated struct FlixSiteExclusions: Equatable, Sendable {
     /// Hosts typed in Settings, lowercased, without `www.`.
     var userSites: [String]

@@ -21,8 +21,12 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
     var date: Date
     /// When Flix Files first recorded the item.
     var firstSeen: Date
-    /// The page a download came from (`kMDItemWhereFroms`), reduced to scheme, host, and path.
+    /// The page a download came from (`kMDItemWhereFroms`), cleaned by `FlixURLSanitizer`. Kept
+    /// only while web links are on and the site is not excluded (``FlixSourcePolicy``).
     var sourcePage: URL?
+    /// The download page's host without `www.`, for "Downloaded from billing.example.com". Kept
+    /// when the page itself is not (web links off); nil for an excluded site.
+    var sourceHost: String?
     /// The uniform type identifier, when known.
     var contentTypeIdentifier: String?
     var byteSize: Int64?
@@ -31,8 +35,9 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
     /// Set for apps, so reopening and icons do not depend on the path.
     var bundleIdentifier: String?
 
+    /// - Parameter sourceHost: Defaults to `sourcePage`'s host.
     init(id: UUID = UUID(), path: String? = nil, link: FlixLink? = nil, name: String, kind: FlixItemKind,
-         activity: FlixActivity, date: Date, firstSeen: Date? = nil, sourcePage: URL? = nil,
+         activity: FlixActivity, date: Date, firstSeen: Date? = nil, sourcePage: URL? = nil, sourceHost: String? = nil,
          contentTypeIdentifier: String? = nil, byteSize: Int64? = nil, isFlagged: Bool = false,
          bundleIdentifier: String? = nil) {
         self.id = id
@@ -44,6 +49,7 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
         self.date = date
         self.firstSeen = firstSeen ?? date
         self.sourcePage = sourcePage
+        self.sourceHost = sourceHost ?? sourcePage.flatMap(FlixPaths.displayHost)
         self.contentTypeIdentifier = contentTypeIdentifier
         self.byteSize = byteSize
         self.isFlagged = isFlagged
@@ -79,12 +85,6 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
         return parent.isEmpty ? nil : FileManager.default.displayName(atPath: parent)
     }
 
-    /// The download page's host without `www.`, for "Downloaded from billing.example.com".
-    var sourceHost: String? {
-        guard let host = sourcePage?.host(percentEncoded: false) else { return nil }
-        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
-    }
-
     /// Whether the item lies inside `folder` (a standardized absolute path), at any depth.
     func isInside(_ folder: String) -> Bool {
         guard let path else { return false }
@@ -101,14 +101,17 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
     var kind: FlixItemKind
     var activity: FlixActivity
     var date: Date
+    /// The download page as the source read it. ``FlixSourcePolicy`` decides what of it is kept.
     var sourcePage: URL?
+    var sourceHost: String?
     var contentTypeIdentifier: String?
     var byteSize: Int64?
     var bundleIdentifier: String?
 
+    /// - Parameter sourceHost: Defaults to `sourcePage`'s host.
     init(path: String? = nil, link: FlixLink? = nil, name: String, kind: FlixItemKind, activity: FlixActivity,
-         date: Date, sourcePage: URL? = nil, contentTypeIdentifier: String? = nil, byteSize: Int64? = nil,
-         bundleIdentifier: String? = nil) {
+         date: Date, sourcePage: URL? = nil, sourceHost: String? = nil, contentTypeIdentifier: String? = nil,
+         byteSize: Int64? = nil, bundleIdentifier: String? = nil) {
         self.path = path.map(FlixPaths.standardized)
         self.link = link
         self.name = name
@@ -116,6 +119,7 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
         self.activity = activity
         self.date = date
         self.sourcePage = sourcePage
+        self.sourceHost = sourceHost ?? sourcePage.flatMap(FlixPaths.displayHost)
         self.contentTypeIdentifier = contentTypeIdentifier
         self.byteSize = byteSize
         self.bundleIdentifier = bundleIdentifier

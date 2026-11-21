@@ -50,14 +50,16 @@ nonisolated enum FlixConversionDecision: Hashable, Sendable {
 /// - Pictures that ImageIO can read (HEIC, PNG, TIFF, WebP, JPEG, GIF…) become a PDF when PDFs are
 ///   accepted, else a JPEG, else a PNG. A picture over the size limit is scaled down (JPEG, or PNG
 ///   when only PNG is accepted).
-/// - Text documents that `NSAttributedString` reads (RTF, RTFD, plain text, Markdown, HTML, Word
-///   `.docx`/`.doc`, OpenDocument text) become a PDF when PDFs are accepted.
+/// - Text documents that `NSAttributedString` reads off the main thread (RTF, RTFD, plain text,
+///   Markdown, Word `.docx`/`.doc`, OpenDocument text) become a PDF when PDFs are accepted. HTML and
+///   web archives are not converted: their importer needs the main thread and loads external
+///   resources (`FlixDocumentImport`).
 /// - Everything else is unconvertible: iWork files (Pages, Numbers, Keynote) and other formats
 ///   need their own app to export, and a PDF or document over the limit cannot be made smaller here.
 nonisolated enum FlixConversionPlanner {
-    /// The text types `NSAttributedString` can import.
+    /// The text types Flix Files imports with `NSAttributedString` off the main thread.
     static let textTypes: [UTType] = [
-        .rtf, .rtfd, .flatRTFD, .plainText, .html, .webArchive,
+        .rtf, .rtfd, .flatRTFD, .plainText,
         UTType("net.daringfireball.markdown"), UTType("org.openxmlformats.wordprocessingml.document"),
         UTType("com.microsoft.word.doc"), UTType("org.oasis-open.opendocument.text"),
     ].compactMap { $0 }
@@ -108,7 +110,8 @@ nonisolated enum FlixConversionPlanner {
     }
 
     static func isText(_ type: UTType) -> Bool {
-        textTypes.contains { type.conforms(to: $0) }
+        guard !type.conforms(to: .html), !type.conforms(to: .webArchive) else { return false }
+        return textTypes.contains { type.conforms(to: $0) }
     }
 
     /// The copy's file name: the original's name with the new extension ("Scan.heic" → "Scan.pdf").

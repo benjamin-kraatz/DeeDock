@@ -83,13 +83,10 @@ nonisolated enum FlixContentReader {
         } else if let type, type.conforms(to: .plainText) || type.conforms(to: .sourceCode) || type.conforms(to: .json)
                     || type.conforms(to: .commaSeparatedText) || type.conforms(to: .xml) {
             content.text = plainText(url, limit: limit)
-        } else if let type, type.conforms(to: .rtf) || type.conforms(to: .rtfd)
-                    || ["docx", "doc", "odt"].contains(url.pathExtension.lowercased()) {
-            // Office and RTF documents through AppKit's importers. HTML is left out: its importer
-            // loads WebKit, which belongs on the main thread.
-            if let text = try? NSAttributedString(url: url, options: [:], documentAttributes: nil).string {
-                content.text = String(text.prefix(limit))
-            }
+        } else if let type, let text = FlixDocumentImport.attributedString(at: url, type: type)?.string {
+            // Office and RTF documents through AppKit's importers, typed so nothing is read as
+            // HTML: that importer loads WebKit and external resources.
+            content.text = String(text.prefix(limit))
         }
         if content.pageCount == nil { content.pageCount = spotlightPageCount(path) }
         return content

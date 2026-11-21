@@ -79,8 +79,10 @@ enum FlixQueryModel {
             result.days = days
             result.timePhrase = .days(days)
         }
-        if result.minimumAmount == nil, let amount = generated.minimumAmount, amount > 0,
-           folded.filter(\.isNumber).contains(String(Int(amount))) {
+        // The model's amount is untrusted: only a finite, bounded value is converted to digits.
+        if result.minimumAmount == nil, let amount = FlixNumbers.amount(generated.minimumAmount),
+           let whole = FlixNumbers.int64(amount, in: 0...Int64.max),
+           folded.filter(\.isNumber).contains(String(whole)) {
             result.minimumAmount = amount
         }
         if result.folder == nil { result.folder = backed(generated.folder) }

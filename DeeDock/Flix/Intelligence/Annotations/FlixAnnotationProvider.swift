@@ -11,8 +11,8 @@ import Foundation
 /// in progress, caches each result by path and stamp (`FlixAnalysisStore`), and asks for a new pass
 /// after every few files, which then shows them.
 ///
-/// Respects the settings on every pass: captions, names, and facts only with `writesCaptions`, folder
-/// suggestions only with `suggestsFolders`. Reads only what `FlixReadPolicy` allows, so it never
+/// Respects the settings on every pass: nothing at all while Flix Files is off, captions, names, and
+/// facts only with `writesCaptions`, folder suggestions only with `suggestsFolders`. Reads only what `FlixReadPolicy` allows, so it never
 /// makes macOS ask for a folder. ``stop()`` cancels the worker. Main actor.
 @MainActor
 final class FlixAnnotationProvider: FlixAnnotationProviding {
@@ -41,6 +41,10 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
 
     func annotations(for items: [FlixItem], known: [FlixItem.ID: FlixItemAnnotation]) async
         -> [FlixItem.ID: FlixItemAnnotation] {
+        guard services.settings.isEnabled else {
+            stop()
+            return [:]
+        }
         services.observeActivity(items)
         followRenames(items)
         let settings = services.settings
@@ -138,6 +142,8 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             let id = queue.removeFirst()
             await services.waitWhileDragging()
             guard !Task.isCancelled else { break }
+            // Re-checked per file: switching Flix Files or captions off stops the worker at once.
+            guard services.settings.isEnabled else { break }
             guard services.settings.writesCaptions, let item = services.item(id), let path = item.path,
                   services.readPolicy.canRead(path),
                   let stamp = await FlixContentReader.stamps([path])[path] else { continue }
@@ -146,7 +152,8 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
                 Analytics.count(.aiCacheHits)
                 continue
             }
-            let analyzed = await FlixFileAnalyzer.analyze(item, stamp: stamp, useModel: FlixLanguageModel.isAvailable)
+            let analyzed = await FlixFileAnalyzer.analyze(item, stamp: stamp, useModel: FlixLanguageModel.isAvailable,
+                                                          policy: services.readPolicy)
             guard !Task.isCancelled else { break }
             if analyzed?.caption != nil { Analytics.count(.captionsGenerated) }
             // A file that couldn't be read gets an empty record, so it isn't read again until it changes.

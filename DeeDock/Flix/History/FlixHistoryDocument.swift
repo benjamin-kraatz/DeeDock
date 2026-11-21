@@ -6,7 +6,8 @@ import Foundation
 /// - one item per ``FlixItem/key`` (path or page);
 /// - `items` sorted by `date`, newest first;
 /// - at most ``capacity`` items, flagged items exempt; at most ``noiseCapacity`` noise items;
-/// - an item removed from Flix Files comes back only with an event newer than its removal.
+/// - an item removed from Flix Files comes back only with an event newer than its removal;
+/// - after Clear History, no event dated at or before the clear is recorded (``clearedAt``).
 nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
     /// Total items kept. Older unflagged items fall off first.
     static let capacity = 5_000
@@ -20,10 +21,22 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
     var removed: [String: Date] = [:]
     /// When the panel was last opened. Drives the tile's unseen badge.
     var lastSeen: Date = .distantPast
+    /// When the history was last cleared. Sources replay the past (Spotlight seeds the last 30
+    /// days of opened files at every launch), so an event dated at or before this is dropped;
+    /// otherwise cleared items would come back. Survives ``cleared(at:)``, unlike the tombstones.
+    var clearedAt: Date?
 
     init() {}
 
-    private enum CodingKeys: String, CodingKey { case version, items, removed, lastSeen }
+    /// An empty history that remembers it was cleared at `date`.
+    static func cleared(at date: Date) -> FlixHistoryDocument {
+        var document = FlixHistoryDocument()
+        document.lastSeen = date
+        document.clearedAt = date
+        return document
+    }
+
+    private enum CodingKeys: String, CodingKey { case version, items, removed, lastSeen, clearedAt }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -31,6 +44,7 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
         items = try container.decodeIfPresent([FlixItem].self, forKey: .items) ?? []
         removed = try container.decodeIfPresent([String: Date].self, forKey: .removed) ?? [:]
         lastSeen = try container.decodeIfPresent(Date.self, forKey: .lastSeen) ?? .distantPast
+        clearedAt = try container.decodeIfPresent(Date.self, forKey: .clearedAt)
         normalize()
     }
 
@@ -42,6 +56,7 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
     @discardableResult
     mutating func record(_ event: FlixActivityEvent) -> Bool {
         let key = event.key
+        if let clearedAt, event.date <= clearedAt { return false }
         if let removedAt = removed[key] {
             guard event.date > removedAt else { return false }
             removed[key] = nil
@@ -68,6 +83,7 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
                 item.activity = event.activity
             }
             item.sourcePage = item.sourcePage ?? event.sourcePage
+            item.sourceHost = item.sourceHost ?? event.sourceHost
             item.contentTypeIdentifier = item.contentTypeIdentifier ?? event.contentTypeIdentifier
             item.byteSize = event.byteSize ?? item.byteSize
             item.bundleIdentifier = item.bundleIdentifier ?? event.bundleIdentifier
@@ -78,6 +94,7 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
         } else {
             insertSorted(FlixItem(path: event.path, link: event.link, name: event.name, kind: event.kind,
                                   activity: event.activity, date: event.date, sourcePage: event.sourcePage,
+                                  sourceHost: event.sourceHost,
                                   contentTypeIdentifier: event.contentTypeIdentifier, byteSize: event.byteSize,
                                   bundleIdentifier: event.bundleIdentifier))
         }
@@ -116,6 +133,21 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         items[index].path = path
         items[index].name = name
+    }
+
+    /// Strips download pages the settings no longer allow (``FlixSourcePolicy``).
+    /// - Returns: True when any item changed.
+    @discardableResult
+    mutating func applySourcePolicy(_ settings: FlixSettings) -> Bool {
+        var changed = false
+        for index in items.indices {
+            let allowed = FlixSourcePolicy.apply(to: items[index], settings: settings)
+            if allowed != items[index] {
+                items[index] = allowed
+                changed = true
+            }
+        }
+        return changed
     }
 
     /// Items that arrived by themselves since the panel was last opened, noise excluded.

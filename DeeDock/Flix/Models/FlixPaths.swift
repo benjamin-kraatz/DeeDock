@@ -9,22 +9,22 @@ nonisolated enum FlixPaths {
         return standardized.count > 1 && standardized.hasSuffix("/") ? String(standardized.dropLast()) : standardized
     }
 
-    /// The page a download came from, reduced to scheme, host, and path so tokens in the query or
-    /// fragment are never stored. `whereFroms` is `kMDItemWhereFroms`: the file's own address
-    /// first, then the page that linked to it. The page is preferred when present.
+    /// The page a download came from, cleaned by ``FlixURLSanitizer`` (no query, fragment, or
+    /// sign-in details; nothing at all for a credential-bearing address). `whereFroms` is
+    /// `kMDItemWhereFroms`: the file's own address first, then the page that linked to it. The page
+    /// is preferred when present.
+    ///
+    /// This is what a source reports; whether any of it is stored is decided later by
+    /// ``FlixSourcePolicy`` from the web-link settings.
     static func sourcePage(fromWhereFroms whereFroms: [String]) -> URL? {
         let candidates = whereFroms.count > 1 ? [whereFroms[1], whereFroms[0]] : whereFroms
-        for candidate in candidates {
-            guard var components = URLComponents(string: candidate),
-                  let scheme = components.scheme?.lowercased(), scheme == "http" || scheme == "https",
-                  components.host?.isEmpty == false else { continue }
-            components.query = nil
-            components.fragment = nil
-            components.user = nil
-            components.password = nil
-            if let url = components.url { return url }
-        }
-        return nil
+        return candidates.lazy.compactMap { FlixURLSanitizer.sanitize($0) }.first
+    }
+
+    /// A page's host without `www.`, as the "Downloaded from …" line shows it.
+    static func displayHost(of url: URL) -> String? {
+        guard let host = url.host(percentEncoded: false)?.lowercased(), !host.isEmpty else { return nil }
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
     /// The default watched folders: Desktop, Documents, Downloads, and iCloud Drive.
