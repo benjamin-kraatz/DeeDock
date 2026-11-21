@@ -36,7 +36,10 @@ struct LookoutSearcherRankingTests {
         try index.add("a/all.txt", text: "the quarterly invoice for march")
         try index.add("a/half.txt", text: "an invoice, nothing else")
         try index.add("a/none.txt", text: "holiday pictures")
-        let results = try index.searcher().search("quarterly invoice", queryVector: nil)
+        // Every word counting the same: with rare words weighing more, "invoice" (in two of three files) is under half.
+        let searcher = try index.searcher()
+        searcher.tuning.idfExponent = 0
+        let results = try searcher.search("quarterly invoice", queryVector: nil)
         let all = try #require(results.all.first { $0.path == index.path("a/all.txt") })
         let half = try #require(results.all.first { $0.path == index.path("a/half.txt") })
         #expect(results.count == 2)
@@ -47,8 +50,29 @@ struct LookoutSearcherRankingTests {
         // 0.71 is under half of 2.0: the half match folds under weaker matches.
         #expect(results.strong.map(\.path) == [all.path] && results.weak.map(\.path) == [half.path])
 
-        let three = try index.searcher().search("quarterly invoice march", queryVector: nil)
+        let three = try searcher.search("quarterly invoice march", queryVector: nil)
         #expect(three.all.map(\.path) == [all.path])   // a third of the words isn't enough
+    }
+
+    @Test func aCodeIsOnePhraseAndTheFileNamedAfterItComesFirst() throws {
+        let index = try LookoutSearchIndex()
+        let invoice = try index.add("bills/RE-24-0815.pdf", kind: .pdf, text: "Rechnung RE-24-0815 Gewürze")
+        try index.store.addNameRow(file: invoice, path: index.path("bills/RE-24-0815.pdf"))
+        try index.add("bills/RK-24-0816.pdf", kind: .pdf, text: "Korrektur zur Rechnung RE-24-0815")
+        try index.add("bills/RE-24-0817.pdf", kind: .pdf, text: "Rechnung RE-24-0817 0815 Stück")
+        let results = try index.searcher().search("RE-24-0815", queryVector: nil)
+        // As separate words "re", "26" and "2853" matched all three; as one phrase only the two that contain it.
+        #expect(results.isLookup)
+        #expect(results.all.map(\.path) == [index.path("bills/RE-24-0815.pdf"), index.path("bills/RK-24-0816.pdf")])
+    }
+
+    @Test func germanSpellingsFindEachOther() throws {
+        let index = try LookoutSearchIndex()
+        try index.add("bills/invoice.pdf", kind: .pdf, text: "Rechnung an Frau Großmann, München")
+        let searcher = try index.searcher()
+        // ss for ß and ue for ü, as people type them; accents alone were already folded.
+        #expect(try searcher.search("Grossmann", queryVector: nil).all.map(\.path) == [index.path("bills/invoice.pdf")])
+        #expect(try searcher.search("Muenchen", queryVector: nil).all.map(\.path) == [index.path("bills/invoice.pdf")])
     }
 
     @Test func meaningAndWordsAddUpAndSayBoth() throws {

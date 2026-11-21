@@ -18,8 +18,9 @@ nonisolated struct LookoutResultSet: Sendable, Equatable {
     init() {}
 
     /// Splits `ranked` (best first) at `strongRatio` of the top score.
-    init(ranked: [LookoutHit], terms: [String], isLookup: Bool, usedMeaning: Bool) {
-        let strongCount = Searcher.strongCount(ranked)
+    init(ranked: [LookoutHit], terms: [String], isLookup: Bool, usedMeaning: Bool,
+         strongRatio: Double = LookoutRanking.strongRatio) {
+        let strongCount = Searcher.strongCount(ranked, ratio: strongRatio)
         strong = Array(ranked.prefix(strongCount))
         weak = Array(ranked.dropFirst(strongCount))
         self.terms = terms

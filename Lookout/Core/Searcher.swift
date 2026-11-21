@@ -35,6 +35,13 @@ nonisolated final class Searcher {
     /// False after `releaseVectors()` (or `loadVectors: false`): keyword search still works, and the next search with
     /// a query vector loads them again.
     private(set) var vectorsLoaded = false
+    /// The numbers `search` ranks with: `LookoutRanking`'s constants unless the bench tries others.
+    var tuning = LookoutRanking.Tuning()
+    /// The moment relative dates in a query ("letzten Monat") are read against; nil for now. The bench sets it to the
+    /// day its cases were written.
+    var referenceDate: Date?
+    /// `fileCount()`'s answer, cleared when the vectors load again after the index changed.
+    private var searchableFiles: Int?
 
     var vectorCount: Int { rowFile.count }
 
@@ -50,6 +57,7 @@ nonisolated final class Searcher {
     /// - Throws: SQLite errors; the vectors stay released then.
     func reload() throws {
         releaseVectors()
+        searchableFiles = nil
         vectorSource = try store.meta("vector_source")
         var rows = 0
         try store.db.query("SELECT COUNT(*) FROM segments WHERE vec IS NOT NULL") { rows = Int($0.int(0)) }
@@ -116,7 +124,7 @@ nonisolated final class Searcher {
     func search(_ text: String, queryVector: [Float]?, scope: String? = nil, kinds: Set<FileKind>? = nil,
                 filter: LookoutSearchFilter? = nil, limit: Int = 40, prefixLast: Bool = false) throws
         -> LookoutResultSet {
-        let zGate = LookoutRanking.zGate
+        let tuning = self.tuning, zGate = tuning.zGate
         if queryVector != nil, !vectorsLoaded { try reload() }
         let range = scope.map(Self.prefixRange)
         let scoped = try range.map(files(in:))
@@ -137,10 +145,13 @@ nonisolated final class Searcher {
             }
         }
 
-        // Words: FTS5 with Porter stemming over file names, folder names, OCR, page and document text.
-        let terms = Self.terms(text)
-        let found = try wordMatches(Self.patterns(terms, prefixLast: prefixLast), terms: terms, range: range,
-                                    kinds: kinds, filter: filter)
+        // Words: FTS5 with Porter stemming over file names, folder names, OCR, page and document text. A code in the
+        // query is one phrase (`QueryUnit`); `terms` keeps its parts for highlighting.
+        let units = Self.units(text)
+        let terms = Array(NSOrderedSet(array: units.flatMap(\.words))) as? [String] ?? []
+        let found = try wordMatches(Self.patterns(units, prefixLast: prefixLast), terms: terms, range: range,
+                                    kinds: kinds, filter: filter, names: tuning.nameWeight != 0,
+                                    idfExponent: tuning.idfExponent)
         let (words, coverage, allowed) = (found.matches, found.coverage, found.allowed)
 
         // A file qualifies by standing out in meaning, or by containing at least half of the query's words.
@@ -148,35 +159,46 @@ nonisolated final class Searcher {
         // One common word can't beat a strong meaning match; all the words of an exact lookup usually do.
         // (This beat reciprocal-rank fusion on both of DigUp's evals, 2026-10-07: R@1 0.88 vs 0.73 synthetic, 0.86
         // vs 0.82 real.)
-        let lookup = Self.isLookup(terms)
+        let lookup = Self.isLookup(units: units)
         let (meaningWeight, wordsWeight) = lookup
-            ? (LookoutRanking.lookupMeaningWeight, LookoutRanking.wordWeight * LookoutRanking.lookupWordFactor)
-            : (1, LookoutRanking.wordWeight)
+            ? (tuning.lookupMeaningWeight, tuning.wordWeight * tuning.lookupWordFactor)
+            : (1, tuning.wordWeight)
         let hinted = Self.kindHints(text)
+        let dateHint = tuning.dateBonus == 0 ? nil : DateHint.parse(text, now: referenceDate ?? Date())
         var candidates = Set(best.filter { $0.value.z >= zGate }.keys)
-        for (file, share) in coverage where share >= LookoutRanking.wordGate { candidates.insert(file) }
+        for (file, share) in coverage where share >= tuning.wordGate { candidates.insert(file) }
         let fileRows = try files(withIDs: candidates)
         var scored: [Int64: Double] = [:]
         var members: [LookoutFolderGrouping.Member] = []
         for file in candidates {
             guard let row = fileRows[file], allowed[file] ?? filter?.allows(row.path) ?? true else { continue }
             let z = best[file]?.z, share = coverage[file] ?? 0
-            var score = meaningWeight * max(z ?? 0, 0) + wordsWeight * pow(share, LookoutRanking.coverageExponent)
-            if hinted.contains(row.kind) { score += LookoutRanking.kindHintBonus }
+            var score = meaningWeight * max(z ?? 0, 0) + wordsWeight * pow(share, tuning.coverageExponent)
+            if hinted.contains(row.kind) { score += tuning.kindHintBonus }
+            score += tuning.nameWeight * (found.nameCoverage[file] ?? 0)
+            if let dateHint, dateHint.interval.contains(DateHint.fileDate(modified: row.modified, info: row.info)) {
+                score += tuning.dateBonus
+            }
             scored[file] = score
             members.append(.init(path: row.path, score: score, z: z, coverage: share,
-                                 match: .init(meaning: (z ?? -.infinity) >= zGate, words: share >= LookoutRanking.wordGate)))
+                                 match: .init(meaning: (z ?? -.infinity) >= zGate, words: share >= tuning.wordGate)))
         }
 
-        // Files and folders in one ranked list. Ties go by path, so equal scores keep a stable order.
+        // Files and folders in one ranked list, best first. On equal scores a file goes before a folder, so a folder
+        // never ranks above its best file (DEE-166), then by path, so equal scores keep a stable order.
         enum Entry { case file(Int64), folder(LookoutHit) }
         var entries: [(score: Double, path: String, entry: Entry)] = scored.map { file, score in
             (score: score, path: fileRows[file]!.path, entry: Entry.file(file))
         }
-        entries += LookoutFolderGrouping.folders(from: members, excluding: scope).map {
+        entries += LookoutFolderGrouping.folders(from: members, excluding: scope, tuning: tuning).map {
             (score: $0.score, path: $0.path, entry: Entry.folder($0))
         }
-        entries.sort { $0.score > $1.score || ($0.score == $1.score && $0.path < $1.path) }
+        entries.sort { a, b in
+            if a.score != b.score { return a.score > b.score }
+            if case .file = a.entry, case .folder = b.entry { return true }
+            if case .folder = a.entry, case .file = b.entry { return false }
+            return a.path < b.path
+        }
         let page = entries.prefix(limit)
 
         // Point at the best meaning segment if it stands out; else at the segment the words matched.
@@ -204,14 +226,15 @@ nonisolated final class Searcher {
                 hits.append(LookoutHit(
                     path: row.path, kind: row.kind, folder: nil, score: score, z: semantic?.z, cosine: semantic?.cosine,
                     coverage: share, keywordRank: keyword?.rank,
-                    match: .init(meaning: (semantic?.z ?? -.infinity) >= zGate, words: share >= LookoutRanking.wordGate),
+                    match: .init(meaning: (semantic?.z ?? -.infinity) >= zGate, words: share >= tuning.wordGate),
                     segment: segment.kind, segmentID: segmentID, loc: segment.loc, locEnd: segment.locEnd,
                     snippet: Self.snippet(pointedAt: segmentID, segment: segment, keyword: keyword?.match,
                                           matchedKind: keyword.flatMap { segmentRows[$0.match.segment]?.kind }),
                     excerpt: segment.excerpt, modified: row.modified, size: row.size, info: row.info))
             }
         }
-        return LookoutResultSet(ranked: hits, terms: terms, isLookup: lookup, usedMeaning: usedMeaning)
+        return LookoutResultSet(ranked: hits, terms: terms, isLookup: lookup, usedMeaning: usedMeaning,
+                                strongRatio: tuning.strongRatio)
     }
 
     /// How many of `hits` (best first) are strong: scoring at least `ratio` × the top hit. The rest pass the gates but
@@ -227,6 +250,9 @@ nonisolated final class Searcher {
         var matches: [(file: Int64, segment: Int64, snippet: String?)] = []
         /// The share of the query's words found anywhere in each of `matches`' files.
         var coverage: [Int64: Double] = [:]
+        /// The share found in the file's own name (the `name` column: the file name; folder names are in `body`), when
+        /// `names` asked.
+        var nameCoverage: [Int64: Double] = [:]
         /// The settings filter's verdict, existence included, for every file the search stepped through.
         var allowed: [Int64: Bool] = [:]
     }
@@ -241,7 +267,8 @@ nonisolated final class Searcher {
     ///
     /// - Throws: SQLite errors.
     func wordMatches(_ patterns: [String], terms: [String], range: (lower: String, upper: String)?,
-                     kinds: Set<FileKind>?, filter: LookoutSearchFilter?) throws -> WordMatches {
+                     kinds: Set<FileKind>?, filter: LookoutSearchFilter?, names: Bool = false,
+                     idfExponent: Double = 0) throws -> WordMatches {
         var found = WordMatches()
         guard !patterns.isEmpty else { return found }
         let match = SQLValue.text(patterns.joined(separator: " OR "))
@@ -284,13 +311,50 @@ nonisolated final class Searcher {
         }
         found.matches = matched.map { ($0.file, $0.segment, snippets[$0.segment]) }
         let files = found.matches.map { String($0.file) }.joined(separator: ",")
-        for pattern in patterns {
+        let weights = try patternWeights(patterns, idfExponent: idfExponent)
+        for (pattern, weight) in zip(patterns, weights) {
             try store.db.query("""
                 SELECT DISTINCT s.file FROM fts JOIN segments s ON s.id = fts.rowid
                 WHERE fts MATCH ? AND s.file IN (\(files))
-                """, [.text(pattern)]) { found.coverage[$0.int(0), default: 0] += 1 / Double(patterns.count) }
+                """, [.text(pattern)]) { found.coverage[$0.int(0), default: 0] += weight }
+            guard names else { continue }
+            try store.db.query("""
+                SELECT DISTINCT s.file FROM fts JOIN segments s ON s.id = fts.rowid
+                WHERE fts MATCH ? AND s.file IN (\(files))
+                """, [.text("name : " + pattern)]) { found.nameCoverage[$0.int(0), default: 0] += weight }
         }
         return found
+    }
+
+    /// How much each pattern counts towards a file's word coverage, summing to 1. With `idfExponent` 0 every pattern
+    /// counts the same; above it a pattern counts by `idf^idfExponent`, where `idf = ln((files + 1) / (df + 1)) + 1`
+    /// and `df` is how many files contain it, so a word in most files ("Rechnung" among invoices) counts less than a
+    /// rare one, in any language and without a stopword list.
+    ///
+    /// - Throws: SQLite errors.
+    func patternWeights(_ patterns: [String], idfExponent: Double) throws -> [Double] {
+        guard idfExponent != 0, patterns.count > 1 else {
+            return Array(repeating: 1 / Double(max(patterns.count, 1)), count: patterns.count)
+        }
+        let total = Double(try fileCount())
+        let raw = try patterns.map { pattern -> Double in
+            var df = 0.0
+            try store.db.query("""
+                SELECT COUNT(DISTINCT s.file) FROM fts JOIN segments s ON s.id = fts.rowid WHERE fts MATCH ?
+                """, [.text(pattern)]) { df = Double($0.int(0)) }
+            return pow(log((total + 1) / (df + 1)) + 1, idfExponent)
+        }
+        let sum = raw.reduce(0, +)
+        return raw.map { $0 / sum }
+    }
+
+    /// How many files are searchable, counted once per searcher (a reload counts again).
+    private func fileCount() throws -> Int {
+        if let searchableFiles { return searchableFiles }
+        var count = 0
+        try store.db.query("SELECT COUNT(*) FROM files WHERE state IN ('done', 'partial')") { count = Int($0.int(0)) }
+        searchableFiles = count
+        return count
     }
 
     /// The text of a page, a document's passage or a screenshot's OCR, as it's written: the preview shows the part of
