@@ -32,6 +32,18 @@ nonisolated enum Crawler {
                                       .ubiquitousItemDownloadingStatusKey]
         var report = CrawlReport()
         var projectRoots = Set<String>()
+        // Whether `folder` is a project root or inside one. A root's walk visits a folder before anything in it, so by
+        // the time it asks about a folder, that folder and every folder above it in the root were already checked for
+        // project markers. Another root can still find a project above a folder, so the remembered answers are cleared
+        // before each root and before the files are filtered.
+        var inProject: [String: Bool] = [:]
+        func isInProject(_ folder: String) -> Bool {
+            if let known = inProject[folder] { return known }
+            let parent = (folder as NSString).deletingLastPathComponent
+            let answer = projectRoots.contains(folder) || (parent != folder && parent.count > 1 && isInProject(parent))
+            inProject[folder] = answer
+            return answer
+        }
         var found: [Candidate] = []
         var foundPaths = Set<String>()   // a folder inside another root would be walked twice
         func add(_ candidate: Candidate) {
@@ -50,6 +62,7 @@ nonisolated enum Crawler {
         let excluded = options.excludedFolders.flatMap { [$0, FolderSelection.realPath($0)] }
 
         for root in allowed {
+            inProject.removeAll()
             if Rules.isProjectRoot(root.path) { projectRoots.insert(root.path) }
             // A skip applies inside the chosen folders that contain it: a folder chosen inside a skipped one is
             // walked whole (`FolderSelection`).
@@ -69,6 +82,11 @@ nonisolated enum Crawler {
                     if let reason = Rules.skipReason(forFolder: url, home: home, excluded: skips) {
                         walker.skipDescendants()
                         report.skippedFolders[reason, default: 0] += 1
+                    } else if Rules.buildOutputFolderNames.contains(url.lastPathComponent),
+                              isInProject((url.path as NSString).deletingLastPathComponent) {
+                        // Only screenshots would count in there, and a build can leave hundreds of thousands of files.
+                        walker.skipDescendants()
+                        report.skippedFolders["build output", default: 0] += 1
                     } else if Rules.isProjectRoot(url.path) {
                         projectRoots.insert(url.path)
                     }
@@ -142,14 +160,7 @@ nonisolated enum Crawler {
         }
 
         // Inside a code project only screenshots count (assets, fixtures and datasets don't).
-        var inProject: [String: Bool] = [:]
-        func isInProject(_ folder: String) -> Bool {
-            if let known = inProject[folder] { return known }
-            let parent = (folder as NSString).deletingLastPathComponent
-            let answer = projectRoots.contains(folder) || (parent != folder && parent.count > 1 && isInProject(parent))
-            inProject[folder] = answer
-            return answer
-        }
+        inProject.removeAll()
         var kept: [Candidate] = []
         for file in found {
             if file.kind != .screenshot, isInProject((file.path as NSString).deletingLastPathComponent) {
