@@ -154,6 +154,9 @@ enum AnalyticsEvent {
     /// Documents were handed to an app from its tile. A cancelled picker reports `canceled`.
     case documentsOpened(AnalyticsDocumentSource, fileCount: Int, fileType: AnalyticsFileType?,
                          outcome: AnalyticsOutcome)
+    /// An app tile was dropped on the desktop past the Place distance (Drop to Place). Never which
+    /// app, and never the frame.
+    case dockAppPlaced(outcome: DropPlacementOutcome, kind: DropPlacementKind, running: Bool)
     case shortcutRun(AnalyticsShortcutSource, fileCount: Int, outcome: AnalyticsOutcome, duration: Double)
     case shortcutTile(AnalyticsShortcutTileAction, tileCount: Int)
 

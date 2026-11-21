@@ -5,6 +5,42 @@ see [Acceptance gaps](ACCEPTANCE-GAPS.md). The sections below preserve the evide
 implementation slice. Statements such as "tests were not run" describe that slice's original
 validation, unless a later dated result supersedes them.
 
+## DEE-161 Drop to Place
+
+Implemented on `benn/drag-drop-window-position` to the approved mockup `docs/mockups/drop-to-place.html` (distance zones). Dragging an app icon 180 pt or more from its dock (`DockDragGeometry.placeDistance = 180`) arms Drop to Place: a glass ghost of the window follows the pointer with its top-left corner there, and release opens the app (or moves a running app's front window) to that frame through Accessibility. The 64–180 pt band keeps today's Unpin, and a drag-out unpin now offers a 5-second Undo toast. Window memory, edge tiling, and Shift-to-draw follow the mockup. Behavior is in the [user guide](GUIDE.md#arrange-pins-with-drag-and-drop); the code is in `DeeDock/Dock/DropToPlace/`. One analytics event, `dock_app_placed`, and one counter, `pin_unpin_undone`, were added.
+
+Validation on 2026-11-20: `xcodebuild -project DeeDock.xcodeproj -scheme DeeDock -configuration Debug -derivedDataPath <scratch> build` and `build-for-testing` succeeded with no warnings in the new or changed files. New tests in `DeeDockTests/DropPlacementGeometryTests.swift` cover the zone decision, free placement with shrink and shift, the base size order, the 44 pt magnet and clamping, the 8 pt tiling bands, Shift draw, a second display with negative origins, and trimming a reserving dock from the usable frame. The tests were not run. The app was not launched, and previews were not rendered.
+
+### Known limitations
+
+- Spaces and full-screen apps are untested. The overlay joins all Spaces; a window placed while another Space or a full-screen app is in front may land on a different Space, and macOS may refuse to move a full-screen window.
+- Apps that ignore or constrain Accessibility moves (fixed-size windows, some Electron and Java apps, apps that reposition their window after launch) keep the frame they accept. DOKK reads the frame back but does not retry.
+- Apps that open several windows at launch: DOKK moves the first focused or main window it finds, which may be a splash screen, a document picker, or a restored window other than the intended one.
+- An app with no window that ignores the reopen event times out after about 10 seconds; the pad fades and the app stays open.
+- On a display whose dock sits on its left edge, left-half tiling is out of reach within 180 pt of the dock, because the 8 pt band there lies inside the Place distance. Farther along that edge it works. The same applies to right-half tiling with a right-edge dock.
+- The window may appear briefly at its default position before it moves, as the mockup's "flashes at default spot" option shows.
+
+### Required hands-on acceptance
+
+None of these scenarios has been exercised.
+
+- [ ] Pinned closed app: 64–180 pt shows **Unpin** and unpins; 180 pt or more shows the ghost springing out of icon size and opens the app with its first window's top-left corner at the drop point. The dock tile bounces as usual.
+- [ ] Running app: the ghost reads **Move Here**, the current window shows as a faint dashed **Now here**, and release moves the front window and brings the app forward.
+- [ ] Running app that is not pinned: 64–180 pt shows **Farther to Move** and flies back on release; 180 pt or more moves its window.
+- [ ] Running app with no windows: release reopens a window and places it.
+- [ ] Returning under 180 pt disarms the ghost live; Escape cancels from either band.
+- [ ] Folders still unpin at any distance past 64 pt; drives still eject past 64 pt; utility tiles and file drags behave as before.
+- [ ] Window memory: quit an app, drag it out, see **Last here · <date>**; dropping near its top-left snaps to **Back Where It Was** and the outline brightens.
+- [ ] Left, right, and top edge tiling, and Shift draw (anchor fixed where Shift went down).
+- [ ] Free ghost follows the pointer without lag; the native drag image shrinks to a small icon at the ghost's top-left.
+- [ ] Landing pad breathes while launching and hands off with a slight grow and fade; a 10-second timeout fades it quietly.
+- [ ] Accessibility off: the ghost reads **Open Normally** with the Settings hint; release opens or activates without moving anything and without a permission prompt.
+- [ ] Unpin Undo toast above bottom, left, right, and top docks; Undo restores the pin at its old index and survives a relaunch; the toast never takes focus.
+- [ ] Two displays, including one left of and below the primary (negative origins); a reserving dock and an auto-hiding dock.
+- [ ] Reduce Motion (fades, no breathing) and Reduce Transparency (opaque ghost and toast); light and dark appearance.
+- [ ] English and German copy.
+- [ ] Debug analytics log: `dock_app_placed` with each `outcome` and `kind`, and `pin_unpin_undone` in `usage_summary`.
+
 ## DEE-155 notification feed triage
 
 Implemented on `codex/dee-155-notification-feed-triage` to the approved mockup `docs/mockups/notification-feed-triage.html`. The feed groups notifications into per-app stacks that unfold inline, rows and stacks clear with a two-finger trackpad swipe or a mouse drag, opening an app from anywhere removes its entries, and an opt-in **Clear when closed** setting empties what was seen on close. Five count-only analytics events were added. The design is in [Notification feed](NOTIFICATION-FEED.md#triage-dee-155) and the behaviour in the [user guide](GUIDE.md#notification-feed).

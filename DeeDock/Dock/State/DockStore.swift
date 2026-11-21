@@ -520,6 +520,17 @@ final class DockStore {
 
     func removePin(_ id: String) -> Bool { savePins(pins.filter { $0.id != id }) }
 
+    /// Puts back a pin that was just removed, at its previous index in the saved list, for
+    /// Unpin Undo. Saves through ``savePins(_:relocated:)``, so the restore persists like any
+    /// other pin edit. Does nothing if the pin is already back.
+    @discardableResult
+    func restorePin(_ pin: DockPin, at index: Int) -> Bool {
+        guard canEditPins, !persistedPins.contains(where: { $0.id == pin.id }) else { return false }
+        var restored = persistedPins
+        restored.insert(pin, at: min(max(0, index), restored.count))
+        return savePins(restored, relocated: [pin.id])
+    }
+
     // MARK: Islands
 
     /// This display's island plan, reconciled to the saved pins. Automatic islands carry stable
@@ -656,10 +667,16 @@ final class DockStore {
     }
 
     /// Opens or activates an app without applying the app-icon hide toggle.
-    func open(_ item: DockItem) {
+    func open(_ item: DockItem) { open(item, completion: nil) }
+
+    /// Opens or activates an app, then reports whether macOS opened it.
+    /// - Parameter completion: Not called when the same app is already being opened, because
+    ///   that earlier request reports instead.
+    func open(_ item: DockItem, completion: ((Bool) -> Void)?) {
         Analytics.count(.appActivated(Analytics.trigger()))
         let token = session.token
         catalog.open(item.reference) { [weak self] error in
+            completion?(error == nil)
             guard let self, session.accepts(token) else { return }
             errorMessage = error
             if error == nil { applicationOpened?() }

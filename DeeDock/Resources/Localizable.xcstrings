@@ -3403,6 +3403,348 @@
         }
       }
     },
+    "dockUnpinnedToast" : {
+      "comment" : "Toast above the dock after an app was dragged off the dock to unpin it, next to the Undo button. appName is the app's name from macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ abgelöst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unpinned %1$(appName)@"
+          }
+        }
+      }
+    },
+    "dockUnpinUndo" : {
+      "comment" : "Button in the toast after unpinning by dragging; pins the app again at its old place. Also an accessibility action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widerrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "dropPlaceAccessibilityNeeded" : {
+      "comment" : "Drop to Place without Accessibility access: line under 'Open Normally'. Explains, without alarm, what the permission is for. 'Accessibility' is the macOS Privacy & Security setting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube DOKK unter „Bedienungshilfen“ in den Einstellungen, Fenster zu platzieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Accessibility in Settings so DOKK can place windows"
+          }
+        }
+      }
+    },
+    "dropPlaceBackWhereItWas" : {
+      "comment" : "Drop to Place: title on the window outline when it has snapped to where the app's window was last time.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück an den alten Platz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back Where It Was"
+          }
+        }
+      }
+    },
+    "dropPlaceDrawSize" : {
+      "comment" : "Drop to Place: title on the window outline while Shift is held and the pointer draws the window's size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe aufziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw Size"
+          }
+        }
+      }
+    },
+    "dropPlaceDrawSubtitle" : {
+      "comment" : "Drop to Place: size under 'Draw Size', in points. width and height are whole numbers.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(width)lld × %2$(height)lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(width)lld × %2$(height)lld"
+          }
+        }
+      }
+    },
+    "dropPlaceFartherToMove" : {
+      "comment" : "Caption under a dragged running (not pinned) app icon between 64 and 180 points from the dock: dragging farther lets the release move its window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter ziehen zum Bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farther to Move"
+          }
+        }
+      }
+    },
+    "dropPlaceFillScreen" : {
+      "comment" : "Drop to Place: title on the window outline when the pointer touches the top of the screen, so the window fills the screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirm füllen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill Screen"
+          }
+        }
+      }
+    },
+    "dropPlaceLastHere" : {
+      "comment" : "Drop to Place: label on the dashed outline of where the app's window was last time. when is a relative date from the system, such as 'yesterday' or '3 days ago'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt hier · %1$(when)@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last here · %1$(when)@"
+          }
+        }
+      }
+    },
+    "dropPlaceLeftHalf" : {
+      "comment" : "Drop to Place: title on the window outline when the pointer touches the screen's left edge, so the window takes the left half of the screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linke Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Half"
+          }
+        }
+      }
+    },
+    "dropPlaceMoveHere" : {
+      "comment" : "Drop to Place: title on the glass window outline while dragging a running app's dock icon onto the desktop. Releasing moves its front window here.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hierher bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Here"
+          }
+        }
+      }
+    },
+    "dropPlaceMoving" : {
+      "comment" : "Drop to Place: text on the outline left after release, while a running app's window moves there. appName is the app's name from macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ wird bewegt …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving %1$(appName)@…"
+          }
+        }
+      }
+    },
+    "dropPlaceNowHere" : {
+      "comment" : "Drop to Place: label on the dashed outline of a running app's current front window while its dock icon is dragged.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt hier"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now here"
+          }
+        }
+      }
+    },
+    "dropPlaceOpenHere" : {
+      "comment" : "Drop to Place: title on the glass window outline while dragging a closed app's dock icon onto the desktop. Releasing opens the app with its window here.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Here"
+          }
+        }
+      }
+    },
+    "dropPlaceOpening" : {
+      "comment" : "Drop to Place: text on the glowing outline left after release, while the app launches. appName is the app's name from macOS.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ wird geöffnet …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening %1$(appName)@…"
+          }
+        }
+      }
+    },
+    "dropPlaceOpenNormally" : {
+      "comment" : "Drop to Place without Accessibility access: title on the window outline. Releasing opens the app where macOS puts its window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Normally"
+          }
+        }
+      }
+    },
+    "dropPlaceRightHalf" : {
+      "comment" : "Drop to Place: title on the window outline when the pointer touches the screen's right edge, so the window takes the right half of the screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte Hälfte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Half"
+          }
+        }
+      }
+    },
+    "dropPlaceSubtitleSize" : {
+      "comment" : "Drop to Place: line under 'Open Here' or 'Move Here'. appName is the app's name from macOS; width and height are the window size in points.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ · %2$(width)lld × %3$(height)lld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ · %2$(width)lld × %3$(height)lld"
+          }
+        }
+      }
+    },
+    "dropPlaceSubtitleSizeNudged" : {
+      "comment" : "Drop to Place: line under 'Open Here' or 'Move Here' when the window was moved or shrunk to stay on screen. appName is the app's name from macOS; width and height are the window size in points.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ · %2$(width)lld × %3$(height)lld · eingepasst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$(appName)@ · %2$(width)lld × %3$(height)lld · nudged to fit"
+          }
+        }
+      }
+    },
     "flixAccessAllowed" : {
       "comment" : "Flix Files Settings: folder access status.",
       "extractionState" : "manual",
