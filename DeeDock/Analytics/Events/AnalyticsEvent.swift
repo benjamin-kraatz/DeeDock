@@ -270,6 +270,9 @@ enum AnalyticsEvent {
     case flixPickPickerClosed(picker: AnalyticsFlixPickerKind, outcome: AnalyticsFlixPickOutcome, chosenRank: Int?)
     /// **Not in <App>** in Flix Pick's menu.
     case flixPickDisabledForApp(appCategory: FlixAppCategory)
+    /// **Forget** next to drag memory in Flix Files' settings: what drops and picker picks taught
+    /// Flix Files (Flix Pick's "Picked here" included) is cleared. `learningOn` is the switch beside it.
+    case flixDragMemoryForgotten(learningOn: Bool)
     /// Flix Pick's rail opened under the pointer, once per picker.
     case flixPickExpanded(picker: AnalyticsFlixPickerKind, candidateCount: Int)
     /// **Flix Pick Settings…** in Flix Pick's menu.

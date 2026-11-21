@@ -416,7 +416,10 @@ final class FlixIntelligence {
         notice = message
     }
 
-    func forgetDragMemory() { providers.dragMemory?.forget() }
+    func forgetDragMemory() {
+        providers.dragMemory?.forget()
+        Analytics.track(.flixDragMemoryForgotten(learningOn: settings.learnsDragDestinations))
+    }
 
     // MARK: Flix Pick
 

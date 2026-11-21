@@ -123,6 +123,7 @@ extension AnalyticsEvent {
         case .flixPickUsed: "flix_pick_used"
         case .flixPickPickerClosed: "flix_pick_picker_closed"
         case .flixPickDisabledForApp: "flix_pick_disabled_for_app"
+        case .flixDragMemoryForgotten: "flix_drag_memory_forgotten"
         case .flixPickExpanded: "flix_pick_expanded"
         case .flixPickSettingsOpened: "flix_pick_settings_opened"
         case .flixPickNoCandidates: "flix_pick_no_candidates"
@@ -415,6 +416,8 @@ extension AnalyticsEvent {
             ["picker_kind": .init(picker), "outcome": .init(outcome), "chosen_rank": chosenRank.map(AnalyticsValue.init)]
         case let .flixPickDisabledForApp(appCategory):
             ["app_category": .init(appCategory)]
+        case let .flixDragMemoryForgotten(learningOn):
+            ["learning_on": .init(learningOn)]
         case let .flixPickExpanded(picker, candidateCount):
             ["picker_kind": .init(picker), "candidate_count": .init(candidateCount)]
         case let .flixPickSettingsOpened(picker):
