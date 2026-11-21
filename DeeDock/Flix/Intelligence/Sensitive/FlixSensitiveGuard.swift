@@ -136,7 +136,13 @@ final class FlixSensitiveGuard {
 
     /// The current verdict for an item, from memory. Synchronous, for the drag hooks.
     func verdict(for item: FlixItem) -> FlixSensitiveKind? {
-        guard isEnabled, let path = item.path, let entry = document.entries[path] else { return nil }
+        item.path.flatMap(verdict(forPath:))
+    }
+
+    /// The cached verdict for a path, from memory, whether or not the history still lists it
+    /// (Flix Pick's learned picks).
+    func verdict(forPath path: String) -> FlixSensitiveKind? {
+        guard isEnabled, let entry = document.entries[path] else { return nil }
         return effectiveVerdict(path, entry)
     }
 

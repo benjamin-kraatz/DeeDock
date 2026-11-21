@@ -209,11 +209,14 @@ final class FlixPickCoordinator {
         let settings = flix.settings
         let sensitive = settings.guardsSensitiveFiles
             ? Set(intelligence.annotations.filter { $0.value.isSensitive }.keys) : []
-        return FlixPickContext(kind: picker.kind, appName: appName, types: types, items: flix.history.items,
-                               picks: intelligence.pickerPicks(for: bundleIdentifier),
-                               dropCounts: intelligence.dropCounts(for: bundleIdentifier),
-                               threads: settings.groupsThreads ? intelligence.threads : [],
-                               sensitive: sensitive, hidesNoise: settings.hidesNoise, now: .now)
+        let guardian = settings.guardsSensitiveFiles ? flix.contextServices?.sensitive : nil
+        var context = FlixPickContext(kind: picker.kind, appName: appName, types: types, items: flix.history.items,
+                                      picks: intelligence.pickerPicks(for: bundleIdentifier),
+                                      dropCounts: intelligence.dropCounts(for: bundleIdentifier),
+                                      threads: settings.groupsThreads ? intelligence.threads : [],
+                                      sensitive: sensitive, hidesNoise: settings.hidesNoise, now: .now)
+        if let guardian { context.isSensitivePath = { guardian.verdict(forPath: $0) != nil } }
+        return context
     }
 
     private func show(_ rows: [FlixPickRow], appName: String) {
@@ -377,11 +380,13 @@ final class FlixPickCoordinator {
         actionTask = nil
         if state.busyRowID == action.row.id { state.busyRowID = nil }
         let path = FlixPaths.standardized(action.row.path)
-        // Only a press that went through counts as Flix Pick's confirm.
-        if result.confirmed { session?.evidence.confirmedByFlix = (path, .now) }
+        // Only a press that went through and closed the picker counts as Flix Pick's pick, at the
+        // time of the press itself.
+        let confirmed = result.confirmed && result.closedByPress ? result.confirmedAt.map { (path, $0) } : nil
+        if let confirmed { session?.evidence.confirmedByFlix = confirmed }
         if var closing = closingDuringConfirm, closing.session.picker.serial == serial {
             closingDuringConfirm = nil
-            if result.confirmed { closing.session.evidence.confirmedByFlix = (path, closing.at) }
+            if let confirmed { closing.session.evidence.confirmedByFlix = confirmed }
             resolveClosing(closing.session, at: closing.at)
         }
         if session?.picker.serial == serial {

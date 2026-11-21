@@ -8,6 +8,12 @@ struct FlixPickActionResult: Equatable {
     /// The default button was pressed, and the press went through.
     var confirmed = false
     var failure: AnalyticsFlixPickFailure?
+    /// When the press went through.
+    var confirmedAt: Date?
+    /// The picker was gone within ``FlixPickRouter/closeWindow`` of the press. Only then is the
+    /// press Flix Pick's pick: a picker still open (a "Replace?" prompt, a refused name) was not
+    /// closed by it.
+    var closedByPress = false
 }
 
 /// Puts a file or folder into another app's picker, the cheapest way that works, and presses the
@@ -36,6 +42,10 @@ struct FlixPickActionResult: Equatable {
 /// task when the picker closes. Main actor; the Accessibility calls run on `FlixAXThread`.
 @MainActor
 enum FlixPickRouter {
+    /// How long after a press that went through the picker must be gone for the press to count
+    /// as what closed it.
+    static let closeWindow: Duration = .milliseconds(600)
+
     static func perform(path: String, picker: FlixPickPicker, confirm: Bool,
                         observer: FlixPickObserver) async -> FlixPickActionResult {
         let serial = picker.serial
@@ -74,7 +84,10 @@ enum FlixPickRouter {
         let pressed = await observer.run { $0.confirm(path, isSave: isSave, serial: serial, generation: generation) }
         switch pressed {
         case .done:
-            return FlixPickActionResult(route: route, selected: true, confirmed: true)
+            let at = Date.now
+            let closed = await poll(for: closeWindow) { !(await observer.run { $0.exists(serial: serial) }) }
+            return FlixPickActionResult(route: route, selected: true, confirmed: true, confirmedAt: at,
+                                        closedByPress: closed)
         case .gone:
             return FlixPickActionResult(route: route, selected: true, failure: .pickerClosed)
         case .notFrontmost, .secureInput, .modifiersHeld:

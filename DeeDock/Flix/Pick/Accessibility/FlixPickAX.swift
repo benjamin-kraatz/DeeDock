@@ -50,12 +50,15 @@ nonisolated enum FlixPickAX {
 
     /// The picker in `window`: the window itself, or a sheet on it. Reads only the window's
     /// identifier and its direct children's roles; a child is looked at further only when it is a
-    /// sheet, and then only for its identifier.
+    /// sheet, and then only for its identifier. Every child carries the messaging timeout before
+    /// its role is read, and the whole check stops after 0.3 seconds.
     static func picker(in window: AXUIElement) -> (element: AXUIElement, kind: FlixPickPickerKind, parent: AXUIElement?)? {
+        let deadline = Deadline(seconds: 0.3)
         AXUIElementSetMessagingTimeout(window, messagingTimeout)
         if let kind = pickerKind(of: window) { return (window, kind, nil) }
-        for child in RobiAX.children(window).prefix(64) where role(child) == kAXSheetRole as String {
-            AXUIElementSetMessagingTimeout(child, messagingTimeout)
+        for child in children(window).prefix(64) {
+            guard !deadline.passed else { return nil }
+            guard role(child) == kAXSheetRole as String else { continue }
             if let kind = pickerKind(of: child) { return (child, kind, window) }
         }
         return nil
@@ -154,9 +157,10 @@ nonisolated enum FlixPickAX {
     /// The Go to Folder sheet a field sits in: its nearest sheet or window ancestor, when that is
     /// not the picker itself (whose default button is the picker's Open or Save).
     static func goToSheet(of field: AXUIElement, picker: AXUIElement) -> AXUIElement? {
+        let deadline = Deadline(seconds: 0.3)
         var ancestor = element(field, kAXParentAttribute)
         for _ in 0..<12 {
-            guard let current = ancestor else { return nil }
+            guard let current = ancestor, !deadline.passed else { return nil }
             if CFEqual(current, picker) { return nil }
             let role = role(current)
             if role == kAXSheetRole as String || role == kAXWindowRole as String { return current }
@@ -169,7 +173,7 @@ nonisolated enum FlixPickAX {
 
     /// The frame a list is seen through: its scroll area, else the list itself.
     static func visibleFrame(ofList list: AXUIElement) -> CGRect? {
-        if let parent = RobiAX.element(list, kAXParentAttribute), role(parent) == kAXScrollAreaRole as String {
+        if let parent = element(list, kAXParentAttribute), role(parent) == kAXScrollAreaRole as String {
             return frame(parent)
         }
         return frame(list)

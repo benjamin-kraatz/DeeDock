@@ -16,6 +16,9 @@ struct FlixPickContext {
     var threads: [FlixThread]
     /// Items the sensitive guard flagged; never suggested.
     var sensitive: Set<FlixItem.ID>
+    /// The sensitive guard's cached verdict by standardized path, for paths the history may no
+    /// longer list (learned picks). True: flagged, never suggested.
+    var isSensitivePath: (String) -> Bool = { _ in false }
     var hidesNoise: Bool
     var home: String = NSHomeDirectory()
     var now: Date
@@ -54,9 +57,12 @@ enum FlixPickCandidates {
         })
     }
 
-    /// Whether a path from any source may be suggested: not flagged sensitive, not noise.
+    /// Whether a path from any source may be suggested: not flagged sensitive (by a history row
+    /// or by the guard's verdict for the path itself), not noise.
     private static func allowed(_ path: String, sensitive: Set<String>, context: FlixPickContext) -> Bool {
-        !sensitive.contains(FlixPaths.standardized(path)) && !(context.hidesNoise && FlixNoiseRules.isNoise(path: path))
+        let standardized = FlixPaths.standardized(path)
+        return !sensitive.contains(standardized) && !context.isSensitivePath(standardized)
+            && !(context.hidesNoise && FlixNoiseRules.isNoise(path: path))
     }
 
     // MARK: Open

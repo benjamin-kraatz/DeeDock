@@ -187,7 +187,7 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
     /// Checks the focused window for a picker and reports what changed.
     private func evaluate() {
         guard let app, observer != nil else { return }
-        let found = RobiAX.element(app, kAXFocusedWindowAttribute).flatMap(FlixPickAX.picker(in:))
+        let found = FlixPickAX.element(app, kAXFocusedWindowAttribute).flatMap(FlixPickAX.picker(in:))
         if let current {
             if let found, CFEqual(found.element, current.element) {
                 refresh(current)
@@ -371,13 +371,13 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         return AXUIElementGetPid(focused, &pid) == .success ? pid : nil
     }
 
-    /// Everything an action re-checks right before it acts: the attachment it started under, the
-    /// picker, its app with keyboard focus, and the picker focused in it.
-    private func inFront(_ serial: Int, generation: Int) -> (picker: Picker?, result: FlixPickGuardResult) {
-        guard isCurrent(generation) else { return (nil, .notFrontmost) }
-        guard let picker = live(serial) else { return (nil, .gone) }
-        guard focusedPID() == pid, focused(picker) else { return (picker, .notFrontmost) }
-        return (picker, .done)
+    /// The last checks before an irreversible action (a posted key, `AXConfirm`, an `AXPress`),
+    /// made after every other read so nothing is read between them and the action: the
+    /// attachment the action started under is unchanged, and the picker's app still holds
+    /// keyboard focus. Callers check the picker's focus and the exact selection, folder, or field
+    /// value just before this.
+    private func stillInFront(_ generation: Int) -> Bool {
+        isCurrent(generation) && focusedPID() == pid
     }
 
     private func focused(_ picker: Picker) -> Bool {
@@ -437,8 +437,10 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
     /// block, immediately before posting: the attachment, the picker, its app with keyboard focus,
     /// the picker focused, no modifier held, and Secure Event Input off.
     func postGoToFolder(serial: Int, generation: Int) -> FlixPickGuardResult {
-        let check = inFront(serial, generation: generation)
-        guard check.result == .done else { return check.result }
+        guard isCurrent(generation) else { return .notFrontmost }
+        guard let picker = live(serial) else { return .gone }
+        guard focused(picker) else { return .notFrontmost }
+        guard stillInFront(generation) else { return .notFrontmost }
         guard FlixPickKeys.canType else { return .secureInput }
         guard !FlixPickKeys.modifiersHeld else { return .modifiersHeld }
         FlixPickKeys.press(FlixPickKeys.goToFolderKey, flags: [.maskShift, .maskCommand])
@@ -450,9 +452,10 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
     private func pathField(of picker: Picker) -> AXUIElement? {
         guard let app, let focused = FlixPickAX.element(app, kAXFocusedUIElementAttribute),
               FlixPickAX.identifier(focused) == FlixPickAX.pathField else { return nil }
+        let deadline = FlixPickAX.Deadline(seconds: 0.3)
         var ancestor: AXUIElement? = focused
         for _ in 0..<12 {
-            guard let element = ancestor else { break }
+            guard let element = ancestor, !deadline.passed else { break }
             if CFEqual(element, picker.element) || picker.parent.map({ CFEqual(element, $0) }) == true { return focused }
             ancestor = FlixPickAX.element(element, kAXParentAttribute)
         }
@@ -472,29 +475,41 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
 
     /// Sends the Go to Folder sheet on, preferring the field or the sheet itself: the field's
     /// `AXConfirm`, else the sheet's default button when it is not the picker's `OKButton`, else
-    /// Return, as the probe proved works. Return is posted from this block right after its own
-    /// checks, in the same block: the attachment, the picker, its app with keyboard focus, no
-    /// modifier held, Secure Event Input off, and the app's focused element still this picker's
-    /// `PathTextField` holding exactly `path`. When any fails, the sheet is left as it is with the
-    /// path typed (`unavailable`). Escape is never posted.
+    /// Return, as the probe proved works. The way is chosen first; then, with nothing else read in
+    /// between, every one of them is preceded by the same final checks: the picker focused, the
+    /// app's focused element still this picker's `PathTextField` holding exactly `path`, the
+    /// attachment unchanged, and the picker's app holding keyboard focus (and for Return, no
+    /// modifier held and Secure Event Input off). When any fails, the sheet is left as it is with
+    /// the path typed (`unavailable`). Escape is never posted.
     func submitGoToFolder(_ path: String, serial: Int, generation: Int) -> FlixPickGuardResult {
+        guard isCurrent(generation) else { return .notFrontmost }
         guard let picker = live(serial) else { return .gone }
         guard let field = pathField(of: picker) else { return .unavailable }
+        enum Way { case confirm, button(AXUIElement), returnKey }
+        let way: Way
         if FlixPickAX.actions(field).contains(kAXConfirmAction as String) {
+            way = .confirm
+        } else if let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
+                  let button = FlixPickAX.element(sheet, kAXDefaultButtonAttribute),
+                  FlixPickAX.identifier(button) != FlixPickAX.okButton {
+            way = .button(button)
+        } else {
+            way = .returnKey
+        }
+        // Final checks, then the action, with no other read in between.
+        guard focused(picker), let app, let focusedNow = FlixPickAX.element(app, kAXFocusedUIElementAttribute),
+              CFEqual(focusedNow, field), FlixPickAX.string(field, kAXValueAttribute) == path,
+              stillInFront(generation) else { return .unavailable }
+        switch way {
+        case .confirm:
             return AXUIElementPerformAction(field, kAXConfirmAction as CFString) == .success ? .done : .unavailable
-        }
-        if let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
-           let button = FlixPickAX.element(sheet, kAXDefaultButtonAttribute),
-           FlixPickAX.identifier(button) != FlixPickAX.okButton {
+        case .button(let button):
             return AXUIElementPerformAction(button, kAXPressAction as CFString) == .success ? .done : .unavailable
+        case .returnKey:
+            guard FlixPickKeys.canType, !FlixPickKeys.modifiersHeld else { return .unavailable }
+            FlixPickKeys.press(FlixPickKeys.returnKey)
+            return .done
         }
-        // Last fallback: Return, guarded like ⇧⌘G plus the field and its value.
-        guard isCurrent(generation), FlixPickAX.isAlive(picker.element), focusedPID() == pid,
-              FlixPickKeys.canType, !FlixPickKeys.modifiersHeld,
-              let focusedField = pathField(of: picker),
-              FlixPickAX.string(focusedField, kAXValueAttribute) == path else { return .unavailable }
-        FlixPickKeys.press(FlixPickKeys.returnKey)
-        return .done
     }
 
     /// Closes the Go to Folder sheet the same way: the field's `AXCancel`, else the sheet's cancel
@@ -512,15 +527,20 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         _ = AXUIElementPerformAction(button, kAXPressAction as CFString)
     }
 
-    /// Presses `OKButton`, in one block with every check right before the press: the attachment
-    /// the action started under, the picker in front and focused, exactly `path` selected (Open)
-    /// or the picker's listed rows inside `path` (Save), and the button enabled. `done` only when
-    /// the press went through.
+    /// Presses `OKButton`. Discovery and the button's enabled state are read first; then, with
+    /// nothing else read in between, the final checks: the picker focused, exactly `path` selected
+    /// (Open) or the picker's listed rows inside `path` (Save), the attachment the action started
+    /// under unchanged, and the picker's app holding keyboard focus. `done` only when the press
+    /// went through.
     func confirm(_ path: String, isSave: Bool, serial: Int, generation: Int) -> FlixPickGuardResult {
-        let check = inFront(serial, generation: generation)
-        guard check.result == .done, let picker = check.picker else { return check.result }
+        guard isCurrent(generation) else { return .notFrontmost }
+        guard let picker = live(serial) else { return .gone }
         ensureControls(picker)
         guard let list = picker.controls[FlixPickAX.listView] else { return .notVerified }
+        guard let ok = picker.controls[FlixPickAX.okButton],
+              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? false else { return .unavailable }
+        // Final checks, then the press, with no other read in between.
+        guard focused(picker) else { return .notFrontmost }
         let deadline = FlixPickAX.Deadline(seconds: 0.5)
         if isSave {
             guard let shown = FlixPickAX.listedFolder(in: list, deadline: deadline), FlixPickAX.same(shown, path)
@@ -529,8 +549,11 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
             let selected = FlixPickAX.selection(in: list, deadline: deadline)
             guard selected.count == 1, let url = selected.url, FlixPickAX.same(url, path) else { return .notVerified }
         }
-        guard let ok = picker.controls[FlixPickAX.okButton],
-              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? false else { return .unavailable }
+        guard stillInFront(generation) else { return .notFrontmost }
         return AXUIElementPerformAction(ok, kAXPressAction as CFString) == .success ? .done : .unavailable
     }
+
+    /// Whether the picker still exists and has focus in its app, for telling whether a press
+    /// closed it.
+    func exists(serial: Int) -> Bool { live(serial) != nil }
 }
