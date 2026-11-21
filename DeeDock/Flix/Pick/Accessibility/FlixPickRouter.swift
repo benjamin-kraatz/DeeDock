@@ -18,13 +18,14 @@ struct FlixPickActionResult: Equatable {
 /// 2. **Listed row** (Open pickers with a list view): the file is among the rows of the folder the
 ///    picker shows; the selection is replaced by its row through Accessibility (about 70 ms,
 ///    nothing on screen).
-/// 3. **Go to Folder**: ⇧⌘G, the full path into `PathTextField`, then the sheet's own
-///    Accessibility action (the field's `AXConfirm`, or the sheet's default button) instead of
-///    Return. ⇧⌘G is the only keystroke; the Accessibility thread posts it right after checking,
-///    in the same block, that the picker's app has keyboard focus, the picker is focused, no
-///    modifier is held, and Secure Event Input is off. When the sheet cannot be sent on, it stays
-///    open with the path typed; when it stays open after being sent on (the path is gone), it is
-///    dismissed with the field's `AXCancel` or the sheet's cancel button, never with Escape.
+/// 3. **Go to Folder**: ⇧⌘G, the full path into `PathTextField`, then the sheet is sent on: the
+///    field's `AXConfirm`, else the sheet's default button, else Return. Keys are posted by the
+///    Accessibility thread right after checking, in the same block, that the picker's app has
+///    keyboard focus, the picker is focused, no modifier is held, and Secure Event Input is off;
+///    Return also needs the focused element to still be the field holding the path. When a check
+///    fails, the sheet stays open with the path typed; when it stays open after being sent on
+///    (the path is gone), it is dismissed with the field's `AXCancel` or the sheet's cancel
+///    button, never with Escape.
 /// 4. **Confirm** (⌥-click, double-click): once the picker shows exactly that file or that
 ///    folder's rows, one Accessibility block checks everything again (the attachment the action
 ///    started under, the picker in front and focused, the exact selection or folder, the button
@@ -112,7 +113,7 @@ enum FlixPickRouter {
             await observer.run { $0.dismissGoToFolder(serial: serial) }
             return Task.isCancelled ? .pickerClosed : .noPathField
         }
-        switch await observer.run({ $0.submitGoToFolder(serial: serial) }) {
+        switch await observer.run({ $0.submitGoToFolder(path, serial: serial, generation: generation) }) {
         case .done: break
         case .gone: return .pickerClosed
         // Left open with the path typed, for the person to send on.

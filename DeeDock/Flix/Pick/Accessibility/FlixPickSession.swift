@@ -470,19 +470,31 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         return AXUIElementSetAttributeValue(field, kAXValueAttribute as CFString, path as CFString) == .success
     }
 
-    /// Sends the Go to Folder sheet on, on the field or the sheet itself, never as a key: the
-    /// field's `AXConfirm`, else the sheet's default button when it is not the picker's
-    /// `OKButton`. `unavailable` leaves the sheet open with the path typed, for the person.
-    func submitGoToFolder(serial: Int) -> FlixPickGuardResult {
+    /// Sends the Go to Folder sheet on, preferring the field or the sheet itself: the field's
+    /// `AXConfirm`, else the sheet's default button when it is not the picker's `OKButton`, else
+    /// Return, as the probe proved works. Return is posted from this block right after its own
+    /// checks, in the same block: the attachment, the picker, its app with keyboard focus, no
+    /// modifier held, Secure Event Input off, and the app's focused element still this picker's
+    /// `PathTextField` holding exactly `path`. When any fails, the sheet is left as it is with the
+    /// path typed (`unavailable`). Escape is never posted.
+    func submitGoToFolder(_ path: String, serial: Int, generation: Int) -> FlixPickGuardResult {
         guard let picker = live(serial) else { return .gone }
         guard let field = pathField(of: picker) else { return .unavailable }
         if FlixPickAX.actions(field).contains(kAXConfirmAction as String) {
             return AXUIElementPerformAction(field, kAXConfirmAction as CFString) == .success ? .done : .unavailable
         }
-        guard let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
-              let button = FlixPickAX.element(sheet, kAXDefaultButtonAttribute),
-              FlixPickAX.identifier(button) != FlixPickAX.okButton else { return .unavailable }
-        return AXUIElementPerformAction(button, kAXPressAction as CFString) == .success ? .done : .unavailable
+        if let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
+           let button = FlixPickAX.element(sheet, kAXDefaultButtonAttribute),
+           FlixPickAX.identifier(button) != FlixPickAX.okButton {
+            return AXUIElementPerformAction(button, kAXPressAction as CFString) == .success ? .done : .unavailable
+        }
+        // Last fallback: Return, guarded like ⇧⌘G plus the field and its value.
+        guard isCurrent(generation), FlixPickAX.isAlive(picker.element), focusedPID() == pid,
+              FlixPickKeys.canType, !FlixPickKeys.modifiersHeld,
+              let focusedField = pathField(of: picker),
+              FlixPickAX.string(focusedField, kAXValueAttribute) == path else { return .unavailable }
+        FlixPickKeys.press(FlixPickKeys.returnKey)
+        return .done
     }
 
     /// Closes the Go to Folder sheet the same way: the field's `AXCancel`, else the sheet's cancel
