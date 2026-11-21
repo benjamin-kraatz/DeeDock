@@ -87,12 +87,17 @@ private struct FlixRobiAnswer: View {
     }
 
     private func answerText(_ text: String, streaming: Bool) -> some View {
-        let answer = Text((try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                          ?? AttributedString(text))
-        let caret = Text(verbatim: streaming ? " ▍" : "").foregroundStyle(FlixStyle.aiViolet)
+        var answer = (try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+            ?? AttributedString(text)
+        if streaming {
+            // The caret trails the text inline, so it wraps with the last word. One attributed
+            // string, not an interpolated `Text`, which would make Robi's answer a localization key.
+            var caret = AttributedString(" ▍")
+            caret.foregroundColor = FlixStyle.aiViolet
+            answer += caret
+        }
         return ScrollView {
-            // The caret trails the text inline, so it wraps with the last word.
-            Text("\(answer)\(caret)")
+            Text(answer)
                 .font(.system(size: 12.5))
                 .lineSpacing(3)
                 .textSelection(.enabled)

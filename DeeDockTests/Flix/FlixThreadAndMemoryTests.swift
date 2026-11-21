@@ -52,6 +52,25 @@ struct FlixThreadAndMemoryTests {
         #expect(FlixThreadProvider.overlap(Set(ids[0..<2]), Set(ids[2..<6])) == 0)
     }
 
+    /// Two parts of one piece of work, named the same, read as one thread: never "Craft Anything
+    /// and Craft Anything" on the morning card.
+    @Test func threadsWithTheSameNameAreShownAsOne() {
+        let ids = (0..<7).map { _ in UUID() }
+        let dates = Dictionary(uniqueKeysWithValues: ids.enumerated().map { ($1, t0.addingTimeInterval(Double($0) * 3_600)) })
+        typealias Record = FlixThreadProvider.Record
+        let records = [
+            Record(id: "newer", memberIDs: [ids[6], ids[5], ids[4]], name: "Craft Anything", emoji: "🎨",
+                   summary: "Icons.", namedByModel: true),
+            Record(id: "trip", memberIDs: [ids[3]], name: "Berlin trip", emoji: "🧳"),
+            Record(id: "older", memberIDs: [ids[2], ids[1], ids[0], ids[4]], name: " craft anything ", emoji: "📄"),
+        ]
+        let threads = FlixThreadProvider.displayThreads(records, dates: dates)
+        #expect(threads.map(\.id) == ["newer", "trip"])
+        #expect(threads[0].name == "Craft Anything" && threads[0].emoji == "🎨" && threads[0].summary == "Icons.")
+        #expect(threads[0].memberIDs == [ids[6], ids[5], ids[4], ids[2], ids[1], ids[0]])
+        #expect(threads[1].memberIDs == [ids[3]])
+    }
+
     // MARK: Drag memory
 
     private func item(_ name: String, kind: FlixItemKind = .document, folder: String = "/Users/test/Projects/Oak",

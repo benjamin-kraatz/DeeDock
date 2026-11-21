@@ -12,7 +12,9 @@ import Foundation
 /// Names start as the fallback (shared folder or word) and are replaced by Apple Intelligence's name,
 /// emoji, and summary in this provider's own worker, one thread at a time, never during a drag. A
 /// thread is named again when fewer than ``renameBelow`` of its members are the ones it was named
-/// for. The model sees member names, captions, and folders, never file contents. Main actor.
+/// for. The model sees member names, captions, and folders, never file contents, plus the names the
+/// other threads already carry, so it tells them apart. Threads that still end up with the same name
+/// are shown as one (``displayThreads(_:dates:)``). Main actor.
 @MainActor
 final class FlixThreadProvider: FlixThreadProviding {
     nonisolated struct Record: Codable, Equatable, Sendable {
@@ -56,16 +58,17 @@ final class FlixThreadProvider: FlixThreadProviding {
             item.path != nil && item.kind != .app && item.kind != .link && now.timeIntervalSince(item.date) <= Self.window
                 && !FlixNoiseRules.isNoise(path: item.path)
         }
+        let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let dates = byID.mapValues(\.date)
         let vectors = await services.semantic.vectors(for: recent.compactMap(\.path))
-        guard !Task.isCancelled else { return records.map(Self.thread) }
+        guard !Task.isCancelled else { return Self.displayThreads(records, dates: dates) }
         let entries = recent.map { item in
             FlixThreadClusterer.Entry(id: item.id, date: item.date, folder: Self.folder(of: item),
                                       words: FlixWords.distinctive(item.name), vector: item.path.flatMap { vectors[$0] })
         }
         let groups = await FlixThreadClusterer.cluster(entries, catchAll: catchAll)
-        guard !Task.isCancelled else { return records.map(Self.thread) }
+        guard !Task.isCancelled else { return Self.displayThreads(records, dates: dates) }
 
-        let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var taken = Set<String>()
         var next: [Record] = []
         for group in groups {
@@ -94,7 +97,7 @@ final class FlixThreadProvider: FlixThreadProviding {
             file?.schedule(records)
         }
         enqueueNaming()
-        return records.map(Self.thread)
+        return Self.displayThreads(records, dates: dates)
     }
 
     // MARK: Naming
@@ -124,7 +127,9 @@ final class FlixThreadProvider: FlixThreadProviding {
                   let record = records.first(where: { $0.id == id }), needsName(record) else { continue }
             let byID = Dictionary(services.items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
             let members = record.memberIDs
-            guard let generated = await FlixThreadNamer.generated(for: namerMembers(members, byID: byID)),
+            let otherNames = records.filter { $0.id != id && !$0.name.isEmpty }.map(\.name)
+            guard let generated = await FlixThreadNamer.generated(for: namerMembers(members, byID: byID),
+                                                                  otherNames: otherNames),
                   !Task.isCancelled, let index = records.firstIndex(where: { $0.id == id }) else { continue }
             records[index].name = generated.name
             records[index].emoji = generated.emoji
@@ -157,6 +162,45 @@ final class FlixThreadProvider: FlixThreadProviding {
     static func overlap(_ a: Set<FlixItem.ID>, _ b: Set<FlixItem.ID>) -> Double {
         let union = a.union(b).count
         return union == 0 ? 0 : Double(a.intersection(b).count) / Double(union)
+    }
+
+    /// The threads as the sidebar and the morning card see them: records with the same name
+    /// (ignoring case, accents, and surrounding spaces) shown as one thread.
+    ///
+    /// The clusterer can split one piece of work in two (files more than ``FlixThreadClusterer/linkWindow``
+    /// apart, or in two folders), and each part may then be named the same. Two rows reading "Craft
+    /// Anything" say nothing the person can choose between, so they become one. The newest record
+    /// (records are kept newest first) gives the merged thread its identity, name, emoji, and summary,
+    /// so a selected thread stays selected. Members are joined, newest first by `dates` (unknown
+    /// dates last, in record order), and capped at ``FlixThreadClusterer/memberLimit``.
+    static func displayThreads(_ records: [Record], dates: [FlixItem.ID: Date]) -> [FlixThread] {
+        var threads: [FlixThread] = []
+        var indexByName: [String: Int] = [:]
+        for record in records {
+            let key = record.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                .folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
+            guard !key.isEmpty, let index = indexByName[key] else {
+                if !key.isEmpty { indexByName[key] = threads.count }
+                threads.append(thread(record))
+                continue
+            }
+            let known = Set(threads[index].memberIDs)
+            threads[index].memberIDs += record.memberIDs.filter { !known.contains($0) }
+            threads[index].namedByAppleIntelligence = threads[index].namedByAppleIntelligence || record.namedByModel
+        }
+        for index in threads.indices {
+            let order = Dictionary(threads[index].memberIDs.enumerated().map { ($1, $0) }, uniquingKeysWith: { a, _ in a })
+            let sorted = threads[index].memberIDs.sorted { a, b in
+                switch (dates[a], dates[b]) {
+                case let (x?, y?) where x != y: return x > y
+                case (_?, nil): return true
+                case (nil, _?): return false
+                default: return order[a, default: 0] < order[b, default: 0]
+                }
+            }
+            threads[index].memberIDs = Array(sorted.prefix(FlixThreadClusterer.memberLimit))
+        }
+        return threads
     }
 
     private static func thread(_ record: Record) -> FlixThread {
