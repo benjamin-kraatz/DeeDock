@@ -8599,6 +8599,24 @@
         }
       }
     },
+    "flixSearchClose" : {
+      "comment" : "Flix Files: the close button inside the open search field; turns it back into the search button and clears the search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche beenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Search"
+          }
+        }
+      }
+    },
     "flixSearchHelp" : {
       "comment" : "Flix Files: help and VoiceOver label of the search button and field.",
       "extractionState" : "manual",
@@ -10815,24 +10833,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "flixTidy" : {
-      "comment" : "Flix Files: header button that opens Tidy.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aufräumen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tidy"
           }
         }
       }

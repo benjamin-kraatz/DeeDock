@@ -99,7 +99,7 @@ The panel is Liquid Glass tinted with the window background colour, the way the 
 | New item while open | Accent rim and wash, fading over 1.6 s | Same |
 | Sidebar selection | The pill slides to the new row | Jumps |
 | New Smart Filter | Violet wash on its row, fading over 1.4 s | Same |
-| Search field | Grows out of the search button | Appears |
+| Search field | The search button widens into the field to its left; the close button inside turns it back; Tidy fades out meanwhile | Appears |
 | Tokens | Pop in; a removed one shrinks and the rest close up | Crossfade |
 | Fits and other loading | A violet band sweeps the placeholder rows | Still placeholders |
 | ✦ Rename | The new name resolves out of a blur | Changes at once |

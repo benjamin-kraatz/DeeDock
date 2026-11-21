@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// Title and count, the search field that grows from its button, ✦ Tidy, search, and the pin.
+/// Title and count, ✦ Tidy, search (a button that becomes the field), and the pin.
 ///
-/// The title keeps its width first and the search field gives way, so a long German title or
-/// count never pushes the buttons out: the field shrinks from 220 points down to 120.
+/// Every control is an icon, so the header stays quiet: Tidy is used now and then, and it steps
+/// away while search is open. The title keeps its width first and the search field gives way, so
+/// a long German title or count never pushes the buttons out: the field shrinks from 220 points
+/// down to 120.
 struct FlixHeaderView: View {
     let state: FlixPanelState
     let count: Int
@@ -29,22 +31,15 @@ struct FlixHeaderView: View {
                 .contentTransition(state.reduceMotion ? .identity : .numericText(value: Double(count)))
                 .animation(state.reduceMotion ? nil : state.motion(FlixMotion.row), value: count)
             Spacer(minLength: 4)
-            FlixSearchField(state: state)
-                .layoutPriority(1)
-            if state.intelligence.canTidy {
+            if state.intelligence.canTidy, !state.searchActive {
                 FlixHeaderButton(help: .flixTidyHelp, action: state.openTidy) {
-                    HStack(spacing: 4) {
-                        FlixSparkle(size: 11)
-                        Text(.flixTidy)
-                    }
+                    Image(systemName: "wand.and.sparkles")
                 }
                 .layoutPriority(3)
+                .transition(.opacity)
             }
-            FlixHeaderButton(help: .flixSearchHelp, active: state.searchActive,
-                             action: { state.setSearchActive(!state.searchActive) }) {
-                Image(systemName: "magnifyingglass")
-            }
-            .layoutPriority(3)
+            FlixSearchField(state: state)
+                .layoutPriority(1)
             FlixHeaderButton(help: state.isPinned ? .flixUnpinHelp : .flixPinHelp, active: state.isPinned,
                              action: state.togglePin) {
                 Image(systemName: state.isPinned ? "pin.fill" : "pin")
@@ -55,6 +50,8 @@ struct FlixHeaderView: View {
         .padding(.leading, 16)
         .padding(.trailing, 10)
         .frame(height: FlixStyle.headerHeight)
+        // Tidy steps away in the same motion as the field opens.
+        .animation(state.reduceMotion ? nil : FlixMotion.field, value: state.searchActive)
     }
 }
 
