@@ -51,6 +51,8 @@ enum AnalyticsCounter: Hashable {
     case appHealthManualLabel
     /// App Health data was exported to a zip archive.
     case appHealthExported
+    /// One of Flix Files' counters (``AnalyticsFlixCounter``).
+    case flix(AnalyticsFlixCounter)
 
     /// The property name in `usage_summary`.
     var key: String {
@@ -77,6 +79,7 @@ enum AnalyticsCounter: Hashable {
         case .appHealthPromptIgnored: "app_health_prompt_ignored"
         case .appHealthManualLabel: "app_health_manual_label"
         case .appHealthExported: "app_health_exported"
+        case let .flix(counter): counter.rawValue
         }
     }
 }

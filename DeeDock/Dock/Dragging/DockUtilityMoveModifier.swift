@@ -15,12 +15,14 @@ struct DockUtilityMoveModifier: ViewModifier {
                 .overlay {
                     DockUtilityMoveSource(
                         optionDragsFiles: slot.shelf != nil,
+                        movesOnlyWithOption: slot.flix != nil,
                         click: {
                             if let folder = slot.folder { interaction.openFolder?(folder, false) }
                             else if slot.isLauncher { interaction.openLauncher?() }
                             else if slot.shelf != nil { interaction.openShelf?() }
                             else if slot.notificationFeed != nil { interaction.openNotificationFeed?() }
                             else if slot.harbor != nil { interaction.openHarbor?() }
+                            else if slot.flix != nil { interaction.openFlix?() }
                             else { interaction.openSessionCapsules?() }
                         },
                         begin: { view, event in interaction.beginUtilityDrag?(slot, view, event) },
@@ -53,6 +55,9 @@ struct DockUtilityMoveModifier: ViewModifier {
 /// Distinguishes clicks from native utility drags without activating the dock panel.
 private struct DockUtilityMoveSource: NSViewRepresentable {
     let optionDragsFiles: Bool
+    /// The Flix Files tile inverts the Shelf's split: a plain drag carries its newest item (its own
+    /// source handles that), and only an Option-drag moves the tile.
+    var movesOnlyWithOption = false
     let click: () -> Void
     let begin: (NSView, NSEvent) -> Void
     let tracking: (Bool) -> Void
@@ -74,7 +79,8 @@ private struct DockUtilityMoveSource: NSViewRepresentable {
         override func hitTest(_ point: NSPoint) -> NSView? {
             guard let event = NSApp.currentEvent, event.type == .leftMouseDown,
                   !event.modifierFlags.contains(.control),
-                  !(configuration?.optionDragsFiles == true && event.modifierFlags.contains(.option)) else { return nil }
+                  !(configuration?.optionDragsFiles == true && event.modifierFlags.contains(.option)),
+                  !(configuration?.movesOnlyWithOption == true && !event.modifierFlags.contains(.option)) else { return nil }
             return super.hitTest(point)
         }
         override func mouseDown(with event: NSEvent) {

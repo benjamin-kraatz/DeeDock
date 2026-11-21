@@ -14,6 +14,16 @@ final class DockInteraction {
     var badges: DockBadgeController?
     /// Shared notification feed. The tile reads its unread count here. Nil in previews.
     var notificationFeed: NotificationFeedController?
+    /// Flix Files' shared tile state: newest item, unseen badge, ✦ pill. Nil in previews.
+    var flix: FlixTileState?
+    /// A file drag from another app is over the Flix Files tile.
+    var flixTargeted = false
+    /// Opens or closes Flix Files above this dock's tile.
+    @ObservationIgnored var openFlix: (() -> Void)?
+    /// Drags the newest Flix item off the tile.
+    @ObservationIgnored var beginFlixDrag: ((NSView, NSEvent) -> Void)?
+    /// Routes the next Settings window to the Flix Files page.
+    @ObservationIgnored var prepareFlixSettings: (() -> Void)?
     /// Shared plugins. Plugin tiles read their badge and status here. Nil in previews.
     var plugins: DockPluginController?
     /// When true, notification badges draw their count. Off draws a red dot.

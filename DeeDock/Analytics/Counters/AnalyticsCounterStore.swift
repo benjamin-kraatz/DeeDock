@@ -32,6 +32,13 @@ final class AnalyticsCounterStore {
         isDirty = true
     }
 
+    /// Keeps the largest value seen this period, for a `_max` counter such as Flix Files' slowest open.
+    func raise(_ counter: AnalyticsCounter, to value: Int) {
+        guard value > document.counts[counter.key, default: 0] else { return }
+        document.counts[counter.key] = value
+        isDirty = true
+    }
+
     /// Writes the counts if they changed since the last write.
     func persist() {
         guard isDirty, let data = try? JSONEncoder().encode(document) else { return }

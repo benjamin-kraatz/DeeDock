@@ -1,0 +1,56 @@
+import AppKit
+
+/// The workspace side of Flix Files' commands: open, reveal, copy, and the Trash.
+///
+/// Every command is a deliberate user action. Moves, renames, and Undo are file system work and
+/// live in ``FlixFileOperations``, run on ``FlixFileWorker``; trashing uses `NSWorkspace.recycle`,
+/// which records Put Back, after the worker checked each file is still the listed one. Nothing here
+/// changes the history; the panel state does that once a command succeeded.
+@MainActor
+enum FlixFileActions {
+    /// Opens items with their default app; links open in the browser they were seen in.
+    static func open(_ items: [FlixItem]) {
+        for item in items {
+            if let link = item.link {
+                if let id = link.browserBundleIdentifier,
+                   let browser = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) {
+                    NSWorkspace.shared.open([link.url], withApplicationAt: browser, configuration: NSWorkspace.OpenConfiguration())
+                } else {
+                    NSWorkspace.shared.open(link.url)
+                }
+            } else if let url = item.url {
+                NSWorkspace.shared.open(url)
+            }
+        }
+    }
+
+    /// Opens files with a specific app, for a drop on an app favorite.
+    static func open(_ urls: [URL], withApplicationAt app: URL) {
+        guard !urls.isEmpty else { return }
+        NSWorkspace.shared.open(urls, withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration())
+    }
+
+    static func reveal(_ items: [FlixItem]) {
+        HubFileOperations.revealInFinder(items.compactMap(\.url))
+    }
+
+    /// Copies the items as Finder does: file URLs, and page URLs for links.
+    static func copy(_ items: [FlixItem]) {
+        let urls = items.compactMap(\.shareURL)
+        guard !urls.isEmpty else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.writeObjects(urls as [NSURL])
+    }
+
+    /// Copies POSIX paths, or page addresses for links, one per line.
+    static func copyPaths(_ items: [FlixItem]) {
+        FilePathCopy.copy(items.compactMap { item in item.url.map(FilePathCopy.path) ?? item.link?.url.absoluteString })
+    }
+
+    /// Moves files to the Trash with Put Back. Call only with items ``FlixFileOperations/trashable(_:)``
+    /// confirmed are still the listed files.
+    static func trash(_ items: [FlixItem]) async throws -> [URL] {
+        try await HubFileOperations.moveToTrash(items.compactMap(\.url))
+    }
+}

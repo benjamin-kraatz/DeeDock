@@ -100,6 +100,29 @@ extension AnalyticsEvent {
         case .discoveryCallout: "discovery_callout"
         case .lineIconCoverage: "line_icon_coverage"
         case .toolOpened: "tool_opened"
+        case .flixSessionEnded: "flix_session_ended"
+        case .flixDrop: "flix_drop"
+        case .flixSearchEnded: "flix_search_ended"
+        case .flixFitsComputed: "flix_fits_computed"
+        case .flixTidy: "flix_tidy"
+        case .flixSuggestionActed: "flix_suggestion_acted"
+        case .flixSmartFilterCreated: "flix_smart_filter_created"
+        case .flixSmartFilterRemoved: "flix_smart_filter_removed"
+        case .flixThreadUsed: "flix_thread_used"
+        case .flixMorningCard: "flix_morning_card"
+        case .flixMoreLikeThis: "flix_more_like_this"
+        case .flixRobiAsked: "flix_robi_asked"
+        case .flixSensitiveMarkedSafe: "flix_sensitive_marked_safe"
+        case .flixVersionsExpanded: "flix_versions_expanded"
+        case .flixLinkSaved: "flix_link_saved"
+        case .flixFolderAccess: "flix_folder_access"
+        case .flixShortcutRegistration: "flix_shortcut_registration"
+        case .flixTipShown: "flix_tip_shown"
+        case .flixTipActed: "flix_tip_acted"
+        case .flixPickShown: "flix_pick_shown"
+        case .flixPickUsed: "flix_pick_used"
+        case .flixPickPickerClosed: "flix_pick_picker_closed"
+        case .flixPickDisabledForApp: "flix_pick_disabled_for_app"
         case .focusDockEntered: "focus_dock_entered"
         case .focusDockCommand: "focus_dock_command"
         case let .update(event, _): event.name
@@ -342,6 +365,53 @@ extension AnalyticsEvent {
             ["tool": .init(tool), "trigger": .init(trigger)]
         case .onboardingCompleted, .launcherHistoryCleared:
             [:]
+        case let .flixSessionEnded(session):
+            session.properties
+        case let .flixDrop(drop):
+            drop.properties
+        case let .flixSearchEnded(search):
+            search.properties
+        case let .flixFitsComputed(fits):
+            fits.properties
+        case let .flixTidy(tidy):
+            tidy.properties
+        case let .flixSuggestionActed(type, action, itemKind):
+            ["type": .init(type), "action": .init(action), "item_kind": itemKind?.value]
+        case let .flixSmartFilterCreated(source, ruleKinds, matchCount, generator):
+            ["source": .init(source), "rule_kinds": .list(ruleKinds.map(AnalyticsValue.init)),
+             "match_count": .init(matchCount), "generator": generator.map(AnalyticsValue.init)]
+        case let .flixSmartFilterRemoved(source):
+            ["source": .init(source)]
+        case let .flixThreadUsed(action, threadSize, namedBy):
+            ["action": .init(action), "thread_size": .init(threadSize), "named_by": .init(namedBy)]
+        case let .flixMorningCard(action, threadCount):
+            ["action": .init(action), "thread_count": .init(threadCount)]
+        case let .flixMoreLikeThis(resultCount, outcome, itemKind):
+            ["result_count": .init(resultCount), "outcome": .init(outcome), "item_kind": itemKind?.value]
+        case let .flixRobiAsked(robi):
+            robi.properties
+        case let .flixSensitiveMarkedSafe(itemKind):
+            ["item_kind": itemKind?.value]
+        case let .flixVersionsExpanded(versionCount):
+            ["version_count": .init(versionCount)]
+        case let .flixLinkSaved(trigger, pageKind):
+            ["trigger": .init(trigger), "page_kind": .init(pageKind)]
+        case let .flixFolderAccess(result, folder):
+            ["result": .init(result), "folder": .init(folder)]
+        case let .flixShortcutRegistration(result, customized, combo):
+            ["result": .init(result), "customized": .init(customized), "combo": .init(combo)]
+        case let .flixTipShown(tip):
+            ["tip": .init(tip)]
+        case let .flixTipActed(tip, action):
+            ["tip": .init(tip), "action": .init(action)]
+        case let .flixPickShown(picker, appCategory, candidateCount):
+            ["picker_kind": .init(picker), "app_category": .init(appCategory), "candidate_count": .init(candidateCount)]
+        case let .flixPickUsed(use):
+            use.properties
+        case let .flixPickPickerClosed(picker, outcome, chosenRank):
+            ["picker_kind": .init(picker), "outcome": .init(outcome), "chosen_rank": chosenRank.map(AnalyticsValue.init)]
+        case let .flixPickDisabledForApp(appCategory):
+            ["app_category": .init(appCategory)]
         case let .focusDockEntered(trigger):
             ["trigger": .init(trigger)]
         case let .focusDockCommand(command):

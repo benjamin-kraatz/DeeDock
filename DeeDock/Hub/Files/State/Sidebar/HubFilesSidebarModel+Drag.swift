@@ -50,8 +50,8 @@ extension HubFilesSidebarModel {
     func itemDragEntered(_ info: NSDraggingInfo) {
         guard itemDrag?.sequence != info.draggingSequenceNumber,
               info.draggingPasteboard.string(forType: DockDragCoordinator.pasteboardType) == nil else { return }
-        let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
-                                                       options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        // A Flix drag may carry converted upload copies; the sidebar's moves take the originals.
+        let urls = FlixDragSession.fileURLs(on: info.draggingPasteboard)
         guard !urls.isEmpty else { return }
         startItemDrag(sequence: info.draggingSequenceNumber, sources: urls)
     }

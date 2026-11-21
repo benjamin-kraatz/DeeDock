@@ -109,6 +109,12 @@ final class Analytics {
     /// Adds to a high-frequency counter that is reported in the next `usage_summary`.
     static func count(_ counter: AnalyticsCounter) { shared.count(counter) }
 
+    /// Adds `amount` to a counter, for sums such as total milliseconds. Zero or less adds nothing.
+    static func count(_ counter: AnalyticsCounter, by amount: Int) { shared.count(counter, by: amount) }
+
+    /// Raises a `_max` counter to `value` when it is larger than the period's maximum so far.
+    static func countMaximum(_ counter: AnalyticsCounter, _ value: Int) { shared.countMaximum(counter, value) }
+
     static func log(_ message: String, attributes: AnalyticsProperties = [:]) {
         shared.log(message, attributes: attributes)
     }
@@ -125,6 +131,16 @@ final class Analytics {
     func count(_ counter: AnalyticsCounter) {
         guard acceptsEvents else { return }
         counters.increment(counter)
+    }
+
+    func count(_ counter: AnalyticsCounter, by amount: Int) {
+        guard acceptsEvents, amount > 0 else { return }
+        counters.increment(counter, by: amount)
+    }
+
+    func countMaximum(_ counter: AnalyticsCounter, _ value: Int) {
+        guard acceptsEvents else { return }
+        counters.raise(counter, to: value)
     }
 
     private func log(_ message: String, attributes: AnalyticsProperties) {
@@ -187,6 +203,12 @@ final class Analytics {
         enqueue(AnalyticsSettingChange.changes(from: old, to: new), area: area, display: display)
     }
 
+    /// The same, for a model whose reflected properties were adjusted before they are compared, such
+    /// as Flix Files' settings (`FlixSettings.analyticsProperties`).
+    func settingsChanged(from old: AnalyticsProperties, to new: AnalyticsProperties, area: AnalyticsSettingArea) {
+        enqueue(AnalyticsSettingChange.changes(from: old, to: new), area: area, display: nil)
+    }
+
     /// Reports one app-wide feature preference that lives outside the reflected settings models,
     /// with the same folding of quick consecutive edits. Nothing is sent when the value is unchanged.
     func featureSettingChanged(_ setting: AnalyticsFeatureSetting, from old: AnalyticsValue, to new: AnalyticsValue) {
@@ -231,7 +253,8 @@ final class Analytics {
             forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in MainActor.assumeIsolated { self?.contextDidChange() } })
         appearanceObservation = NSApp.observe(\.effectiveAppearance) { [weak self] _, _ in
-            Task { @MainActor in self?.contextDidChange() }
+            // Copies the weak reference into the task, so no captured variable crosses into it.
+            Task { @MainActor [self] in self?.contextDidChange() }
         }
         // One coarse timer: it writes changed counters and sends the summary when a day has passed.
         maintenance = Task { [weak self] in

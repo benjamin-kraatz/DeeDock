@@ -23,6 +23,15 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private var unpinDestinationID: String?
     private var trashDestinationID: String?
     private var shelfDestinationID: String?
+    /// The display whose Flix Files tile a file drag is over.
+    private var flixDestinationID: String?
+    /// Items of a drag that started in Flix Files; the tile refuses its own items.
+    private var flixSourceIDs: [UUID] = []
+    /// A Flix Files drag's files with the identity each row listed, for the Trash's check.
+    private var flixFiles: FlixDraggedFiles?
+    /// Files of the Flix drag that are no longer the ones their rows listed, read off the main actor
+    /// with the payload. The Trash refuses the drop while any is present.
+    private var flixChangedFiles: [URL] = []
     private var actionDestination: (String, UUID)?
     private var folderDestination: (String, FolderDockItem)?
     /// A volume tile under a file drag: drop copies (Shift moves), dwell opens its stack.
@@ -45,6 +54,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var documentHoverChanged: ((DockItem?, DockPanelController?, DocumentResourceAccess?) -> Void)?
     var chooseDocumentDestination: ((DocumentResourceAccess, DockItem, DockPanelController) -> Void)?
     var deliverToLauncher: ((DocumentResourceAccess, DockPanelController) -> Void)?
+    /// Keeps files dropped on a Flix Files tile as items.
+    var keepInFlix: (([URL]) -> Void)?
+    /// A Flix Files drag landed on the Shelf, the Trash, or a folder or drive tile, for its drop
+    /// report. Other dock drops of Flix items count as a dock app. Called before the drag source
+    /// hears that the drag ended.
+    var flixDropLanded: ((AnalyticsFlixDropTarget) -> Void)?
     /// Drop to Place and Unpin Undo. Nil disables both; drags then behave as before.
     var dropToPlace: DropToPlaceController?
     /// The dragged application tile while Drop to Place applies to it. Nil for folders, volumes,
@@ -218,6 +233,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         if folderDestination?.0 == displayID { return info.draggingSourceOperationMask.contains(.copy) ? .copy : [] }
         if volumeDestination?.0 == displayID { return FolderFileDrop.operation(info, allowsMove: true) }
         if shelfDestinationID == displayID { return .copy }
+        if flixDestinationID == displayID { return .copy }
         // Removing a staged reference is a discard, not a file operation, but the poof cursor is right.
         if trashDestinationID == displayID {
             return canDiscard(info) ? .delete : []
@@ -298,18 +314,26 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
         if let (id, folder) = folderDestination, id == displayID, let panel = panels[id] {
             let accepted = dropInFolder?(info, folder, panel) ?? false
-            if accepted { completion.committed = true; cancel() }
+            if accepted { reportFlixDrop(.finder); completion.committed = true; cancel() }
             return accepted
         }
         if let (id, volume) = volumeDestination, id == displayID, let panel = panels[id] {
             let accepted = dropInVolume?(info, volume, panel) ?? false
-            if accepted { completion.committed = true; cancel() }
+            if accepted { reportFlixDrop(.finder); completion.committed = true; cancel() }
             return accepted
         }
         if shelfDestinationID == displayID, let access = payload.stageableItems,
            let panel = panels[displayID] {
+            reportFlixDrop(.shelf)
             completion.committed = true
             panel.store.stageOnShelf(access)
+            cancel()
+            return true
+        }
+        if flixDestinationID == displayID, let access = payload.stageableItems {
+            completion.committed = true
+            keepInFlix?(access.urls)
+            panels[displayID]?.tileReceived(.flix)
             cancel()
             return true
         }
@@ -323,8 +347,21 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 return true
             }
             guard let access = payload.stageableItems else { return false }
+            // A stale Flix row must never trash whatever took its file's place. The check ran with
+            // the payload, off the main actor; refusing leaves the drag to slide back.
+            if let changed = flixChangedFiles.first {
+                refuseChangedFlixFiles(flixChangedFiles, name: changed.lastPathComponent, on: panel)
+                return false
+            }
+            reportFlixDrop(.trash)
             completion.committed = true
-            panel.store.recycleToTrash(access)
+            if let flixFiles {
+                // Checked again right before recycling, off the main actor, for a file replaced
+                // between the drag entering the dock and the drop.
+                recycleVerified(access, files: flixFiles, on: panel)
+            } else {
+                panel.store.recycleToTrash(access)
+            }
             cancel()
             return true
         }
@@ -355,6 +392,38 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         completion.committed = true
         if sourceID == nil { cancel() } else { clearFeedback() }
         return success
+    }
+
+    /// Recycles a Flix drag's files after confirming, off the main actor, that each is still the
+    /// file its row listed. A mismatch recycles nothing and reports it as a Trash failure.
+    private func recycleVerified(_ access: DocumentResourceAccess, files: FlixDraggedFiles, on panel: DockPanelController) {
+        let urls = access.urls
+        Task { [weak panel] in
+            let changed = await Task.detached(priority: .userInitiated) { files.changed(among: urls) }.value
+            guard let panel else { return }
+            if let first = changed.first {
+                Self.reportChanged(changed, name: first.lastPathComponent, files: files, on: panel)
+            } else {
+                panel.store.recycleToTrash(access)
+            }
+        }
+    }
+
+    private func refuseChangedFlixFiles(_ changed: [URL], name: String, on panel: DockPanelController) {
+        guard let flixFiles else { return }
+        Self.reportChanged(changed, name: name, files: flixFiles, on: panel)
+    }
+
+    /// The Trash's failure message, naming the first changed file, and the rows' refresh.
+    private static func reportChanged(_ changed: [URL], name: String, files: FlixDraggedFiles, on panel: DockPanelController) {
+        panel.store.errorMessage = .trashMoveFailed(details: FlixDraggedFileChanged(name: name).localizedDescription)
+        files.reportChanged(changed)
+    }
+
+    /// Tells Flix Files where its drag landed, when the drag is one of its own.
+    private func reportFlixDrop(_ target: AnalyticsFlixDropTarget) {
+        guard !flixSourceIDs.isEmpty else { return }
+        flixDropLanded?(target)
     }
 
     func exited() {
@@ -419,11 +488,18 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         // Never accept a stale or fabricated internal token as a Finder payload.
         guard pasteboard.string(forType: Self.pasteboardType) == nil else { return }
         cancel()
-        guard let objects = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
-              !objects.isEmpty else { return }
+        guard let read = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
+              !read.isEmpty else { return }
+        // A Flix drag may carry converted upload copies; the Shelf, the Trash, app tiles, and
+        // actions get the originals, so a temporary copy is never staged, trashed, or opened.
+        let objects = FlixDragSession.originalURLs(for: read, on: pasteboard)
         pasteboardChange = pasteboard.changeCount; active = true; completion = DockDragCompletion(); importSession = DockSession()
         shelfSourceIDs = (pasteboard.string(forType: ShelfDragSession.pasteboardType) ?? "")
             .split(separator: ",").compactMap { UUID(uuidString: String($0)) }
+        flixSourceIDs = FlixDragSession.itemIDs(on: pasteboard)
+        let flixFiles = FlixDragSession.draggedFiles(on: pasteboard)
+        self.flixFiles = flixFiles
+        flixChangedFiles = []
         let generation = importSession.token
         let ownIdentifier = Bundle.main.bundleIdentifier ?? "de.benjaminkraatz.DeeDock"
         installMonitor()
@@ -432,14 +508,19 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         let access = DocumentDragLeaseRegistry.access(for: pasteboard, urls: objects)
         importTask = Task { [weak self] in
             let worker = Task.detached {
-                Result { try DockExternalPayload.read(access, excluding: ownIdentifier) }
+                // A Flix drag's rows are compared with the files at their paths here, with the
+                // payload read, so the Trash can refuse a stale row without touching the disk on
+                // the main actor (`lstat` on a share that went away can wait for seconds).
+                (Result { try DockExternalPayload.read(access, excluding: ownIdentifier) },
+                 flixFiles?.changed(among: access.urls) ?? [])
             }
-            let result = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
+            let (result, changed) = await withTaskCancellationHandler { await worker.value } onCancel: { worker.cancel() }
             guard let self, !Task.isCancelled, importSession.accepts(generation), active else { return }
             switch result {
             case .success(let result): payload = result
             case .failure: payload = .rejected
             }
+            flixChangedFiles = changed
             importTask = nil
             update(at: NSEvent.mouseLocation)
         }
@@ -450,6 +531,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     private func utilityTarget(at point: CGPoint, on panel: DockPanelController) -> DockUtilityDropTarget? {
         if panel.trashTarget(at: point) { return .trash }
         if shelfSourceIDs.isEmpty, panel.shelfTarget(at: point) { return .shelf }
+        if flixSourceIDs.isEmpty, panel.flixTarget(at: point) { return .flix }
         return nil
     }
 
@@ -478,7 +560,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         guard active, !updating, !completion.cancelled, !completion.committed else { return }
         updating = true
         defer { updating = false }
-        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
+        destinationID = nil; destinationIndex = nil; trashDestinationID = nil; shelfDestinationID = nil; flixDestinationID = nil; folderDestination = nil; actionDestination = nil; launcherDestinationID = nil
         panels.values.forEach { $0.interaction.volumeTargetID = nil }
         let hadVolumeDestination = volumeDestination != nil
         volumeDestination = nil
@@ -566,7 +648,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 let targeted = panel === candidate
                 panel.interaction.documentTargetID = nil
                 panel.interaction.trashTargeted = false
-                panel.interaction.shelfTargeted = false
+                panel.interaction.shelfTargeted = false; panel.interaction.flixTargeted = false
                 panel.interaction.springEmphasized = false
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
@@ -586,7 +668,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             for panel in panels.values {
                 let targeted = panel === candidate
                 panel.interaction.documentTargetID = nil
-                panel.interaction.trashTargeted = false; panel.interaction.shelfTargeted = false
+                panel.interaction.trashTargeted = false; panel.interaction.shelfTargeted = false; panel.interaction.flixTargeted = false
                 panel.interaction.springEmphasized = false
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
@@ -619,7 +701,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 let targeted = panel === candidate
                 panel.interaction.documentTargetID = nil
                 panel.interaction.trashTargeted = false
-                panel.interaction.shelfTargeted = false
+                panel.interaction.shelfTargeted = false; panel.interaction.flixTargeted = false
                 panel.interaction.volumeTargetID = targeted ? volume.id : nil
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
@@ -638,7 +720,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 let targeted = panel === candidate
                 panel.interaction.documentTargetID = nil
                 panel.interaction.trashTargeted = false
-                panel.interaction.shelfTargeted = false
+                panel.interaction.shelfTargeted = false; panel.interaction.flixTargeted = false
                 panel.updateSectionDragHover(at: point, valid: false)
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
                     message: targeted ? .folderDropCopyHere : nil)
@@ -652,6 +734,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             switch utility {
             case .trash: trashDestinationID = candidate.store.displayID
             case .shelf: shelfDestinationID = candidate.store.displayID
+            case .flix: flixDestinationID = candidate.store.displayID
             }
             documentDrag.clear()
             for panel in panels.values {
@@ -661,13 +744,14 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 panel.interaction.springEmphasized = false
                 panel.interaction.trashTargeted = targeted && utility == .trash
                 panel.interaction.shelfTargeted = targeted && utility == .shelf
+                panel.interaction.flixTargeted = targeted && utility == .flix
                 panel.setDragPresentation(proposal: nil, source: nil, targeted: targeted,
                     message: targeted ? utility.message(removingFromShelf: !shelfSourceIDs.isEmpty) : nil)
             }
             updateScrollTimer()
             return
         }
-        panels.values.forEach { $0.interaction.trashTargeted = false; $0.interaction.shelfTargeted = false }
+        panels.values.forEach { $0.interaction.trashTargeted = false; $0.interaction.shelfTargeted = false; $0.interaction.flixTargeted = false }
         if payload.documents != nil {
             let documentOwnsPresentation = documentDrag.update(
                 at: point,
@@ -857,7 +941,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
             $0.interaction.documentTargetID = nil
             $0.interaction.springEmphasized = false
             $0.interaction.trashTargeted = false
-            $0.interaction.shelfTargeted = false
+            $0.interaction.shelfTargeted = false; $0.interaction.flixTargeted = false
             $0.interaction.volumeTargetID = nil
             $0.setDragPresentation(proposal: nil, source: nil, targeted: false, message: nil)
             $0.endSectionDrag()
@@ -883,7 +967,8 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         dragImageBaseFrame = .zero
         payload = .checking; nativeDisplayID = nil; trackingID = nil; destinationID = nil; destinationIndex = nil
         unpinDestinationID = nil
-        trashDestinationID = nil; shelfDestinationID = nil; folderDestination = nil; actionDestination = nil; shelfSourceIDs = []
+        trashDestinationID = nil; shelfDestinationID = nil; flixDestinationID = nil; folderDestination = nil; actionDestination = nil
+        shelfSourceIDs = []; flixSourceIDs = []; flixFiles = nil; flixChangedFiles = []
         if volumeDestination != nil { DockDropHintController.shared.hide() }
         volumeDestination = nil; sourceMask = []
         if let pasteboardChange { ignoredPasteboardChange = pasteboardChange }

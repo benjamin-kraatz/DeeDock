@@ -2,8 +2,9 @@ import Foundation
 
 /// Marks an enum whose raw values may leave the device as analytics property values.
 ///
-/// Conform only enums whose cases are compile-time constants. A type that wraps arbitrary text,
-/// such as an app name or a path, must never conform: this protocol, ``AnalyticsFileType``,
+/// Conform only enums whose cases are compile-time constants, or a type whose `init(rawValue:)`
+/// accepts nothing but a closed grammar (``AnalyticsShortcutCombo``). A type that wraps arbitrary
+/// text, such as an app name or a path, must never conform: this protocol, ``AnalyticsFileType``,
 /// ``AnalyticsVersion``, and ``AnalyticsPublicAppIdentifier`` are the only ways text becomes an
 /// ``AnalyticsValue``.
 nonisolated protocol AnalyticsToken: RawRepresentable where RawValue == String {}
@@ -31,6 +32,20 @@ nonisolated struct AnalyticsValue: Equatable, Sendable {
     /// Sent as a JSON array, in the given order.
     init(_ apps: [AnalyticsPublicAppIdentifier]) { storage = .tokens(apps.map(\.bundleIdentifier)) }
     fileprivate init(token: String) { storage = .token(token) }
+
+    /// A JSON array of the token values in `values`, in the given order, without repeats. Values that
+    /// are not tokens (Bools, numbers, lists) are left out, so this only regroups text that already
+    /// passed one of the initializers above.
+    static func list(_ values: [AnalyticsValue]) -> AnalyticsValue {
+        var seen = Set<String>()
+        let tokens = values.compactMap { value -> String? in
+            guard case let .token(text) = value.storage, seen.insert(text).inserted else { return nil }
+            return text
+        }
+        return AnalyticsValue(storage: .tokens(tokens))
+    }
+
+    private init(storage: Storage) { self.storage = storage }
 
     /// The JSON-compatible form handed to the backend.
     var payload: Any {
@@ -84,6 +99,12 @@ nonisolated struct AnalyticsProperties: Equatable, Sendable, ExpressibleByDictio
         set { values["\(key)"] = newValue }
     }
 
+    /// Moves a value to another key, for a reflected name that reads better in reports.
+    mutating func renameKey(_ old: StaticString, to new: StaticString) {
+        guard let value = values.removeValue(forKey: "\(old)") else { return }
+        values["\(new)"] = value
+    }
+
     /// Adds `other`, which wins on a shared key.
     mutating func merge(_ other: AnalyticsProperties) {
         values.merge(other.values) { _, new in new }
@@ -135,7 +156,7 @@ nonisolated enum AnalyticsScope: Sendable {
 
 // MARK: - Reflection
 
-extension AnalyticsProperties {
+nonisolated extension AnalyticsProperties {
     /// Flattens a settings model into properties without naming its fields in analytics code,
     /// so a setting added to the model is reported without touching this file.
     ///
@@ -225,7 +246,7 @@ extension AnalyticsProperties {
 }
 
 /// Lets reflection see through `Optional` and tell an unset text field from an unset number.
-private protocol AnalyticsOptional {
+nonisolated private protocol AnalyticsOptional {
     var analyticsWrapped: Any? { get }
     var wrapsOpaqueValue: Bool { get }
 }
@@ -273,8 +294,14 @@ nonisolated struct AnalyticsSettingChange: Equatable, Sendable {
 
     /// Every setting whose reported value differs between two versions of the same model.
     static func changes(from old: Any, to new: Any) -> [AnalyticsSettingChange] {
-        let before = AnalyticsProperties(reflecting: old).values
-        let after = AnalyticsProperties(reflecting: new).values
+        changes(from: AnalyticsProperties(reflecting: old), to: AnalyticsProperties(reflecting: new))
+    }
+
+    /// Every key whose value differs between two property sets, for a settings model whose
+    /// reflection is adjusted before it is compared (Flix Files' shortcut and list counts).
+    static func changes(from old: AnalyticsProperties, to new: AnalyticsProperties) -> [AnalyticsSettingChange] {
+        let before = old.values
+        let after = new.values
         return Set(before.keys).union(after.keys).sorted().compactMap { key in
             before[key] == after[key] ? nil
                 : AnalyticsSettingChange(key: key, oldValue: before[key], newValue: after[key])

@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flix Pick mockup</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de)}
+p.lede{margin:0 0 10px;color:var(--muted-foreground,#9a9ca6);line-height:1.5;max-width:1200px}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px;max-width:1200px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.ctl input[type=range]{width:90px}
+.ctl .val{font-variant-numeric:tabular-nums;min-width:48px}
+#route{max-width:1200px;margin:0 0 10px;font-size:12px;color:var(--muted-foreground,#9a9ca6);display:flex;gap:8px;align-items:center;min-height:22px}
+#route b{color:var(--foreground,#e6e7ea);font-weight:600}
+#route .pill{padding:2px 8px;border-radius:999px;background:var(--muted,#ffffff10);color:var(--foreground,#d8d9de)}
+.viewport{position:relative;width:100%;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14;max-width:1200px}
+.notes{max-width:1200px;margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.notes section{background:#ffffff08;border-radius:12px;padding:14px 16px;box-shadow:0 0 0 1px #ffffff10;line-height:1.55;color:var(--muted-foreground,#a6a8b2)}
+.notes h3{margin:0 0 6px;font-size:13px;color:var(--foreground,#e6e7ea)}
+.notes ul{margin:0;padding-left:18px}
+.notes code{font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--foreground,#d8d9de)}
+
+.dark{--fg:#f5f5f7;--fg2:rgba(235,235,245,.62);--fg3:rgba(235,235,245,.34);--panel:rgba(34,35,44,.62);--panelSolid:#24252d;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+ --chip:rgba(255,255,255,.07);--chipH:rgba(255,255,255,.12);--hover:rgba(255,255,255,.06);--accent:#0a84ff;--accentSoft:rgba(10,132,255,.22);--shadow:rgba(0,0,0,.55);--menu:rgba(42,43,52,.9);
+ --dock:rgba(36,37,46,.42);--red:#ff453a;--green:#30d158;--orange:#ff9f0a;--purple:#bf5af2;--wallA:#1c3156;--wallB:#3c2050;--wallC:#0d1526;
+ --field:rgba(255,255,255,.07);--key:rgba(255,255,255,.09);--win:#1e1f25;--winBar:#2a2b31;--dlg:#2b2c33;--dlgSide:#26272e;--list:#1f2026;--stripe:rgba(255,255,255,.025);--paper:#2a2b31;--btn:#4a4b52}
+.light{--fg:#1d1d1f;--fg2:rgba(60,60,67,.72);--fg3:rgba(60,60,67,.42);--panel:rgba(250,250,252,.7);--panelSolid:#f4f4f7;--line:rgba(0,0,0,.07);--line2:rgba(0,0,0,.13);
+ --chip:rgba(0,0,0,.05);--chipH:rgba(0,0,0,.08);--hover:rgba(0,0,0,.045);--accent:#007aff;--accentSoft:rgba(0,122,255,.14);--shadow:rgba(30,30,60,.26);--menu:rgba(250,250,252,.92);
+ --dock:rgba(255,255,255,.42);--red:#ff3b30;--green:#28a745;--orange:#e08600;--purple:#a550d8;--wallA:#bcd3f5;--wallB:#f1cde0;--wallC:#e8eef8;
+ --field:rgba(0,0,0,.05);--key:rgba(0,0,0,.06);--win:#ffffff;--winBar:#ececf0;--dlg:#ececee;--dlgSide:#e3e3e7;--list:#ffffff;--stripe:rgba(0,0,0,.028);--paper:#ffffff;--btn:#ffffff}
+
+.stage{position:absolute;left:0;top:0;width:1200px;height:760px;transform-origin:0 0;overflow:hidden;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;touch-action:none}
+#wall{position:absolute;inset:0;background:radial-gradient(900px 620px at 16% 18%,var(--wallB),transparent 70%),radial-gradient(820px 700px at 86% 78%,var(--wallA),transparent 70%),var(--wallC)}
+#menubar{position:absolute;left:0;right:0;top:0;height:26px;display:flex;align-items:center;gap:20px;padding:0 14px 0 18px;font-size:13px;z-index:5;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.dark #menubar{background:rgba(10,10,16,.3)}.light #menubar{background:rgba(255,255,255,.36)}
+#menubar b{font-weight:700}#menubar .r{margin-left:auto;font-variant-numeric:tabular-nums}
+.kc{display:inline-flex;gap:3px;vertical-align:middle}
+.kc span{min-width:17px;height:17px;padding:0 4px;border-radius:4px;background:var(--key);box-shadow:0 0 0 .5px var(--line2) inset,0 1px 0 var(--line2);display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--fg)}
+
+/* app window */
+#win{position:absolute;left:24px;top:46px;width:900px;height:620px;border-radius:12px;background:var(--win);box-shadow:0 0 0 .5px var(--line2),0 22px 60px var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+#win .bar{height:38px;flex:none;background:var(--winBar);display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:.5px solid var(--line);position:relative}
+#win .tl{display:flex;gap:7px}#win .tl i{width:12px;height:12px;border-radius:6px;display:block}
+#win .ttl{position:absolute;left:0;right:0;text-align:center;font-size:13px;font-weight:600;color:var(--fg2);pointer-events:none}
+#win .body{flex:1;min-height:0;position:relative;overflow:hidden}
+.paper{position:absolute;left:50%;top:28px;width:420px;height:560px;margin-left:-210px;background:var(--paper);border-radius:2px;box-shadow:0 0 0 .5px var(--line2),0 6px 24px rgba(0,0,0,.18);padding:46px 48px;transition:opacity .25s}
+.paper h1{margin:0 0 14px;font:700 20px Georgia,serif;color:var(--fg)}
+.paper i{display:block;height:7px;border-radius:3px;background:var(--chip);margin:0 0 10px}
+.paper .ph{color:var(--fg3);font:15px Georgia,serif}
+.bx{padding:28px 34px;display:flex;flex-direction:column;gap:14px}
+.bx h2{margin:0;font-size:18px}
+.bx .zone{height:120px;border-radius:12px;border:1.5px dashed var(--line2);display:flex;align-items:center;justify-content:center;color:var(--fg2);gap:10px}
+.bx .zone button{font:inherit;font-size:12px;border:0;border-radius:6px;padding:5px 12px;background:var(--btn);color:var(--fg);box-shadow:0 0 0 .5px var(--line2),0 1px 1px rgba(0,0,0,.1)}
+.bx .imp{display:flex;flex-direction:column;gap:6px}
+.bx .imp div{display:flex;gap:10px;align-items:center;padding:7px 10px;border-radius:8px;background:var(--chip);font-size:12px}
+.bx .imp em{margin-left:auto;font-style:normal;color:var(--green);font-weight:600}
+
+/* picker */
+#picker{position:absolute;border-radius:12px;background:var(--dlg);box-shadow:0 0 0 .5px var(--line2),0 0 0 .5px rgba(0,0,0,.3),0 30px 80px var(--shadow);overflow:hidden;display:flex;flex-direction:column;z-index:12;font-size:12.5px;
+ transition:transform .32s cubic-bezier(.2,.9,.3,1),opacity .2s}
+#picker.sheet{border-radius:0 0 12px 12px}
+#picker.off{opacity:0;transform:scale(.96);pointer-events:none}
+#picker.sheet.off{transform:translateY(-40px);opacity:0}
+.rm #picker,.rm #picker.off{transform:none!important}
+#picker .save{flex:none;padding:14px 18px 8px;display:grid;grid-template-columns:70px 1fr;gap:8px 10px;align-items:center;border-bottom:.5px solid var(--line)}
+#picker .save label{text-align:right;color:var(--fg2)}
+#picker .save .f{height:22px;border-radius:5px;background:var(--list);box-shadow:0 0 0 .5px var(--line2);display:flex;align-items:center;padding:0 7px;width:300px;transition:box-shadow .2s}
+#picker .save .f.kept{box-shadow:0 0 0 2.5px var(--green)}
+#picker .tb{height:42px;flex:none;display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:.5px solid var(--line);cursor:grab}
+#picker .tb .nav{display:flex;gap:2px}
+#picker .tb .nav span,#picker .tb .vw span{width:24px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--fg2)}
+#picker .where{height:22px;min-width:170px;border-radius:5px;background:var(--chip);display:flex;align-items:center;gap:6px;padding:0 8px;margin:0 auto;font-weight:500}
+#picker .where .chev{margin-left:auto;color:var(--fg3);font-size:9px}
+#picker .search{width:150px;height:22px;border-radius:6px;background:var(--field);display:flex;align-items:center;gap:5px;padding:0 7px;color:var(--fg3)}
+#picker .main{flex:1;display:flex;min-height:0}
+#picker .side{width:150px;flex:none;background:var(--dlgSide);padding:8px 6px;overflow:hidden;border-right:.5px solid var(--line)}
+#picker .side .h{font-size:10.5px;font-weight:600;color:var(--fg3);padding:8px 8px 3px}
+#picker .side .it{height:24px;display:flex;align-items:center;gap:7px;padding:0 8px;border-radius:6px;color:var(--fg);transition:background .15s}
+#picker .side .it svg{color:var(--accent);flex:none}
+#picker .side .it.on{background:var(--chipH)}
+#picker .side .it.ping{background:var(--accent);color:#fff}#picker .side .it.ping svg{color:#fff}
+#picker .lst{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--list);position:relative}
+#picker .cols,#picker .lr{display:grid;grid-template-columns:1fr 120px 64px 110px;align-items:center;gap:8px;padding:0 12px}
+#picker .cols{height:24px;flex:none;font-size:11px;color:var(--fg2);border-bottom:.5px solid var(--line)}
+#picker .rows{flex:1;overflow:hidden;transition:opacity .14s}
+#picker .rows.fade{opacity:0}
+#picker .lr{height:24px;white-space:nowrap}
+#picker .lr:nth-child(even){background:var(--stripe)}
+#picker .lr .n{display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis}
+#picker .lr .m{color:var(--fg2);font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+#picker .lr.dis{opacity:.38}
+#picker .lr.sel{background:var(--accent)!important;color:#fff}#picker .lr.sel .m{color:rgba(255,255,255,.8)}
+#picker .lr.land{animation:land .9s ease-out}
+@keyframes land{0%{box-shadow:0 0 0 2px var(--accent) inset}100%{box-shadow:0 0 0 0 transparent inset}}
+#picker .lst.over{box-shadow:0 0 0 3px var(--accent) inset}
+#picker .bb{height:50px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;border-top:.5px solid var(--line)}
+#picker .bb .sp{flex:1}
+#picker .pb{font:inherit;font-size:12.5px;border:0;border-radius:6px;height:24px;padding:0 14px;min-width:78px;background:var(--btn);color:var(--fg);box-shadow:0 0 0 .5px var(--line2),0 1px 1px rgba(0,0,0,.12);cursor:pointer}
+#picker .pb.def{background:var(--accent);color:#fff;box-shadow:none}
+#picker .pb.def[disabled]{opacity:.45;cursor:default}
+#picker .pb.press{filter:brightness(.78);transform:scale(.97)}
+#goto{position:absolute;left:50%;top:0;width:430px;margin-left:-215px;padding:14px 16px;border-radius:0 0 10px 10px;background:var(--dlg);box-shadow:0 0 0 .5px var(--line2),0 14px 30px var(--shadow);z-index:3;
+ transform:translateY(-110%);transition:transform .12s ease-out}
+#goto.on{transform:none}
+#goto .f{height:24px;border-radius:6px;background:var(--list);box-shadow:0 0 0 2.5px var(--accentSoft),0 0 0 .5px var(--line2);display:flex;align-items:center;padding:0 8px;font-size:12px;overflow:hidden;white-space:nowrap}
+#goto .t{font-size:11px;color:var(--fg2);margin:0 0 6px}
+
+/* pick panel */
+#pick{position:absolute;z-index:11;border-radius:14px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;
+ backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);
+ box-shadow:0 0 0 .5px var(--line2) inset,0 0 0 .5px rgba(0,0,0,.3),0 22px 60px var(--shadow);
+ opacity:0;transform:var(--from,translateX(-18px)) scale(.98);transition:opacity .22s,transform .42s cubic-bezier(.2,1.1,.3,1),width .32s cubic-bezier(.2,1,.3,1);pointer-events:none}
+#pick.in{opacity:1;transform:none;pointer-events:auto}
+.rm #pick{transform:none!important;transition:opacity .2s,width 0s}
+.rt #pick{background:var(--panelSolid);backdrop-filter:none;-webkit-backdrop-filter:none}
+.ph2{flex:none;display:flex;align-items:center;gap:8px;padding:11px 12px 7px 13px}
+.ph2 .logo{width:20px;height:20px;border-radius:6px;background:linear-gradient(150deg,#5ac8fa,#0a84ff 55%,#5e5ce6);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.ph2 .nm{font-weight:700;font-size:13px}
+.ph2 .for{font-size:11px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph2 .ib{margin-left:auto;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--fg3)}
+.ph2 .ib:hover{background:var(--hover);color:var(--fg)}
+.plist{flex:1;min-height:0;padding:2px 6px 6px;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.pr{display:flex;align-items:center;gap:10px;height:56px;padding:0 8px;border-radius:9px;cursor:pointer;position:relative;flex:none;transition:background .12s,transform .1s}
+.pr:hover{background:var(--hover)}
+.pr:active,.pr.hit{transform:scale(.985);background:var(--accentSoft)}
+.pr .ic{width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center}
+.pr .tx{flex:1;min-width:0}
+.pr .a{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr .b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.pr .c{font-size:10.5px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+#pick.ribbon .pr .c{display:none}
+.why{font-weight:600}
+.why.ctx{color:var(--purple)}.why.used{color:var(--accent)}.why.new{color:var(--orange)}.why.learned{color:var(--green)}
+.pr .tm{font-size:10.5px;color:var(--fg3);flex:none;font-variant-numeric:tabular-nums}
+.pr.dragsrc{opacity:.35}
+.pf{flex:none;border-top:.5px solid var(--line);height:28px;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:10.5px;color:var(--fg3);white-space:nowrap}
+.pf b{font-weight:500;color:var(--fg2)}
+/* ribbon */
+#pick.ribbon .plist{flex-direction:row;gap:6px;padding:2px 10px 10px}
+#pick.ribbon .pr{flex:1;min-width:0;height:auto;flex-direction:column;align-items:flex-start;gap:6px;padding:9px 10px;background:var(--chip)}
+#pick.ribbon .pr:hover{background:var(--chipH)}
+#pick.ribbon .pr .tx{width:100%}
+#pick.ribbon .pr .tm{position:absolute;right:9px;top:10px}
+#pick.ribbon .ph2{padding:9px 12px 6px 13px}
+#pick.ribbon .pf{display:none}
+/* tuck */
+#pick.tuck .ph2 .nm,#pick.tuck .ph2 .for,#pick.tuck .ph2 .ib,#pick.tuck .tx,#pick.tuck .tm,#pick.tuck .pf{opacity:0;transition:opacity .12s}
+#pick.tuck.open .ph2 .nm,#pick.tuck.open .ph2 .for,#pick.tuck.open .ph2 .ib,#pick.tuck.open .tx,#pick.tuck.open .tm,#pick.tuck.open .pf{opacity:1;transition:opacity .2s .08s}
+#pick.tuck .pr{padding-left:8px}#pick.tuck .ph2{padding-left:19px}
+#pick.tuck .pf{height:0;border:0}
+#pick.tuck.open .pf{height:28px;border-top:.5px solid var(--line)}
+
+/* drag ghost + toast + dock */
+#ghost{position:absolute;z-index:50;pointer-events:none;display:none;align-items:center;gap:8px}
+#ghost .lbl{padding:3px 9px;border-radius:7px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#toast{position:absolute;left:50%;bottom:86px;transform:translate(-50%,16px);opacity:0;z-index:30;padding:8px 14px;border-radius:12px;background:var(--menu);box-shadow:0 0 0 .5px var(--line2) inset,0 10px 30px var(--shadow);font-size:12.5px;display:flex;gap:8px;align-items:center;transition:opacity .2s,transform .35s cubic-bezier(.2,1.1,.3,1);white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#dock{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);height:62px;padding:7px 10px;border-radius:20px;display:flex;gap:8px;align-items:center;z-index:6;
+ background:var(--dock);backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 0 0 .5px var(--line2) inset,0 10px 30px var(--shadow)}
+.dk{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:19px;box-shadow:0 1px 2px rgba(0,0,0,.25);position:relative}
+.dk.run::after{content:"";position:absolute;bottom:-6px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:2px;background:var(--fg2)}
+.dsep{width:1px;height:42px;background:var(--line2);margin:0 2px}
+</style>
+</head>
+<body>
+<p class="lede"><b>Flix Pick (DEE-164).</b> When an app shows an Open or Save picker, DOKK puts the files that app most likely wants right beside it. <b>Click</b> a row to select it in the picker, <b>⌥-click or double-click</b> to also press Open, or <b>drag</b> it in as you do today. Drag the picker by its toolbar and the panel follows. The timings are from the two probes on macOS 27.</p>
+<div class="ctl">
+ <div class="grp">Scene <span class="sg" id="cScn"><button data-v="pagesOpen" class="on">Pages · ⌘O</button><button data-v="billImport">BillExporter · Import</button><button data-v="pagesSave">Pages · Save</button></span></div>
+ <div class="grp">Style <span class="sg" id="cStyle"><button data-v="shelf" class="on">Shelf</button><button data-v="ribbon">Ribbon</button><button data-v="tuck">Tuck</button></span></div>
+ <div class="grp">Name <span class="sg" id="cName"><button data-v="Flix Pick" class="on">Flix Pick</button><button data-v="Shortlist">Shortlist</button><button data-v="Pickup">Pickup</button></span></div>
+</div>
+<div class="ctl">
+ <div class="grp">Go to Folder flash <input type="range" id="cFlash" min="100" max="400" step="10" value="250"><span class="val" id="vFlash">250 ms</span></div>
+ <div class="grp"><label><input type="checkbox" id="cSide" checked> Skip it via sidebar (to verify)</label></div>
+ <div class="grp">Look <span class="sg" id="cTheme"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></span></div>
+ <div class="grp"><label><input type="checkbox" id="cRM"> Reduce Motion</label> <label><input type="checkbox" id="cRT"> Reduce Transparency</label></div>
+ <button class="btn" id="cAgain">Open picker again</button>
+</div>
+<div id="route"><span>Route:</span><span class="pill" id="rText">Pick something</span></div>
+
+<div class="viewport" id="vp">
+ <div class="stage dark" id="st">
+  <div id="wall"></div>
+  <div id="menubar"><b id="mbApp">Pages</b><span>File</span><span>Edit</span><span>Insert</span><span>Format</span><span>View</span><span>Window</span><span class="r">Sat 21 Nov 12:40</span></div>
+  <div id="win"><div class="bar"><div class="tl"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div><div class="ttl" id="winTitle">Untitled</div></div><div class="body" id="winBody"></div></div>
+  <div id="picker" class="off"></div>
+  <div id="pick"></div>
+  <div id="dock"></div>
+  <div id="toast"></div>
+  <div id="ghost"><span id="gIcon"></span><span class="lbl" id="gLbl"></span></div>
+ </div>
+</div>
+
+<div class="notes">
+ <section><h3>What the probes proved</h3><ul>
+  <li>Pickers carry <code>open-panel</code> / <code>save-panel</code>, sandboxed apps included. They are detected about 40 ms after they open.</li>
+  <li>Clicking a non-activating panel keeps the app in front and its picker focused.</li>
+  <li>A file already listed: select its row through Accessibility, about 70 ms, nothing on screen.</li>
+  <li>Anywhere else: ⇧⌘G, then the path, then Return, 0.1–0.4 s, and Go to Folder flashes. Then press <code>OKButton</code> to open or save.</li>
+  <li>A Save picker keeps the typed name when it changes folder.</li>
+ </ul></section>
+ <section><h3>Why these files</h3><ul>
+  <li><b>Fits the app</b>: types the app declares it opens. The picker's greyed rows can't be read, so this replaces them.</li>
+  <li><b>Context</b>: same project or thread as the window behind the picker (Flix Files threads).</li>
+  <li><b>Drag memory</b>: kinds you send to this app (Flix Files counts this already).</li>
+  <li><b>Picked here</b>: what you chose in this app's picker before, learned when it closes. Open something twice and watch it move up. Stays on this Mac; <b>Forget</b> clears it.</li>
+ </ul></section>
+ <section><h3>Decide</h3><ul>
+  <li><b>Style</b>: Shelf (beside), Ribbon (big cards above or below), or Tuck (icon rail that opens on hover).</li>
+  <li><b>Name</b>: Flix Pick, Shortlist, Pickup, or your own.</li>
+  <li><b>Opening</b>: both ⌥-click and double-click, or one of them?</li>
+  <li><b>Keyboard</b>: a shortcut like ⌃1–⌃5 to pick a row while the picker has focus? This needs a global hot key, because the keys belong to the picker.</li>
+  <li><b>Per app</b>: a "Not in this app" item in the panel's ⋯ menu.</li>
+ </ul></section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const st=$('#st'), vp=$('#vp');
+let K=1;
+function fit(){K=Math.min(1,vp.clientWidth/1200);st.style.transform=`scale(${K})`;vp.style.height=(760*K)+'px'}
+new ResizeObserver(fit).observe(vp);fit();
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- sample file system (deterministic) ---------- */
+const FS={
+ 'Desktop':[{n:'Client Letters',k:'dir',d:'Today, 09:12',s:'--'},{n:'Certificate – Mia.pages',k:'pages',d:'Today, 11:58',s:'412 KB'},{n:'Moodboard.png',k:'png',d:'Yesterday',s:'3.1 MB'},{n:'Neighborhood Prices.numbers',k:'numbers',d:'18 Nov',s:'1.9 MB'}],
+ 'Desktop/Client Letters':[{n:'Quarterly Letter.pages',k:'pages',d:'Today, 09:12',s:'288 KB'},{n:'Letter – Lindner.pages',k:'pages',d:'12 Nov',s:'240 KB'},{n:'Signature.png',k:'png',d:'3 Nov',s:'88 KB'}],
+ 'Documents':[{n:'BillExAblage',k:'dir',d:'Yesterday',s:'--'},{n:'Invoices',k:'dir',d:'19 Nov',s:'--'},{n:'Oak & Ash',k:'dir',d:'Today, 12:20',s:'--'},{n:'Newsletter November.pages',k:'pages',d:'Yesterday',s:'1.2 MB'},{n:'Notes.txt',k:'txt',d:'16 Nov',s:'4 KB'},{n:'Offer – Oak & Ash.pages',k:'pages',d:'17 Nov',s:'656 KB'},{n:'Product Shot.jpg',k:'jpg',d:'14 Nov',s:'5.4 MB'}],
+ 'Documents/Oak & Ash':[{n:'Brief v2.pages',k:'pages',d:'13 Nov',s:'702 KB'},{n:'Brief v3.pages',k:'pages',d:'Today, 12:20',s:'720 KB'},{n:'Budget.numbers',k:'numbers',d:'19 Nov',s:'210 KB'},{n:'Logo.svg',k:'svg',d:'2 Nov',s:'18 KB'}],
+ 'Documents/Invoices':[{n:'Invoice 2026-041.pages',k:'pages',d:'19 Nov',s:'180 KB'},{n:'Invoice 2026-040.pdf',k:'pdf',d:'5 Nov',s:'96 KB'}],
+ 'Documents/BillExAblage':[{n:'Bestellungen_2026-11-13.xml',k:'xml',d:'13 Nov',s:'7.6 MB'},{n:'Bestellungen_2026-11-06.xml',k:'xml',d:'6 Nov',s:'7.1 MB'},{n:'Ablage-81339c16.pdf',k:'pdf',d:'6 Nov',s:'120 KB'}],
+ 'Downloads':[{n:'Bestellungen_2026-11-20.xml',k:'xml',d:'Today, 10:31',s:'7.8 MB'},{n:'Contract signed.pdf',k:'pdf',d:'Today, 08:02',s:'340 KB'},{n:'photo-0412.jpg',k:'jpg',d:'Yesterday',s:'2.2 MB'},{n:'Shop export.csv',k:'csv',d:'19 Nov',s:'1.1 MB'}],
+ 'iCloud Drive':[{n:'Pages',k:'dir',d:'20 Nov',s:'--'},{n:'Shared',k:'dir',d:'2 Nov',s:'--'}],
+ 'iCloud Drive/Pages':[{n:'Recipe Book.pages',k:'pages',d:'20 Nov',s:'2.4 MB'}],
+};
+const ROOTS=['Desktop','Documents','Downloads','iCloud Drive'];
+const SCN={
+ pagesOpen:{app:'Pages',key:'pages',kind:'open',ok:'Open',start:'Documents',accept:['pages','dir'],color:'#ff9f0a',letter:'P',
+  items:[
+   {p:'Documents/Oak & Ash/Brief v3.pages',why:'Same project as the open window',tag:'ctx',tm:'20 min'},
+   {p:'Documents/Newsletter November.pages',why:'Opened in Pages yesterday',tag:'used',tm:'1 d'},
+   {p:'Desktop/Certificate – Mia.pages',why:'New on Desktop',tag:'new',tm:'42 min'},
+   {p:'Desktop/Client Letters/Quarterly Letter.pages',why:'Edited this morning',tag:'used',tm:'3 h'},
+   {p:'Documents/Offer – Oak & Ash.pages',why:'Opened 4× in Pages',tag:'used',tm:'4 d'}]},
+ billImport:{app:'BillExporter',key:'bill',kind:'open',ok:'Import',start:'Documents/BillExAblage',accept:['xml','dir'],color:'#34c759',letter:'B',title:'Datei einlesen',
+  items:[
+   {p:'Downloads/Bestellungen_2026-11-20.xml',why:'Downloaded 2 h ago · orders XML',tag:'new',tm:'2 h'},
+   {p:'Documents/BillExAblage/Bestellungen_2026-11-13.xml',why:'Imported here last week',tag:'used',tm:'8 d'},
+   {p:'Documents/BillExAblage/Bestellungen_2026-11-06.xml',why:'You send XML here',tag:'used',tm:'15 d'}]},
+ pagesSave:{app:'Pages',key:'pages',kind:'save',ok:'Save',start:'Documents',color:'#ff9f0a',letter:'P',name:'Letter – Hoffmann.pages',
+  items:[
+   {p:'Desktop/Client Letters',why:'3 letters saved here this week',tag:'used',tm:'3 h'},
+   {p:'Documents/Oak & Ash',why:'Same project as the open window',tag:'ctx',tm:'20 min'},
+   {p:'Documents/Invoices',why:'Where Pages invoices go',tag:'used',tm:'2 d'},
+   {p:'Desktop',why:'Last place you saved',tag:'used',tm:'1 h'},
+   {p:'iCloud Drive/Pages',why:'Shared with your iPad',tag:'ctx',tm:'1 d'}]},
+};
+
+/* ---------- icons ---------- */
+const KC={pages:'#ff9f0a',xml:'#8e8e93',numbers:'#30d158',png:'#bf5af2',jpg:'#bf5af2',pdf:'#ff453a',csv:'#30d158',txt:'#8e8e93',svg:'#ff9f0a'};
+function icon(k,s){
+ if(k==='dir')return `<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h7l2.5 3h11.5A2.5 2.5 0 0 1 29 11.5v13a2.5 2.5 0 0 1-2.5 2.5h-21A2.5 2.5 0 0 1 3 24.5z" fill="#4a9ff0"/><path d="M3 12.5h26v12a2.5 2.5 0 0 1-2.5 2.5h-21A2.5 2.5 0 0 1 3 24.5z" fill="#74b9ff"/></svg>`;
+ const c=KC[k]||'#8e8e93', lab=k.toUpperCase().slice(0,5);
+ return `<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M8 3h11l7 7v17a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="#fbfbfd" stroke="rgba(0,0,0,.18)" stroke-width=".6"/><path d="M19 3v5a2 2 0 0 0 2 2h5" fill="#e4e4ea"/><rect x="6" y="19" width="20" height="7" rx="1" fill="${c}"/><text x="16" y="24.4" font-size="5.2" font-weight="700" text-anchor="middle" fill="#fff" font-family="-apple-system,system-ui">${lab}</text></svg>`;
+}
+const SIDE_IC={Recents:'<path d="M8 2.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2v3.6l2.4 1.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+ Applications:'<path d="M3 13 8 3l5 10M5 9.5h6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+ Desktop:'<rect x="2" y="3" width="12" height="8.5" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 13.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+ Documents:'<path d="M4.5 2h5l3 3v8.5a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5z" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+ Downloads:'<circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 4.8v6M5.6 8.6 8 11l2.4-2.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+ 'iCloud Drive':'<path d="M4.6 12.5h7a2.6 2.6 0 0 0 .3-5.2A3.7 3.7 0 0 0 4.8 8a2.3 2.3 0 0 0-.2 4.5z" fill="none" stroke="currentColor" stroke-width="1.3"/>'};
+const sideIc=n=>`<svg width="15" height="15" viewBox="0 0 16 16">${SIDE_IC[n]}</svg>`;
+
+/* ---------- state ---------- */
+const S={scn:'pagesOpen',style:'shelf',name:'Flix Pick',flash:250,sidebar:true,folder:'Documents',sel:null,open:false,busy:false,
+ picks:{},nameField:'',x:0,y:0,w:740,h:440,docTitle:{pages:null},imported:[]};
+const sc=()=>SCN[S.scn];
+const split=p=>{const i=p.lastIndexOf('/');return i<0?['',p]:[p.slice(0,i),p.slice(i+1)]};
+const extOf=n=>(n.split('.').pop()||'').toLowerCase();
+const leaf=p=>p.split('/').pop();
+
+/* ---------- app window ---------- */
+function renderWin(){
+ const c=sc();
+ $('#mbApp').textContent=c.app;
+ if(c.key==='pages'){
+  const t=S.docTitle.pages;
+  $('#winTitle').textContent=t||'Untitled';
+  $('#winBody').innerHTML=`<div class="paper">${t?`<h1>${t.replace(/\.pages$/,'')}</h1>`+'<i></i><i></i><i style="width:82%"></i><i></i><i style="width:64%"></i><br><i></i><i style="width:90%"></i><i style="width:72%"></i>':'<span class="ph">Start typing…</span>'}</div>`;
+ }else{
+  $('#winTitle').textContent='BillExporter';
+  $('#winBody').innerHTML=`<div class="bx"><h2>Bestellungen einlesen</h2><div class="zone">Drop an orders XML here or <button>Datei einlesen…</button></div><div class="imp">${S.imported.map(n=>`<div>${icon('xml',18)}${n}<em>Imported</em></div>`).join('')}</div></div>`;
+ }
+ const dock=[['Finder','#1e90ff','F'],['Pages','#ff9f0a','P'],['BillExporter','#34c759','B'],['Mail','#3a8dff','M'],['Notes','#ffcc00','N']];
+ $('#dock').innerHTML=dock.map(([n,c2,l])=>`<div class="dk ${n===c.app||n==='Finder'?'run':''}" style="background:${c2}">${l}</div>`).join('')+'<div class="dsep"></div><div class="dk" style="background:linear-gradient(150deg,#5ac8fa,#0a84ff 55%,#5e5ce6)">'+flixGlyph(22)+'</div>';
+}
+function flixGlyph(s){return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h9l3 3v13H6z"/><path d="M9 12h6M9 16h4"/></svg>`}
+
+/* ---------- picker ---------- */
+function pickerGeom(){
+ const c=sc();
+ if(c.kind==='save'){S.w=740;S.h=440;S.x=24+(900-740)/2;S.y=46+38}
+ else{S.w=740;S.h=440;S.x=84;S.y=128}
+}
+function renderPicker(){
+ const c=sc(),p=$('#picker');
+ p.className=(c.kind==='save'?'sheet':'')+(S.open?'':' off');
+ p.style.left=S.x+'px';p.style.top=S.y+'px';p.style.width=S.w+'px';p.style.height=S.h+'px';
+ const side=['Recents','Applications','Desktop','Documents','Downloads'];
+ p.innerHTML=`
+  ${c.kind==='save'?`<div class="save"><label>Save As:</label><div class="f" id="pName">${S.nameField}</div><label>Tags:</label><div class="f" style="width:300px;color:var(--fg3)"></div></div>`:''}
+  <div class="tb" id="pTb"><span class="nav"><span>‹</span><span>›</span></span><span class="vw" style="display:flex;gap:2px"><span>☰</span></span>
+   <div class="where" id="pWhere">${icon('dir',15)}<span>${leaf(S.folder)}</span><span class="chev">▲▼</span></div>
+   <div class="search"><svg width="12" height="12" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Search</div></div>
+  <div class="main">
+   <div class="side"><div class="h">Favorites</div>${side.map(n=>`<div class="it ${S.folder===n?'on':''}" data-root="${n}">${sideIc(n)}<span>${n}</span></div>`).join('')}
+    <div class="h">Locations</div><div class="it ${S.folder==='iCloud Drive'?'on':''}" data-root="iCloud Drive">${sideIc('iCloud Drive')}<span>iCloud Drive</span></div></div>
+   <div class="lst" id="pList"><div class="cols"><span>Name</span><span>Date Modified</span><span>Size</span><span>Kind</span></div><div class="rows" id="pRows"></div></div>
+  </div>
+  <div class="bb">${c.kind==='save'?'<button class="pb">New Folder</button>':'<button class="pb">Options</button>'}<span class="sp"></span><button class="pb" id="pCancel">Cancel</button><button class="pb def" id="pOK">${c.ok}</button></div>
+  <div id="goto"><div class="t">Go to the folder:</div><div class="f" id="gField"></div></div>`;
+ renderRows();
+ p.querySelectorAll('.side .it').forEach(el=>el.onclick=()=>{if(S.busy)return;S.sel=null;navigate(el.dataset.root)});
+ $('#pCancel').onclick=()=>closePicker(null);
+ $('#pOK').onclick=()=>confirmPicker();
+ // move the picker by its toolbar; the panel follows (AXMoved in the real build)
+ $('#pTb').onpointerdown=e=>{
+  if(c.kind==='save')return;
+  const sx=e.clientX,sy=e.clientY,ox=S.x,oy=S.y;
+  const mv=ev=>{S.x=Math.max(0,Math.min(1200-S.w,ox+(ev.clientX-sx)/K));S.y=Math.max(30,Math.min(700-S.h,oy+(ev.clientY-sy)/K));$('#picker').style.left=S.x+'px';$('#picker').style.top=S.y+'px';placePick(true)};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);
+ };
+}
+function renderRows(land){
+ const c=sc(),rows=$('#pRows');if(!rows)return;
+ const list=(FS[S.folder]||[]).slice().sort((a,b)=>a.n.localeCompare(b.n));
+ rows.innerHTML=list.map(f=>{
+  const dis=c.kind==='open'&&!c.accept.includes(f.k);
+  const kind=f.k==='dir'?'Folder':({pages:'Pages Document',xml:'XML Document',numbers:'Numbers Spreadsheet',png:'PNG Image',jpg:'JPEG Image',pdf:'PDF Document',csv:'CSV Document',txt:'Plain Text',svg:'SVG Image'}[f.k]);
+  return `<div class="lr ${dis?'dis':''} ${S.sel===f.n?'sel':''} ${S.sel===f.n&&land?'land':''}" data-n="${f.n}" data-k="${f.k}"><span class="n">${icon(f.k,16)}${f.n}</span><span class="m">${f.d}</span><span class="m">${f.s}</span><span class="m">${kind}</span></div>`}).join('');
+ rows.querySelectorAll('.lr').forEach(el=>{
+  el.onclick=()=>{if(el.classList.contains('dis')||S.busy)return;S.sel=el.dataset.n;renderRows();updateOK()};
+  el.ondblclick=()=>{if(el.classList.contains('dis')||S.busy)return;if(el.dataset.k==='dir'){S.sel=null;navigate(S.folder+'/'+el.dataset.n)}else{S.sel=el.dataset.n;confirmPicker()}};
+ });
+ const w=$('#pWhere');if(w)w.querySelector('span').textContent=leaf(S.folder);
+ document.querySelectorAll('#picker .side .it').forEach(el=>el.classList.toggle('on',el.dataset.root===S.folder));
+ updateOK();
+}
+function updateOK(){const ok=$('#pOK');if(!ok)return;ok.disabled=sc().kind==='open'&&!S.sel}
+async function navigate(folder,instant){
+ if(folder===S.folder){renderRows(true);return}
+ const rows=$('#pRows');
+ if(!instant&&!st.classList.contains('rm')){rows.classList.add('fade');await sleep(120)}
+ S.folder=folder;renderRows(true);rows.classList.remove('fade');
+}
+function openPicker(){
+ const c=sc();
+ S.folder=c.start;S.sel=null;S.nameField=c.name||'';S.busy=false;
+ pickerGeom();S.open=false;renderPicker();renderPick();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{S.open=true;$('#picker').classList.remove('off');setTimeout(()=>{placePick();$('#pick').classList.add('in')},140)}));
+}
+function closePicker(result){
+ const c=sc();
+ $('#pick').classList.remove('in','open');
+ S.open=false;$('#picker').classList.add('off');
+ if(result){
+  const k=c.key+':'+result.p;S.picks[k]=(S.picks[k]||0)+1;
+  if(c.kind==='open'&&c.key==='pages'){S.docTitle.pages=leaf(result.p)}
+  if(c.kind==='open'&&c.key==='bill'){S.imported.unshift(leaf(result.p))}
+  setTimeout(renderWin,180);
+  toast(c.kind==='save'?`Saved “${S.nameField}” to ${leaf(result.p)}`:`${c.ok==='Import'?'Imported':'Opened'} “${leaf(result.p)}” in ${c.app}`);
+ }else toast('Picker cancelled · '+S.name+' hides with it');
+}
+async function confirmPicker(){
+ const c=sc(),ok=$('#pOK');
+ if(c.kind==='open'&&!S.sel)return;
+ ok.classList.add('press');await sleep(140);ok.classList.remove('press');
+ const p=c.kind==='open'?S.folder+'/'+S.sel:S.folder;
+ closePicker({p});
+}
+
+/* ---------- the pick panel ---------- */
+function ranked(){
+ const c=sc();
+ return c.items.map((it,i)=>({...it,score:(c.items.length-i)+(S.picks[c.key+':'+it.p]||0)*10})).sort((a,b)=>b.score-a.score);
+}
+function renderPick(){
+ const c=sc(),el=$('#pick'),items=ranked();
+ el.className=S.style+(el.classList.contains('in')?' in':'');
+ const isFolder=c.kind==='save';
+ const sub=isFolder?`Likely folders for ${c.app}`:`Likely for ${c.app} · ${c.ok}`;
+ el.innerHTML=`<div class="ph2"><div class="logo">${flixGlyph(13)}</div><div style="min-width:0"><div class="nm">${S.name}</div><div class="for">${sub}</div></div><span class="ib" title="More">⋯</span></div>
+  <div class="plist">${items.slice(0,S.style==='ribbon'?4:5).map((it,i)=>{
+   const [dir,n]=split(it.p),k=isFolder?'dir':extOf(n),count=S.picks[c.key+':'+it.p]||0;
+   const why=count?`<span class="why learned">Picked here ${count}×</span>`:`<span class="why ${it.tag}">${it.why}</span>`;
+   const where=isFolder?dir||'Home':dir.split('/').join(' › ');
+   return `<div class="pr" role="button" tabindex="0" aria-label="${n}, ${count?'picked here '+count+' times':it.why}" data-i="${c.items.indexOf(c.items.find(x=>x.p===it.p))}" title="${it.p}">
+    <div class="ic">${icon(k,S.style==='ribbon'?30:28)}</div><div class="tx"><div class="a">${n}</div><div class="b">${why}</div><div class="c">${where}</div></div><span class="tm">${it.tm}</span></div>`}).join('')}</div>
+  <div class="pf"><span>Click <b>${isFolder?'goes there':'selects'}</b></span><span>⌥-click <b>${c.ok.toLowerCase()}s</b></span><span>or drag it in</span></div>`;
+ el.querySelectorAll('.pr').forEach(row=>wireRow(row,c.items[+row.dataset.i]));
+ if(S.style==='tuck'){el.onmouseenter=()=>{el.classList.add('open');placePick(true)};el.onmouseleave=()=>{if(!S.dragging){el.classList.remove('open');placePick(true)}}}
+ else{el.onmouseenter=el.onmouseleave=null}
+ placePick(true);
+}
+/** Placement uses the picker's frame (AX position/size in the real build): beside it on the
+ *  right, flipped left when the screen ends; Ribbon goes above, or below when the menu bar is near. */
+function placePick(noAnim){
+ const el=$('#pick'),gap=12;
+ let x,y,w,h;
+ if(S.style==='shelf'){w=272;h=50+Math.min(5,sc().items.length)*57+12+28;x=S.x+S.w+gap;y=S.y;if(x+w>1192){x=S.x-gap-w;el.style.setProperty('--from','translateX(18px)')}else el.style.setProperty('--from','translateX(-18px)')}
+ else if(S.style==='ribbon'){w=S.w;h=146;x=S.x;y=S.y-gap-h;if(y<34){y=S.y+S.h+gap;el.style.setProperty('--from','translateY(-14px)')}else el.style.setProperty('--from','translateY(14px)')}
+ else{const open=el.classList.contains('open');w=open?272:58;const n=Math.min(5,sc().items.length);h=50+n*57+(open?40:12);x=S.x+S.w+8;y=S.y+8;if(x+272>1192)x=S.x-8-w;el.style.setProperty('--from','translateX(-12px)')}
+ el.style.left=x+'px';el.style.top=y+'px';el.style.width=w+'px';el.style.height=h+'px';
+}
+
+/* ---------- click / ⌥-click / double-click / drag ---------- */
+function wireRow(row,it){
+ let last=0;
+ row.onpointerdown=e=>{
+  if(S.busy)return;
+  const sx=e.clientX,sy=e.clientY,alt=e.altKey;let drag=false;
+  const mv=ev=>{
+   if(!drag&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>5){drag=true;S.dragging=true;row.classList.add('dragsrc');$('#gIcon').innerHTML=icon(sc().kind==='save'?'dir':extOf(it.p),34);$('#gLbl').textContent=leaf(it.p);$('#ghost').style.display='flex'}
+   if(drag){const r=st.getBoundingClientRect(),px=(ev.clientX-r.left)/K,py=(ev.clientY-r.top)/K;$('#ghost').style.left=(px-17)+'px';$('#ghost').style.top=(py-17)+'px';$('#pList').classList.toggle('over',inPicker(px,py))}
+  };
+  const up=async ev=>{
+   removeEventListener('pointermove',mv);removeEventListener('pointerup',up);
+   if(drag){
+    S.dragging=false;row.classList.remove('dragsrc');$('#ghost').style.display='none';$('#pList').classList.remove('over');
+    const r=st.getBoundingClientRect(),px=(ev.clientX-r.left)/K,py=(ev.clientY-r.top)/K;
+    if(inPicker(px,py))await land(it,'drop',false);
+    return;
+   }
+   const now=Date.now(),dbl=now-last<380;last=now;
+   if(dbl&&S.busy){S.pendingOpen=true;return}
+   row.classList.add('hit');setTimeout(()=>row.classList.remove('hit'),160);
+   await land(it,dbl?'dbl':'click',alt||dbl);
+  };
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);
+ };
+ row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();land(it,'key',e.altKey)}};
+}
+function inPicker(px,py){return S.open&&px>=S.x&&px<=S.x+S.w&&py>=S.y&&py<=S.y+S.h}
+
+/** The three ways a pick reaches the picker, cheapest first (probe-measured). */
+async function land(it,how,confirm){
+ const c=sc();if(S.busy||!S.open)return;
+ const isFolder=c.kind==='save';
+ const [dir,n]=isFolder?[it.p,null]:split(it.p);
+ const already=isFolder?S.folder===it.p:(S.folder===dir&&S.sel===n);
+ S.busy=true;let route;
+ if(how==='drop'){route='<b>Dropped</b> · the picker jumps there itself, like dragging from Flix Files today';await navigate(dir)}
+ else if(already){route='<b>Already there</b> · nothing to do'}
+ else if(S.folder===dir){route='<b>Listed row selected</b> · Accessibility, ~70 ms, nothing on screen'}
+ else if(S.sidebar&&ROOTS.includes(dir)){
+  route='<b>Sidebar, then row</b> · no Go to Folder sheet (to verify in a probe)';
+  const sb=[...document.querySelectorAll('#picker .side .it')].find(e=>e.dataset.root===dir);
+  if(sb){sb.classList.add('ping');await sleep(st.classList.contains('rm')?60:140);sb.classList.remove('ping')}
+  await navigate(dir);
+ }else{
+  route=`<b>Go to Folder</b> · ⇧⌘G, path, Return, ~${S.flash} ms`;
+  const g=$('#goto');$('#gField').textContent=isFolder?'~/'+it.p:'~/'+it.p;
+  g.classList.add('on');await sleep(S.flash);g.classList.remove('on');await sleep(80);
+  await navigate(dir,true);
+ }
+ if(!isFolder){S.sel=n;renderRows(true)}
+ else{const f=$('#pName');if(f){f.classList.add('kept');setTimeout(()=>f.classList.remove('kept'),700)};route+=' · name kept'}
+ if(confirm||S.pendingOpen){S.pendingOpen=false;route+=` · then <b>${c.ok}</b> pressed`;setRoute(route);await sleep(160);S.busy=false;return confirmPicker()}
+ setRoute(route);S.busy=false;
+}
+function setRoute(h){$('#rText').innerHTML=h}
+let tt;function toast(t){const e=$('#toast');e.innerHTML=`<span style="color:var(--green)">✓</span>${t}`;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
+
+/* ---------- controls ---------- */
+function seg(id,fn){document.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{document.querySelectorAll(id+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b.dataset.v)})}
+seg('#cScn',v=>{S.scn=v;renderWin();openPicker();setRoute('Pick something')});
+seg('#cStyle',v=>{S.style=v;const was=$('#pick').classList.contains('in');$('#pick').classList.remove('in');renderPick();if(was&&S.open)setTimeout(()=>{placePick();$('#pick').classList.add('in')},60)});
+seg('#cName',v=>{S.name=v;renderPick()});
+seg('#cTheme',v=>{st.classList.toggle('dark',v==='dark');st.classList.toggle('light',v==='light')});
+$('#cFlash').oninput=e=>{S.flash=+e.target.value;$('#vFlash').textContent=S.flash+' ms'};
+$('#cSide').onchange=e=>S.sidebar=e.target.checked;
+$('#cRM').onchange=e=>st.classList.toggle('rm',e.target.checked);
+$('#cRT').onchange=e=>st.classList.toggle('rt',e.target.checked);
+$('#cAgain').onclick=()=>{if(S.open){$('#pick').classList.remove('in');S.open=false;$('#picker').classList.add('off');setTimeout(openPicker,260)}else openPicker()};
+
+renderWin();openPicker();
+</script>
+</body>
+</html>

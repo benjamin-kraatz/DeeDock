@@ -41,6 +41,8 @@ final class DockStore {
     @ObservationIgnored var openNotificationFeed: (() -> Void)?
     /// Opens or closes Harbor.
     @ObservationIgnored var openHarbor: (() -> Void)?
+    /// Opens or closes Flix Files on this display's tile.
+    @ObservationIgnored var openFlix: (() -> Void)?
     /// Runs a plugin tile's click action, by the plugin's bundle identifier.
     @ObservationIgnored var openPlugin: ((String) -> Void)?
     /// The shared plugins whose pinned tiles this dock shows. Nil shows none.
@@ -73,6 +75,7 @@ final class DockStore {
     @ObservationIgnored private var showsShelf = true
     @ObservationIgnored private var showsNotificationFeed = false
     @ObservationIgnored private var showsHarbor = false
+    @ObservationIgnored private var showsFlix = false
     @ObservationIgnored private var volumeVisibility = VolumeVisibility.hidden
     @ObservationIgnored private var showsSessionCapsules = true
     @ObservationIgnored private var session = DockSession()
@@ -226,6 +229,7 @@ final class DockStore {
                                                   capsules: showsSessionCapsules ? capsules?.item : nil,
                                                   shelf: showsShelf ? shelf?.item : nil,
                                                   notificationFeed: showsNotificationFeed ? NotificationFeedDockItem() : nil,
+                                                  flix: showsFlix ? FlixDockItem() : nil,
                                                   harbor: showsHarbor ? HarborDockItem() : nil,
                                                   volumes: volumes?.dockItems.filter { volumeVisibility.includes($0.kind) } ?? [],
                                                   update: updateTile,
@@ -237,7 +241,7 @@ final class DockStore {
         content.insert(contentsOf: pairs.flatMap { pair in pair.applicationIDs.indices.map { DockRenderSlot.melt(pair, $0) } },
                        at: content.firstIndex(where: \.isUtility) ?? content.count)
         let downloads = DockRenderSlot.folder(DownloadsDockItem.item(displayID: displayID))
-        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.notificationFeed != nil || $0.harbor != nil || $0.volume != nil || $0.trash != nil } ?? content.count
+        let insertion = content.firstIndex { $0.capsule != nil || $0.capsules != nil || $0.shelf != nil || $0.notificationFeed != nil || $0.flix != nil || $0.harbor != nil || $0.volume != nil || $0.trash != nil } ?? content.count
         content.insert(downloads, at: insertion)
         let order = utilityOrder
         let positions = content.indices.filter { content[$0].movableUtilityID != nil }
@@ -255,7 +259,7 @@ final class DockStore {
     private var utilityOrder: [String] {
         // A tile added later is appended, so a saved order keeps its existing arrangement.
         let defaults = ["folder:\(DownloadsDockItem.id.uuidString)", "session-capsules", "shelf",
-                        DockEntryID.notificationFeed.hitID, DockEntryID.harbor.hitID]
+                        DockEntryID.notificationFeed.hitID, DockEntryID.harbor.hitID, DockEntryID.flix.hitID]
         let saved = UserDefaults.standard.stringArray(forKey: utilityOrderKey) ?? []
         var seen = Set<String>()
         return (saved + defaults).filter { defaults.contains($0) && seen.insert($0).inserted }
@@ -309,6 +313,13 @@ final class DockStore {
     func configureNotificationFeed(_ visible: Bool) {
         guard showsNotificationFeed != visible else { return }
         showsNotificationFeed = visible
+        refreshEntries()
+    }
+
+    /// Shows or removes the Flix Files tile. App-wide: `DockCoordinator` sets it from Flix's settings.
+    func configureFlix(_ visible: Bool) {
+        guard showsFlix != visible else { return }
+        showsFlix = visible
         refreshEntries()
     }
 
@@ -716,6 +727,7 @@ final class DockStore {
         case .shelf: openShelf?()
         case .notificationFeed: openNotificationFeed?()
         case .harbor: openHarbor?()
+        case .flix: openFlix?()
         case .plugin(let item): openPlugin?(item.pluginID)
         case .update(let item): openUpdate?(item)
         case .volume(let item): openVolume?(item, keyboardFocus)
@@ -726,5 +738,5 @@ final class DockStore {
 
     /// Ends this panel session without cancelling shared launches or removing global observers.
     func stop() {
-        previewPins = nil; openLauncher = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
+        previewPins = nil; openLauncher = nil; sections.stop(); presentationDidChange = nil; copyPin = nil; soapBubblePlay = nil; openFolder = nil; openShelf = nil; openNotificationFeed = nil; openHarbor = nil; openFlix = nil; openPlugin = nil; plugins = nil; openUpdate = nil; openVolume = nil; openSessionCapsules = nil; openSessionCapsule = nil; session.stop(); applicationOpened = nil; errorDidChange = nil; keyboardFocus = false; selectedID = nil }
 }

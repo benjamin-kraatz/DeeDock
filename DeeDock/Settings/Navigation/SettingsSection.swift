@@ -15,12 +15,14 @@ enum SettingsSection: Hashable, Identifiable {
     case lookout
     /// DOKK Plugins: installed plugins, their pins, and the system approval window. The section is the page.
     case plugins
+    /// Flix Files: where it lives, what it tracks, web links, and intelligence. The section is the page.
+    case flix
     case display(String)
 
     /// What the app and the dock are; the sidebar's untitled first group.
     static let primary: [SettingsSection] = [.general, .dock]
     /// Opt-in capabilities, listed under the sidebar's Features heading.
-    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .lookout, .plugins]
+    static let featureSections: [SettingsSection] = [.extras, .windowsFocus, .suggestionsHistory, .flix, .lookout, .plugins]
     /// Sections that always exist, in sidebar order. Displays are inserted from the profile store.
     static let fixed: [SettingsSection] = primary + featureSections
 
@@ -33,6 +35,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: "suggestionsHistory"
         case .lookout: "lookout"
         case .plugins: "plugins"
+        case .flix: "flix"
         case .display(let id): "display.\(id)"
         }
     }
@@ -47,6 +50,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .settingsSuggestionsHistory
         case .lookout: .lookoutSettingsTitle
         case .plugins: .pluginsSettingsTitle
+        case .flix: .flixName
         case .display: nil
         }
     }
@@ -60,6 +64,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .settingsSuggestionsHistorySummary
         case .lookout: .lookoutSettingsSummary
         case .plugins: .pluginsSettingsSummary
+        case .flix: .flixSettingsSummary
         case .display: .settingsDisplaySummary
         }
     }
@@ -74,6 +79,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .suggestionsHistory: .symbol("clock.arrow.circlepath")
         case .lookout: .lookout
         case .plugins: .symbol("puzzlepiece.extension.fill")
+        case .flix: .symbol("tray.full.fill")
         case .display: .symbol("display")
         }
     }
@@ -90,6 +96,8 @@ enum SettingsSection: Hashable, Identifiable {
                         Color(red: 94 / 255, green: 92 / 255, blue: 230 / 255)]
         // The DEE-140 mockup's Plugins tile, #4CD9A3 to #16946B.
         case .plugins: [Color(red: 76 / 255, green: 217 / 255, blue: 163 / 255), Color(red: 22 / 255, green: 148 / 255, blue: 107 / 255)]
+        // The mockup's intelligence gradient, #8B6CFF to #3AA8FF.
+        case .flix: [Color(red: 139 / 255, green: 108 / 255, blue: 1), Color(red: 58 / 255, green: 168 / 255, blue: 1)]
         }
     }
 
@@ -110,7 +118,7 @@ enum SettingsSection: Hashable, Identifiable {
             [[.windowPeek, .harbor, .robi], [.permissions]]
         case .suggestionsHistory:
             [[.appSuggestions, .discovery], [.localHistory]]
-        case .lookout, .plugins:
+        case .lookout, .plugins, .flix:
             []
         }
     }
@@ -118,7 +126,7 @@ enum SettingsSection: Hashable, Identifiable {
     /// Sections whose pages write dock preferences, so the window offers to restore them.
     var offersRestoreDefaults: Bool {
         switch self {
-        case .general, .lookout, .plugins: false
+        case .general, .lookout, .plugins, .flix: false
         case .dock, .display, .extras, .windowsFocus, .suggestionsHistory: true
         }
     }
@@ -132,6 +140,7 @@ enum SettingsSection: Hashable, Identifiable {
         case .extras, .windowsFocus, .suggestionsHistory: [.settingsFeatures, .settingsFeaturesKeywords]
         case .lookout: [.lookoutSettingsKeywords]
         case .plugins: [.pluginsSettingsKeywords]
+        case .flix: [.flixSettingsKeywords]
         case .display: []
         }
     }

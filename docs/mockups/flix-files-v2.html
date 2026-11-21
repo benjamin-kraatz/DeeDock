@@ -1,0 +1,574 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>DOKK Flix Files v2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--foreground,#d8d9de)}
+p.lede{margin:0 0 10px;color:var(--muted-foreground,#9a9ca6);line-height:1.5;max-width:1200px}
+p.lede b{color:var(--foreground,#e6e7ea);font-weight:600}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 12px;max-width:1200px}
+.ctl .grp{display:flex;align-items:center;gap:6px;color:var(--muted-foreground,#9a9ca6);font-size:12px}
+.sg{display:inline-flex;border-radius:8px;background:var(--muted,#ffffff10);padding:2px;gap:2px}
+.sg button,.btn{font:inherit;font-size:12px;border:0;border-radius:6px;padding:4px 9px;background:transparent;color:var(--foreground,#d8d9de);cursor:pointer}
+.sg button.on{background:var(--card,#ffffff22);box-shadow:0 0 0 1px var(--border,#ffffff22)}
+.btn{background:var(--muted,#ffffff10)}
+.btn:hover{background:var(--secondary,#ffffff1c)}
+.viewport{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14;max-width:1200px}
+.notes{max-width:1200px;margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.notes section{background:#ffffff08;border-radius:12px;padding:14px 16px;box-shadow:0 0 0 1px #ffffff10;line-height:1.55;color:var(--muted-foreground,#a6a8b2)}
+.notes h3{margin:0 0 6px;font-size:13px;color:var(--foreground,#e6e7ea)}
+.notes ul{margin:0;padding-left:18px}
+.notes code{font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--foreground,#d8d9de)}
+h2.sec{font-size:14px;margin:22px 0 8px;color:var(--foreground,#e6e7ea);max-width:1200px}
+
+.dark{--fg:#f5f5f7;--fg2:rgba(235,235,245,.62);--fg3:rgba(235,235,245,.34);--panel:rgba(32,33,42,.66);--panelSolid:#22232b;--side:rgba(255,255,255,.035);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+ --chip:rgba(255,255,255,.07);--chipH:rgba(255,255,255,.12);--hover:rgba(255,255,255,.06);--accent:#0a84ff;--accentSoft:rgba(10,132,255,.22);--shadow:rgba(0,0,0,.55);--menu:rgba(42,43,52,.86);
+ --dock:rgba(36,37,46,.42);--red:#ff453a;--green:#30d158;--orange:#ff9f0a;--yellow:#ffd60a;--purple:#bf5af2;--wallA:#1c3156;--wallB:#3c2050;--wallC:#0d1526;
+ --pane:rgba(255,255,255,.035);--field:rgba(255,255,255,.06);--key:rgba(255,255,255,.09);--sheet:#2a2b33;--win:#1e1f25;--winBar:#2a2b31}
+.light{--fg:#1d1d1f;--fg2:rgba(60,60,67,.72);--fg3:rgba(60,60,67,.40);--panel:rgba(248,248,251,.72);--panelSolid:#f3f3f6;--side:rgba(0,0,0,.025);--line:rgba(0,0,0,.07);--line2:rgba(0,0,0,.12);
+ --chip:rgba(0,0,0,.05);--chipH:rgba(0,0,0,.08);--hover:rgba(0,0,0,.045);--accent:#007aff;--accentSoft:rgba(0,122,255,.14);--shadow:rgba(30,30,60,.24);--menu:rgba(250,250,252,.90);
+ --dock:rgba(255,255,255,.42);--red:#ff3b30;--green:#28a745;--orange:#e08600;--yellow:#f5b800;--purple:#a550d8;--wallA:#bcd3f5;--wallB:#f1cde0;--wallC:#e8eef8;
+ --pane:rgba(0,0,0,.025);--field:rgba(0,0,0,.045);--key:rgba(0,0,0,.06);--sheet:#ffffff;--win:#ffffff;--winBar:#ececf0}
+
+.stage{position:absolute;left:0;top:0;width:1200px;height:760px;transform-origin:0 0;overflow:hidden;outline:none;cursor:default;color:var(--fg);
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;touch-action:none}
+#wall{position:absolute;inset:0;background:radial-gradient(900px 620px at 16% 18%,var(--wallB),transparent 70%),radial-gradient(820px 700px at 86% 78%,var(--wallA),transparent 70%),var(--wallC)}
+#menubar{position:absolute;left:0;right:0;top:0;height:26px;display:flex;align-items:center;gap:20px;padding:0 14px 0 18px;font-size:13px;z-index:5;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.dark #menubar{background:rgba(10,10,16,.30)}.light #menubar{background:rgba(255,255,255,.36)}
+#menubar b{font-weight:700}#menubar .r{margin-left:auto;display:flex;gap:14px;align-items:center;font-variant-numeric:tabular-nums}
+#mbFlix{width:24px;height:20px;border-radius:5px;display:none;align-items:center;justify-content:center;cursor:pointer}
+#mbFlix.on{display:flex}#mbFlix:hover,#mbFlix.act{background:var(--chipH)}
+.kc{display:inline-flex;gap:3px}
+.kc span{min-width:22px;height:22px;padding:0 6px;border-radius:6px;background:var(--key);box-shadow:0 0 0 .5px var(--line2) inset,0 1px 0 var(--line2);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--fg)}
+.kc.sm span{min-width:17px;height:17px;padding:0 4px;border-radius:4px;font-size:10.5px}
+
+/* target window */
+#win{position:absolute;left:46px;top:58px;width:500px;height:420px;border-radius:12px;background:var(--win);box-shadow:0 0 0 .5px var(--line2),0 22px 60px var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+#win .bar{height:38px;background:var(--winBar);display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:.5px solid var(--line)}
+#win .tl{display:flex;gap:7px}#win .tl i{width:12px;height:12px;border-radius:6px;display:block}
+#win .url{flex:1;margin:0 30px;height:22px;border-radius:6px;background:var(--chip);font-size:11.5px;color:var(--fg2);display:flex;align-items:center;justify-content:center}
+#win .content{padding:18px 22px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+#win h3{margin:0;font-size:17px}
+#win p{margin:-6px 0 0;font-size:12px;color:var(--fg2)}
+#drop{height:118px;border-radius:12px;border:1.5px dashed var(--line2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--fg2);font-size:12.5px;transition:background .15s,border-color .15s}
+#drop.over{background:var(--accentSoft);border-color:var(--accent);color:var(--accent)}
+#ups{display:flex;flex-direction:column;gap:6px;overflow:auto}
+.up{display:flex;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--pane);font-size:12px}
+.up .bar2{flex:1;height:4px;border-radius:2px;background:var(--chip);overflow:hidden}.up .bar2 i{display:block;height:100%;width:0;background:var(--green);border-radius:2px}
+.up .nm{width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* dock */
+#dock{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);height:64px;padding:7px 10px;border-radius:20px;display:flex;gap:8px;align-items:center;z-index:6;
+ background:var(--dock);backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 0 0 .5px var(--line2) inset,0 10px 30px var(--shadow)}
+.dk{width:50px;height:50px;border-radius:12px;position:relative;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:filter .15s}
+.dk.over{filter:brightness(1.3);box-shadow:0 0 0 2.5px var(--accent)}
+.dk .lab{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);padding:3px 9px;border-radius:7px;font-size:12px;font-weight:500;white-space:nowrap;background:var(--menu);color:var(--fg);box-shadow:0 0 0 .5px var(--line2) inset;opacity:0;pointer-events:none;transition:opacity .12s}
+.dk:hover .lab,.dk.over .lab{opacity:1}
+.sep{width:1px;height:44px;background:var(--line2);margin:0 2px}
+#tile{background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.06));box-shadow:0 0 0 .5px var(--line2) inset,0 1px 3px rgba(0,0,0,.25);cursor:pointer;overflow:visible}
+#tile .th{width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+#tile .bd{position:absolute;top:-5px;right:-6px;min-width:20px;height:20px;border-radius:10px;padding:0 6px;background:var(--red);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+#tile .bd.z{display:none}
+#tile .dotr{position:absolute;bottom:-6px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:2px;background:var(--fg2);opacity:0}
+#tile.open .dotr{opacity:1}
+
+/* panel */
+#panel{position:absolute;width:640px;height:500px;border-radius:16px;background:var(--panel);display:flex;overflow:hidden;z-index:10;
+ backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);
+ box-shadow:0 0 0 .5px var(--line2) inset,0 0 0 .5px rgba(0,0,0,.35),0 28px 80px var(--shadow),0 6px 18px rgba(0,0,0,.18)}
+#panel.hidden{visibility:hidden}
+.rt #panel,.rt .menu{background:var(--panelSolid)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#side{width:178px;flex:none;background:var(--side);border-right:.5px solid var(--line);padding:12px 8px;overflow-y:auto;scrollbar-width:none}
+#side::-webkit-scrollbar{display:none}
+.sh{font-size:10.5px;font-weight:600;color:var(--fg3);padding:10px 8px 4px;letter-spacing:.02em}
+.si{height:26px;display:flex;align-items:center;gap:8px;padding:0 8px;border-radius:7px;font-size:12.5px;cursor:default;position:relative}
+.si:hover{background:var(--hover)}
+.si.on{background:var(--chipH)}
+.si .g{width:16px;display:flex;justify-content:center;color:var(--accent);font-size:12px}
+.si .c{margin-left:auto;font-size:11px;color:var(--fg3);font-variant-numeric:tabular-nums}
+.si.over{background:var(--accent);color:#fff}.si.over .g,.si.over .c{color:#fff}
+.si.add{color:var(--fg3)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+.mh{height:46px;flex:none;display:flex;align-items:center;gap:8px;padding:0 10px 0 16px;border-bottom:.5px solid var(--line)}
+.mh .tt{font-size:14px;font-weight:700}
+.mh .cnt{font-size:11.5px;color:var(--fg3)}
+.mh .sp{flex:1}
+.ib{width:28px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--fg2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ib:hover{background:var(--hover);color:var(--fg)}
+.ib.on{color:var(--accent);background:var(--accentSoft)}
+#sbox{height:26px;border-radius:7px;background:var(--field);display:flex;align-items:center;gap:6px;padding:0 8px;width:0;opacity:0;overflow:hidden;box-shadow:0 0 0 .5px var(--line2) inset}
+#sbox input{border:0;outline:0;background:transparent;color:var(--fg);font:inherit;font-size:12.5px;width:100%}
+#list{flex:1;overflow-y:auto;padding:4px 8px 10px;scrollbar-width:thin}
+.grp{font-size:11px;font-weight:600;color:var(--fg3);padding:10px 8px 3px}
+.row{height:50px;display:flex;align-items:center;gap:10px;padding:0 10px 0 8px;border-radius:9px;position:relative;cursor:grab}
+.row:hover{background:var(--hover)}
+.row.sel{background:var(--accent);color:#fff}
+.row.dragsrc{opacity:.4}
+.row .ic{width:36px;height:36px;flex:none;display:flex;align-items:center;justify-content:center}
+.row .txt{flex:1;min-width:0}
+.row .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.row .nm mark{background:transparent;color:inherit;font-weight:700}
+.row .sub{font-size:11px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;gap:5px;align-items:center;margin-top:1px}
+.row.sel .sub{color:rgba(255,255,255,.8)}
+.ev{display:inline-flex;align-items:center;gap:3px;font-weight:600}
+.ev.opened{color:var(--accent)}.ev.downloaded{color:var(--green)}.ev.new{color:var(--orange)}.ev.changed{color:var(--purple)}
+.row.sel .ev{color:#fff}
+.row .tm{font-size:11.5px;color:var(--fg3);font-variant-numeric:tabular-nums;flex:none;text-align:right;min-width:38px}
+.row.sel .tm{color:rgba(255,255,255,.78)}
+.flag{color:var(--orange);display:flex}
+.row.sel .flag{color:#fff}
+.row.fresh::after{content:"";position:absolute;inset:0;border-radius:9px;box-shadow:0 0 0 1.5px var(--accent) inset;animation:fresh 1.6s ease-out forwards;pointer-events:none}
+@keyframes fresh{0%{opacity:1;background:var(--accentSoft)}100%{opacity:0}}
+.foot{height:28px;flex:none;border-top:.5px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 14px;font-size:11px;color:var(--fg3);position:relative;overflow:hidden}
+.foot .h{display:flex;gap:5px;align-items:center}
+#toast{position:absolute;inset:0;display:flex;align-items:center;gap:8px;padding:0 10px 0 14px;background:var(--panelSolid);font-size:11.5px;color:var(--fg);transform:translateY(100%)}
+#toast .sp{flex:1}
+#toast button{font:inherit;font-size:11px;border:0;height:20px;padding:0 8px;border-radius:6px;background:transparent;color:var(--accent);font-weight:600;cursor:pointer}
+.empty{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--fg2);padding:70px 20px;text-align:center;font-size:12px}
+.empty b{color:var(--fg);font-size:14px}
+
+/* drag ghost */
+#ghost{position:absolute;left:0;top:0;z-index:50;pointer-events:none;display:none}
+#ghost .stack{position:relative;width:52px;height:52px}
+#ghost .card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 10px 18px rgba(0,0,0,.4))}
+#ghost .lbl{position:absolute;left:58px;top:14px;padding:3px 9px;border-radius:7px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#ghost .n{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+#ghost .verb{display:block;font-weight:500;opacity:.85;font-size:10.5px}
+
+.menu{position:absolute;z-index:40;min-width:210px;padding:5px;border-radius:10px;background:var(--menu);backdrop-filter:blur(30px) saturate(1.6);-webkit-backdrop-filter:blur(30px) saturate(1.6);
+ box-shadow:0 0 0 .5px var(--line2) inset,0 0 0 .5px rgba(0,0,0,.3),0 12px 32px var(--shadow);font-size:13px;transform-origin:top left}
+.menu .it{height:22px;display:flex;align-items:center;gap:8px;padding:0 10px 0 10px;border-radius:5px;white-space:nowrap}
+.menu .it:hover{background:var(--accent);color:#fff}
+.menu .it .k{margin-left:auto;color:var(--fg3);font-size:12px;padding-left:18px}
+.menu .it:hover .k{color:rgba(255,255,255,.8)}
+.menu hr{border:0;height:.5px;background:var(--line2);margin:4px 8px}
+#banner{position:absolute;top:40px;left:50%;transform:translateX(-50%);z-index:20;padding:8px 14px;border-radius:12px;font-size:12.5px;display:flex;gap:8px;align-items:center;white-space:nowrap;
+ background:var(--panel);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 0 0 .5px var(--line2) inset,0 10px 30px var(--shadow);opacity:0;pointer-events:none}
+
+/* settings */
+.settings{max-width:1200px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px #ffffff14;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));color:var(--fg);background:var(--sheet)}
+.sform{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.sform+.sform{border-left:.5px solid var(--line)}
+.sform h5{margin:0;font-size:13px;font-weight:700}
+.sbox{border-radius:10px;background:var(--pane);box-shadow:0 0 0 .5px var(--line) inset}
+.srow{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;border-top:.5px solid var(--line)}
+.srow:first-child{border-top:0}
+.srow{flex-wrap:wrap}.srow .l{flex:1;min-width:150px}.srow .l small{display:block;color:var(--fg2);font-size:11px;margin-top:2px}
+.sw{width:32px;height:18px;border-radius:9px;background:var(--accent);position:relative;flex:none;cursor:pointer;transition:background .2s}
+.sw::after{content:"";position:absolute;top:2px;left:16px;width:14px;height:14px;border-radius:7px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .2s}
+.sw.off{background:var(--chipH)}.sw.off::after{left:2px}
+.mini{display:inline-flex;background:var(--chip);border-radius:7px;padding:2px;gap:2px}
+.mini button{white-space:nowrap;font:inherit;font-size:11.5px;border:0;border-radius:5px;height:20px;padding:0 8px;background:transparent;color:var(--fg2);cursor:pointer}
+.mini button.on{background:var(--chipH);color:var(--fg);box-shadow:0 0 0 .5px var(--line2) inset}
+.rec{min-width:120px;height:24px;border-radius:7px;background:var(--field);box-shadow:0 0 0 .5px var(--line2) inset;display:flex;align-items:center;justify-content:center;font-size:12px;padding:0 8px}
+.fold{display:flex;align-items:center;gap:8px;font-size:12.5px}
+</style></head><body>
+
+<p class="lede"><b>Flix Files v2</b>: a file <b>activity stream you grab from</b>, not a search box. It lives in the dock (and optionally the menu bar). Everything you open, download, save, or create lands at the top. Then you <b>drag it straight into whatever needs it</b>: try dragging a row onto the upload form, a dock app, or a Favorite folder. Drag the <b>Flix tile itself</b> to carry the newest item without opening anything. Use the buttons below to simulate activity.</p>
+
+<div class="ctl">
+ <div class="grp">Simulate <button class="btn" id="simShot">📸 Take screenshot</button><button class="btn" id="simDl">⬇︎ Download a file</button><button class="btn" id="simSave">✎ Save a document</button></div>
+ <div class="grp">Opens from <div class="sg" id="cSummon"><button data-v="tile" class="on">Dock tile</button><button data-v="pointer">Shortcut → at pointer</button><button data-v="menubar">Menu bar</button></div></div>
+</div>
+<div class="ctl">
+ <div class="grp">Appearance <div class="sg" id="cAppear"><button data-v="dark" class="on">Dark</button><button data-v="light">Light</button></div></div>
+ <div class="grp">Accessibility <div class="sg" id="cA11y"><button data-v="rm">Reduce Motion</button><button data-v="rt">Reduce Transparency</button></div></div>
+ <button class="btn" id="reset">Reset</button>
+</div>
+
+<div class="viewport" id="vp">
+ <div class="stage dark" id="stage" tabindex="0">
+  <div id="wall"></div>
+  <div id="menubar"><b></b><b>Safari</b><span>File</span><span>Edit</span><span>View</span><span>History</span><span>Window</span>
+   <div class="r"><div id="mbFlix" title="Flix Files"></div><span>⌁</span><span>Fri 20 Nov&nbsp; 21:20</span></div></div>
+  <div id="win">
+   <div class="bar"><div class="tl"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div><div class="url">portal.example.com/upload</div></div>
+   <div class="content"><h3>Upload documents</h3><p>Attach the signed contract and this month's invoice.</p>
+    <div id="drop" data-drop="upload"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4.5 4.5M12 4l4.5 4.5M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drop files here</div>
+    <div id="ups"></div></div>
+  </div>
+  <div id="dock"></div>
+  <div id="banner"></div>
+
+  <div id="panel" class="hidden">
+   <div id="side"></div>
+   <div id="main">
+    <div class="mh"><span class="tt" id="ttl">All Activity</span><span class="cnt" id="cnt"></span><span class="sp"></span>
+     <div id="sbox"><svg width="12" height="12" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="q" placeholder="Filter by name" spellcheck="false"></div>
+     <button class="ib" id="bSearch" title="Search (⌘F)"><svg width="15" height="15" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+     <button class="ib" id="bPin" title="Stay open after dragging"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 4 4H6l4-4zM12 13v8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+    </div>
+    <div id="list"></div>
+    <div class="foot"><span class="h">Drag rows into any app</span><span style="flex:1"></span><span class="h"><span class="kc sm"><span>↩</span></span>Open</span><span class="h"><span class="kc sm"><span>⌘</span><span>C</span></span>Copy</span><span class="h"><span class="kc sm"><span>␣</span></span>Quick Look</span><div id="toast"></div></div>
+   </div>
+  </div>
+  <div id="ghost"></div>
+ </div>
+</div>
+
+<h2 class="sec">Settings → Features → Flix Files</h2>
+<div class="settings dark" id="settings">
+ <div class="sform"><h5>Where it lives</h5>
+  <div class="sbox">
+   <div class="srow"><div class="l">Show in the dock<small>The tile shows your newest item and counts what's new since you last looked.</small></div><div class="sw" data-k="inDock"></div></div>
+   <div class="srow"><div class="l">Show in the menu bar</div><div class="sw off" data-k="inBar"></div></div>
+   <div class="srow"><div class="l">Keyboard shortcut<small>Opens Flix Files at the pointer, newest item selected.</small></div><div class="rec"><span class="kc sm"><span>⌃</span><span>⌥</span><span>⌘</span><span>F</span></span></div></div>
+  </div>
+  <div class="sbox">
+   <div class="srow"><div class="l">When Flix Files opens</div><div class="mini" id="sOnOpen"><button data-v="none" class="on">Do nothing</button><button data-v="copy">Copy newest</button><button data-v="path">Copy its path</button></div></div>
+   <div class="srow"><div class="l">After you drag something out</div><div class="mini" id="sAfter"><button data-v="close" class="on">Close</button><button data-v="stay">Stay open</button></div></div>
+  </div>
+ </div>
+ <div class="sform"><h5>What it tracks</h5>
+  <div class="sbox">
+   <div class="srow"><div class="l">Files you open</div><div class="sw"></div></div>
+   <div class="srow"><div class="l">New, saved, and downloaded files<small>Only inside the folders below.</small></div><div class="sw"></div></div>
+   <div class="srow"><div class="l">Folders</div><div class="sw"></div></div>
+   <div class="srow"><div class="l">Apps</div><div class="sw"></div></div>
+  </div>
+  <div class="sbox">
+   <div class="srow"><div class="fold">📁 Desktop</div><span class="sp" style="flex:1"></span><div class="sw"></div></div>
+   <div class="srow"><div class="fold">📁 Documents</div><span style="flex:1"></span><div class="sw"></div></div>
+   <div class="srow"><div class="fold">📁 Downloads</div><span style="flex:1"></span><div class="sw"></div></div>
+   <div class="srow"><div class="fold">☁︎ iCloud Drive</div><span style="flex:1"></span><div class="sw"></div></div>
+   <div class="srow"><div class="fold" style="color:var(--accent)">＋ Add Folder…</div></div>
+  </div>
+ </div>
+</div>
+
+<div class="notes">
+ <section><h3>What changed from v1</h3><ul>
+  <li><b>Grab, not search.</b> The main gesture is dragging the newest thing into an upload form, a mail, a chat. Search stays, but hides behind ⌘F or just typing.</li>
+  <li><b>Activity, not just "recently opened".</b> Downloads (with the site they came from), new screenshots, saved and changed files, folders, apps.</li>
+  <li><b>Home is the dock.</b> A live tile with the newest item's thumbnail and a "new since you looked" badge. Drag the tile to carry that item. The menu bar is optional.</li>
+  <li><b>Sidebar instead of chips.</b> Activity types, kinds, Smart Filters (v1 collections become saved filters with an icon), and Favorites that accept drops.</li>
+  <li><b>The panel steps aside.</b> Drag a row out of it and it fades so you can reach what's underneath. It comes back only if pinned.</li>
+ </ul></section>
+ <section><h3>Data sources (public API)</h3><ul>
+  <li>Opened: Spotlight <code>kMDItemLastUsedDate</code> via a live <code>NSMetadataQuery</code>.</li>
+  <li>New / changed: FSEvents with file-level events on the watched folders. DOKK needs folder access, the same prompts Lookout already handles.</li>
+  <li>Downloaded: new in Downloads, with the source from <code>kMDItemWhereFroms</code>.</li>
+  <li>Screenshots: <code>kMDItemIsScreenCapture</code>.</li>
+  <li>Apps: <code>NSWorkspace</code> activation notifications.</li>
+  <li>DOKK keeps its own history (capped, per-item Remove). Spotlight only feeds it.</li>
+ </ul></section>
+ <section><h3>To decide</h3><ul>
+  <li>Web links. Trickster 4 tracks them through browser extensions. Out of scope for v1?</li>
+  <li>Flags (keep an item from aging out) as well as Favorites, or just Favorites?</li>
+  <li>The menu bar item: off by default, as shown?</li>
+ </ul></section>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), stage=$('#stage'), vp=$('#vp'), panel=$('#panel'), list=$('#list'), side=$('#side'), q=$('#q');
+const S={rm:false,rt:false,summon:'tile',open:false,filter:'all',sel:new Set(),anchor:null,pinned:false,onOpen:'none',unseen:3,search:false,ptr:{x:820,y:300},resp:.34,damp:.78};
+
+/* ───────── data ───────── */
+const SEED=[
+ ['Screenshot 2026-11-20 at 21.18.png','shot','PNG',['Desktop'],'new',null,2,0],
+ ['Invoice-2026-11.pdf','pdf','PDF',['Downloads'],'downloaded','billing.example.com',6,0],
+ ['Signed contract.pdf','pdf','PDF',['Downloads'],'downloaded','sign.example.com',9,0],
+ ['Launch deck.key','doc','KEY',['iCloud Drive','Talks'],'changed',null,14,0],
+ ['Preview','app','',['Applications'],'opened',null,20,0],
+ ['Oak & Ash','folder','',['Documents','Clients'],'opened',null,33,0],
+ ['FlixPanelController.swift','code','SWIFT',['Projects','DeeDock','Flix'],'changed',null,63,0],
+ ['Budget 2027.numbers','doc','NUM',['Documents','Finance'],'opened',null,128,0],
+ ['Screenshot 2026-11-20 at 16.02.png','shot','PNG',['Desktop'],'new',null,318,0],
+ ['podcast-ep42.m4a','media','M4A',['Music','Recordings'],'new',null,1420,330],
+ ['IMG_4821.HEIC','image','HEIC',['Pictures','Berlin trip'],'opened',null,1530,20],
+ ['Contract draft v3.docx','doc','DOCX',['Downloads'],'downloaded','docs.example.com',1640,0],
+ ['Xcode','app','',['Applications'],'opened',null,1700,0],
+ ['Mockups','folder','',['Desktop'],'opened',null,3100,0],
+ ['Packaging spec.pdf','pdf','PDF',['Documents','Clients','Oak & Ash'],'opened',null,4300,0],
+ ['Moodboard.png','image','PNG',['iCloud Drive','Design'],'changed',null,6100,300],
+ ['Onboarding copy.pages','doc','PAGES',['iCloud Drive','DOKK'],'changed',null,11800,0],
+ ['Invoice-2026-10.pdf','pdf','PDF',['Documents','Finance'],'downloaded','billing.example.com',29000,0],
+ ['Lease agreement.pdf','pdf','PDF',['Documents','Home'],'opened',null,29500,0],
+];
+let items,uid=0,ups=[];
+function reset(){uid=0;items=SEED.map(r=>({id:'i'+(uid++),name:r[0],kind:r[1],ext:r[2],path:r[3].slice(),ev:r[4],from:r[5],mins:r[6],hue:r[7],flag:false}));
+ items.find(i=>i.name==='Lease agreement.pdf').flag=true;items.find(i=>i.name==='Packaging spec.pdf').flag=true;
+ ups=[];S.unseen=3;S.sel=new Set();S.filter='all'}
+reset();
+const byId=id=>items.find(x=>x.id===id);
+const APPS={Preview:'#5aa9ff',Xcode:'#1c7cf4',Mail:'#3b9cff',Pages:'#f08a24',Messages:'#30d158',Notes:'#ffd60a'};
+const FAVS=[{t:'folder',n:'Clients',path:['Documents','Clients']},{t:'folder',n:'Finance',path:['Documents','Finance']},{t:'app',n:'Preview'},{t:'app',n:'Mail'}];
+
+/* ───────── icons ───────── */
+const BAND={PDF:'#e5484d',KEY:'#2f7cf6',NUM:'#2fb14a',PAGES:'#f08a24',DOCX:'#2b5fd9',SWIFT:'#f0682a',M4A:'#ff375f'};
+function photo(h,w,hh){return `<svg width="${w}" height="${hh}" viewBox="0 0 60 44" preserveAspectRatio="xMidYMid slice" style="display:block"><rect width="60" height="44" fill="hsl(${h} 65% 55%)"/><rect width="60" height="22" fill="hsl(${(h+30)%360} 70% 68%)"/><circle cx="44" cy="12" r="5" fill="rgba(255,255,255,.8)"/><path d="M0 34 L16 22 L28 31 L40 20 L60 33 L60 44 L0 44Z" fill="hsl(${(h+200)%360} 40% 30%)"/></svg>`}
+function shot(w,hh){return `<svg width="${w}" height="${hh}" viewBox="0 0 60 40" style="display:block"><rect width="60" height="40" fill="#2a3550"/><rect x="5" y="5" width="34" height="24" rx="2" fill="#e9ecf3"/><rect x="5" y="5" width="34" height="4" rx="1" fill="#c9cdd8"/><rect x="9" y="12" width="20" height="2" fill="#9aa"/><rect x="9" y="16" width="25" height="2" fill="#bbc"/><rect x="24" y="14" width="31" height="21" rx="2" fill="#1f2230"/><rect x="28" y="19" width="16" height="2" fill="#5aa9ff"/><rect x="28" y="23" width="22" height="2" fill="#667"/></svg>`}
+function appIcon(n,s){const c=APPS[n]||'#888';return `<div style="width:${s}px;height:${s}px;border-radius:${s*.23}px;background:linear-gradient(160deg,${c},color-mix(in srgb,${c} 60%,#000));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:${s*.42}px;box-shadow:0 1px 2px rgba(0,0,0,.3)">${n[0]}</div>`}
+function icon(it,s=32){
+ if(it.kind==='app')return appIcon(it.name,s*.9);
+ if(it.kind==='folder')return `<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M3 8.5c0-1.4 1.1-2.5 2.5-2.5h6.2c.8 0 1.4.3 1.9.9l1.4 1.6h11.5c1.4 0 2.5 1.1 2.5 2.5V12H3z" fill="#4aa5f2"/><rect x="3" y="10.5" width="26" height="16.5" rx="2.6" fill="#5db3f8"/><rect x="3" y="10.5" width="26" height="1" fill="rgba(255,255,255,.45)"/></svg>`;
+ if(it.kind==='image'||it.kind==='shot')return `<div style="width:${s*.94}px;height:${s*.66}px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1.5px #fff,0 1px 3px rgba(0,0,0,.35)">${it.kind==='shot'?shot(s*.94,s*.66):photo(it.hue,s*.94,s*.66)}</div>`;
+ const band=BAND[it.ext]||'#888';
+ const glyph=it.kind==='media'?`<path d="M13.5 10.5v7l6-3.5z" fill="${band}"/>`:it.kind==='code'?`<text x="16" y="17" text-anchor="middle" font-size="7" font-weight="700" fill="${band}" font-family="ui-monospace,Menlo">{ }</text>`:'<g stroke="#c7c9d1" stroke-width="1.1"><path d="M10 9h9M10 11.5h12M10 14h12M10 16.5h8"/></g>';
+ return `<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M7 2.5h12.5l6 6V28a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 28V4A1.5 1.5 0 0 1 7 2.5z" fill="#fbfbfd" stroke="rgba(0,0,0,.16)" stroke-width=".6"/><path d="M19.5 2.5v4.5a1.5 1.5 0 0 0 1.5 1.5h4.5" fill="#e4e5ea"/>${glyph}<rect x="5.5" y="21" width="20" height="6" fill="${band}"/><text x="15.5" y="25.6" text-anchor="middle" font-size="4.6" font-weight="800" fill="#fff" font-family="-apple-system,system-ui">${it.ext.slice(0,5)}</text></svg>`}
+const FLAG=`<svg width="11" height="11" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
+const EVG={opened:'↗',downloaded:'↓',new:'＋',changed:'✎'};
+const evText=it=>it.ev==='downloaded'?`Downloaded from ${it.from}`:it.ev==='new'?(it.kind==='shot'?'New screenshot':'New'):it.ev==='changed'?'Saved':'Opened';
+
+/* ───────── time ───────── */
+const minsToday=21*60+20;
+const group=m=>m<10?'Just Now':m<minsToday?'Today':m<minsToday+1440?'Yesterday':'Earlier';
+function when(m){if(m<1)return 'now';if(m<60)return m+' min';const d=new Date(2026,10,20,21,20-m);
+ if(m<minsToday+1440)return d.toTimeString().slice(0,5);return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}
+
+/* ───────── spring ───────── */
+function spring(resp,damp){const w=2*Math.PI/resp,z=Math.min(damp,.999),wd=w*Math.sqrt(1-z*z);
+ const T=Math.min(1.4,-Math.log(.002)/(z*w)),n=Math.max(12,Math.round(T*60)),v=[];
+ for(let i=0;i<=n;i++){const t=T*i/n;v.push(1-Math.exp(-z*w*t)*(Math.cos(wd*t)+(z*w/wd)*Math.sin(wd*t)))}v[n]=1;return {dur:T*1000,v}}
+function sAnim(el,fn,resp,damp,o={}){const s=spring(resp,damp);return el.animate(s.v.map(fn),Object.assign({duration:s.dur,easing:'linear',fill:'backwards'},o))}
+const cl=x=>Math.max(0,Math.min(1,x));
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let sc=1;const scale=()=>sc;
+function pt(e){const r=stage.getBoundingClientRect();return {x:(e.clientX-r.left)/sc,y:(e.clientY-r.top)/sc}}
+function rectOf(el){const r=el.getBoundingClientRect(),s=stage.getBoundingClientRect();return {x:(r.left-s.left)/sc,y:(r.top-s.top)/sc,w:r.width/sc,h:r.height/sc}}
+
+/* ───────── filters ───────── */
+const FILTERS=[
+ {sec:null,rows:[['all','◎','All Activity',()=>true],['opened','↗','Opened',i=>i.ev==='opened'],['downloaded','↓','Downloaded',i=>i.ev==='downloaded'],['new','＋','New',i=>i.ev==='new'],['changed','✎','Saved',i=>i.ev==='changed'],['flagged','⚑','Flagged',i=>i.flag]]},
+ {sec:'Kinds',rows:[['shots','⌗','Screenshots',i=>i.kind==='shot'],['images','◩','Images',i=>i.kind==='image'||i.kind==='shot'],['docs','▤','Documents',i=>['pdf','doc','code'].includes(i.kind)],['folders','▱','Folders',i=>i.kind==='folder'],['apps','◇','Apps',i=>i.kind==='app']]},
+ {sec:'Smart Filters',rows:[['invoices','🧾','Invoices',i=>/invoice/i.test(i.name)],['oak','🌳','Oak & Ash',i=>i.path.includes('Oak & Ash')||i.name==='Oak & Ash']]},
+];
+const ALLF=FILTERS.flatMap(s=>s.rows);
+function fn(id){if(id.startsWith('fav:')){const f=FAVS[+id.slice(4)];return i=>i.path.includes(f.n)}return ALLF.find(r=>r[0]===id)[3]}
+function title(id){if(id.startsWith('fav:'))return FAVS[+id.slice(4)].n;return ALLF.find(r=>r[0]===id)[2]}
+function visible(){const t=q.value.trim().toLowerCase(),f=fn(S.filter);return items.filter(i=>f(i)&&(!t||i.name.toLowerCase().includes(t))).sort((a,b)=>a.mins-b.mins)}
+
+function renderSide(){let h='';
+ FILTERS.forEach(s=>{if(s.sec)h+=`<div class="sh">${s.sec}</div>`;
+  s.rows.forEach(([id,g,n,f])=>{h+=`<div class="si ${S.filter===id?'on':''}" data-f="${id}"><span class="g">${g}</span>${n}<span class="c">${items.filter(f).length}</span></div>`})});
+ h+=`<div class="si add" data-f="__new"><span class="g">＋</span>New Smart Filter…</div><div class="sh">Favorites</div>`;
+ FAVS.forEach((f,i)=>{h+=`<div class="si ${S.filter==='fav:'+i?'on':''}" data-f="fav:${i}" data-drop="fav:${i}"><span class="g">${f.t==='folder'?icon({kind:'folder'},16):appIcon(f.n,15)}</span>${f.n}${f.t==='folder'?`<span class="c">${items.filter(it=>it.path.includes(f.n)).length}</span>`:''}</div>`});
+ side.innerHTML=h}
+side.addEventListener('click',e=>{const s=e.target.closest('[data-f]');if(!s)return;const f=s.dataset.f;
+ if(f==='__new'){toast('A Smart Filter matches by location, kind, Finder tag, or name, with an icon you pick.');return}
+ if(f.startsWith('fav:')&&FAVS[+f.slice(4)].t==='app'){banner(`Opening ${FAVS[+f.slice(4)].n}`);return}
+ S.filter=f;S.sel=new Set();renderSide();render(true)});
+
+/* ───────── list ───────── */
+function hl(n){const t=q.value.trim();if(!t)return esc(n);const i=n.toLowerCase().indexOf(t.toLowerCase());if(i<0)return esc(n);return esc(n.slice(0,i))+'<mark>'+esc(n.slice(i,i+t.length))+'</mark>'+esc(n.slice(i+t.length))}
+function render(animate,freshId){
+ const before=new Map();if(animate)list.querySelectorAll('.row').forEach(el=>before.set(el.dataset.id,el.getBoundingClientRect()));
+ const rows=visible();
+ if(!S.sel.size&&rows.length)S.sel=new Set([rows[0].id]);
+ let h='',g='';
+ rows.forEach(it=>{const gr=group(it.mins);if(gr!==g){g=gr;h+=`<div class="grp">${gr}</div>`}
+  h+=`<div class="row ${S.sel.has(it.id)?'sel':''} ${it.id===freshId?'fresh':''}" data-id="${it.id}"><div class="ic">${icon(it)}</div><div class="txt"><div class="nm">${hl(it.name)}</div>
+   <div class="sub"><span class="ev ${it.ev}">${EVG[it.ev]} ${evText(it)}</span><span>· ${esc(it.path[it.path.length-1])}</span></div></div>${it.flag?`<span class="flag">${FLAG}</span>`:''}<span class="tm">${when(it.mins)}</span></div>`});
+ if(!rows.length)h=`<div class="empty"><b>Nothing here yet</b>Files show up as you open, save, or download them.</div>`;
+ list.innerHTML=h;$('#ttl').textContent=title(S.filter);$('#cnt').textContent=rows.length+' item'+(rows.length===1?'':'s');
+ if(!animate)return;
+ list.querySelectorAll('.row').forEach((el,ix)=>{const b=before.get(el.dataset.id),a=el.getBoundingClientRect();
+  if(S.rm){if(!b)el.animate([{opacity:0},{opacity:1}],{duration:150,fill:'backwards'});return}
+  if(b){const dy=(b.top-a.top)/sc;if(Math.abs(dy)>.5)sAnim(el,p=>({transform:`translateY(${dy*(1-p)}px)`}),.36,.86)}
+  else if(el.dataset.id===freshId)sAnim(el,p=>({opacity:cl(p*1.5),height:(50*cl(p))+'px',transform:`scale(${.96+.04*p})`}),.4,.82);
+  else sAnim(el,p=>({opacity:cl(p*1.4),transform:`translateY(${(1-p)*8}px)`}),.34,.85,{delay:Math.min(ix,10)*12})})}
+function stagger(){if(S.rm)return;list.querySelectorAll('.row,.grp').forEach((el,i)=>{if(i>12)return;sAnim(el,p=>({opacity:cl(p*1.5),transform:`translateY(${(1-p)*7}px)`}),.36,.86,{delay:50+i*14})})}
+const rowsNow=()=>[...list.querySelectorAll('.row')].map(r=>r.dataset.id);
+function selectOnly(id){S.sel=new Set([id]);S.anchor=id;list.querySelectorAll('.row').forEach(r=>r.classList.toggle('sel',S.sel.has(r.dataset.id)))}
+function paintSel(){list.querySelectorAll('.row').forEach(r=>r.classList.toggle('sel',S.sel.has(r.dataset.id)))}
+
+/* ───────── tile + dock ───────── */
+const DOCKAPPS=['Preview','Mail','Messages','Pages','Notes','Xcode'];
+$('#dock').innerHTML=DOCKAPPS.map(n=>`<div class="dk" data-drop="app:${n}" style="background:linear-gradient(160deg,${APPS[n]},color-mix(in srgb,${APPS[n]} 60%,#000))">${n[0]}<span class="lab">${n}</span></div>`).join('')
+ +`<div class="sep"></div><div class="dk" id="tile"><div class="th"></div><span class="bd"></span><span class="dotr"></span><span class="lab" id="tileLab">Flix Files</span></div>`
+ +`<div class="dk" style="background:linear-gradient(160deg,#c9ccd6,#8e929e)" data-drop="trash">🗑<span class="lab">Trash</span></div>`;
+const tile=$('#tile');
+function newest(){return [...items].sort((a,b)=>a.mins-b.mins)[0]}
+function paintTile(pop){const n=newest();tile.querySelector('.th').innerHTML=icon(n,38);const bd=tile.querySelector('.bd');bd.textContent=S.unseen;bd.classList.toggle('z',!S.unseen);
+ $('#tileLab').innerHTML=`Flix Files · drag to take “${esc(n.name.length>26?n.name.slice(0,24)+'…':n.name)}”`;
+ $('#mbFlix').innerHTML=`<svg width="16" height="14" viewBox="0 0 16 14"><rect x="1" y="1" width="14" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 5h8M4 8h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+ if(pop&&!S.rm){sAnim(tile.querySelector('.th'),p=>({transform:`scale(${.6+.4*p})`,opacity:cl(p*2)}),.38,.55);sAnim(bd,p=>({transform:`scale(${.4+.6*p})`}),.3,.45)}}
+
+/* ───────── open / close ───────── */
+function anchorPanel(){const W=640,H=500;let x,y,ox,oy;
+ if(S.summon==='tile'){const t=rectOf(tile);x=t.x+t.w/2-W/2;y=t.y-12-H;ox=t.x+t.w/2-x;oy=H}
+ else if(S.summon==='menubar'){const m=rectOf($('#mbFlix'));x=m.x+m.w/2-W/2;y=32;ox=m.x+m.w/2-x;oy=0}
+ else{x=S.ptr.x-60;y=S.ptr.y-80;ox=60;oy=80}
+ x=Math.max(8,Math.min(1200-W-8,x));y=Math.max(32,Math.min(760-H-80,y));
+ if(S.summon==='tile')ox=rectOf(tile).x+25-x;
+ panel.style.left=x+'px';panel.style.top=y+'px';panel.style.transformOrigin=`${ox}px ${oy}px`}
+function openPanel(){S.open=true;closeMenu();anchorPanel();panel.classList.remove('hidden');panel.style.opacity='';panel.style.pointerEvents='';panel.getAnimations().forEach(a=>a.cancel());
+ tile.classList.add('open');$('#mbFlix').classList.add('act');
+ q.value='';S.search=false;$('#sbox').style.width='0';$('#sbox').style.opacity=0;
+ const n=visible()[0];S.sel=new Set(n?[n.id]:[]);S.anchor=n&&n.id;
+ renderSide();render(false);list.scrollTop=0;
+ if(S.rm)panel.animate([{opacity:0},{opacity:1}],{duration:150});
+ else sAnim(panel,p=>({opacity:cl(p*1.8),transform:`scale(${.9+.1*p})`,filter:`blur(${Math.max(0,1-p)*6}px)`}),S.resp,S.damp);
+ stagger();
+ if(S.unseen){S.unseen=0;paintTile(false)}
+ if(S.onOpen!=='none'&&n)setTimeout(()=>toast(S.onOpen==='copy'?`Copied “${esc(n.name)}”. Paste it anywhere.`:`Copied path <span style="font-family:ui-monospace,Menlo;color:var(--fg2)">~/${esc(n.path.join('/'))}/${esc(n.name)}</span>`),260);
+ stage.focus({preventScroll:true})}
+function closePanel(){if(!S.open)return;S.open=false;closeMenu();hideToast();tile.classList.remove('open');$('#mbFlix').classList.remove('act');
+ panel.animate(S.rm?[{opacity:1},{opacity:0}]:[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.96)'}],{duration:160,easing:'cubic-bezier(.4,0,1,1)'}).onfinish=()=>{if(!S.open)panel.classList.add('hidden')}}
+$('#mbFlix').onclick=e=>{e.stopPropagation();S.summon='menubar';syncSummon();S.open?closePanel():openPanel()};
+$('#bPin').onclick=()=>{S.pinned=!S.pinned;$('#bPin').classList.toggle('on',S.pinned);syncAfter();toast(S.pinned?'Flix Files stays open after you drag something out.':'Flix Files closes after you drag something out.')};
+$('#bSearch').onclick=()=>toggleSearch();
+function toggleSearch(on=!S.search){S.search=on;const b=$('#sbox');
+ if(S.rm){b.style.width=on?'170px':'0';b.style.opacity=on?1:0}
+ else{const w0=parseFloat(b.style.width)||0,w1=on?170:0;b.style.width=w1+'px';b.style.opacity=on?1:0;sAnim(b,p=>({width:(w0+(w1-w0)*p)+'px',opacity:on?cl(p*2):cl(1-p*2)}),.3,.85)}
+ $('#bSearch').classList.toggle('on',on);if(on)q.focus();else{q.value='';render(true);stage.focus()}}
+q.addEventListener('input',()=>{S.sel=new Set();render(true)});
+
+/* ───────── toast / banner / menu ───────── */
+let tT;
+function toast(msg,undo){const t=$('#toast');clearTimeout(tT);t.innerHTML=`<span>${msg}</span><span class="sp"></span>${undo?'<button>Undo</button>':''}`;
+ if(undo)t.querySelector('button').onclick=()=>{undo();hideToast()};
+ t.getAnimations().forEach(a=>a.cancel());
+ if(S.rm)t.animate([{opacity:0,transform:'none'},{opacity:1,transform:'none'}],{duration:150,fill:'forwards'});
+ else sAnim(t,p=>({transform:`translateY(${(1-p)*100}%)`}),.32,.86,{fill:'forwards'});
+ tT=setTimeout(hideToast,3600)}
+function hideToast(){const t=$('#toast');clearTimeout(tT);t.getAnimations().forEach(a=>a.cancel());t.animate([{transform:'translateY(0)',opacity:1},{transform:'translateY(100%)',opacity:S.rm?0:1}],{duration:170,easing:'ease-in',fill:'forwards'})}
+function banner(html){const b=$('#banner');b.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="var(--green)"/><path d="M7 12.5l3.2 3L17 9" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${html}`;
+ b.getAnimations().forEach(a=>a.cancel());b.animate([{opacity:0,transform:'translate(-50%,-8px)'},{opacity:1,transform:'translate(-50%,0)',offset:.12},{opacity:1,transform:'translate(-50%,0)',offset:.85},{opacity:0,transform:'translate(-50%,-4px)'}],{duration:2400})}
+let menuEl=null;
+function closeMenu(){if(menuEl){menuEl.remove();menuEl=null}}
+function ctx(e){const id=e.target.closest('.row').dataset.id;if(!S.sel.has(id))selectOnly(id);const p=pt(e),it=byId(id),n=S.sel.size;
+ closeMenu();const m=document.createElement('div');m.className='menu';
+ m.innerHTML=`<div class="it" data-v="open">Open${n>1?` ${n} Items`:''}<span class="k">↩</span></div><div class="it" data-v="reveal">Show in Finder<span class="k">⌘↩</span></div><div class="it" data-v="ql">Quick Look<span class="k">Space</span></div><hr>
+ <div class="it" data-v="copy">Copy<span class="k">⌘C</span></div><div class="it" data-v="path">Copy Path<span class="k">⌥⌘C</span></div><div class="it" data-v="shelf">Send to Shelf</div><hr>
+ <div class="it" data-v="flag">${it.flag?'Unflag':'Flag'}<span class="k">⌘K</span></div><div class="it" data-v="fav">Add to Favorites<span class="k">⌘D</span></div><hr>
+ <div class="it" data-v="remove">Remove from Flix Files<span class="k">⌫</span></div><div class="it" data-v="trash">Move to Trash<span class="k">⌘⌫</span></div>`;
+ stage.appendChild(m);m.style.left=Math.min(p.x,1200-m.offsetWidth-8)+'px';m.style.top=Math.min(p.y,760-m.offsetHeight-8)+'px';menuEl=m;
+ if(!S.rm)m.animate([{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'scale(1)'}],{duration:130});
+ m.onclick=ev=>{const it2=ev.target.closest('.it');if(!it2)return;ev.stopPropagation();closeMenu();act(it2.dataset.v)}}
+
+/* ───────── actions ───────── */
+const selItems=()=>items.filter(i=>S.sel.has(i.id));
+function act(a){const sel=selItems();if(!sel.length)return;const one=sel[0],lbl=sel.length>1?`${sel.length} items`:`“${esc(one.name)}”`;
+ if(a==='open'){closePanel();banner(`Opening ${lbl}`)}
+ else if(a==='reveal'){closePanel();banner(`Showing ${lbl} in Finder`)}
+ else if(a==='ql')toast(`Quick Look shows ${lbl}.`);
+ else if(a==='copy')toast(`Copied ${lbl}. Paste it anywhere.`);
+ else if(a==='path')toast(`Copied the path of ${lbl}.`);
+ else if(a==='shelf')toast(`Put ${lbl} on the Shelf.`);
+ else if(a==='flag'){const v=!one.flag;sel.forEach(i=>i.flag=v);renderSide();render(false);toast(v?`Flagged ${lbl}. It won't age out.`:`Unflagged ${lbl}.`)}
+ else if(a==='fav')toast(`Added ${lbl} to Favorites.`);
+ else if(a==='remove'||a==='trash'){const snap=items.slice();items=items.filter(i=>!S.sel.has(i.id));S.sel=new Set();renderSide();render(true);
+  toast(a==='trash'?`Moved ${lbl} to the Trash.`:`Removed ${lbl} from Flix Files. The file stays where it is.`,()=>{items=snap;renderSide();render(true)})}}
+
+/* ───────── drag system ───────── */
+const ghost=$('#ghost');let D=null;
+function startDrag(ids,from,p){pOut=false;D={ids,from,start:p,over:null,panelOut:false};
+ const its=ids.map(byId),top=its[0];
+ ghost.innerHTML=`<div class="stack">${its.slice(0,3).reverse().map((it,i,arr)=>`<div class="card" style="transform:translate(${(arr.length-1-i)*4}px,${(arr.length-1-i)*-4}px) rotate(${(arr.length-1-i)*4}deg)">${icon(it,48)}</div>`).join('')}${its.length>1?`<span class="n">${its.length}</span>`:''}<span class="lbl" style="display:none"></span></div>`;
+ ghost.style.display='block';moveGhost(p);
+ if(!S.rm)sAnim(ghost.querySelector('.stack'),q=>({transform:`scale(${.7+.3*q})`}),.28,.6);
+ list.querySelectorAll('.row').forEach(r=>r.classList.toggle('dragsrc',ids.includes(r.dataset.id)))}
+function moveGhost(p){ghost.style.transform=`translate(${p.x-24}px,${p.y-24}px)`}
+let pOut=false;
+function setPanelOut(out){if(!S.open||pOut===out)return;pOut=out;if(D)D.panelOut=out;panel.getAnimations().forEach(a=>a.cancel());
+ panel.style.pointerEvents=out?'none':'';
+ panel.animate(out?[{opacity:1,transform:'scale(1)'},{opacity:.06,transform:'scale(.97)'}]:[{opacity:.06,transform:'scale(.97)'},{opacity:1,transform:'scale(1)'}],{duration:S.rm?120:200,easing:'cubic-bezier(.2,.8,.3,1)',fill:'forwards'})}
+function target(e){const els=document.elementsFromPoint(e.clientX,e.clientY);for(const el of els){const d=el.closest&&el.closest('[data-drop]');if(d&&!(D.panelOut&&panel.contains(d)))return d}return null}
+function verb(t){const v=t.dataset.drop;if(v==='upload')return 'Upload';if(v==='trash')return 'Move to Trash';if(v.startsWith('app:'))return 'Open in '+v.slice(4);
+ const f=FAVS[+v.slice(4)];return f.t==='folder'?'Move to '+f.n:'Open in '+f.n}
+let P=null;
+stage.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=pt(e);S.ptr=p;
+ if(menuEl&&!menuEl.contains(e.target))closeMenu();
+ const row=e.target.closest('.row'),onTile=e.target.closest('#tile');
+ if(row){const id=row.dataset.id;
+  if(e.metaKey){S.sel.has(id)?S.sel.delete(id):S.sel.add(id);S.anchor=id;paintSel()}
+  else if(e.shiftKey&&S.anchor){const ids=rowsNow(),a=ids.indexOf(S.anchor),b=ids.indexOf(id);S.sel=new Set(ids.slice(Math.min(a,b),Math.max(a,b)+1));paintSel()}
+  else if(!S.sel.has(id))selectOnly(id);
+  P={kind:'row',id,p};return}
+ if(onTile){P={kind:'tile',p};return}
+ if(S.open&&!panel.contains(e.target)&&!e.target.closest('.menu')&&!e.target.closest('#mbFlix'))closePanel();
+});
+window.addEventListener('pointermove',e=>{if(!P)return;const p=pt(e);
+ if(!D){if(Math.hypot(p.x-P.p.x,p.y-P.p.y)<5)return;
+  if(P.kind==='row')startDrag(S.sel.has(P.id)?rowsNow().filter(x=>S.sel.has(x)):[P.id],'panel',P.p);
+  else{const n=newest();startDrag([n.id],'tile',P.p)}}
+ moveGhost(p);
+ if(S.open){const r=rectOf(panel);setPanelOut(!(p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h))}
+ const t=target(e);if(t!==D.over){if(D.over)D.over.classList.remove('over');D.over=t;if(t)t.classList.add('over');
+  const l=ghost.querySelector('.lbl');if(t){l.style.display='block';l.textContent=verb(t)}else l.style.display='none'}});
+window.addEventListener('pointerup',e=>{const P0=P;P=null;if(!P0)return;
+ if(!D){if(P0.kind==='tile'){S.summon='tile';syncSummon();S.open?closePanel():openPanel()}return}
+ const d=D;D=null;if(d.over)d.over.classList.remove('over');list.querySelectorAll('.dragsrc').forEach(r=>r.classList.remove('dragsrc'));
+ if(!d.over){// fly back
+  const s=d.start,cur=pt(e);if(S.rm){ghost.style.display='none'}else{const dx=s.x-cur.x,dy=s.y-cur.y;
+   sAnim(ghost,q=>({transform:`translate(${cur.x-24+dx*q}px,${cur.y-24+dy*q}px) scale(${1-.3*q})`,opacity:cl(1.4-q)}),.34,.9,{fill:'forwards'}).onfinish=()=>{ghost.style.display='none';ghost.getAnimations().forEach(a=>a.cancel())}}
+  if(d.panelOut)setPanelOut(false);return}
+ drop(d,d.over,pt(e))});
+function drop(d,t,p){const its=d.ids.map(byId),v=t.dataset.drop,lbl=its.length>1?`${its.length} items`:`“${esc(its[0].name)}”`;
+ // ghost sinks into the target
+ const r=rectOf(t);ghost.querySelector('.lbl').style.display='none';
+ if(S.rm)ghost.style.display='none';
+ else{const tx=Math.min(Math.max(p.x,r.x+20),r.x+r.w-20),ty=Math.min(Math.max(p.y,r.y+20),r.y+r.h-20);
+  sAnim(ghost,q=>({transform:`translate(${p.x-24+(tx-p.x)*q}px,${p.y-24+(ty-p.y)*q}px) scale(${1-.65*q})`,opacity:cl(1.3-q)}),.3,.95,{fill:'forwards'}).onfinish=()=>{ghost.style.display='none';ghost.getAnimations().forEach(a=>a.cancel())}}
+ if(v==='upload'){its.forEach(it=>addUpload(it));if(!S.rm)sAnim($('#drop'),q=>({transform:`scale(${1.03-.03*q})`}),.3,.5)}
+ else if(v==='trash'){const snap=items.slice();items=items.filter(i=>!d.ids.includes(i.id));S.sel=new Set();renderSide();render(true);bounce(t);
+  if(S.open&&S.pinned)toast(`Moved ${lbl} to the Trash.`,()=>{items=snap;renderSide();render(true)});else banner(`Moved ${lbl} to the Trash`)}
+ else if(v.startsWith('app:')){bounce(t);banner(`Opening ${lbl} in ${v.slice(4)}`)}
+ else{const f=FAVS[+v.slice(4)];
+  if(f.t==='app')banner(`Opening ${lbl} in ${f.n}`);
+  else{const old=its.map(i=>i.path);its.forEach(i=>i.path=f.path.slice());renderSide();render(false);
+   toast(`Moved ${lbl} to ${f.n}.`,()=>{its.forEach((i,k)=>i.path=old[k]);renderSide();render(false)})}}
+ // panel behaviour after dropping outside it
+ if(S.open&&d.panelOut){if(S.pinned||S.afterStay)setTimeout(()=>setPanelOut(false),260);else{S.open=false;tile.classList.remove('open');$('#mbFlix').classList.remove('act');panel.animate([{opacity:.06},{opacity:0}],{duration:120,fill:'forwards'}).onfinish=()=>{panel.classList.add('hidden');panel.getAnimations().forEach(a=>a.cancel());panel.style.pointerEvents=''}}}
+}
+function bounce(el){if(S.rm)return;el.animate([{transform:'translateY(0)'},{transform:'translateY(-16px)',offset:.35},{transform:'translateY(0)',offset:.7},{transform:'translateY(-6px)',offset:.85},{transform:'translateY(0)'}],{duration:620,easing:'ease-out'})}
+function addUpload(it){const u=document.createElement('div');u.className='up';u.innerHTML=`<div style="width:24px;display:flex;justify-content:center">${icon(it,22)}</div><span class="nm">${esc(it.name)}</span><div class="bar2"><i></i></div><span style="color:var(--fg3);font-size:11px;width:44px;text-align:right">…</span>`;
+ $('#ups').prepend(u);if(!S.rm)sAnim(u,q=>({opacity:cl(q*1.5),transform:`translateY(${(1-q)*-8}px)`}),.34,.8);
+ const bar=u.querySelector('i'),lab=u.querySelector('span:last-child');const dur=900+Math.random()*700;
+ bar.animate([{width:'0%'},{width:'100%'}],{duration:dur,easing:'cubic-bezier(.3,.1,.3,1)',fill:'forwards'}).onfinish=()=>{lab.textContent='Done';lab.style.color='var(--green)'}}
+
+/* ───────── simulate activity ───────── */
+let shotN=0;
+function arrive(it){items.forEach(i=>i.mins+=1);items.unshift(it);if(!S.open){S.unseen++}paintTile(true);
+ if(S.open){renderSide();render(true,it.id)}}
+$('#simShot').onclick=()=>{shotN++;arrive({id:'i'+(uid++),name:`Screenshot 2026-11-20 at 21.${20+shotN}.png`,kind:'shot',ext:'PNG',path:['Desktop'],ev:'new',mins:0,hue:0,flag:false})};
+$('#simDl').onclick=()=>{const n=['Receipt-48213.pdf','Brand kit.pdf','Invoice-2026-12.pdf'][uid%3];arrive({id:'i'+(uid++),name:n,kind:'pdf',ext:'PDF',path:['Downloads'],ev:'downloaded',from:n.startsWith('Invoice')?'billing.example.com':'files.example.com',mins:0,hue:0,flag:false})};
+$('#simSave').onclick=()=>{const it=items.find(i=>i.name==='Budget 2027.numbers'||i.name==='Launch deck.key');if(!it)return;items=items.filter(i=>i!==it);it.ev='changed';it.mins=0;arrive(it)};
+
+/* ───────── keyboard ───────── */
+const isShortcut=e=>e.code==='KeyF'&&e.altKey&&e.metaKey&&e.ctrlKey&&!e.shiftKey;
+stage.addEventListener('keydown',e=>{
+ if(isShortcut(e)){e.preventDefault();if(S.open){closePanel();return}S.summon=S.summon==='menubar'?'menubar':'pointer';syncSummon();openPanel();return}
+ if(!S.open)return;
+ const ids=rowsNow(),cur=ids.indexOf(S.anchor??ids[0]);
+ if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const n=Math.max(0,Math.min(ids.length-1,cur+(e.key==='ArrowDown'?1:-1)));
+  if(e.shiftKey){S.sel.add(ids[n]);S.anchor=ids[n];paintSel()}else selectOnly(ids[n]);
+  const el=list.querySelector(`[data-id="${ids[n]}"]`);if(el){const lr=list.getBoundingClientRect(),r=el.getBoundingClientRect();if(r.top<lr.top)list.scrollTop-=(lr.top-r.top)/sc+24;else if(r.bottom>lr.bottom)list.scrollTop+=(r.bottom-lr.bottom)/sc+6}}
+ else if(e.key==='Enter'){e.preventDefault();act(e.metaKey?'reveal':'open')}
+ else if(e.key===' '&&document.activeElement!==q){e.preventDefault();act('ql')}
+ else if(e.metaKey&&e.altKey&&e.code==='KeyC'){e.preventDefault();act('path')}
+ else if(e.metaKey&&e.code==='KeyC'&&document.activeElement!==q){e.preventDefault();act('copy')}
+ else if(e.metaKey&&e.code==='KeyK'){e.preventDefault();act('flag')}
+ else if(e.metaKey&&e.code==='KeyD'){e.preventDefault();act('fav')}
+ else if(e.metaKey&&e.code==='KeyF'){e.preventDefault();toggleSearch(true)}
+ else if(e.metaKey&&e.key==='Backspace'){e.preventDefault();act('trash')}
+ else if(e.key==='Backspace'&&document.activeElement!==q){e.preventDefault();act('remove')}
+ else if(e.key==='Escape'){e.preventDefault();if(S.search)toggleSearch(false);else closePanel()}
+ else if(e.key.length===1&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&document.activeElement!==q){toggleSearch(true)}
+});
+list.addEventListener('dblclick',e=>{if(e.target.closest('.row'))act('open')});
+list.addEventListener('contextmenu',e=>{if(!e.target.closest('.row'))return;e.preventDefault();ctx(e)});
+stage.addEventListener('mousemove',e=>{if(!D)S.ptr=pt(e)});
+
+/* ───────── controls ───────── */
+function seg(id,fn){document.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{document.querySelectorAll(id+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b.dataset.v)})}
+function syncSummon(){document.querySelectorAll('#cSummon button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.summon));if(S.summon==='menubar'&&!S.inBar)setBar(true)}
+seg('#cSummon',v=>{S.summon=v;if(v==='menubar')setBar(true);if(v==='pointer')S.ptr={x:760,y:260};openPanel()});
+seg('#cAppear',v=>{[stage,$('#settings')].forEach(el=>{el.classList.remove('dark','light');el.classList.add(v)});document.documentElement.style.colorScheme=v});
+document.querySelectorAll('#cA11y button').forEach(b=>b.onclick=()=>{b.classList.toggle('on');S[b.dataset.v]=b.classList.contains('on');stage.classList.toggle('rt',S.rt)});
+seg('#sOnOpen',v=>{S.onOpen=v;openPanel()});
+function syncAfter(){document.querySelectorAll('#sAfter button').forEach(b=>b.classList.toggle('on',b.dataset.v===(S.pinned?'stay':'close')))}
+seg('#sAfter',v=>{S.pinned=v==='stay';$('#bPin').classList.toggle('on',S.pinned)});
+function setBar(on){S.inBar=on;$('#mbFlix').classList.toggle('on',on);document.querySelector('[data-k="inBar"]').classList.toggle('off',!on)}
+document.querySelectorAll('.sw').forEach(sw=>sw.onclick=()=>{sw.classList.toggle('off');const on=!sw.classList.contains('off');
+ if(sw.dataset.k==='inBar')setBar(on);if(sw.dataset.k==='inDock')tile.style.display=on?'':'none'});
+$('#reset').onclick=()=>{reset();$('#ups').innerHTML='';paintTile(true);openPanel()};
+
+function fit(){sc=Math.min(1,vp.clientWidth/1200);stage.style.transform=`scale(${sc})`;vp.style.height=(760*sc)+'px'}
+new ResizeObserver(fit).observe(vp);fit();paintTile(false);renderSide();render(false);
+setTimeout(()=>openPanel(),300);
+})();
+</script>
+</body></html>

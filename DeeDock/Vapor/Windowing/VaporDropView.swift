@@ -2,9 +2,9 @@ import AppKit
 
 /// Reads the file URLs a drag carries.
 enum VaporDragPasteboard {
+    /// A Flix drag may carry converted upload copies; Vapor deletes the originals, never a copy.
     static func fileURLs(_ pasteboard: NSPasteboard) -> [URL] {
-        let options: [NSPasteboard.ReadingOptionKey: Any] = [.urlReadingFileURLsOnly: true]
-        return (pasteboard.readObjects(forClasses: [NSURL.self], options: options) as? [URL]) ?? []
+        FlixDragSession.fileURLs(on: pasteboard)
     }
 }
 

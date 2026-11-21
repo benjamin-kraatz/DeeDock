@@ -192,6 +192,54 @@ nonisolated extension Searcher {
         return source
     }
 
+    /// Each file's stored vectors averaged into one, for features that compare whole files (Flix Files' Threads,
+    /// folder suggestions, More like this). A file with text segments averages those; one without (a photo, a
+    /// screenshot without text) averages its picture vectors, flagged `isPicture`. At most `segmentLimit` segments of
+    /// each modality count, in index order, so a 300-page PDF costs no more than a short one. Reads the store
+    /// directly: the in-memory vectors are not loaded for it.
+    ///
+    /// - Parameter paths: Files as the index stores them (real paths).
+    /// - Returns: One L2-normalized vector per file that has any; files without one are left out.
+    /// - Throws: SQLite errors.
+    func fileVectors(paths: Set<String>, segmentLimit: Int = 8) throws -> [String: LookoutFileVector] {
+        guard !paths.isEmpty else { return [:] }
+        let rowBytes = Vectors.dimension * MemoryLayout<Float16>.stride
+        struct Sum {
+            var vector = [Float](repeating: 0, count: Vectors.dimension)
+            var count = 0
+        }
+        var text: [String: Sum] = [:], pictures: [String: Sum] = [:]
+        // SQLite caps the number of bound values per statement; 500 stays far below every build's limit.
+        let sorted = paths.sorted()
+        for start in stride(from: 0, to: sorted.count, by: 500) {
+            let chunk = Array(sorted[start..<min(start + 500, sorted.count)])
+            let marks = chunk.map { _ in "?" }.joined(separator: ",")
+            try store.db.query("""
+                SELECT f.path, s.modality, s.vec FROM segments s JOIN files f ON f.id = s.file
+                WHERE f.path IN (\(marks)) AND s.vec IS NOT NULL ORDER BY s.id
+                """, chunk.map { .text($0) }) { row in
+                guard let path = row.text(0), let blob = row.blob(2), blob.count == rowBytes else { return }
+                let isPicture = Modality(rawValue: row.text(1) ?? "") == .image
+                var sum = (isPicture ? pictures[path] : text[path]) ?? Sum()
+                guard sum.count < segmentLimit else { return }
+                blob.withUnsafeBytes { raw in
+                    for (index, half) in raw.bindMemory(to: Float16.self).enumerated() { sum.vector[index] += Float(half) }
+                }
+                sum.count += 1
+                if isPicture { pictures[path] = sum } else { text[path] = sum }
+            }
+        }
+        var result: [String: LookoutFileVector] = [:]
+        for path in Set(text.keys).union(pictures.keys) {
+            let isPicture = text[path] == nil
+            guard let sum = isPicture ? pictures[path] : text[path] else { continue }
+            let norm = sum.vector.reduce(0) { $0 + $1 * $1 }.squareRoot()
+            guard norm > 0 else { continue }
+            result[path] = LookoutFileVector(vector: sum.vector.map { $0 / norm }, isPicture: isPicture)
+        }
+        return result
+    }
+
     /// Which of `paths` (as the index stores them) the index holds with at least one vector.
     ///
     /// - Throws: SQLite errors.
