@@ -29,7 +29,7 @@ private final class FlixPickHostingView<Content: View>: NSHostingView<Content> {
 /// current size, so the panel never covers more than it shows: opening the rail first widens the
 /// window (the edge next to the picker stays put) and then springs the body open inside it;
 /// closing springs the body shut and only then narrows the window. With Reduce Motion the body
-/// changes size at once and only the text fades.
+/// and the window change size at once and only the text fades. The timings are `FlixPickMotion`'s.
 ///
 /// Never activates DOKK and never becomes key: `.nonactivatingPanel`, `becomesKeyOnlyIfNeeded`,
 /// and a window class that refuses key. Floating level, on every Space and beside full-screen
@@ -87,7 +87,8 @@ final class FlixPickPanelController {
         window.orderFrontRegardless()
         DispatchQueue.main.async { [weak self] in
             guard let self, generation == token else { return }
-            withAnimation(state.reduceMotion ? FlixMotion.fade : FlixMotion.panel) { self.state.isShown = true }
+            // The fade; the slide and scale take their own spring in `FlixPickEntrance`.
+            withAnimation(FlixPickMotion.fadeIn) { self.state.isShown = true }
         }
     }
 
@@ -107,20 +108,28 @@ final class FlixPickPanelController {
     /// Opens or closes the rail.
     func setOpen(_ open: Bool) {
         guard isVisible, open != state.isOpen else { return }
-        let animation: Animation = state.reduceMotion ? FlixMotion.fade
-            : .spring(response: open ? 0.38 : 0.3, dampingFraction: open ? 0.8 : 0.9)
-        if open {
-            windowOpen = true
-            window.setFrame(FlixPickPlacement.window(around: body(open: true)), display: true)
-            withAnimation(animation) { state.isOpen = true }
+        if state.reduceMotion {
+            // No transaction animation, so the width changes at once; the text still fades, as its
+            // reveal carries its own animation.
+            if open { resizeWindow(open: true) }
+            state.isOpen = open
+            if !open { resizeWindow(open: false) }
+        } else if open {
+            resizeWindow(open: true)
+            withAnimation(FlixPickMotion.open) { state.isOpen = true }
         } else {
             let token = generation
-            withAnimation(animation) { state.isOpen = false } completion: { [weak self] in
+            withAnimation(FlixPickMotion.close) { state.isOpen = false } completion: { [weak self] in
                 guard let self, generation == token, isVisible, !state.isOpen else { return }
-                windowOpen = false
-                window.setFrame(FlixPickPlacement.window(around: body(open: false)), display: true)
+                resizeWindow(open: false)
             }
         }
+    }
+
+    /// Sizes the window for the open or the closed rail; the edge next to the picker stays put.
+    private func resizeWindow(open: Bool) {
+        windowOpen = open
+        window.setFrame(FlixPickPlacement.window(around: body(open: open)), display: true)
     }
 
     /// Fades away and orders out.
@@ -140,7 +149,7 @@ final class FlixPickPanelController {
             finish()
             return
         }
-        withAnimation(.easeOut(duration: state.reduceMotion ? 0.12 : 0.15)) { state.isShown = false } completion: { finish() }
+        withAnimation(FlixPickMotion.leave) { state.isShown = false } completion: { finish() }
     }
 
     /// Hides at once and releases the content. The controller must not be used after.

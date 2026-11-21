@@ -427,11 +427,13 @@ final class FlixPickCoordinator {
                                                              serial: current.picker.serial, accepted: accepted,
                                                              at: point, started: started)
                                          })
+        state.draggingRowID = dragging ? row.id : nil
     }
 
     private func dragEnded(_ row: FlixPickRow, rank: Int, kind: FlixPickPickerKind, serial: Int, accepted: Bool,
                            at point: CGPoint, started: ContinuousClock.Instant) {
         dragging = false
+        state.draggingRowID = nil
         scheduleCollapse()
         guard accepted, let picker = session?.picker, picker.serial == serial,
               Self.appKit(picker.frame).contains(point) else { return }

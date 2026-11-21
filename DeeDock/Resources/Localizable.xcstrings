@@ -7129,38 +7129,92 @@
         }
       }
     },
-    "flixPickHintOpen" : {
-      "comment" : "Flix Pick: footer hint beside an Open picker. ⌥ is the Option key.",
+    "flixPickHintClickGoesThere" : {
+      "comment" : "Flix Pick: footer hint beside a Save picker: a click on a folder row moves the picker to that folder. The words between ** are shown a little stronger; keep the ** around what the click does.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klick wählt aus · ⌥-Klick öffnet · oder hineinziehen"
+            "value" : "Klick **geht dorthin**"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Click selects · ⌥-click opens · or drag it in"
+            "value" : "Click **goes there**"
           }
         }
       }
     },
-    "flixPickHintSave" : {
-      "comment" : "Flix Pick: footer hint beside a Save picker. ⌥ is the Option key.",
+    "flixPickHintClickSelects" : {
+      "comment" : "Flix Pick: footer hint beside an Open picker: a click on a row selects that file in the picker. The words between ** are shown a little stronger; keep the ** around what the click does.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klick geht dorthin · ⌥-Klick sichert"
+            "value" : "Klick **wählt aus**"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Click goes there · ⌥-click saves"
+            "value" : "Click **selects**"
+          }
+        }
+      }
+    },
+    "flixPickHintDrag" : {
+      "comment" : "Flix Pick: last footer hint, after the click hints: a row can also be dragged into the picker. Keep it short; it is dropped when the line does not fit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oder ziehen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or drag it in"
+          }
+        }
+      }
+    },
+    "flixPickHintOptionOpens" : {
+      "comment" : "Flix Pick: footer hint beside an Open picker: Option-click also presses the picker's Open button. ⌥ is the Option key. The words between ** are shown a little stronger; keep the ** around what it does.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥-Klick **öffnet**"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥-click **opens**"
+          }
+        }
+      }
+    },
+    "flixPickHintOptionSaves" : {
+      "comment" : "Flix Pick: footer hint beside a Save picker: Option-click also presses the picker's Save button. ⌥ is the Option key. The words between ** are shown a little stronger; keep the ** around what it does.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥-Klick **sichert**"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌥-click **saves**"
           }
         }
       }
@@ -9362,7 +9416,7 @@
       }
     },
     "flixSettingsPick" : {
-      "comment" : "Flix Files Settings: card title and toggle for Flix Pick.",
+      "comment" : "Flix Files Settings: title of the Flix Pick card.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -9447,6 +9501,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flix Pick reads only the Open and Save pickers themselves, never other windows. What you pick in them is counted on this Mac with Learn where I drag things, and Forget clears it."
+          }
+        }
+      }
+    },
+    "flixSettingsPickShow" : {
+      "comment" : "Flix Files Settings: the switch that turns Flix Pick on, under the card titled Flix Pick. Flix Pick is the feature's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix Pick zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Flix Pick"
           }
         }
       }

@@ -3966,3 +3966,25 @@ Built on `codex/dee-163-flix-files` after the approved mockup `docs/mockups/flix
 - [ ] DOKK's own Open panels (Settings → Add Folder…): no rail.
 - [ ] Not yet covered by any probe: Chrome and Electron pickers, the column and icon views (a click should still go to the file; ⌥-click should not press Open), a picker on a second display or one with a negative origin, and a picker over a full-screen app.
 - [ ] With the debug menu's sending on: `flix_pick_shown`, `flix_pick_used` with `route` and `trigger`, and `flix_pick_picker_closed` with `outcome`, and no app name, path, or file name anywhere.
+
+#### Polish pass
+
+A visual and interaction pass over the panel and the Settings card, against the mockup's Tuck style. Detection, routes, ranking, learning, analytics, and what the settings mean are unchanged.
+
+- Surface: the Flix glass with the mockup's 14-point corner and a shorter shadow. The header keeps the rows' columns, so the logo (now the mockup's glyph) is centred over the icons and the title starts where the names do.
+- Motion (`FlixPickMotion`): the panel fades in over 0.22 s while it slides 12 points from the picker's side and grows from 98 %, and leaves with a 0.18 s fade. The rail springs open, and the text fades in 80 ms later; on closing the text fades first. With Reduce Motion the panel only fades and the rail changes width at once.
+- Rows: the highlight follows the rail's width (a square around the icon when closed), hover and press fade in 0.12 s, a click flashes the row for 160 ms, and a dragged row dims. Reason colours are the mockup's, with darker orange, green, and purple in light appearance.
+- Footer: three hints with the action words a level stronger ("Click **selects**", "⌥-click **opens**", "or drag it in"), also beside a Save picker. A long translation moves them closer, then drops the last one. New strings: `flixPickHintClickSelects`, `flixPickHintClickGoesThere`, `flixPickHintOptionOpens`, `flixPickHintOptionSaves`, `flixPickHintDrag`; they replace `flixPickHintOpen` and `flixPickHintSave`.
+- Settings: the switch is titled **Show Flix Pick** (`flixSettingsPickShow`) under the **Flix Pick** heading, the Accessibility note is the shared status row, and hidden apps sit on the page's row grid.
+- Previews: closed, open (dark and light), Save in German, nothing fits, a row at work with the footer note, Reduce Transparency, and left of the picker. Their read policy now refuses the sample paths, so folders show folder icons.
+
+Validation: `xcodebuild -scheme DeeDock -configuration Debug -derivedDataPath <isolated folder> build` ended with `** BUILD SUCCEEDED **`, with no warnings in the files touched. No tests were run and the app was not launched. The views were drawn off screen from the debug build with the preview data (both appearances, English and German, solid surface) to check layout, alignment, colours, and truncation. That does not show Liquid Glass, any animation, or hover.
+
+- [ ] Closed rail: the logo and the icons share one centre line; nothing of the text shows through.
+- [ ] Hover: the rail springs open with a slight settle, the text follows a moment later, and the hovered row's highlight grows with the rail. Leave: the text goes first, then the rail closes; nothing jumps when the window narrows.
+- [ ] A picker opening: the rail slides in from the picker's side (from the right when it sits on the picker's left) and fades; a picker closing: it fades away.
+- [ ] Click a row: it dips and tints for a moment, and stays tinted while Go to Folder runs. Drag a row: it dims until the drag ends.
+- [ ] Light and dark appearance over a bright and a dark window: names, reasons, and the footer stay readable on the glass.
+- [ ] Reduce Motion: no slide, spring, or dip; the width changes at once and the text fades. Reduce Transparency: a solid body with the same corner and hairline.
+- [ ] German: the footer shows all three hints beside an Open picker without clipping.
+- [ ] Settings → Flix Files → **Flix Pick**: the card lines up with its neighbours, in both appearances.

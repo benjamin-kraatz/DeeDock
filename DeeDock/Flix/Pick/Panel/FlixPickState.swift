@@ -21,6 +21,8 @@ final class FlixPickState {
     var side: FlixPickPlacement.Side = .right
     /// The row whose action is running.
     var busyRowID: FlixItem.ID?
+    /// The row being dragged, which dims until the drag ends.
+    var draggingRowID: FlixItem.ID?
     /// A short note in the footer after an action could not reach the picker.
     var message: String?
     var now = Date.now

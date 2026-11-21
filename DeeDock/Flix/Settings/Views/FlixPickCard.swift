@@ -13,16 +13,11 @@ struct FlixPickCard: View {
 
     var body: some View {
         SettingsCard(title: .flixSettingsPick, footnote: .flixSettingsPickPrivacy) {
-            SettingsToggleRow(title: .flixSettingsPick, subtitle: .flixSettingsPickHelp, isOn: $settings.showsFlixPick)
+            SettingsToggleRow(title: .flixSettingsPickShow, subtitle: .flixSettingsPickHelp, isOn: $settings.showsFlixPick)
             if settings.showsFlixPick, !accessibilityGranted {
-                Label { Text(.flixSettingsPickNeedsAccess) } icon: {
-                    Image(systemName: "accessibility").foregroundStyle(.secondary)
-                }
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, SettingsMetrics.rowInset)
-                .padding(.vertical, 10)
+                // Quiet, as the web links card's note about the same permission: it explains,
+                // it does not warn.
+                SettingsStatusRow(symbol: "accessibility", tint: .secondary, message: Text(.flixSettingsPickNeedsAccess))
             }
             ForEach(settings.flixPickExcludedApps, id: \.self) { bundleIdentifier in
                 FlixPickExcludedAppRow(bundleIdentifier: bundleIdentifier) {
@@ -35,26 +30,29 @@ struct FlixPickCard: View {
 }
 
 /// One app where Flix Pick is hidden: its icon and name as macOS shows them, and **Show Again**.
+/// On the same grid as the page's other list rows.
 private struct FlixPickExcludedAppRow: View {
     let bundleIdentifier: String
     let remove: () -> Void
 
     var body: some View {
         let app = Self.lookUp(bundleIdentifier)
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(nsImage: app.icon)
                 .resizable()
-                .frame(width: 18, height: 18)
+                .frame(width: 20, height: 20)
                 .accessibilityHidden(true)
             Text(.flixSettingsPickHiddenIn(app.name))
                 .lineLimit(1)
-            Spacer(minLength: 8)
+                .truncationMode(.middle)
+            Spacer(minLength: SettingsMetrics.controlSpacing)
             Button(action: remove) { Text(.flixSettingsPickShowAgain) }
                 .controlSize(.small)
                 .accessibilityLabel(Text(.flixSettingsPickShowAgainIn(app.name)))
         }
         .padding(.horizontal, SettingsMetrics.rowInset)
-        .frame(minHeight: 34)
+        .padding(.vertical, SettingsMetrics.rowVerticalInset)
+        .frame(minHeight: SettingsMetrics.rowMinimumHeight)
     }
 
     /// The app's name and icon from Launch Services; the bundle identifier when it is not installed.
@@ -68,7 +66,7 @@ private struct FlixPickExcludedAppRow: View {
 }
 
 #if DEBUG
-#Preview("Flix Pick settings") {
+#Preview("Flix Pick settings, no Accessibility, two hidden apps") {
     @Previewable @State var settings: FlixSettings = {
         var settings = FlixSettings()
         settings.flixPickExcludedApps = ["com.example.writer", "com.example.importer"]
@@ -77,5 +75,13 @@ private struct FlixPickExcludedAppRow: View {
     FlixPickCard(settings: $settings, accessibilityGranted: false)
         .frame(width: 600)
         .padding()
+}
+
+#Preview("Flix Pick settings, German") {
+    @Previewable @State var settings = FlixSettings()
+    FlixPickCard(settings: $settings, accessibilityGranted: true)
+        .frame(width: 600)
+        .padding()
+        .environment(\.locale, Locale(identifier: "de"))
 }
 #endif

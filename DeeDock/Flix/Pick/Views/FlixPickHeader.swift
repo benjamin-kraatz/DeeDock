@@ -3,14 +3,18 @@ import SwiftUI
 
 /// The panel's header: the Flix logo, "Flix Pick", whom it is for, and the ⋯ menu. In the closed
 /// rail only the logo shows.
+///
+/// It keeps the rows' columns: the logo is centred over the icons, and the title starts where the
+/// file names do.
 struct FlixPickHeader: View {
     let state: FlixPickState
 
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        HStack(spacing: 8) {
-            FlixPickLogo(size: 20)
+        HStack(spacing: FlixPickStyle.iconGap) {
+            FlixPickLogo(size: FlixPickStyle.logoSize)
+                .frame(width: FlixPickStyle.iconBox)
             VStack(alignment: .leading, spacing: 1) {
                 Text(.flixPickName)
                     .font(.system(size: 13, weight: .bold))
@@ -21,8 +25,8 @@ struct FlixPickHeader: View {
                     .truncationMode(.tail)
             }
             .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .flixPickReveal(state.isOpen)
-            Spacer(minLength: 4)
             FlixPickMoreButton(appName: state.appName,
                                disableForApp: { state.disableForApp?() },
                                openSettings: {
@@ -34,8 +38,8 @@ struct FlixPickHeader: View {
                 .allowsHitTesting(state.isOpen)
                 .accessibilityHidden(!state.isOpen)
         }
-        .padding(.leading, 19)
-        .padding(.trailing, 10)
+        .padding(.leading, FlixPickStyle.listInset + FlixPickStyle.rowPadding)
+        .padding(.trailing, 12)
         .padding(.top, 4)
         .frame(height: FlixPickPlacement.headerHeight)
     }
@@ -48,27 +52,6 @@ struct FlixPickHeader: View {
         case .save:
             return String(localized: .flixPickSubtitleSave(state.appName))
         }
-    }
-}
-
-/// Flix Files' mark in small: the blue-to-indigo gradient square with a white document.
-struct FlixPickLogo: View {
-    var size: CGFloat = 20
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
-            .fill(LinearGradient(stops: [.init(color: Color(red: 0.353, green: 0.784, blue: 0.98), location: 0),
-                                         .init(color: Color(red: 0.039, green: 0.518, blue: 1), location: 0.55),
-                                         .init(color: Color(red: 0.369, green: 0.361, blue: 0.902), location: 1)],
-                                 startPoint: .topLeading, endPoint: .bottomTrailing))
-            .overlay {
-                Image(systemName: "doc.text")
-                    .font(.system(size: size * 0.55, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: size, height: size)
-            .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
-            .accessibilityHidden(true)
     }
 }
 

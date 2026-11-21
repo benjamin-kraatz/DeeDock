@@ -7,14 +7,24 @@ import SwiftUI
 /// Reduce Transparency raises the tint to a solid fill and sets the glass to `.identity`. Both
 /// cases keep one view structure, so switching the option with the panel open never rebuilds the
 /// content (which would drop focus and scroll position).
+///
+/// Flix Pick's rail is the same surface with a tighter corner and a shorter shadow.
 struct FlixPanelGlass: ViewModifier {
+    /// The far shadow's blur radius and drop, in points.
+    struct Shadow {
+        var radius: CGFloat = 22
+        var y: CGFloat = 10
+    }
+
     let reduceTransparency: Bool
     let increaseContrast: Bool
+    var radius: CGFloat = FlixStyle.cornerRadius
+    var shadow = Shadow()
 
     @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: FlixStyle.cornerRadius, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         content
             .background { shape.fill(FlixStyle.surface.opacity(fillOpacity)) }
             .clipShape(shape)
@@ -24,7 +34,7 @@ struct FlixPanelGlass: ViewModifier {
                                    lineWidth: 0.5)
                     .allowsHitTesting(false)
             }
-            .background { FlixPanelShadow(shape: shape) }
+            .background { FlixPanelShadow(shape: shape, shadow: shadow) }
     }
 
     private var fillOpacity: Double {
@@ -36,10 +46,11 @@ struct FlixPanelGlass: ViewModifier {
 /// The panel's shadow, drawn only outside its outline so it never darkens the glass from behind.
 private struct FlixPanelShadow: View {
     let shape: RoundedRectangle
+    let shadow: FlixPanelGlass.Shadow
 
     var body: some View {
         shape.fill(.black)
-            .shadow(color: .black.opacity(0.3), radius: 22, y: 10)
+            .shadow(color: .black.opacity(0.3), radius: shadow.radius, y: shadow.y)
             .shadow(color: .black.opacity(0.14), radius: 5, y: 2)
             .mask {
                 // Everything but the panel's own outline. The margin matches the window's.
