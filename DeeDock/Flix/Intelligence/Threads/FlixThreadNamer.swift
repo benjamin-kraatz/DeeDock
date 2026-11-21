@@ -52,7 +52,7 @@ enum FlixThreadNamer {
                 such as "Craft Anything icons" next to "Craft Anything".
                 """
         }
-        guard let thread = await FlixLanguageModel.generate(FlixGeneratedThread.self, span: "flix_thread_name",
+        guard let thread = await FlixLanguageModel.generate(FlixGeneratedThread.self, task: .threadName,
                                                             instructions: instructions,
                                                             prompt: prompt,
                                                             maximumTokens: 120, timeout: timeout) else { return nil }

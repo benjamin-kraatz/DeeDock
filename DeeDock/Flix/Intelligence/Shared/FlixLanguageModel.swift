@@ -10,6 +10,9 @@ import FoundationModels
 /// token limit, and a closed error code (`AIObservability.ErrorCode`), never an error's text. Callers treat a nil result as "no answer" and use their rule
 /// fallback; nothing is retried. Each such fallback counts toward `flix_ai_failures`.
 ///
+/// Every call names its ``FlixAITask``; ``FlixAIRouting`` keeps each one on Apple Intelligence
+/// (the only engine this type runs). A task routed elsewhere in a later version returns nil here.
+///
 /// Main actor: sessions are created and awaited here; the model itself runs out of process.
 @MainActor
 enum FlixLanguageModel {
@@ -31,12 +34,13 @@ enum FlixLanguageModel {
     /// longer than `timeout`, or the calling task is cancelled. Cancelling ends generation.
     ///
     /// - Parameters:
-    ///   - span: The `$ai_span_name` observability reports, such as `flix_caption`.
+    ///   - task: What the call is for; decides the engine and the `$ai_span_name` observability reports.
     ///   - image: A picture for the model to look at; dropped when the model reads none.
-    static func generate<Output: Generable & Sendable>(_ type: Output.Type, span: String, instructions: String,
+    static func generate<Output: Generable & Sendable>(_ type: Output.Type, task: FlixAITask, instructions: String,
                                                        prompt: String, image: CGImage? = nil,
                                                        maximumTokens: Int, timeout: Duration) async -> Output? {
-        guard isAvailable, !Task.isCancelled else { return nil }
+        guard FlixAIRouting.engine(for: task) == .appleIntelligence, isAvailable, !Task.isCancelled else { return nil }
+        let span = task.span
         let picture = readsImages ? image : nil
         let work = Task { () -> Output in
             let session = LanguageModelSession(model: SystemLanguageModel.default, instructions: instructions)

@@ -59,7 +59,7 @@ nonisolated enum FlixDemandInterpreter {
     ///   - text: The window's text from Accessibility or Vision.
     ///   - appName: Supplied by macOS; it helps tell a mail draft from a chat.
     @concurrent static func demand(fromText text: String, appName: String?) async -> FlixWindowDemand? {
-        guard isAvailable, !text.isEmpty else { return nil }
+        guard FlixAIRouting.engine(for: .windowText) == .appleIntelligence, isAvailable, !text.isEmpty else { return nil }
         let excerpt = String(text.prefix(maximumTextLength))
         return await withTimeout {
             let session = LanguageModelSession(model: SystemLanguageModel.default, instructions: instructions)
@@ -76,7 +76,8 @@ nonisolated enum FlixDemandInterpreter {
 
     /// Reads the window's picture, for windows whose text no reader could get.
     @concurrent static func demand(fromImage sendable: FlixSendableImage, appName: String?) async -> FlixWindowDemand? {
-        guard isAvailable, SystemLanguageModel.default.capabilities.contains(.vision) else { return nil }
+        guard FlixAIRouting.engine(for: .windowPicture) == .appleIntelligence, isAvailable,
+              SystemLanguageModel.default.capabilities.contains(.vision) else { return nil }
         return await withTimeout {
             let session = LanguageModelSession(model: SystemLanguageModel.default, instructions: instructions)
             let response = try await session.respond(

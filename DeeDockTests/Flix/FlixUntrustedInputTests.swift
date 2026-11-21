@@ -34,10 +34,8 @@ struct FlixUntrustedInputTests {
     }
 
     @Test func modelTotalsThatAreNotFiniteAreDropped() {
-        let document = FlixGeneratedDocument(caption: "Invoice", fileName: "Invoice", dueDate: nil, total: .infinity,
-                                             currency: "EUR", needsSignature: false, isSigned: false)
-        let merged = FlixFileAnalyzer.merge([], with: document, text: "Total 999", pageCount: nil, isPresentation: false)
-        #expect(merged.isEmpty)
+        let document = FlixGeneratedDocument.reading(total: (.infinity, "Total €999"))
+        #expect(FlixDocumentReading.facts(from: document, text: "Total €999", pageCount: nil, isPresentation: false).isEmpty)
     }
 
     // MARK: AI observability

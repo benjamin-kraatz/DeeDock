@@ -19,9 +19,9 @@ nonisolated enum FlixFactValue: Codable, Hashable, Sendable {
 /// Finds key facts in a file's text and metadata without a model: due dates, totals with their
 /// currency, "needs signature" or "signed", "paid" or "auto-debit", and page or slide counts.
 ///
-/// English and German wording. Deterministic and cheap, so it runs for every readable document a
-/// person reads (``readsFacts(contentType:name:)``); Apple Intelligence's structured facts
-/// (`FlixFileAnalyzer.merge`) only fill what this leaves out. Key words count only as whole words
+/// English and German wording only. The fallback: with Apple Intelligence, `FlixDocumentReading`
+/// decides a document's facts instead, and this runs only for documents a person reads
+/// (``readsFacts(contentType:name:)``) when the model is off, unavailable, or gives no answer. Key words count only as whole words
 /// (``wordRanges(of:in:)``): "format" is not "form", "totally" is not "total", "residue" is not "due".
 /// German stems end in `*` and match inside words, since German builds compounds around them
 /// ("Stromrechnung", "Gesamtbetrag", "Zahlungsfälligkeit").

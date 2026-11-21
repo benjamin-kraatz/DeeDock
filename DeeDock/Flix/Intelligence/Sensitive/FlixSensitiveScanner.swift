@@ -98,6 +98,7 @@ nonisolated enum FlixSensitiveScanner {
     /// Apple Intelligence's look at the picture, limited to 12 seconds. Not sent to AI observability:
     /// the input is the person's own picture.
     private static func classify(_ image: CGImage) async -> FlixSensitiveKind? {
+        guard FlixAIRouting.engine(for: .pictureSensitiveCheck) == .appleIntelligence else { return nil }
         let sendable = FlixSendableImage(image: image)
         return await withTaskGroup(of: FlixSensitiveKind??.self) { group in
             group.addTask {

@@ -4,6 +4,19 @@ import Testing
 
 /// Key facts read without a model (English and German), and AI observability's per-call content
 /// opt-out that every Flix Files model call uses.
+extension FlixGeneratedDocument {
+    /// A reading with only the given facts; everything else empty.
+    static func reading(kind: FlixGeneratedDocumentKind = .invoice, due: (String, String)? = nil,
+                        total: (Double, String)? = nil, payment: FlixGeneratedPayment = .none,
+                        paymentEvidence: String? = nil, signature: FlixGeneratedSignature = .none,
+                        signatureEvidence: String? = nil) -> FlixGeneratedDocument {
+        FlixGeneratedDocument(caption: "", fileName: "", kind: kind, payment: payment, paymentEvidence: paymentEvidence,
+                              dueDate: due?.0, dueDateEvidence: due?.1, validUntil: nil, validUntilEvidence: nil,
+                              total: total?.0, totalEvidence: total?.1, signature: signature,
+                              signatureEvidence: signatureEvidence)
+    }
+}
+
 struct FlixFactsAndPrivacyTests {
     private func day(_ year: Int, _ month: Int, _ day: Int) -> Date {
         Calendar(identifier: .gregorian).date(from: DateComponents(year: year, month: month, day: day, hour: 12))!
@@ -41,22 +54,29 @@ struct FlixFactsAndPrivacyTests {
     }
 
     @Test func modelFactsNeedTheTextToBackThem() {
-        let document = FlixGeneratedDocument(caption: "Quote", fileName: "Quote", dueDate: "2026-12-15", total: 9_999,
-                                             currency: "EUR", needsSignature: true, isSigned: false)
-        let merged = FlixFileAnalyzer.merge([.pages(3)], with: document, text: "Quote for packaging, 3 options",
-                                            pageCount: 3, isPresentation: false)
-        // The text names no due date, shows no total, and mentions no signature.
-        #expect(merged == [.pages(3)])
+        let document = FlixGeneratedDocument.reading(due: ("2026-12-15", "Payment due 15 Dec 2026"), total: (9_999, "Total €9,999"),
+                                                     signature: .needed, signatureEvidence: "Please sign")
+        let facts = FlixDocumentReading.facts(from: document, text: "Quote for packaging, 3 options",
+                                              pageCount: 3, isPresentation: false)
+        // None of the evidence is in the text.
+        #expect(facts == [.pages(3)])
     }
 
     /// A data file's timestamp and counts are never a due date and a total (seen on a manifest.json).
     @Test func numbersAndTimestampsInDataAreNotFacts() {
         let manifest = #"{"format": 2, "platform": "mac", "modified": "2026-11-21T09:12:00Z", "totalSize": 16581}"#
-        let document = FlixGeneratedDocument(caption: "Manifest", fileName: "Manifest", dueDate: "2026-11-21", total: 16_581,
-                                             currency: "", needsSignature: false, isSigned: false)
-        #expect(FlixFileAnalyzer.merge([], with: document, text: manifest, pageCount: nil, isPresentation: false).isEmpty)
+        let document = FlixGeneratedDocument.reading(due: ("2026-11-21", "2026-11-21T09:12:00Z"), total: (16_581, "16581"))
+        // The evidence is in the text, but writes no date the patterns read and no currency.
+        #expect(FlixDocumentReading.facts(from: document, text: manifest, pageCount: nil, isPresentation: false).isEmpty)
         #expect(!FlixFactExtractor.readsFacts(contentType: "public.json", name: "manifest.json"))
         #expect(FlixFactExtractor.readsFacts(contentType: "com.adobe.pdf", name: "Invoice.pdf"))
+    }
+
+    /// Cloud calls cost money: only expensive tasks the person asks for may ever leave the Mac.
+    @Test func onlyOnDemandExpensiveTasksMayUseTheCloud() {
+        let cloud = FlixAITask.allCases.filter { FlixAIRouting.engine(for: $0, cloudChosen: true) == .claude }
+        #expect(cloud == [.askRobi])
+        #expect(FlixAITask.allCases.allSatisfy { FlixAIRouting.engine(for: $0) == .appleIntelligence })
     }
 
     // MARK: AI observability

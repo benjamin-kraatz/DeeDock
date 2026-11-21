@@ -47,6 +47,9 @@ nonisolated struct FlixSensitiveDocument: Codable, Sendable {
 /// - **Results**: pushed through ``verdictChanged`` as they arrive; the coordinator writes them into
 ///   the item's annotation (`isSensitive`, `sensitiveReason`), which blurs the row, the tile, and the
 ///   drag picture.
+/// - **Apple Intelligence**: the rules give the first, fast verdict; once the annotation provider
+///   has read a document, its kind settles it (`FlixSensitiveRules.verdict(rules:documentKind:)`,
+///   through ``documentKind`` and ``documentRead(_:)``). The guard never waits for the model.
 /// - **Not Sensitive**: ``markNotSensitive(_:)`` stores the path; it is never flagged again.
 ///
 /// The worker task belongs to the guard and is cancelled by ``stop()`` or by switching the guard
@@ -57,6 +60,9 @@ final class FlixSensitiveGuard {
 
     /// An item's verdict changed: nil means not sensitive.
     var verdictChanged: ((FlixItem.ID, FlixSensitiveKind?) -> Void)?
+    /// What Apple Intelligence read a file as, for the version modified at the given date; nil
+    /// when it hasn't read that version.
+    var documentKind: ((String, Date?) -> FlixDocumentKind?)?
 
     private var document = FlixSensitiveDocument()
     private let file: FlixJSONFile<FlixSensitiveDocument>?
@@ -75,6 +81,8 @@ final class FlixSensitiveGuard {
     /// Paths the worker could not open (gone, unreadable, refused by the policy), with the item date
     /// it tried. Not queued again until the item has a newer date or the policy changes.
     private var unopened: [String: Date] = [:]
+    /// The candidates of the latest update by path, so a reading that lands later finds its item.
+    private var itemsByPath: [String: FlixItem] = [:]
 
     /// - Parameter folder: Where `sensitive.json` lives; nil keeps verdicts in memory.
     init(folder: URL?) {
@@ -102,12 +110,14 @@ final class FlixSensitiveGuard {
         if policy != self.policy { unopened = [:] }
         self.policy = policy
         var added = 0
+        itemsByPath = [:]
         for item in items {
             guard let path = item.path, Self.isCandidate(item) else { continue }
+            itemsByPath[path] = item
             // A cached verdict is reported without touching the disk; only files to check are
             // looked at with the policy (the worker checks it again when it opens them).
             if let entry = document.entries[path] {
-                report(item, kind: document.cleared.contains(path) ? nil : entry.kind)
+                report(item, kind: effectiveVerdict(path, entry))
                 // A file written after its check is checked again; the worker compares the real
                 // modification date off the main actor. Opening a file does not change it.
                 let written = item.activity == .saved || item.activity == .created || item.activity == .downloaded
@@ -126,8 +136,21 @@ final class FlixSensitiveGuard {
 
     /// The current verdict for an item, from memory. Synchronous, for the drag hooks.
     func verdict(for item: FlixItem) -> FlixSensitiveKind? {
-        guard isEnabled, let path = item.path, !document.cleared.contains(path) else { return nil }
-        return document.entries[path]?.kind
+        guard isEnabled, let path = item.path, let entry = document.entries[path] else { return nil }
+        return effectiveVerdict(path, entry)
+    }
+
+    /// Apple Intelligence read the document at `path`: reports the verdict its kind settles.
+    func documentRead(_ path: String) {
+        guard isEnabled, let entry = document.entries[path], let item = itemsByPath[path] else { return }
+        report(item, kind: effectiveVerdict(path, entry))
+    }
+
+    /// The rules' verdict, settled by Apple Intelligence's reading of the same file version, and
+    /// nil for a path marked **Not Sensitive**.
+    private func effectiveVerdict(_ path: String, _ entry: FlixSensitiveDocument.Entry) -> FlixSensitiveKind? {
+        guard !document.cleared.contains(path) else { return nil }
+        return FlixSensitiveRules.verdict(rules: entry.kind, documentKind: documentKind?(path, entry.modified))
     }
 
     /// **Not Sensitive**: the file is never flagged again.
@@ -186,7 +209,7 @@ final class FlixSensitiveGuard {
                 document.entries[path] = outcome
                 document.trim()
                 save()
-                report(item, kind: document.cleared.contains(path) ? nil : outcome.kind)
+                report(item, kind: effectiveVerdict(path, outcome))
             }
             guard let self, workerGeneration == generation else { return }
             worker = nil

@@ -23,6 +23,16 @@ extension FlixCoordinator {
         // Fits this window (phase B1) matches by meaning through the same Lookout window.
         contextServices?.fits.semantic = services.semantic
         let annotations = FlixAnnotationProvider(services: services)
+        // The sensitive guard's rules give a fast first verdict; Apple Intelligence's reading of a
+        // document (its kind) settles it, for the same file version only.
+        if let sensitive = contextServices?.sensitive {
+            sensitive.documentKind = { [weak services] path, modified in
+                guard let record = services?.analyses[path], let modified, let read = record.stamp.modified,
+                      abs(read.timeIntervalSince(modified)) < 0.001 else { return nil }
+                return record.documentKind
+            }
+            annotations.documentRead = { [weak sensitive] path in sensitive?.documentRead(path) }
+        }
         let threads = FlixThreadProvider(services: services)
         let similarity = FlixSimilarityProvider(services: services)
         let memory = FlixDragMemoryProvider(services: services)

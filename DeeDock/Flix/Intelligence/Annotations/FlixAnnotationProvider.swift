@@ -28,6 +28,8 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
     private var worker: Task<Void, Never>?
     /// Each item's path at the last pass, so an analysis follows a rename or move made in Flix Files.
     private var lastPaths: [FlixItem.ID: String] = [:]
+    /// Apple Intelligence read a document at this path: the sensitive guard settles its verdict.
+    var documentRead: ((String) -> Void)?
 
     init(services: FlixSmartServices) {
         self.services = services
@@ -120,9 +122,16 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
 
     private func needsAnalysis(_ item: FlixItem, record: FlixAnalysisRecord?, stamp: FlixFileStamp) -> Bool {
         guard let record, record.stamp == stamp else { return true }
-        guard FlixFileNaming.isCryptic(item.name), FlixLanguageModel.isAvailable else { return false }
+        guard Self.wantsModel(item), FlixLanguageModel.isAvailable else { return false }
         if record.modelFailed { return Date.now.timeIntervalSince(record.analyzedAt) > Self.retryAfter }
-        return !record.usedAppleIntelligence
+        return !record.modelConsidered
+    }
+
+    /// Files Apple Intelligence reads: cryptic names (for a caption) and documents a person reads
+    /// (for their kind and facts).
+    private static func wantsModel(_ item: FlixItem) -> Bool {
+        FlixFileNaming.isCryptic(item.name)
+            || (item.kind == .document && FlixFactExtractor.readsFacts(contentType: item.contentTypeIdentifier, name: item.name))
     }
 
     private func enqueue(_ items: [FlixItem]) {
@@ -160,6 +169,7 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             if analyzed?.caption != nil { Analytics.count(.captionsGenerated) }
             // A file that couldn't be read gets an empty record, so it isn't read again until it changes.
             services.analyses.set(analyzed ?? FlixAnalysisRecord(stamp: stamp, analyzedAt: .now), for: path)
+            if analyzed?.documentKind != nil { documentRead?(path) }
             unshown += 1
             if unshown >= 4 {
                 services.requestRefresh()

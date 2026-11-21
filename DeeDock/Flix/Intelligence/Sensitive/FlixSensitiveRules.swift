@@ -67,6 +67,20 @@ nonisolated enum FlixSensitiveRules {
         "depotauszug", "kontoeröffnung", "account details", "kontodaten",
     ]
 
+    /// The verdict once Apple Intelligence has read the document (`FlixDocumentReading`): its kind
+    /// settles what the text rules can only guess from words. An ID document or a bank or card
+    /// statement is sensitive; a payment document (invoice, receipt, quote, reminder) is not for the
+    /// bank details it prints to be paid. A secret the rules found (a key block, a key file) stays one.
+    /// Without a reading, the rules' verdict stands.
+    static func verdict(rules: FlixSensitiveKind?, documentKind: FlixDocumentKind?) -> FlixSensitiveKind? {
+        guard let documentKind, rules != .secret else { return rules }
+        switch documentKind {
+        case .identityDocument: return .identity
+        case .bankStatement, .cardStatement: return .bank
+        default: return rules == .bank && documentKind.isPaymentDocument ? nil : rules
+        }
+    }
+
     /// The verdict from a file's name alone, before anything is read.
     static func kind(forFileName name: String) -> FlixSensitiveKind? {
         let lower = name.lowercased()

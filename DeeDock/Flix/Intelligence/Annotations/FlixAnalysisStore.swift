@@ -8,7 +8,8 @@ nonisolated struct FlixAnalysisRecord: Codable, Equatable, Sendable {
     /// Bump to analyze every file again after the analysis changes.
     /// 2: no facts from data and code files; key words as whole words; model facts need the text.
     /// 3: the auto-debit fact.
-    static let currentVersion = 3
+    /// 4: Apple Intelligence reads every document and decides its kind and facts.
+    static let currentVersion = 4
 
     var version = FlixAnalysisRecord.currentVersion
     var stamp: FlixFileStamp
@@ -17,8 +18,14 @@ nonisolated struct FlixAnalysisRecord: Codable, Equatable, Sendable {
     /// A safe file name (extension kept) offered as "✦ Rename"; nil when the current name is fine.
     var suggestedName: String?
     var facts: [FlixFactValue] = []
+    /// What the document is, as Apple Intelligence read it; nil without a reading. The sensitive
+    /// guard reads it too.
+    var documentKind: FlixDocumentKind?
     /// Apple Intelligence took part. A record made without it is redone once the model is ready.
     var usedAppleIntelligence = false
+    /// Apple Intelligence was ready when the file was analyzed, whether or not it was asked (a
+    /// document with too little text is not). A record made without it is redone once it is ready.
+    var modelConsidered = false
     /// The model was asked but returned nothing (unavailable, refused, timed out). Not retried for
     /// a day.
     var modelFailed = false

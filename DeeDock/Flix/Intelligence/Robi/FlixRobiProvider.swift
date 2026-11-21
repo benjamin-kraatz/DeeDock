@@ -97,9 +97,12 @@ final class FlixRobiProvider: FlixRobiProviding {
         }
     }
 
+    /// Robi's own setting chooses the engine; ``FlixAIRouting`` confirms Ask Robi may use the cloud
+    /// (an expensive task the person asks for).
     private func model() throws -> RobiAgent.Model {
-        switch store.settings.answerModel {
-        case .onDevice:
+        let cloudChosen = store.settings.answerModel == .claude
+        switch FlixAIRouting.engine(for: .askRobi, cloudChosen: cloudChosen) {
+        case .appleIntelligence:
             if let reason = RobiAgent.onDeviceUnavailableReason { throw Failure.onDeviceUnavailable(String(localized: reason)) }
             return .onDevice
         case .claude:

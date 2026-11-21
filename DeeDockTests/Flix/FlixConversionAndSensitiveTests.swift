@@ -108,6 +108,13 @@ struct FlixConversionAndSensitiveTests {
         #expect(!FlixSensitiveRules.containsValidIBAN("Order DE00 3704 0044 0532 0130 00"))
     }
 
+    /// Apple Intelligence's reading settles the rules' guess; a secret the rules found stays one.
+    @Test func theDocumentKindSettlesTheVerdict() {
+        #expect(FlixSensitiveRules.verdict(rules: .bank, documentKind: .invoice) == nil)
+        #expect(FlixSensitiveRules.verdict(rules: nil, documentKind: .bankStatement) == .bank)
+        #expect(FlixSensitiveRules.verdict(rules: .secret, documentKind: .letter) == .secret)
+    }
+
     @Test func accountWordsAndCardsAreBankDetails() {
         #expect(FlixSensitiveRules.kind(forText: "Account number 12345678\nRouting number 021000021") == .bank)
         #expect(FlixSensitiveRules.kind(forText: "Card 4111 1111 1111 1111 exp 12/29") == .bank)
