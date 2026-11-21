@@ -5,7 +5,8 @@ import Foundation
 /// A plain value so the rules are testable without a store. Invariants after every mutation:
 /// - one item per ``FlixItem/key`` (path or page);
 /// - `items` sorted by `date`, newest first, then by key (``precedes(_:_:)``);
-/// - at most ``capacity`` items, flagged items exempt; at most ``noiseCapacity`` noise items;
+/// - at most ``capacity`` items in all, never dropping a flagged one; at most ``noiseCapacity``
+///   unflagged noise items;
 /// - an item removed from Flix Files comes back only with an event newer than its removal;
 /// - after Clear History, no event dated at or before the clear is recorded (``clearedAt``);
 /// - a file row's download page is set only by ``attachVerifiedSource(_:toPath:)``, never from an
@@ -67,15 +68,24 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
                 changed = true
             }
         }
+        let added: FlixItem?
         if let index = items.firstIndex(where: { $0.key == key }) {
             let item = Self.merged(items[index], with: event)
             guard item != items[index] else { return changed }
             items.remove(at: index)
             insertSorted(item)
+            added = nil
         } else {
-            insertSorted(Self.newItem(from: event))
+            let item = Self.newItem(from: event)
+            insertSorted(item)
+            added = item
         }
-        enforceCapacity()
+        // The caps held before this event, and a merge keeps the item's path and flag, so only a new
+        // item can break one: a noise item the noise cap, any item the total. Checking only then
+        // keeps a single event from running the noise rules over the whole history.
+        if let added, items.count > Self.capacity || FlixNoiseRules.isNoise(path: added.path) {
+            enforceCapacity()
+        }
         return true
     }
 
@@ -274,20 +284,22 @@ nonisolated struct FlixHistoryDocument: Codable, Equatable, Sendable {
         items.insert(item, at: index)
     }
 
+    /// Keeps at most ``capacity`` items in all and ``noiseCapacity`` unflagged noise items, dropping
+    /// the oldest unflagged ones. Flagged items are always kept and take their place in the total.
+    /// One pass, newest first.
     private mutating func enforceCapacity() {
+        let flagged = items.count(where: \.isFlagged)
+        let unflaggedRoom = max(0, Self.capacity - flagged)
         var noise = 0
-        var kept = 0
+        var unflagged = 0
         items = items.filter { item in
             if item.isFlagged { return true }
             if FlixNoiseRules.isNoise(path: item.path) {
                 noise += 1
-                return noise <= Self.noiseCapacity
+                guard noise <= Self.noiseCapacity else { return false }
             }
-            kept += 1
-            return kept <= Self.capacity
-        }
-        while items.count > Self.capacity, let index = items.lastIndex(where: { !$0.isFlagged }) {
-            items.remove(at: index)
+            unflagged += 1
+            return unflagged <= unflaggedRoom
         }
     }
 

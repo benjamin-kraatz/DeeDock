@@ -85,10 +85,14 @@ struct FlixHistoryTests {
         var document = FlixHistoryDocument()
         document.record(event("/old/flagged.pdf", at: -1))
         document.setFlagged(true, for: Set(document.items.map(\.id)))
-        for index in 0..<(FlixHistoryDocument.capacity + 5) {
+        // Filled in one batch: one by one, 5,000 events take minutes in a debug build. The last few
+        // arrive singly, so the single-event path enforces the cap too.
+        let capacity = FlixHistoryDocument.capacity
+        document.record(batch: (0..<capacity).map { event("/many/\($0).pdf", at: TimeInterval($0)) })
+        for index in capacity..<(capacity + 5) {
             document.record(event("/many/\(index).pdf", at: TimeInterval(index)))
         }
-        #expect(document.items.count == FlixHistoryDocument.capacity + 1)
+        #expect(document.items.count == FlixHistoryDocument.capacity)
         #expect(document.items.contains { $0.path == "/old/flagged.pdf" })
         #expect(!document.items.contains { $0.path == "/many/0.pdf" })
         #expect(document.items.first?.path == "/many/\(FlixHistoryDocument.capacity + 4).pdf")
