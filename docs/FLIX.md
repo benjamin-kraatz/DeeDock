@@ -427,7 +427,7 @@ macOS reports no button press, and the picker is gone when its destruction is re
 ### Limits and what was not exercised
 
 - The identifiers (`open-panel`, `save-panel`, `OKButton`, `CancelButton`, `ListView`, `ColumnView`, `where popup`, `PathTextField`) are macOS's private structure, proven by two probes on macOS 27. Another macOS version may change them; Flix Pick then finds nothing or falls back to dragging.
-- Not exercised: pickers in Chrome and Electron apps, row selection in column and icon view (Go to Folder is used, and confirming is skipped), multiple displays and displays with negative origins, full-screen apps, and Spaces. Nothing of Flix Pick has run in the app yet; the routes and timings come from the probes.
+- Not exercised: pickers in Chrome and Electron apps, row selection in column and icon view (Go to Folder is used, and confirming is skipped), multiple displays and displays with negative origins, full-screen apps, and Spaces. The rest passed hands-on acceptance on macOS 27 (2026-11-21).
 - Keyboard closes are not learned; a Save picker's folder is learned only from a mouse press on its Save button (or Flix Pick's own) while its rows show where it is, so a save into an empty folder is not learned.
 - Context from the window behind the picker (the document it belongs to) is not read: that would mean reading a window that is not a picker. The purple reason comes from Flix Files' Threads instead.
 - A file in a protected folder DOKK may not read is never checked for existence, so a deleted one can still be listed; Go to Folder then fails and the footer says to drag instead.

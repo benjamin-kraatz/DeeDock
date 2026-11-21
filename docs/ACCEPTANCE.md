@@ -3941,34 +3941,35 @@ Built on `codex/dee-163-flix-files` after the approved mockup `docs/mockups/flix
 - Learning from the picker's close: Flix Pick's own confirm, a press on `OKButton`, or a double-click in the list counts; Cancel never does; keyboard closes are unknown. Stored in `memory.json` with drag memory, capped, cleared by **Forget**.
 - The panel: non-activating, never key, Tuck rail that opens on hover, flips to the picker's left at the screen edge, follows the picker, the ⋯ menu (**Not in**, **Flix Pick Settings…**), Reduce Motion and Reduce Transparency paths, VoiceOver actions on every row.
 - Settings → Flix Files → **Flix Pick**: the switch (on), the Accessibility note, and the hidden apps with **Show Again**.
-- Analytics: `flix_pick_shown`, `flix_pick_used`, `flix_pick_picker_closed`, `flix_pick_disabled_for_app`, and `shows_flix_pick` and `flix_pick_excluded_app_count` in `setting_changed`; categories and counts only ([ANALYTICS.md](ANALYTICS.md#flix-files)).
+- Analytics: `flix_pick_shown`, `flix_pick_used`, `flix_pick_picker_closed`, `flix_pick_disabled_for_app`, `flix_pick_expanded`, `flix_pick_settings_opened`, `flix_pick_no_candidates`, `flix_drag_memory_forgotten` (**Forget**), and `shows_flix_pick` and `flix_pick_excluded_app_count` in `setting_changed`; categories and counts only ([ANALYTICS.md](ANALYTICS.md#flix-files)).
 
 #### Validation status
 
 - `xcodebuild … build` and `… build-for-testing` (scheme DeeDock, Debug) with an isolated derived-data folder: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix Pick or the files it touched.
 - Two tests in `DeeDockTests/Flix/FlixPickTests.swift` compile, **not run**: the rail flipping to the picker's left at the screen edge, and earlier picks outranking a file opened a minute ago.
-- The app was not launched. Nothing below has been seen on screen.
+- Hands-on acceptance below passed on macOS 27 (Benn, 2026-11-21), except the line of setups no probe covered.
+- Fixed during hands-on: reopening a picker with the pointer resting where the rail appears crashed DOKK (AppKit's "Update Constraints in Window" loop). Hover is now reported after the layout pass, the window moves only when its frame changes and never forces a display, and the hosting view sits in a plain container.
 
 #### Hands-on acceptance
 
-- [ ] Pages, File › Open: the rail appears to the right of the picker within a moment, its top 8 points below the picker's top, with Pages documents only. Hover opens it with names, coloured reasons, places, and times; leaving closes it.
-- [ ] Click a row whose file is in the folder the picker shows: it is selected without anything flashing. Click one elsewhere: Go to Folder flashes and the file is selected. Pages stays in front, and typing goes to the picker.
-- [ ] ⌥-click and double-click a row: the file opens. Hold ⌥ for a while before letting go: nothing is typed until it is released.
-- [ ] Pages, File › Save (a sheet): folders are listed; click one and the picker goes there with the typed name kept; ⌥-click saves there.
-- [ ] Drag a row into the picker: it goes to the file.
-- [ ] Move the picker by its toolbar: the rail follows. Move it to the right screen edge and reopen it: the rail is on its left and opens away from it.
-- [ ] Open a file through Flix Pick twice, then reopen the picker: the row says **Picked here 2×** in green and moves up. Pick a file in the picker itself with the Open button: it is counted too. Cancel: nothing is counted. **Forget** in Settings clears the counts.
-- [ ] ⋯ › **Not in Pages**: the rail disappears and stays away in Pages; Settings lists Pages with **Show Again**, which brings it back.
-- [ ] Turn off Accessibility for DOKK: no rail anywhere, and the Settings card shows the note. Turn off Flix Pick or Flix Files: no rail.
-- [ ] A password field focused in another app's sheet (Secure Event Input): a click on a row says to drag instead.
-- [ ] Go to Folder: click a row in another folder and switch apps right after the click; nothing is typed into the new app. Check which of `AXConfirm`, the sheet's default button, and the guarded Return the macOS 27 Go to Folder sheet ends up using (in that order); with Return, edit the field or click elsewhere in the instant before it would be posted, and the sheet stays open with the path typed instead.
-- [ ] Open picker with ⌘-click selecting two files, ⌥-click one of them on the rail: only that file opens. Save picker on an empty folder, ⌥-click a folder row with the same name elsewhere: the picker goes there and Save is not pressed.
-- [ ] Save picker with the name field emptied, ⌥-click a folder, then Cancel: nothing is learned for that folder.
-- [ ] Switch away from the app with the picker open: the rail hides, and comes back when you return. Change the display arrangement: it hides.
-- [ ] Reduce Motion: the rail fades in and opens without a slide or spring. Reduce Transparency: a solid panel. VoiceOver: each row reads its name, reason, and place, and offers Select in Picker and Open (or Go There and Save Here).
-- [ ] DOKK's own Open panels (Settings → Add Folder…): no rail.
+- [x] Pages, File › Open: the rail appears to the right of the picker within a moment, its top 8 points below the picker's top, with Pages documents only. Hover opens it with names, coloured reasons, places, and times; leaving closes it.
+- [x] Click a row whose file is in the folder the picker shows: it is selected without anything flashing. Click one elsewhere: Go to Folder flashes and the file is selected. Pages stays in front, and typing goes to the picker.
+- [x] ⌥-click and double-click a row: the file opens. Hold ⌥ for a while before letting go: nothing is typed until it is released.
+- [x] Pages, File › Save (a sheet): folders are listed; click one and the picker goes there with the typed name kept; ⌥-click saves there.
+- [x] Drag a row into the picker: it goes to the file.
+- [x] Move the picker by its toolbar: the rail follows. Move it to the right screen edge and reopen it: the rail is on its left and opens away from it.
+- [x] Open a file through Flix Pick twice, then reopen the picker: the row says **Picked here 2×** in green and moves up. Pick a file in the picker itself with the Open button: it is counted too. Cancel: nothing is counted. **Forget** in Settings clears the counts.
+- [x] ⋯ › **Not in Pages**: the rail disappears and stays away in Pages; Settings lists Pages with **Show Again**, which brings it back.
+- [x] Turn off Accessibility for DOKK: no rail anywhere, and the Settings card shows the note. Turn off Flix Pick or Flix Files: no rail.
+- [x] A password field focused in another app's sheet (Secure Event Input): a click on a row says to drag instead.
+- [x] Go to Folder: click a row in another folder and switch apps right after the click; nothing is typed into the new app. Check which of `AXConfirm`, the sheet's default button, and the guarded Return the macOS 27 Go to Folder sheet ends up using (in that order); with Return, edit the field or click elsewhere in the instant before it would be posted, and the sheet stays open with the path typed instead.
+- [x] Open picker with ⌘-click selecting two files, ⌥-click one of them on the rail: only that file opens. Save picker on an empty folder, ⌥-click a folder row with the same name elsewhere: the picker goes there and Save is not pressed.
+- [x] Save picker with the name field emptied, ⌥-click a folder, then Cancel: nothing is learned for that folder.
+- [x] Switch away from the app with the picker open: the rail hides, and comes back when you return. Change the display arrangement: it hides.
+- [x] Reduce Motion: the rail fades in and opens without a slide or spring. Reduce Transparency: a solid panel. VoiceOver: each row reads its name, reason, and place, and offers Select in Picker and Open (or Go There and Save Here).
+- [x] DOKK's own Open panels (Settings → Add Folder…): no rail.
 - [ ] Not yet covered by any probe: Chrome and Electron pickers, the column and icon views (a click should still go to the file; ⌥-click should not press Open), a picker on a second display or one with a negative origin, and a picker over a full-screen app.
-- [ ] With the debug menu's sending on: `flix_pick_shown`, `flix_pick_used` with `route` and `trigger`, and `flix_pick_picker_closed` with `outcome`, and no app name, path, or file name anywhere.
+- [x] With the debug menu's sending on: `flix_pick_shown`, `flix_pick_used` with `route` and `trigger`, and `flix_pick_picker_closed` with `outcome`, and no app name, path, or file name anywhere.
 
 #### Polish pass
 
@@ -3983,11 +3984,11 @@ A visual and interaction pass over the panel and the Settings card, against the 
 
 Validation: `xcodebuild -scheme DeeDock -configuration Debug -derivedDataPath <isolated folder> build` ended with `** BUILD SUCCEEDED **`, with no warnings in the files touched. No tests were run and the app was not launched. The views were drawn off screen from the debug build with the preview data (both appearances, English and German, solid surface) to check layout, alignment, colours, and truncation. That does not show Liquid Glass, any animation, or hover.
 
-- [ ] Closed rail: the logo and the icons share one centre line; nothing of the text shows through.
-- [ ] Hover: the rail springs open with a slight settle, the text follows a moment later, and the hovered row's highlight grows with the rail. Leave: the text goes first, then the rail closes; nothing jumps when the window narrows.
-- [ ] A picker opening: the rail slides in from the picker's side (from the right when it sits on the picker's left) and fades; a picker closing: it fades away.
-- [ ] Click a row: it dips and tints for a moment, and stays tinted while Go to Folder runs. Drag a row: it dims until the drag ends.
-- [ ] Light and dark appearance over a bright and a dark window: names, reasons, and the footer stay readable on the glass.
-- [ ] Reduce Motion: no slide, spring, or dip; the width changes at once and the text fades. Reduce Transparency: a solid body with the same corner and hairline.
-- [ ] German: the footer shows all three hints beside an Open picker without clipping.
-- [ ] Settings → Flix Files → **Flix Pick**: the card lines up with its neighbours, in both appearances.
+- [x] Closed rail: the logo and the icons share one centre line; nothing of the text shows through.
+- [x] Hover: the rail springs open with a slight settle, the text follows a moment later, and the hovered row's highlight grows with the rail. Leave: the text goes first, then the rail closes; nothing jumps when the window narrows.
+- [x] A picker opening: the rail slides in from the picker's side (from the right when it sits on the picker's left) and fades; a picker closing: it fades away.
+- [x] Click a row: it dips and tints for a moment, and stays tinted while Go to Folder runs. Drag a row: it dims until the drag ends.
+- [x] Light and dark appearance over a bright and a dark window: names, reasons, and the footer stay readable on the glass.
+- [x] Reduce Motion: no slide, spring, or dip; the width changes at once and the text fades. Reduce Transparency: a solid body with the same corner and hairline.
+- [x] German: the footer shows all three hints beside an Open picker without clipping.
+- [x] Settings → Flix Files → **Flix Pick**: the card lines up with its neighbours, in both appearances.
