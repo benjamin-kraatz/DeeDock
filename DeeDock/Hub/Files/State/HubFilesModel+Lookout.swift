@@ -157,6 +157,9 @@ extension HubFilesModel {
             Analytics.track(LookoutAnalytics.opened(hit, section: .weak, rank: index + 1, scope: analyticsSearchScope,
                                                     isLookup: results.isLookup))
         }
+        if !isPictureSearch, let index = results.all.firstIndex(where: { $0.path == hit.path }) {
+            logLookoutSearch(opened: .init(source: "lookout", path: hit.path, rank: index + 1, lookoutRank: index + 1))
+        }
         endLookoutSearchSession()
         let url = hit.fileItem.url
         if hit.isFolder {
@@ -183,6 +186,10 @@ extension HubFilesModel {
     /// compare. Called by `openSearchResult`.
     func trackNameResultOpenedForLookout(_ item: HubFileItem) {
         guard isLookoutActive, let index = searchResults.firstIndex(where: { $0.url == item.url }) else { return }
+        // Lookout lists real paths (/private/var, not /var).
+        let path = FolderSelection.realPath(item.url.path)
+        logLookoutSearch(opened: .init(source: "name", path: path, rank: index + 1,
+                                       lookoutRank: lookoutResults.all.firstIndex { $0.path == path }.map { $0 + 1 }))
         Analytics.track(LookoutAnalytics.openedName(rank: index + 1, scope: analyticsSearchScope,
                                                     isLookup: lookoutResults.isLookup))
     }
@@ -193,9 +200,23 @@ extension HubFilesModel {
     /// showed last: hits or the honest empty state. Once per search; nothing when Lookout is off or its final
     /// results hadn't arrived. Callers run this before the query's results are cleared.
     func endLookoutSearchSession() {
+        logLookoutSearch(opened: nil)
         guard !lookoutSearchCounted, isLookoutActive,
               let counter = LookoutAnalytics.searchCounter(phase: lookoutPhase, results: lookoutResults) else { return }
         lookoutSearchCounted = true
         Analytics.count(counter)
+    }
+
+    /// Writes the current search to the developer click log (`LookoutClickLog`) once: with what was opened, or as
+    /// ended when `opened` is nil. Nothing without the log, in a search with a picture, or before Lookout listed
+    /// anything for the words.
+    private func logLookoutSearch(opened: LookoutClickRecord.Opened?) {
+        guard let log = lookout.clickLog, !lookoutSearchLogged, isLookoutActive, !isPictureSearch,
+              !trimmedQuery.isEmpty, lookoutPhase != .idle, lookoutPhase != .unavailable else { return }
+        lookoutSearchLogged = true
+        log.record(LookoutClickRecord(
+            event: opened == nil ? "end" : "open", query: trimmedQuery, scope: resolvedSearchScope, phase: lookoutPhase,
+            results: lookoutResults, names: searchResults.map(\.url), weakExpanded: lookoutWeakExpanded,
+            opened: opened))
     }
 }
