@@ -3,9 +3,8 @@ import UniformTypeIdentifiers
 
 /// Scores how well one history item answers one thing a window asks for.
 ///
-/// ``FlixKeywordFitScorer`` is the only scorer today. The protocol exists so a scorer backed by
-/// Lookout's embeddings can replace it once Lookout exposes text and file vectors (planned with
-/// phase B2's accessors); ``FlixFitRanker`` does not care which one it gets.
+/// ``FlixKeywordFitScorer`` matches words. ``FlixBlendedFitScorer`` adds meaning from Lookout's
+/// vectors on top of it when Lookout runs; ``FlixFitRanker`` does not care which one it gets.
 nonisolated protocol FlixFitScoring: Sendable {
     /// 0 means unrelated, 1 a certain match. The ranker keeps scores of at least
     /// ``FlixFitRanker/minimumScore``.
@@ -18,6 +17,41 @@ nonisolated struct FlixFitCandidate: Sendable {
     var item: FlixItem
     var caption: String?
     var facts: [String] = []
+}
+
+/// Keyword scores raised by Lookout's sense of meaning, for "Fits this window" while Lookout runs.
+///
+/// `FlixFitsProvider` embeds each wanted phrase once (`FlixSemanticIndex.embed(_:)`), compares it
+/// with the candidates' text-averaged file vectors, and keeps only the files that stand out
+/// (`FlixSemanticScoring.ranked`, with ``floor`` and ``minimumZ``). Those similarities, mapped to 0…1
+/// between ``floor`` and ``strong``, are blended with the keyword score as
+/// `max(keyword, 0.6 × meaning + 0.4 × keyword)`: a file that matches by words keeps its score, and
+/// one that matches only by meaning passes the ranker's 0.5 bar only when its similarity is near
+/// ``strong``. Picture vectors are left out: text-to-picture similarities run on another scale. The
+/// numbers are first guesses, like those in `FlixSemanticScoring`; `docs/FLIX.md` lists the checks.
+nonisolated struct FlixBlendedFitScorer: FlixFitScoring {
+    /// Below this cosine a phrase and a file are unrelated.
+    static let floor: Float = 0.30
+    /// At this cosine the meaning alone is a match.
+    static let strong: Float = 0.55
+    /// Standard deviations above the candidates' mean a file must stand.
+    static let minimumZ: Float = 1.0
+    static let meaningWeight = 0.6
+
+    let keyword: any FlixFitScoring
+    /// Meaning scores (0…1) by wanted phrase, then item. Items missing scored nothing by meaning.
+    let meaning: [String: [FlixItem.ID: Double]]
+
+    func score(_ wanted: FlixWindowDemand.Wanted, item: FlixFitCandidate, now: Date) -> Double {
+        let words = keyword.score(wanted, item: item, now: now)
+        guard let meaning = meaning[wanted.phrase]?[item.item.id] else { return words }
+        return min(1, max(words, Self.meaningWeight * meaning + (1 - Self.meaningWeight) * words))
+    }
+
+    /// A cosine similarity as a 0…1 meaning score.
+    static func normalized(_ cosine: Float) -> Double {
+        Double(min(1, max(0, (cosine - floor) / (strong - floor))))
+    }
 }
 
 /// Name, caption, folder, and source overlap with the window's words.

@@ -171,6 +171,8 @@ nonisolated struct FlixSmartFilterProposal: Equatable, Sendable {
     var filter: FlixSmartFilter
     /// Human-readable rules ("Location contains `Oak & Ash`"), Markdown.
     var ruleDescriptions: [String]
+    /// Apple Intelligence wrote it; false: the rules alone.
+    var generatedByModel = false
 }
 
 nonisolated enum FlixSmartFilterDraftState: Equatable, Sendable {
@@ -217,6 +219,8 @@ nonisolated struct FlixDragPlan: Equatable, Sendable {
     var substitutions: [FlixItem.ID: URL] = [:]
     /// The ghost label, such as "✦ Upload as PDF · 2 converted".
     var label: String?
+    /// How long the slowest of the carried conversions took to make, in milliseconds.
+    var convertMs: Int?
 }
 
 /// A question to ask before items leave for another app.
@@ -227,7 +231,8 @@ nonisolated enum FlixDropConfirmation: Equatable, Sendable {
     case newerVersion(itemID: FlixItem.ID, newerID: FlixItem.ID)
 }
 
-/// How each engine is doing, for Settings' "What powers it" rows.
+/// How each engine is doing, for Settings' "What powers it" rows. `FlixEngineMonitor` keeps
+/// `FlixIntelligence.engines` current.
 nonisolated struct FlixEngineStatus: Equatable, Sendable {
     nonisolated enum State: Equatable, Sendable {
         /// Not installed in this build (phase A) or not supported on this Mac.
@@ -240,4 +245,6 @@ nonisolated struct FlixEngineStatus: Equatable, Sendable {
     var lookout: State = .unavailable
     var appleIntelligence: State = .unavailable
     var robi: State = .unavailable
+    /// Robi's settings choose Apple Intelligence on this Mac, which needs no key; false: Claude.
+    var robiOnDevice = false
 }

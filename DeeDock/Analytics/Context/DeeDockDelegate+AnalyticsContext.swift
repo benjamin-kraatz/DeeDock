@@ -38,6 +38,7 @@ extension DeeDockDelegate {
             checksAutomatically: updater.automaticallyChecksForUpdates,
             installsAutomatically: updater.automaticallyInstallsUpdates,
             installsWhenIdle: updater.awareness.installWhenIdle)
+        inputs.flix = coordinator.flix.analyticsProfile
         return inputs
     }
 }

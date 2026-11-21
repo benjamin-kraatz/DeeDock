@@ -22,7 +22,7 @@ final class FlixIntelligence {
     var settings = FlixSettings() {
         didSet { if settings != oldValue { clearDisabledSlots() } }
     }
-    /// Settings' "What powers it" rows. Phase B keeps it current.
+    /// Settings' "What powers it" rows, kept current by `FlixEngineMonitor`.
     var engines = FlixEngineStatus()
 
     private(set) var fits: FlixFitsState = .hidden
@@ -34,13 +34,19 @@ final class FlixIntelligence {
     private(set) var threads: [FlixThread] = []
     private(set) var annotations: [FlixItem.ID: FlixItemAnnotation] = [:]
     private(set) var morning: FlixMorningCard?
-    private(set) var moreLikeThis: FlixMoreLikeThis?
+    private(set) var moreLikeThis: FlixMoreLikeThis? {
+        didSet { if moreLikeThis != oldValue { metrics?.moreLikeThisChanged(from: oldValue, to: moreLikeThis) } }
+    }
     private(set) var smartFilterDraft: FlixSmartFilterDraftState = .idle
     private(set) var tidy: [FlixTidySuggestion] = []
     private(set) var robi: FlixRobiAnswerState = .idle
     private(set) var filterTip: FlixFilterTip?
     /// A banner such as "✦ Flix noticed: PDFs go to portal.example.com".
     var notice: String?
+    /// How the last plain-words search was understood, for `flix_search_ended`. Nil before one.
+    private(set) var searchReport: FlixSearchReport?
+    /// The open visit's tracker, set by the coordinator. Nil in previews and tests.
+    @ObservationIgnored weak var metrics: FlixSessionMetrics?
 
     @ObservationIgnored private var fitsTask: Task<Void, Never>?
     @ObservationIgnored private var tileTask: Task<Void, Never>?
@@ -70,6 +76,8 @@ final class FlixIntelligence {
     var robiAnswersOnDevice: Bool { providers.robi?.answersOnDevice ?? false }
     var canShowMoreLikeThis: Bool { providers.similarity != nil }
     var hasThreads: Bool { settings.groupsThreads && !threads.isEmpty }
+    /// Lookout runs and answers searches by meaning (from ``engines``).
+    var lookoutAvailable: Bool { if case .ready = engines.lookout { true } else { false } }
 
     func annotation(for id: FlixItem.ID) -> FlixItemAnnotation? {
         settings.writesCaptions || settings.guardsSensitiveFiles ? annotations[id] : nil
@@ -151,8 +159,18 @@ final class FlixIntelligence {
                 self.fits = .reading(windowLabel: label, chain: chain)
             }
             guard let self, generation == token, !Task.isCancelled else { return }
-            fits = result.map(FlixFitsState.ready) ?? .hidden
+            fits = result.map { .ready(self.withMemory($0, context: context, items: items)) } ?? .hidden
         }
+    }
+
+    /// Adds drag memory's "↺ you've sent PDFs here before" to fits that lack a reason.
+    private func withMemory(_ result: FlixFitsResult, context: FlixFrontmostContext, items: [FlixItem]) -> FlixFitsResult {
+        var result = result
+        for index in result.fits.indices where result.fits[index].memory == nil {
+            let id = result.fits[index].itemID
+            result.fits[index].memory = items.first { $0.id == id }.flatMap { dragReason(for: $0, context: context) }
+        }
+        return result
     }
 
     /// The window in front changed while the panel is closed: refreshes the tile pill.
@@ -230,6 +248,7 @@ final class FlixIntelligence {
         queryTask = Task { [weak self] in
             let result = await provider.understand(trimmed, items: items, now: now)
             guard let self, !Task.isCancelled else { return }
+            searchReport = provider.lastReport
             query = result.map { .understood(tokens: $0.tokens, matches: $0.matches) } ?? .idle
         }
     }
@@ -237,6 +256,7 @@ final class FlixIntelligence {
     /// Removes one understood token; the search widens.
     func removeToken(_ id: FlixQueryToken.ID) {
         guard case .understood(var tokens, _) = query else { return }
+        if let removed = tokens.first(where: { $0.id == id }) { metrics?.searchTokenRemoved(removed.rule.analyticsTokenType) }
         tokens.removeAll { $0.id == id }
         query = tokens.isEmpty ? .idle : .understood(tokens: tokens, matches: nil)
     }
@@ -293,21 +313,33 @@ final class FlixIntelligence {
         }
     }
 
-    func ask(_ question: String, about items: [FlixItem]) {
+    /// Asks Robi. `token` says which question it was (a suggestion's position or typed) for
+    /// `flix_robi_asked`, which reports only that, the selection's kinds, the latency, and the result.
+    func ask(_ question: String, about items: [FlixItem], question token: AnalyticsFlixRobiQuestion = .typed) {
         robiTask?.cancel()
         guard let provider = providers.robi, !items.isEmpty else { return }
         robi = .answering(question: question, text: "")
+        let started = ContinuousClock.now
+        let report = { (result: AnalyticsFlixRobiResult) in
+            Analytics.track(.flixRobiAsked(AnalyticsFlixRobi(
+                question: token, selectionCount: items.count, itemKinds: items.analyticsKinds,
+                latencyMs: Int((ContinuousClock.now - started) / .milliseconds(1)), result: result)))
+        }
         robiTask = Task { [weak self] in
             var text = ""
             do {
                 for try await chunk in provider.answer(question, about: items) {
-                    guard !Task.isCancelled else { return }
+                    guard !Task.isCancelled else { return report(.cancelled) }
                     text += chunk
                     self?.robi = .answering(question: question, text: text)
                 }
+                // A cancelled stream ends quietly instead of throwing.
+                guard !Task.isCancelled else { return report(.cancelled) }
                 self?.robi = .answered(question: question, text: text)
+                report(.answered)
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, !(error is CancellationError) else { return report(.cancelled) }
+                if case FlixRobiProvider.Failure.needsKey = error { report(.noKey) } else { report(.failed) }
                 self?.robi = .failed(question: question, message: error.localizedDescription)
             }
         }

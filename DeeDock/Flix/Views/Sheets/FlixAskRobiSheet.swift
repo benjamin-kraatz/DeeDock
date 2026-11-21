@@ -16,8 +16,8 @@ struct FlixAskRobiSheet: View {
             state.sheet = nil
         }
         HStack(spacing: 6) {
-            ForEach(state.intelligence.robiQuestions(for: items), id: \.self) { suggestion in
-                Button { ask(suggestion) } label: { Text(verbatim: suggestion) }
+            ForEach(Array(state.intelligence.robiQuestions(for: items).enumerated()), id: \.element) { index, suggestion in
+                Button { ask(suggestion, suggestion: index) } label: { Text(verbatim: suggestion) }
                     .buttonStyle(.bordered)
                     .clipShape(.capsule)
             }
@@ -26,7 +26,7 @@ struct FlixAskRobiSheet: View {
         TextField(text: $question) { Text(.flixAskRobiPlaceholder) }
             .textFieldStyle(.roundedBorder)
             .focused($focused)
-            .onSubmit { ask(question) }
+            .onSubmit { ask(question, suggestion: nil) }
             .onAppear { focused = true }
         answer
         Label { Text(privacy) } icon: { Image(systemName: "lock.fill") }
@@ -55,9 +55,10 @@ struct FlixAskRobiSheet: View {
         }
     }
 
-    private func ask(_ text: String) {
+    /// - Parameter suggestion: The suggested question's position, nil for a typed one.
+    private func ask(_ text: String, suggestion: Int?) {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
-        state.intelligence.ask(trimmed, about: items)
+        state.ask(trimmed, about: items, suggestionIndex: suggestion)
     }
 }

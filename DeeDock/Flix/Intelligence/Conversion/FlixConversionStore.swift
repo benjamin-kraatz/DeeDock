@@ -10,6 +10,8 @@ nonisolated struct FlixPreparedConversion: Equatable, Sendable {
     /// The original's modification date when it was converted; a newer original makes the copy stale.
     var sourceModified: Date?
     var createdAt: Date
+    /// How long making the copy took, in milliseconds.
+    var durationMs = 0
 }
 
 /// Converted copies for uploads, prepared before a drag starts.
@@ -92,6 +94,7 @@ final class FlixConversionStore {
             let destination = folder.appending(path: String(UUID().uuidString.prefix(8)), directoryHint: .isDirectory)
             let modified = Self.modified(key.path)
             running[key] = Task(priority: .utility) { [weak self] in
+                let started = ContinuousClock.now
                 // `convert` is `@concurrent`, so the work leaves the main actor; cancelling this task
                 // cancels it too.
                 let result = try? await FlixFileConverter.convert(source, type: type, recipe: key.recipe, name: name,
@@ -99,8 +102,10 @@ final class FlixConversionStore {
                 guard let self else { return }
                 running[key] = nil
                 if let result, !Task.isCancelled {
+                    let elapsed = ContinuousClock.now - started
                     ready[key] = FlixPreparedConversion(url: result.url, bytes: result.bytes, recipe: key.recipe,
-                                                        sourceModified: modified, createdAt: .now)
+                                                        sourceModified: modified, createdAt: .now,
+                                                        durationMs: Int(elapsed / .milliseconds(1)))
                     version += 1
                 }
                 startWaiting()

@@ -14,8 +14,10 @@ struct FlixIntelligenceCard: View {
                           readyLabel: { detail in detail.map { .flixEngineOnFolders($0) } ?? .flixEngineOn })
             FlixEngineRow(title: .flixReaderAppleIntelligence, subtitle: .flixEngineAppleIntelligenceHelp,
                           state: engines.appleIntelligence, readyLabel: { _ in .flixEngineAvailable })
-            FlixEngineRow(title: .flixEngineRobi, subtitle: .flixEngineRobiHelp, state: engines.robi,
-                          readyLabel: { _ in .flixEngineReady })
+            FlixEngineRow(title: .flixEngineRobi,
+                          subtitle: engines.robiOnDevice ? .flixEngineRobiHelpOnDevice : .flixEngineRobiHelp,
+                          state: engines.robi,
+                          readyLabel: { _ in engines.robiOnDevice ? .flixEngineRobiOnDevice : .flixEngineRobiClaude })
         }
         SettingsCard {
             SettingsToggleRow(title: .flixSettingsFrontWindow, subtitle: .flixSettingsFrontWindowHelp,

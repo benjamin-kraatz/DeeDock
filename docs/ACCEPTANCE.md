@@ -3657,24 +3657,26 @@ The first hands-on run found that the orb took no clicks or drags: Liquid Glass 
 
 ## DEE-163 Flix Files
 
-Phase A, built on `codex/dee-163-flix-files` after the confirmed mockups `docs/mockups/flix-files-v2.html` and `docs/mockups/flix-files-ai.html`. Architecture, privacy, and limits are in [FLIX.md](FLIX.md).
+Built on `codex/dee-163-flix-files` after the confirmed mockups `docs/mockups/flix-files-v2.html` and `docs/mockups/flix-files-ai.html`, in four phases: A (foundation and the full UI), B1 (window reading, conversions, sensitive guard, web links), B2 (intelligence), and C (analytics and the integration between B1 and B2). B1 and B2 were built on their own branches and merged here. Architecture, privacy, analytics, and limits are in [FLIX.md](FLIX.md). None of the four phases has been exercised on screen; every checklist below is open.
 
-### Implemented
+### Phase A: foundation and UI
+
+#### Implemented
 
 - History with merge, dedupe, tombstones, a 5,000-item cap that spares flagged items, a separate noise cap, and debounced JSON files in `DDock/Flix/` (`Flix-dev/` for development builds).
 - Sources: Spotlight recents including folders, FSEvents on allowed watched folders (downloads with their page, screenshots, new and saved files), app activations. Rule-based noise.
 - Dock tile with live thumbnail, unseen badge, ✦ pill slot, plain drag of the newest item, Option-drag to reorder, file drops kept. Optional menu bar item.
 - Panel anchored above the tile or at the pointer (⌃⌥⌘F, configurable), sidebar, grouped list, rows, cards, sheets, dialogs, footer toast with Undo, context menu, keyboard, multi-select, drag out with stepping aside, drops on Favorites and the panel.
 - Every ✦ surface wired to `FlixIntelligence` slots, hidden while no provider is installed.
-- Settings → Flix Files with the shortcut recorder, watched folders and explicit access, web links and intelligence switches (saved for phases B1 and B2), history clearing, and a privacy note. Discovery tip.
+- Settings → Flix Files with the shortcut recorder, watched folders and explicit access, web links and intelligence switches (which phases B1 and B2 act on), history clearing, and a privacy note. Discovery tip.
 
-### Validation status
+#### Validation status
 
 - `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix files.
 - `DeeDockTests/Flix/` compiles: settings defaults and decoding, history merge, removal, cap, partial downloads, unseen count, persistence and recovery, storage folders, download-page stripping, noise rules, Smart Filter rules, sidebar filters, time sections, the shortcut recorder rules and conflicts, the list builder's noise, search, and versions, panel placement on displays with negative origins, and the read policy. **The tests have not been run.**
 - The app was not launched. Nothing below has been exercised on screen.
 
-### Hands-on acceptance
+#### Hands-on acceptance
 
 - [ ] On a fresh install, the Flix Files tile appears after the Notification Feed and Harbor tiles, shows the newest item, and survives a relaunch with its position.
 - [ ] Take a screenshot with a watched Desktop allowed: the tile pops, the badge counts 1, and opening the panel clears it.
@@ -3703,7 +3705,7 @@ Phase A, built on `codex/dee-163-flix-files` after the confirmed mockups `docs/m
 
 ### Phase B1: window reading, conversions, sensitive guard, web links
 
-Built on `codex/dee-163-b1`. How each part works, the per-browser table, and the limits are in [FLIX.md](FLIX.md#window-reading-and-fits-this-window).
+Built on `codex/dee-163-b1` and merged. How each part works, the per-browser table, and the limits are in [FLIX.md](FLIX.md#window-reading-and-fits-this-window).
 
 #### Validation status
 
@@ -3738,15 +3740,15 @@ Built on `codex/dee-163-b1`. How each part works, the per-browser table, and the
 
 ### Phase B2: intelligence
 
-Built on `codex/dee-163-b2`: search in plain words, Threads, captions, rename suggestions, key facts, folder suggestions, versions, Tidy, Smart Filters from a sentence with the filter tip, Where were you?, More like this, drag memory, and Ask Robi, with Lookout accessors and AI observability's per-call content opt-out. Details in [FLIX.md](FLIX.md#phase-b2-intelligence).
+Built on `codex/dee-163-b2` and merged: search in plain words, Threads, captions, rename suggestions, key facts, folder suggestions, versions, Tidy, Smart Filters from a sentence with the filter tip, Where were you?, More like this, drag memory, and Ask Robi, with Lookout accessors and AI observability's per-call content opt-out. Details in [FLIX.md](FLIX.md#phase-b2-intelligence).
 
-Validation status:
+#### Validation status
 
 - `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix, Lookout, Robi, or AI observability files.
 - New tests in `DeeDockTests/Flix/` compile: rule-based query parsing in English and German, search matching with totals, captions, and Lookout paths, cryptic names, rename sanitizing and collisions, version families and ranks, Thread clustering without Lookout, Thread identity overlap, drag memory counts and the filter tip, fact extraction from text and metadata, model facts checked against the text, and the content opt-out. **The tests have not been run.**
 - The app was not launched. No Apple Intelligence or Claude call, no Lookout query, and no file reading has been exercised.
 
-Hands-on acceptance:
+#### Hands-on acceptance
 
 - [ ] With Apple Intelligence on, take a screenshot of an error: within a minute its row shows a caption instead of "New screenshot" and a **✦ Rename** pill; renaming keeps `.png`.
 - [ ] Download an invoice PDF into an allowed Downloads: chips show its due date and total; with a Finance folder in the history, **✦ Move to Finance** appears. A file in a folder DOKK may not read gets no caption and causes no prompt.
@@ -3762,3 +3764,26 @@ Hands-on acceptance:
 - [ ] Open files in one folder three mornings: one filter tip appears in the sidebar, once.
 - [ ] Ask Robi with Claude and a key: suggested questions fit the selection, the answer streams, and closing the sheet stops it. With Claude and no key: the sheet says to add one. With the on-device model: the privacy line says nothing leaves the Mac. PostHog's `$ai_generation` for `flix_ask_robi` and every `flix_*` span has no `$ai_input` or `$ai_output_choices`.
 - [ ] Turning off captions, Threads, folder suggestions, or drag memory hides that surface at once and stops its background work. No reading or model call happens while a drag is in progress.
+
+### Phase C: analytics and integration
+
+Analytics after the approved spec: `flix_session_ended` once per open, `flix_drop`, `flix_search_ended`, `flix_fits_computed`, `flix_tidy`, `flix_suggestion_acted`, `flix_smart_filter_created` and `_removed`, `flix_thread_used`, `flix_morning_card`, `flix_more_like_this`, `flix_robi_asked`, `flix_sensitive_marked_safe`, `flix_versions_expanded`, `flix_link_saved`, `flix_folder_access`, `flix_shortcut_registration`, `flix_tip_shown` and `flix_tip_acted`, `setting_changed` with `area = flix`, 21 `usage_summary` counters, and ten `flix_*` person properties (PostHog only). Integration: Fits this window matches by meaning through Lookout and breaks ties with drag memory, the Robi row in Settings follows Robi's chosen model, the engine rows follow Lookout, Apple Intelligence, and Robi as they change, and a sensitive item's drag image is blurred. Details in [FLIX.md](FLIX.md#analytics) and [ANALYTICS.md](ANALYTICS.md#flix-files).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-C`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix or Analytics files.
+- New tests in `DeeDockTests/Flix/FlixAnalyticsTests.swift` compile, **not run**: event names and properties, kinds listed once, no file name in a payload, app categories, page kinds, folders, credential counting, shortcut tokens and their grammar, settings reduced to counts and tokens, item kinds and events, the first action and outcome rules, Fits acceptance, ISO weekdays, one session per open with a search visit inside it, meaning scores in Fits, and drag memory's tie-break.
+- The app was not launched. No event has been sent, and nothing has been checked in PostHog.
+
+#### Hands-on acceptance
+
+- [ ] With the debug menu's sending on, open the panel with ⌃⌥⌘F, drag a row into a browser, and check PostHog's DOKK project: one `flix_session_ended` (`trigger = shortcut`, `outcome = dragged_out`, a rank and section for the first action, `keyboard_only = false`) and one `flix_drop` with the browser's category and no name, path, host, or title anywhere.
+- [ ] Open and close the panel ten times by the tile, the shortcut, the menu bar item, and Discovery: exactly ten `flix_session_ended` with the matching `trigger` and `placement`, and the close reasons `escape`, `clicked_away`, and `shortcut_toggle` where nothing was done.
+- [ ] Search "contract sent last week", remove a token, and open a result: `flix_search_ended` with `query_word_count = 4`, the token types, `tokens_removed`, the parser, and `outcome = opened`; the sentence appears nowhere.
+- [ ] Drag a sensitive file into a browser and **Cancel**, then answer **Send Anyway** and drag again: one `flix_drop` with `warning_resolution = cancel` and no target, then one with `send_anyway` and a target.
+- [ ] Record a new shortcut: `setting_changed` (`area = flix`) for `shortcut_customized` and `shortcut_combo`, and `flix_shortcut_registration` with the new combo token. Add a watched folder: `watched_folder_count` changes, no path.
+- [ ] After a day, `usage_summary` carries the `flix_*` counters, including `flix_open_latency_ms_sum`, `_count`, `_max` and the window-read triple; the person profile has the ten `flix_*` properties.
+- [ ] `$ai_generation` events from Flix Files (`flix_caption_*`, `flix_search_understand`, `flix_thread_name`, `flix_smart_filter`, `flix_morning`, `flix_ask_robi`) carry no `$ai_input` or `$ai_output_choices`; the window interpreter and the sensitive scanner send none.
+- [ ] With Lookout reading a folder of contracts, a window asking for "the signed agreement" suggests a scanned contract whose name shares no word with it; with Lookout off, only name matches appear.
+- [ ] Settings → Flix Files → What powers it: with Robi on the on-device model and no key, the Robi row says **On this Mac**; switching Robi to Claude without a key changes it to **Not set up** at once, and saving a key to **Claude**. Turning Lookout off or on updates its row without reopening Settings.
+- [ ] Drag a blurred (sensitive) row and the tile when its newest item is sensitive: the drag picture is blurred with a lock.

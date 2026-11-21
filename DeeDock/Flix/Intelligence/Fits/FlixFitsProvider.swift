@@ -8,8 +8,12 @@ import AppKit
 /// - **Understanding**: Apple Intelligence turns the text (or the picture) into a
 ///   ``FlixWindowDemand``; without it, or when it fails or times out, ``FlixDemandFallbackParser``.
 ///   The tile never uses a model or a capture: Accessibility text and the plain rules only.
-/// - **Matching**: ``FlixFitRanker`` with a ``FlixFitScoring`` (keyword overlap today; Lookout's
-///   embeddings can replace it behind the same protocol).
+/// - **Matching**: ``FlixFitRanker`` with ``FlixKeywordFitScorer``; for the panel, while Lookout runs,
+///   ``FlixBlendedFitScorer`` adds meaning from Lookout's vectors (``semantic``). Drag memory's guess
+///   (``likelyItem``) wins ties. The tile's count matches words only: it never runs a model.
+/// - **Reporting**: each panel reading ends with ``computed`` (`flix_fits_computed`: reader, word
+///   counts, what the window asked for, matches, time), and the time the window read took goes to
+///   the `flix_window_read_ms_*` counters. Never the text.
 ///
 /// Readings are cached per ``FlixWindowKey`` (app, window number, accessibility title), so opening
 /// the panel again on the same window only re-ranks, and a new page or conversation reads afresh.
@@ -24,6 +28,9 @@ final class FlixFitsProvider: FlixFitsProviding {
         /// False for the tile's Accessibility-only reading, which the panel replaces.
         var isComplete: Bool
         var date: Date
+        var reader: AnalyticsFlixReader = .accessibility
+        var accessibilityWords = 0
+        var recognizedWords = 0
     }
 
     private let reader: FlixWindowReader
@@ -39,6 +46,12 @@ final class FlixFitsProvider: FlixFitsProviding {
     var browserPage: (FlixFrontmostContext) async -> FlixBrowserPage? = { _ in nil }
     /// A window's demand is known, with the items picked for it. Conversions are prepared here.
     var demandReady: ((FlixFrontmostContext, FlixWindowDemand, [FlixItem.ID]) -> Void)?
+    /// Lookout, for matching by meaning. Nil (or Lookout off) matches words only.
+    var semantic: FlixSemanticIndex?
+    /// Drag memory's guess for the window in front, which wins ties.
+    var likelyItem: (FlixFrontmostContext, [FlixItem]) -> FlixItem.ID? = { _, _ in nil }
+    /// A panel reading finished, with what `flix_fits_computed` reports.
+    var computed: ((AnalyticsFlixFits) -> Void)?
 
     init(scorer: any FlixFitScoring = FlixKeywordFitScorer()) {
         reader = FlixWindowReader()
@@ -49,26 +62,35 @@ final class FlixFitsProvider: FlixFitsProviding {
 
     func fits(for context: FlixFrontmostContext, candidates: [FlixItem],
               progress: @escaping @MainActor (String, FlixReaderChain) -> Void) async -> FlixFitsResult? {
+        let started = ContinuousClock.now
         let key = await reader.key(for: context)
         guard !Task.isCancelled else { return nil }
         let entry: Entry
         if let cached = cache[key], cached.isComplete {
             entry = cached
+            // The window's reading and Apple Intelligence's interpretation are reused.
+            Analytics.count(.aiCacheHits)
         } else {
             var label = Self.label(for: context, title: key.title)
             progress(label, FlixReaderChain())
             if let page = await browserPage(context) { label = page.host }
             guard !Task.isCancelled else { return nil }
+            let readStarted = ContinuousClock.now
             let reading = await reader.read(context) { chain in progress(label, chain) }
             guard !Task.isCancelled else { return nil }
+            Analytics.countTiming(sum: .windowReadSum, count: .windowReadCount, max: .windowReadMax,
+                                  milliseconds: Self.milliseconds(since: readStarted))
             let demand = await interpret(reading, context: context)
             guard !Task.isCancelled else { return nil }
-            entry = Entry(demand: demand, chain: reading.chain, label: label, isComplete: true, date: .now)
+            entry = Entry(demand: demand, chain: reading.chain, label: label, isComplete: true, date: .now,
+                          reader: Self.reader(for: reading), accessibilityWords: reading.accessibilityWords,
+                          recognizedWords: reading.recognizedWords)
             store(entry, for: key)
         }
-        let ranked = await rank(entry.demand, candidates: candidates)
+        let ranked = await rank(entry.demand, candidates: candidates, context: context, byMeaning: true)
         guard !Task.isCancelled else { return nil }
         demandReady?(context, entry.demand, ranked.map(\.itemID))
+        report(entry, context: context, matches: ranked.count, readyMs: Self.milliseconds(since: started))
         guard !ranked.isEmpty else { return nil }
         return FlixFitsResult(windowLabel: entry.label, chain: entry.chain,
                               fits: ranked.map { FlixFit(itemID: $0.itemID, phrase: $0.phrase) },
@@ -88,7 +110,7 @@ final class FlixFitsProvider: FlixFitsProviding {
             store(Entry(demand: demand, chain: FlixReaderChain(steps: [.accessibility], succeeded: true),
                         label: Self.label(for: context, title: key.title), isComplete: false, date: .now), for: key)
         }
-        let ranked = await rank(demand, candidates: candidates)
+        let ranked = await rank(demand, candidates: candidates, context: context, byMeaning: false)
         guard !Task.isCancelled else { return nil }
         demandReady?(context, demand, ranked.map(\.itemID))
         return ranked.isEmpty ? nil : ranked.count
@@ -130,17 +152,73 @@ final class FlixFitsProvider: FlixFitsProviding {
         return result
     }
 
-    private func rank(_ demand: FlixWindowDemand, candidates items: [FlixItem]) async -> [FlixFitRanker.Ranked] {
+    /// Ranks the candidates for `demand`. `byMeaning` adds Lookout's meaning scores, which costs one
+    /// text embedding per wanted phrase; the tile's count passes false.
+    private func rank(_ demand: FlixWindowDemand, candidates items: [FlixItem], context: FlixFrontmostContext,
+                      byMeaning: Bool) async -> [FlixFitRanker.Ranked] {
         guard !demand.wanted.isEmpty else { return [] }
         let candidates = items.prefix(FlixFitRanker.candidateLimit).compactMap { item -> FlixFitCandidate? in
             let annotation = annotation(item.id)
             if annotation?.isNoise ?? FlixNoiseRules.isNoise(path: item.path) { return nil }
             return FlixFitCandidate(item: item, caption: annotation?.caption, facts: annotation?.facts.map(\.text) ?? [])
         }
-        let scorer = scorer
+        let meaning = byMeaning ? await meaningScores(for: demand, candidates: candidates) : [:]
+        guard !Task.isCancelled else { return [] }
+        let scorer: any FlixFitScoring = meaning.isEmpty ? scorer : FlixBlendedFitScorer(keyword: scorer, meaning: meaning)
+        let preferred = likelyItem(context, candidates.map(\.item))
         return await Task.detached(priority: .userInitiated) {
-            FlixFitRanker.rank(demand: demand, candidates: candidates, scorer: scorer, now: .now)
+            FlixFitRanker.rank(demand: demand, candidates: candidates, scorer: scorer, now: .now, preferred: preferred)
         }.value
+    }
+
+    /// Lookout's meaning scores by wanted phrase and item: only files whose text-averaged vector
+    /// stands out from the rest. Empty while Lookout is off or has no vectors for these files.
+    private func meaningScores(for demand: FlixWindowDemand, candidates: [FlixFitCandidate]) async
+        -> [String: [FlixItem.ID: Double]] {
+        guard let semantic, semantic.isAvailable else { return [:] }
+        let vectors = await semantic.vectors(for: candidates.compactMap(\.item.path))
+        let pool = candidates.compactMap { candidate -> (id: FlixItem.ID, vector: [Float])? in
+            guard let path = candidate.item.path, let vector = vectors[path], !vector.isPicture else { return nil }
+            return (candidate.item.id, vector.vector)
+        }
+        guard !pool.isEmpty else { return [:] }
+        var scores: [String: [FlixItem.ID: Double]] = [:]
+        for wanted in demand.wanted where scores[wanted.phrase] == nil {
+            guard !Task.isCancelled, let query = await semantic.embed(wanted.phrase) else { continue }
+            let ranked = FlixSemanticScoring.ranked(query, against: pool, floor: FlixBlendedFitScorer.floor,
+                                                    minimumZ: FlixBlendedFitScorer.minimumZ, limit: 12)
+            scores[wanted.phrase] = Dictionary(ranked.map { ($0.id, FlixBlendedFitScorer.normalized($0.score)) },
+                                               uniquingKeysWith: { Swift.max($0, $1) })
+        }
+        return scores
+    }
+
+    /// Sends one panel reading's `flix_fits_computed`.
+    private func report(_ entry: Entry, context: FlixFrontmostContext, matches: Int, readyMs: Int) {
+        let category = FlixAppCategory.of(context)
+        let demand = entry.demand
+        computed?(AnalyticsFlixFits(
+            reader: entry.reader, stepsTried: entry.chain.steps.count, axWords: entry.accessibilityWords,
+            ocrWords: entry.recognizedWords, intentItems: demand.wanted.count, hasTypeLimit: !demand.acceptedTypes.isEmpty,
+            hasSizeLimit: demand.maximumBytes != nil, matches: matches, readyMs: readyMs, frontCategory: category,
+            pageKind: category == .browser ? AnalyticsFlixPageKind(demand.pageKind) : nil))
+    }
+
+    /// Which reader produced the text: the step that succeeded, the picture for Apple Intelligence,
+    /// none when every step found too little, or no permission when no step could run.
+    static func reader(for reading: FlixWindowReading) -> AnalyticsFlixReader {
+        guard let last = reading.chain.steps.last else { return .noPermission }
+        if last == .appleIntelligence, reading.image != nil { return .appleIntelligenceImage }
+        guard reading.chain.succeeded else { return .none }
+        switch last {
+        case .accessibility: return .accessibility
+        case .vision: return .vision
+        case .appleIntelligence: return .appleIntelligenceImage
+        }
+    }
+
+    static func milliseconds(since start: ContinuousClock.Instant) -> Int {
+        Int((ContinuousClock.now - start) / .milliseconds(1))
     }
 
     private func store(_ entry: Entry, for key: FlixWindowKey) {

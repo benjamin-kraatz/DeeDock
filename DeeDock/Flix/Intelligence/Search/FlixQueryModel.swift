@@ -33,8 +33,14 @@ enum FlixQueryModel {
     static let timeout: Duration = .milliseconds(3_500)
 
     static func understand(_ sentence: String) async -> FlixQueryUnderstanding {
+        await understandReporting(sentence).understanding
+    }
+
+    /// ``understand(_:)``, also saying whether Apple Intelligence's answer was used (false: the rules
+    /// alone, because the model is off, failed, or ran out of time).
+    static func understandReporting(_ sentence: String) async -> (understanding: FlixQueryUnderstanding, usedModel: Bool) {
         let rules = FlixQueryParser.parse(sentence)
-        guard FlixLanguageModel.isAvailable else { return rules }
+        guard FlixLanguageModel.isAvailable else { return (rules, false) }
         let instructions = """
             You turn a sentence typed into the search field of Flix Files, a list of the person's recent files, into search fields. \
             The sentence may be English or German. Fill only what the sentence says; never invent names, folders, sites or amounts. \
@@ -43,8 +49,8 @@ enum FlixQueryModel {
         guard let generated = await FlixLanguageModel.generate(FlixGeneratedQuery.self, span: "flix_search_understand",
                                                                instructions: instructions,
                                                                prompt: "Sentence: \"\(sentence)\"",
-                                                               maximumTokens: 160, timeout: timeout) else { return rules }
-        return merge(generated, rules: rules, sentence: sentence)
+                                                               maximumTokens: 160, timeout: timeout) else { return (rules, false) }
+        return (merge(generated, rules: rules, sentence: sentence), true)
     }
 
     /// The model's fields that the sentence backs, completed by the rules.

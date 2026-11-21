@@ -20,6 +20,8 @@ extension FlixCoordinator {
             self?.readPolicy ?? FlixReadPolicy(allowedRoots: [])
         }
         services.load()
+        // Fits this window (phase B1) matches by meaning through the same Lookout window.
+        contextServices?.fits.semantic = services.semantic
         let annotations = FlixAnnotationProvider(services: services)
         let threads = FlixThreadProvider(services: services)
         let similarity = FlixSimilarityProvider(services: services)
@@ -39,7 +41,12 @@ extension FlixCoordinator {
         intelligence.providers.robi = robi.map { FlixRobiProvider(store: $0, services: services) }
         intelligence.providers.dragMemory = memory
 
+        // Settings' "What powers it" follows Lookout, Apple Intelligence, and Robi as they change.
+        let engines = FlixEngineMonitor(intelligence: intelligence, lookout: lookout, robi: robi)
+        engines.start()
+
         stopProviders.append {
+            engines.stop()
             annotations.stop()
             threads.stop()
             similarity.stop()

@@ -65,7 +65,8 @@ final class FlixSmartFilterProvider: FlixSmartFilterGenerating {
         guard !Task.isCancelled else { return nil }
         return FlixSmartFilterProposal(filter: filter,
                                        ruleDescriptions: FlixSmartFilterBuilder.descriptions(for: filter,
-                                                                                             byMeaning: services.semantic.isAvailable))
+                                                                                             byMeaning: services.semantic.isAvailable),
+                                       generatedByModel: name != nil)
     }
 
     private func generate(_ sentence: String) async -> FlixGeneratedFilter? {

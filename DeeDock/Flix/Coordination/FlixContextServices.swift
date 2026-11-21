@@ -40,6 +40,11 @@ final class FlixContextServices {
         fits.annotation = { [weak intelligence] id in intelligence?.annotations[id] }
         fits.browserPage = { [weak self] context in await self?.links.page(for: context) }
         fits.demandReady = { [weak self] context, demand, fitIDs in self?.prepareConversions(context, demand, fitIDs) }
+        fits.likelyItem = { [weak intelligence] context, items in intelligence?.likelyItem(for: context, among: items) }
+        fits.computed = { [weak coordinator] report in
+            Analytics.track(.flixFitsComputed(report))
+            coordinator?.metrics.fitsRead(reader: report.reader, readyMs: report.readyMs, shown: report.matches)
+        }
         interceptor.demand = { [weak self] context in self?.fits.demand(for: context) }
         interceptor.destinationLabel = { [weak self] context in
             self?.fits.windowLabel(for: context) ?? context?.applicationName
@@ -159,8 +164,12 @@ final class FlixContextServices {
     private func markNotSensitive(_ id: FlixItem.ID) {
         guard let coordinator, let item = coordinator.history.item(id) else { return }
         sensitive.markNotSensitive(item)
-        coordinator.confirmDrag([id])
-        coordinator.panelState.confirmation = nil
+        Analytics.track(.flixSensitiveMarkedSafe(itemKind: item.analyticsKind))
+        if let pending = coordinator.panelState.confirmation {
+            coordinator.panelState.resolveConfirmation(.sendAnyway, ids: pending.itemIDs)
+        } else {
+            coordinator.confirmDrag([id])
+        }
         coordinator.panelState.showToast(String(localized: .flixToastMarkedNotSensitive(
             String(localized: .flixLabelQuoted(item.name)))))
     }

@@ -14,6 +14,7 @@ import Foundation
 @MainActor
 final class FlixSearchProvider: FlixSearchProviding {
     private let services: FlixSmartServices
+    private(set) var lastReport: FlixSearchReport?
 
     init(services: FlixSmartServices) {
         self.services = services
@@ -26,7 +27,11 @@ final class FlixSearchProvider: FlixSearchProviding {
 
     func understand(_ text: String, items: [FlixItem], now: Date) async
         -> (tokens: [FlixQueryToken], matches: [FlixItem.ID: FlixMatchKind]?)? {
-        let understanding = await FlixQueryModel.understand(text)
+        let started = ContinuousClock.now
+        let (understanding, usedModel) = await FlixQueryModel.understandReporting(text)
+        lastReport = FlixSearchReport(parser: usedModel ? .appleIntelligence : .rules,
+                                      parseMs: Int((ContinuousClock.now - started) / .milliseconds(1)),
+                                      lookoutAvailable: services.semantic.isAvailable)
         guard !Task.isCancelled, !understanding.isEmpty else { return nil }
         let topicOnly = understanding == FlixQueryUnderstanding(topic: understanding.topic)
         if topicOnly, FlixWords.words(understanding.topic ?? "").count < 2, !services.semantic.isAvailable { return nil }

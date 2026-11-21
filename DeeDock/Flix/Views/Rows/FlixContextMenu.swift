@@ -99,12 +99,12 @@ final class FlixContextMenu: NSObject {
     @objc private func askRobi() { state.askRobi(items) }
     @objc private func moreLikeThis() { if let first = items.first { state.showMoreLikeThis(first) } }
     @objc private func renameSuggested() {
-        guard let item = items.first, let name = state.intelligence.annotation(for: item.id)?.renameSuggestion else { return }
-        state.rename(item, to: name)
+        guard let item = items.first else { return }
+        state.renameToSuggestion(item)
     }
     @objc private func moveSuggested() {
-        guard let item = items.first, let folder = state.intelligence.annotation(for: item.id)?.folderSuggestion else { return }
-        state.move([item], into: URL(fileURLWithPath: folder))
+        guard let item = items.first else { return }
+        state.moveToSuggestedFolder(item)
     }
     @objc private func showThread() { if let first = items.first { state.showThread(of: first) } }
     @objc private func rename() { if let first = items.first { state.sheet = .rename(first.id) } }

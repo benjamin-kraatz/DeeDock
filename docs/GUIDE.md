@@ -445,6 +445,8 @@ Reduce Motion replaces the springs with crossfades. Reduce Transparency draws a 
 
 When the panel opens, Flix Files reads the window that was in front and shows **✦ Fits portal.example.com** at the top of the list: up to three items, each with the window's own words ("asks for “the signed contract”"). The label on the right says how the window was read: **read via Accessibility**, or **~~Accessibility~~ → Vision** when the window's text was not available and Flix Files recognized the text in a picture of that one window, or **→ Apple Intelligence** when Apple Intelligence looked at the picture itself. The card shimmers while it reads and disappears when the window asks for nothing. Opening the panel again on the same window reuses the reading; a new page or conversation is read afresh.
 
+Suggestions match the window's words against names, captions, folders, and download pages. With Lookout set up, they also match by meaning: a file Lookout has read can fit even when its name shares no word with the window. When two files fit equally well, the kind you sent to this app before comes first, and a row says "↺ you've sent PDFs here before".
+
 Flix Files needs Accessibility permission to read a window's text and Screen Recording for the picture; without them it skips those readers and never asks. Apple Intelligence understands what the window asks for when it is available; otherwise plain rules do (request words such as "attach" or "upload", file types, and size limits, in English and German). Turn it off with **Suggest files for the window in front**; **Show "fits here" on the tile** controls the tile's pill, which uses only the window's accessibility text and plain rules, never a picture or a model.
 
 ### Uploads that fit
@@ -453,7 +455,7 @@ When the window in front states limits ("PDF only · max 5 MB"), Flix Files prep
 
 ### Sensitive files
 
-With **Sensitive file guard** on, Flix Files checks each file once in the background for an ID or passport, bank details (an IBAN, account and routing numbers, a card), or a key or password file, and blurs its picture in the panel and on the tile. Dragging one into a browser, mail, or chat first asks **Send Anyway**, **Not Sensitive** (never asks about that file again), or **Cancel**; after **Send Anyway**, drag it again. Dragging it into Finder or another app on the Mac asks nothing. Only files Flix Files may read are checked, and nothing leaves the Mac.
+With **Sensitive file guard** on, Flix Files checks each file once in the background for an ID or passport, bank details (an IBAN, account and routing numbers, a card), or a key or password file, and blurs its picture in the panel, on the tile, and under the pointer while you drag it. Dragging one into a browser, mail, or chat first asks **Send Anyway**, **Not Sensitive** (never asks about that file again), or **Cancel**; after **Send Anyway**, drag it again. Dragging it into Finder or another app on the Mac asks nothing. Only files Flix Files may read are checked, and nothing leaves the Mac.
 
 ### Web links
 

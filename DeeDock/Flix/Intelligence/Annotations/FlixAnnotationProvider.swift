@@ -141,9 +141,14 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             guard services.settings.writesCaptions, let item = services.item(id), let path = item.path,
                   services.readPolicy.canRead(path),
                   let stamp = await FlixContentReader.stamps([path])[path] else { continue }
-            guard needsAnalysis(item, record: services.analyses[path], stamp: stamp) else { continue }
+            guard needsAnalysis(item, record: services.analyses[path], stamp: stamp) else {
+                // Read meanwhile (an earlier pass queued it twice): the cached analysis stands.
+                Analytics.count(.aiCacheHits)
+                continue
+            }
             let analyzed = await FlixFileAnalyzer.analyze(item, stamp: stamp, useModel: FlixLanguageModel.isAvailable)
             guard !Task.isCancelled else { break }
+            if analyzed?.caption != nil { Analytics.count(.captionsGenerated) }
             // A file that couldn't be read gets an empty record, so it isn't read again until it changes.
             services.analyses.set(analyzed ?? FlixAnalysisRecord(stamp: stamp, analyzedAt: .now), for: path)
             unshown += 1

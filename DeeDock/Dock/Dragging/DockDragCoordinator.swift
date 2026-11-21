@@ -51,6 +51,10 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
     var deliverToLauncher: ((DocumentResourceAccess, DockPanelController) -> Void)?
     /// Keeps files dropped on a Flix Files tile as items.
     var keepInFlix: (([URL]) -> Void)?
+    /// A Flix Files drag landed on the Shelf, the Trash, or a folder or drive tile, for its drop
+    /// report. Other dock drops of Flix items count as a dock app. Called before the drag source
+    /// hears that the drag ended.
+    var flixDropLanded: ((AnalyticsFlixDropTarget) -> Void)?
     /// Non-empty while the active external drag came out of DeeDock's own Shelf.
     private var shelfSourceIDs: [UUID] = []
     private var sourceBounds = CGRect.zero
@@ -294,16 +298,17 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         }
         if let (id, folder) = folderDestination, id == displayID, let panel = panels[id] {
             let accepted = dropInFolder?(info, folder, panel) ?? false
-            if accepted { completion.committed = true; cancel() }
+            if accepted { reportFlixDrop(.finder); completion.committed = true; cancel() }
             return accepted
         }
         if let (id, volume) = volumeDestination, id == displayID, let panel = panels[id] {
             let accepted = dropInVolume?(info, volume, panel) ?? false
-            if accepted { completion.committed = true; cancel() }
+            if accepted { reportFlixDrop(.finder); completion.committed = true; cancel() }
             return accepted
         }
         if shelfDestinationID == displayID, let access = payload.stageableItems,
            let panel = panels[displayID] {
+            reportFlixDrop(.shelf)
             completion.committed = true
             panel.store.stageOnShelf(access)
             cancel()
@@ -326,6 +331,7 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
                 return true
             }
             guard let access = payload.stageableItems else { return false }
+            reportFlixDrop(.trash)
             completion.committed = true
             panel.store.recycleToTrash(access)
             cancel()
@@ -358,6 +364,12 @@ final class DockDragCoordinator: NSObject, NSDraggingSource {
         completion.committed = true
         if sourceID == nil { cancel() } else { clearFeedback() }
         return success
+    }
+
+    /// Tells Flix Files where its drag landed, when the drag is one of its own.
+    private func reportFlixDrop(_ target: AnalyticsFlixDropTarget) {
+        guard !flixSourceIDs.isEmpty else { return }
+        flixDropLanded?(target)
     }
 
     func exited() {

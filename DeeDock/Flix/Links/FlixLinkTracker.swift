@@ -18,7 +18,9 @@ import CoreGraphics
 /// (``FlixBrowserFamily/tracksAutomatically``) and the window must read as normal, never unknown;
 /// excluded sites (``FlixSiteExclusions``) are skipped. Addresses are cleaned by
 /// ``FlixURLSanitizer``. Only the address, title, browser, and time are stored, one item per
-/// address. Pages are read through Accessibility only when a browser's window title changes
+/// address. Each new link item reports `flix_link_saved` with its trigger and page kind (never the
+/// address); skipped private and excluded pages and removed credentials are counted for
+/// `usage_summary`. Pages are read through Accessibility only when a browser's window title changes
 /// (``FlixFrontWindowObserver``) or a trigger fires; nothing polls. Dwell timers are single sleeping
 /// tasks owned here, cancelled by the next change and by ``stop()``. Main actor.
 @MainActor
@@ -66,7 +68,7 @@ final class FlixLinkTracker {
         let bundle = app.bundleIdentifier
         readTask = Task { [weak self] in
             guard let page = await FlixBrowserPageReader.read(processIdentifier: pid, family: family, bundleIdentifier: bundle),
-                  let self, !Task.isCancelled, canTrack(page) else { return }
+                  let self, !Task.isCancelled, trackable(page) else { return }
             startDwell(on: page, pid: pid, family: family)
         }
     }
@@ -76,9 +78,13 @@ final class FlixLinkTracker {
         guard isTracking else { return }
         let exclusions = FlixSiteExclusions(settings: settings)
         for event in events where event.activity == .downloaded {
-            guard let source = event.sourcePage, let page = FlixURLSanitizer.sanitize(source), !exclusions.excludes(page)
-            else { continue }
-            record(page, title: nil, browser: nil, date: event.date)
+            guard let source = event.sourcePage, let page = FlixURLSanitizer.sanitize(source) else { continue }
+            guard !exclusions.excludes(page) else {
+                Analytics.count(.linksExcludedSkipped)
+                continue
+            }
+            record(page, title: nil, browser: nil, date: event.date, trigger: .downloadSource,
+                   removedSecrets: FlixURLSanitizer.removedSecretCount(source))
         }
     }
 
@@ -92,11 +98,12 @@ final class FlixLinkTracker {
         Task { [weak self] in
             guard let page = await FlixBrowserPageReader.read(processIdentifier: context.processIdentifier, family: family,
                                                               bundleIdentifier: context.bundleIdentifier),
-                  let self, canTrack(page) else { return }
+                  let self, trackable(page) else { return }
             loadIfNeeded()
             relations.record(sent: ids, to: page.url)
             relationsFile?.schedule(relations)
-            record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now)
+            record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now, trigger: .sentTo,
+                   removedSecrets: page.removedSecrets)
         }
     }
 
@@ -118,7 +125,8 @@ final class FlixLinkTracker {
 
     /// **Save this page**.
     func save(_ page: FlixBrowserPage) {
-        record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now)
+        record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now, trigger: .savedButton,
+               removedSecrets: page.removedSecrets)
     }
 
     // MARK: Relation lines
@@ -149,6 +157,20 @@ final class FlixLinkTracker {
         isTracking && page.privacy == .normal && !FlixSiteExclusions(settings: settings).excludes(page.url)
     }
 
+    /// ``canTrack(_:)`` for a page a trigger just read, counting why one is skipped.
+    private func trackable(_ page: FlixBrowserPage) -> Bool {
+        guard isTracking else { return false }
+        if page.privacy != .normal {
+            Analytics.count(.linksPrivateSkipped)
+            return false
+        }
+        if FlixSiteExclusions(settings: settings).excludes(page.url) {
+            Analytics.count(.linksExcludedSkipped)
+            return false
+        }
+        return true
+    }
+
     private func startDwell(on page: FlixBrowserPage, pid: pid_t, family: FlixBrowserFamily) {
         let isDocument = FlixWebDocuments.isWebDocument(page.url)
         let readsPages = settings.tracksPagesYouRead
@@ -158,14 +180,16 @@ final class FlixLinkTracker {
             if isDocument {
                 try? await Task.sleep(for: FlixWebDocuments.dwell)
                 guard let self, !Task.isCancelled, await stillShowing(page, pid: pid, family: family) else { return }
-                record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now)
+                record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now, trigger: .webDocument,
+                       removedSecrets: page.removedSecrets)
                 kept = true
             }
             guard readsPages else { return }
             try? await Task.sleep(for: Self.pagesYouReadDwell - (kept ? FlixWebDocuments.dwell : .zero))
             guard let self, !Task.isCancelled, settings.tracksPagesYouRead, Self.hasRecentInput,
                   await stillShowing(page, pid: pid, family: family) else { return }
-            record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now)
+            record(page.url, title: page.title, browser: page.browserBundleIdentifier, date: .now, trigger: .read,
+                   removedSecrets: kept ? 0 : page.removedSecrets)
         }
     }
 
@@ -182,8 +206,14 @@ final class FlixLinkTracker {
         return CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: any) < recentInput
     }
 
-    private func record(_ url: URL, title: String?, browser: String?, date: Date) {
+    /// Records a page as a link item. A new item reports `flix_link_saved` once; every recording
+    /// counts toward `flix_links_recorded`.
+    private func record(_ url: URL, title: String?, browser: String?, date: Date, trigger: AnalyticsFlixLinkTrigger,
+                        removedSecrets: Int) {
         let existing = history.items.first { $0.link?.url == url }?.link
+        Analytics.count(.linksRecorded)
+        Analytics.count(.linkTokensStripped, by: removedSecrets)
+        if existing == nil { Analytics.track(.flixLinkSaved(trigger, pageKind: AnalyticsFlixPageKind(url: url))) }
         let link = FlixLink(url: url, title: title ?? existing?.title,
                             browserBundleIdentifier: browser ?? existing?.browserBundleIdentifier)
         history.record(FlixActivityEvent(link: link, name: link.title ?? link.host, kind: .link, activity: .link, date: date))

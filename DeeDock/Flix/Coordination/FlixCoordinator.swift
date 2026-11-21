@@ -20,6 +20,8 @@ final class FlixCoordinator {
     let intelligence = FlixIntelligence()
     let tile = FlixTileState()
     let panelState: FlixPanelState
+    /// The open panel visit's analytics (`flix_session_ended` and the visits inside it).
+    @ObservationIgnored let metrics = FlixSessionMetrics()
     /// Whether the shortcut is held. Settings shows a warning while it is not.
     private(set) var shortcutStatus: FlixShortcutStatus = .off
     /// Pauses the shortcut while the Settings recorder listens, so pressing the current combination
@@ -63,6 +65,12 @@ final class FlixCoordinator {
     @ObservationIgnored private var nowTimer: Timer?
     /// Items confirmed by a drop question, so the next drag of them goes ahead. Expires quickly.
     @ObservationIgnored private var confirmedDrag: (ids: Set<FlixItem.ID>, until: Date)?
+    /// When the open in progress was asked for (a tile click or the shortcut), until its first frame.
+    @ObservationIgnored private var openRequestedAt: ContinuousClock.Instant?
+    /// What DOKK's dock said it received from the drag in flight.
+    @ObservationIgnored private var dockDropTarget: AnalyticsFlixDropTarget?
+    /// The last shortcut a registration was reported for, so only changes report again.
+    @ObservationIgnored private var reportedShortcut: FlixShortcutCombo?
     @ObservationIgnored private var lookoutFolders: () -> [String]
     /// Phase B1's window reading, conversions, sensitive guard, and web links. Set by ``live()``;
     /// nil in previews and tests, where Flix Files runs without them.
@@ -76,6 +84,9 @@ final class FlixCoordinator {
         self.history = history
         self.lookoutFolders = lookoutFolders
         panelState = FlixPanelState(history: history, intelligence: intelligence, settingsStore: settings)
+        panelState.metrics = metrics
+        intelligence.metrics = metrics
+        metrics.panel = panelState
     }
 
     /// The live coordinator, reading DOKK's own defaults and Application Support.
@@ -163,8 +174,20 @@ final class FlixCoordinator {
         }
         if shortcut.registered == settings.shortcut { return }
         shortcutStatus = shortcut.start(settings.shortcut) { [weak self] in
-            Analytics.performing(.keyboard) { self?.toggleAtPointer() }
+            Analytics.performing(.keyboard) { self?.toggleAtPointer(trigger: .shortcut) }
         } ? .registered : .unavailable
+        reportShortcutRegistration()
+    }
+
+    /// `flix_shortcut_registration`: at launch only when the combination is taken, and after every
+    /// change of the combination.
+    private func reportShortcutRegistration() {
+        let combo = settings.shortcut
+        let changed = reportedShortcut != nil && reportedShortcut != combo
+        defer { reportedShortcut = combo }
+        guard changed || (reportedShortcut == nil && shortcutStatus == .unavailable) else { return }
+        Analytics.track(.flixShortcutRegistration(shortcutStatus == .registered ? .registered : .unavailable,
+                                                  customized: combo != .default, combo: AnalyticsShortcutCombo(combo)))
     }
 
     private func restartWatcher() {
@@ -177,7 +200,8 @@ final class FlixCoordinator {
 
     private func configurePanelState() {
         spotlight.deliver = { [weak self] events in self?.receive(events) }
-        panelState.close = { [weak self] restore in self?.close(restoreFocus: restore) }
+        // Only Escape asks to restore focus; every other close from the panel hands over to an app.
+        panelState.close = { [weak self] restore in self?.close(restoreFocus: restore, reason: restore ? .escape : .other) }
         panelState.toggleQuickLook = { [weak self] urls in self?.panel?.toggleQuickLook(urls) }
         panelState.quickLookSelectionChanged = { [weak self] urls in self?.panel?.quickLook.update(urls) }
         panelState.sendToShelf = { [weak self] urls in self?.sendToShelf?(urls) ?? false }
@@ -186,7 +210,9 @@ final class FlixCoordinator {
             self?.prepareSettings?()
             self?.close(restoreFocus: false)
         }
-        panelState.beginDrag = { [weak self] ids, view, event in self?.beginDrag(ids, from: view, event: event) }
+        panelState.beginDrag = { [weak self] ids, view, event, origin in
+            self?.beginDrag(ids, from: view, event: event, origin: origin)
+        }
         panelState.confirmDrag = { [weak self] ids in self?.confirmDrag(ids) }
     }
 
@@ -201,8 +227,26 @@ final class FlixCoordinator {
             return true
         }
         guard !kept.isEmpty else { return }
+        countRecorded(kept)
         history.record(kept)
         contextServices?.recorded(kept)
+    }
+
+    /// `usage_summary` counts of what the sources recorded, and how much of it is noise.
+    private func countRecorded(_ events: [FlixActivityEvent]) {
+        for event in events {
+            switch event.activity {
+            case .opened where event.kind == .app: Analytics.count(.itemsApp)
+            case .opened: Analytics.count(.itemsOpened)
+            case .downloaded: Analytics.count(.itemsDownloaded)
+            case .created: Analytics.count(.itemsNew)
+            case .saved, .kept: Analytics.count(.itemsSaved)
+            case .link: break
+            }
+        }
+        if settings.hidesNoise {
+            Analytics.count(.noiseFiltered, by: events.count { FlixNoiseRules.isNoise(path: $0.path) })
+        }
     }
 
     /// An app came to the front. Records the app at most every five minutes, so switching back and
@@ -219,6 +263,7 @@ final class FlixCoordinator {
         let now = Date.now
         if let seen = appSeen[id], now.timeIntervalSince(seen) < 300 { return }
         appSeen[id] = now
+        Analytics.count(.itemsApp)
         history.record(FlixActivityEvent(path: url.path, name: app.localizedName ?? url.deletingPathExtension().lastPathComponent,
                                          kind: .app, activity: .opened, date: now,
                                          contentTypeIdentifier: "com.apple.application-bundle", bundleIdentifier: id))
@@ -238,7 +283,9 @@ final class FlixCoordinator {
         tile.update(newest: newest, unseen: isPanelOpen ? 0 : history.unseenCount(hidingNoise: hiding),
                     sensitive: guarded && (newest.flatMap { intelligence.annotations[$0.id]?.isSensitive } ?? false),
                     policy: readPolicy)
-        tile.fitCount = isPanelOpen ? nil : intelligence.tileFitCount
+        let fitCount = isPanelOpen ? nil : intelligence.tileFitCount
+        if fitCount != nil, fitCount != tile.fitCount { Analytics.count(.fitsPillShown) }
+        tile.fitCount = fitCount
         statusItem?.update()
     }
 
@@ -250,6 +297,7 @@ final class FlixCoordinator {
         requestingAccess = path
         Task { [weak self] in
             let access = await FlixReadPolicy.requestAccess(path)
+            Analytics.track(.flixFolderAccess(access == .allowed ? .granted : .denied, folder: AnalyticsFlixFolder(path: path)))
             guard let self else { return }
             requestingAccess = nil
             settingsStore.setAccess(access, for: path)
@@ -270,40 +318,53 @@ final class FlixCoordinator {
 
     /// A click on a display's tile.
     func toggleFromTile(displayID: String) {
-        if isPanelOpen { close(restoreFocus: true); return }
+        if isPanelOpen { close(restoreFocus: true, reason: .clickedAway); return }
+        let requested = ContinuousClock.now
         guard let (anchor, id) = tileAnchor?(displayID) else { return }
+        if tile.fitCount != nil { Analytics.count(.tileClickedWithPill) }
         let placement = FlixPanelGeometry.anchored(tile: anchor.icon, edge: anchor.edge, visibleFrame: anchor.visibleFrame)
-        open(mode: .anchored, body: placement.body, growth: placement.growth, displayID: id)
+        open(mode: .anchored, body: placement.body, growth: placement.growth, displayID: id,
+             trigger: .tileClick, placement: .tile, requestedAt: requested)
     }
 
     /// The shortcut: at the pointer, newest item selected, keyboard focus in the panel.
-    func toggleAtPointer() {
-        if isPanelOpen { close(restoreFocus: true); return }
+    ///
+    /// - Parameter trigger: What asked; Discovery and menus fall back here when no tile shows.
+    func toggleAtPointer(trigger: AnalyticsFlixTrigger = .shortcut) {
+        if isPanelOpen { close(restoreFocus: true, reason: trigger == .shortcut ? .shortcutToggle : .clickedAway); return }
+        let requested = ContinuousClock.now
         let pointer = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(pointer) }) ?? NSScreen.main else { return }
         let placement = FlixPanelGeometry.atPointer(pointer, visibleFrame: screen.visibleFrame)
-        open(mode: .pointer, body: placement.body, growth: placement.growth, displayID: nil)
+        open(mode: .pointer, body: placement.body, growth: placement.growth, displayID: nil,
+             trigger: trigger, placement: .pointer, requestedAt: trigger == .shortcut ? requested : nil)
     }
 
     /// Opens from Discovery or a menu: anchored when a tile shows, else at the pointer.
-    func openFromAnywhere() {
+    func openFromAnywhere(trigger: AnalyticsFlixTrigger = .discovery) {
         guard !isPanelOpen else { return }
         if showsTile, let (anchor, id) = tileAnchor?(nil) {
             let placement = FlixPanelGeometry.anchored(tile: anchor.icon, edge: anchor.edge, visibleFrame: anchor.visibleFrame)
-            open(mode: .anchored, body: placement.body, growth: placement.growth, displayID: id)
+            open(mode: .anchored, body: placement.body, growth: placement.growth, displayID: id,
+                 trigger: trigger, placement: .tile, requestedAt: nil)
         } else {
-            toggleAtPointer()
+            toggleAtPointer(trigger: trigger)
         }
     }
 
     private func toggleFromMenuBar(_ itemRect: CGRect) {
-        if isPanelOpen { close(restoreFocus: true); return }
+        if isPanelOpen { close(restoreFocus: true, reason: .clickedAway); return }
         guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(itemRect) }) ?? NSScreen.main else { return }
         let placement = FlixPanelGeometry.anchored(tile: itemRect, edge: .top, visibleFrame: screen.visibleFrame)
-        open(mode: .pointer, body: placement.body, growth: placement.growth, displayID: nil)
+        open(mode: .pointer, body: placement.body, growth: placement.growth, displayID: nil,
+             trigger: .menuBar, placement: .menuBar, requestedAt: nil)
     }
 
-    private func open(mode: FlixPanelMode, body: CGRect, growth: FlixGrowthAnchor, displayID: String?) {
+    /// - Parameter requestedAt: When a tile click or the shortcut asked, for the open-latency counters
+    ///   (request → first frame); nil for other routes.
+    private func open(mode: FlixPanelMode, body: CGRect, growth: FlixGrowthAnchor, displayID: String?,
+                      trigger: AnalyticsFlixTrigger, placement: AnalyticsFlixPlacement,
+                      requestedAt: ContinuousClock.Instant?) {
         guard settings.isEnabled else { return }
         // Read before anything can take focus: the window in front is what "Fits" reads.
         previous = previousApplication?() ?? NSWorkspace.shared.frontmostApplication
@@ -311,7 +372,13 @@ final class FlixCoordinator {
         willOpen?(mode)
         let panel = panel ?? makePanel()
         panelState.prepareForOpen(mode: mode, frontmost: context, policy: readPolicy)
+        metrics.begin(trigger: trigger, placement: placement, displayBuiltin: Self.isBuiltIn(body),
+                      front: FlixAppCategory.of(context), unseen: history.unseenCount(hidingNoise: settings.hidesNoise),
+                      listSize: panelState.list.count)
+        if !settings.suggestsForFrontWindow { metrics.fitsRead(reader: .disabled, readyMs: nil, shown: 0) }
+        openRequestedAt = requestedAt
         intelligence.panelOpened(context: context, items: history.items)
+        if intelligence.filterTip != nil { Analytics.track(.flixTipShown(.smartFilter)) }
         contextServices?.panelOpened(context)
         anchoredDisplayID = mode == .anchored ? displayID : nil
         panel.show(body: body, growth: growth)
@@ -332,9 +399,13 @@ final class FlixCoordinator {
         panelState.showToast(notice)
     }
 
-    /// Closes the panel. `restoreFocus` reactivates the app that was in front before it opened.
-    func close(restoreFocus: Bool, animated: Bool = true) {
+    /// Closes the panel. `restoreFocus` reactivates the app that was in front before it opened;
+    /// `reason` is how the visit ended, for its `flix_session_ended`.
+    func close(restoreFocus: Bool, animated: Bool = true, reason: FlixCloseReason = .other) {
         guard let panel, panel.isVisible else { return }
+        // First, while the panel still shows what the visit ended on.
+        metrics.end(reason: reason, pinned: panelState.isPinned)
+        openRequestedAt = nil
         let previous = previous
         self.previous = nil
         let displayID = anchoredDisplayID
@@ -362,16 +433,34 @@ final class FlixCoordinator {
         let controller = FlixPanelController(state: panelState, content: FlixPanelView(state: panelState))
         controller.outsideClick = { [weak self] event in
             guard let self, panelState.drag == nil else { return false }
-            close(restoreFocus: false)
+            close(restoreFocus: false, reason: .clickedAway)
             // A dock click dismisses the panel but must not also reach the tile under it.
             return event?.window is DockPanel
         }
         controller.applicationResigned = { [weak self] in
             guard let self, panelState.drag == nil, panel?.quickLook.isVisible != true else { return }
-            close(restoreFocus: false)
+            close(restoreFocus: false, reason: .clickedAway)
         }
+        controller.pointerPressed = { [weak self] in self?.metrics.pointerPressed() }
+        controller.firstFrame = { [weak self] in self?.recordOpenLatency() }
         panel = controller
         return controller
+    }
+
+    /// The open-latency counters: from the click or shortcut to the panel's first frame.
+    private func recordOpenLatency() {
+        guard let requested = openRequestedAt else { return }
+        openRequestedAt = nil
+        Analytics.countTiming(sum: .openLatencySum, count: .openLatencyCount, max: .openLatencyMax,
+                              milliseconds: Int((ContinuousClock.now - requested) / .milliseconds(1)))
+    }
+
+    /// Whether the display under `body` is the Mac's built-in one.
+    private static func isBuiltIn(_ body: CGRect) -> Bool {
+        let center = CGPoint(x: body.midX, y: body.midY)
+        guard let screen = NSScreen.screens.first(where: { $0.frame.contains(center) }),
+              let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
+        return CGDisplayIsBuiltin(number.uint32Value) != 0
     }
 
     /// Settings' "When Flix Files opens".
@@ -380,9 +469,11 @@ final class FlixCoordinator {
         switch settings.onOpen {
         case .nothing: break
         case .copyNewest:
+            panelState.reportAction(.copy, [newest], origin: .list)
             FlixFileActions.copy([newest])
             panelState.showToast(String(localized: .flixToastCopied(panelState.label(for: [newest]))))
         case .copyNewestPath:
+            panelState.reportAction(.copy, [newest], origin: .list)
             FlixFileActions.copyPaths([newest])
             panelState.showToast(String(localized: .flixToastCopiedPath(1)))
         }
@@ -404,9 +495,11 @@ final class FlixCoordinator {
     /// macOS never tells a drag source where the drop will land, so Flix asks about the window that
     /// was in front when it opened. Answering lets the next drag of the same items go ahead for 30
     /// seconds. Phase B1's conversions replace files on the pasteboard through the plan.
-    func beginDrag(_ ids: [FlixItem.ID], from view: NSView, event: NSEvent) {
+    func beginDrag(_ ids: [FlixItem.ID], from view: NSView, event: NSEvent, origin: FlixActionOrigin = .list) {
         let items = ids.compactMap(history.item)
         guard !items.isEmpty else { return }
+        panelState.dragOrigin = origin
+        panelState.dragFromTile = false
         let set = Set(ids)
         let confirmed = confirmedDrag.map { $0.until > .now && set.isSubset(of: $0.ids) } ?? false
         if !confirmed, let question = intelligence.dropConfirmation(for: items, context: panelState.frontmost) {
@@ -414,13 +507,22 @@ final class FlixCoordinator {
             return
         }
         let plan = intelligence.dragPlan(for: items, context: panelState.frontmost)
-        let icons = Dictionary(uniqueKeysWithValues: items.map { ($0.id, FlixIconProvider.icon(for: $0, policy: readPolicy)) })
+        let icons = Dictionary(uniqueKeysWithValues: items.map {
+            ($0.id, dragIcon(for: $0, base: FlixIconProvider.icon(for: $0, policy: readPolicy)))
+        })
         panelState.drag = FlixDragActivity(itemIDs: ids)
+        dockDropTarget = nil
+        // Read where the first item sits now: the list may change before the drop.
+        let place = panelState.analyticsPlace(of: items[0].id, origin: origin)
+        let warning = panelState.takeAnsweredWarning(for: ids)
         let started = FlixDragSession.begin(items: items, substitutions: plan?.substitutions ?? [:], icons: icons,
                                             label: plan?.label,
                                             from: view, event: event,
                                             moved: { [weak self] point in self?.dragMoved(to: point) },
-                                            ended: { [weak self] accepted, _ in self?.dragEnded(items, accepted: accepted) })
+                                            ended: { [weak self] accepted, point in
+                                                self?.dragEnded(items, accepted: accepted, at: point, plan: plan,
+                                                                place: place, warning: warning)
+                                            })
         if !started { panelState.drag = nil }
     }
 
@@ -435,20 +537,27 @@ final class FlixCoordinator {
         if intelligence.dropConfirmation(for: [newest], context: FlixFrontmostContext.capture(fallback: nil)) != nil,
            confirmedDrag.map({ $0.until > .now && $0.ids.contains(newest.id) }) != true {
             // The question needs the panel; open it on the tile with the question showing.
-            openFromAnywhere()
+            openFromAnywhere(trigger: .tileDrag)
+            panelState.dragOrigin = nil
+            panelState.dragFromTile = true
             panelState.confirmation = intelligence.dropConfirmation(for: [newest], context: panelState.frontmost)
                 .map { FlixPendingConfirmation(confirmation: $0, itemIDs: [newest.id]) }
             return
         }
         let front = FlixFrontmostContext.capture(fallback: nil)
         let plan = intelligence.dragPlan(for: [newest], context: front)
-        let icon = tile.thumbnail ?? FlixIconProvider.typeIcon(for: newest)
+        let icon = dragIcon(for: newest, base: tile.thumbnail ?? FlixIconProvider.typeIcon(for: newest))
+        let warning = panelState.takeAnsweredWarning(for: [newest.id])
+        let predicted = intelligence.likelyItem(for: front, among: history.items) == newest.id
+        dockDropTarget = nil
         FlixDragSession.begin(items: [newest], substitutions: plan?.substitutions ?? [:], icons: [newest.id: icon],
                               label: plan?.label, from: view, event: event, moved: { _ in },
-                              ended: { [weak self] accepted, _ in
-                                  guard accepted else { return }
-                                  self?.intelligence.recordDrop(of: [newest], context: nil)
-                                  self?.contextServices?.dropped([newest], context: front)
+                              ended: { [weak self] accepted, point in
+                                  guard accepted, let self else { return }
+                                  reportDrop([newest], source: .tile, place: nil, at: point, front: front, plan: plan,
+                                             warning: warning, predicted: predicted)
+                                  intelligence.recordDrop(of: [newest], context: nil)
+                                  contextServices?.dropped([newest], context: front)
                               })
     }
 
@@ -462,12 +571,22 @@ final class FlixCoordinator {
     }
 
     /// After a drop outside, the panel closes unless pinned; after a cancelled drag it comes back.
-    private func dragEnded(_ items: [FlixItem], accepted: Bool) {
+    private func dragEnded(_ items: [FlixItem], accepted: Bool, at point: CGPoint, plan: FlixDragPlan?,
+                           place: (section: AnalyticsFlixSection, rank: Int?)?, warning: FlixAnsweredWarning?) {
         let wasOutside = panelState.drag?.isOutside ?? false
         panelState.drag = nil
         guard let panel, panel.isVisible else { return }
         guard wasOutside else { return }
         if accepted {
+            let source = panelState.dragSource
+            metrics.acted(.drag, items: items, at: place)
+            if source == .threadCard, let thread = intelligence.thread(containing: items[0].id) {
+                panelState.reportThread(.dragCard, thread)
+            }
+            let predicted = intelligence.likelyItem(for: panelState.frontmost, among: history.items)
+                .map { id in items.contains { $0.id == id } } ?? false
+            reportDrop(items, source: source, place: place, at: point, front: panelState.frontmost, plan: plan,
+                       warning: warning, predicted: predicted)
             intelligence.recordDrop(of: items, context: panelState.frontmost)
             contextServices?.dropped(items, context: panelState.frontmost)
         }
@@ -479,6 +598,33 @@ final class FlixCoordinator {
                 panel?.stepAside(false)
             }
         }
+    }
+
+    /// DOKK's dock received the drag in flight (see `DockDragCoordinator.flixDropLanded`).
+    func dockReceivedDrop(_ target: AnalyticsFlixDropTarget) {
+        dockDropTarget = target
+    }
+
+    /// Sends `flix_drop` for an accepted drag out.
+    private func reportDrop(_ items: [FlixItem], source: AnalyticsFlixDropSource,
+                            place: (section: AnalyticsFlixSection, rank: Int?)?, at point: CGPoint,
+                            front: FlixFrontmostContext?, plan: FlixDragPlan?, warning: FlixAnsweredWarning?,
+                            predicted: Bool) {
+        let landed = dockDropTarget
+        dockDropTarget = nil
+        let resolution = FlixDropTargetResolver.resolve(
+            at: point, dockTarget: landed,
+            front: front.map { ($0, contextServices?.fits.demand(for: $0)?.pageKind) })
+        Analytics.track(.flixDrop(AnalyticsFlixDrop(
+            items: items, source: source, place: place, target: resolution.target, targetCategory: resolution.category,
+            pageKind: resolution.pageKind, plan: plan, warning: warning?.warning ?? .none,
+            resolution: warning?.resolution, pinned: panelState.isPinned, predicted: predicted)))
+    }
+
+    /// A drag image that blurs an item the sensitive guard flagged, as its row and the tile do.
+    func dragIcon(for item: FlixItem, base: NSImage) -> NSImage {
+        guard settings.guardsSensitiveFiles, intelligence.annotations[item.id]?.isSensitive == true else { return base }
+        return FlixSensitiveImage.blurred(base)
     }
 
     // MARK: Dropping in

@@ -19,16 +19,23 @@ nonisolated enum FlixFitRanker {
         var score: Double
     }
 
+    /// What drag memory adds to the item it expects the window to want: enough to win a tie or a
+    /// near-tie, never enough to make a non-match pass.
+    static let preferredBonus = 0.04
+
+    /// - Parameter preferred: Drag memory's guess (`likelyItem(for:among:)`), which wins ties.
     static func rank(demand: FlixWindowDemand, candidates: [FlixFitCandidate], scorer: any FlixFitScoring,
-                     now: Date) -> [Ranked] {
+                     now: Date, preferred: FlixItem.ID? = nil) -> [Ranked] {
         let usable = candidates.prefix(candidateLimit).filter { isUsable($0.item, for: demand) }
         guard !demand.wanted.isEmpty, !usable.isEmpty else { return [] }
         var all: [Ranked] = []
         var best: [[Ranked]] = []
         for wanted in demand.wanted {
             let scored = usable.compactMap { candidate -> Ranked? in
-                let score = scorer.score(wanted, item: candidate, now: now)
-                return score >= minimumScore ? Ranked(itemID: candidate.item.id, phrase: wanted.phrase, score: score) : nil
+                var score = scorer.score(wanted, item: candidate, now: now)
+                guard score >= minimumScore else { return nil }
+                if candidate.item.id == preferred { score += preferredBonus }
+                return Ranked(itemID: candidate.item.id, phrase: wanted.phrase, score: score)
             }
             .sorted { $0.score > $1.score }
             best.append(scored)

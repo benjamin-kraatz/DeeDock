@@ -28,20 +28,49 @@ final class FlixPanelState {
     var now = Date.now
 
     // MARK: Content state
-    var filter: FlixFilter = .all { didSet { if filter != oldValue { filterChanged() } } }
+    var filter: FlixFilter = .all {
+        didSet {
+            guard filter != oldValue else { return }
+            filterChanged()
+            metrics?.filterChanged(to: filter)
+            reportThreadFilter()
+        }
+    }
     var selection: Set<FlixItem.ID> = []
     /// The row arrow keys move from and Shift-click extends from.
     var cursor: FlixItem.ID?
     var searchActive = false
-    var searchText = "" { didSet { if searchText != oldValue { searchTextChanged() } } }
+    var searchText = "" {
+        didSet {
+            guard searchText != oldValue else { return }
+            // Before the query is cleared below, so an ending search still sees what it understood.
+            metrics?.searchTextChanged(searchText)
+            searchTextChanged()
+        }
+    }
     /// Bumped to move keyboard focus into the search field.
     var searchFocusRequest = 0
     /// Mirrors the search field's focus, so typing keys reach it instead of the list.
     var searchFieldFocused = false
     var showNoise = false
     var expandedVersions: Set<String> = []
-    var sheet: FlixSheet?
-    var confirmation: FlixPendingConfirmation?
+    var sheet: FlixSheet? {
+        didSet {
+            // Tidy closing without Apply reports a dismissal.
+            guard oldValue == .tidy, sheet != .tidy else { return }
+            if !tidyApplied { reportTidyDismissed() }
+            tidyApplied = false
+        }
+    }
+    var confirmation: FlixPendingConfirmation? {
+        didSet {
+            // Closing the question without an answer (Cancel, a click beside it, Escape, the panel
+            // closing) cancels the drag it stopped.
+            guard let old = oldValue, confirmation?.id != old.id else { return }
+            if !confirmationAnswered { reportWarningCancelled(old) }
+            confirmationAnswered = false
+        }
+    }
     var toast: FlixToast?
     /// Stay open after a drag out, toggled by the header pin.
     var isPinned = false
@@ -53,6 +82,27 @@ final class FlixPanelState {
     /// Shown once per session after the access card was dismissed.
     var accessCardDismissed = false
 
+    // MARK: Analytics
+    /// The open visit's tracker (`FlixSessionMetrics`), set by the coordinator. Nil in previews.
+    @ObservationIgnored weak var metrics: FlixSessionMetrics?
+    /// Where the selection was last made: a press on a Fits row, or anywhere else. Keyboard commands
+    /// on the selection report this place.
+    @ObservationIgnored var selectionOrigin: FlixActionOrigin = .list
+    /// Where Ask Robi was opened from, for the question's first-action place.
+    @ObservationIgnored var robiOrigin: FlixActionOrigin?
+    /// A Tidy apply waiting for its Undo window to pass, reported once it settles.
+    @ObservationIgnored var pendingTidy: AnalyticsFlixTidy?
+    /// Where the drag in flight (or the one a question stopped) started, for its drop report.
+    @ObservationIgnored var dragOrigin: FlixActionOrigin?
+    /// That drag started on the dock tile.
+    @ObservationIgnored var dragFromTile = false
+    /// The question on screen was answered rather than dismissed.
+    @ObservationIgnored var confirmationAnswered = false
+    /// The last answered drop question, for the drag that follows it.
+    @ObservationIgnored var answeredWarning: FlixAnsweredWarning?
+    /// The Tidy sheet on screen was applied, so its closing is not a dismissal.
+    @ObservationIgnored var tidyApplied = false
+
     // MARK: Hooks set by the coordinator
     @ObservationIgnored var close: ((_ restoreFocus: Bool) -> Void)?
     @ObservationIgnored var toggleQuickLook: (([URL]) -> Void)?
@@ -62,8 +112,8 @@ final class FlixPanelState {
     @ObservationIgnored var prepareSettings: (() -> Void)?
     /// Lets the next drag of these items skip the drop questions, after one was answered.
     @ObservationIgnored var confirmDrag: (([FlixItem.ID]) -> Void)?
-    /// Starts a native drag of items from a row's view.
-    @ObservationIgnored var beginDrag: (([FlixItem.ID], NSView, NSEvent) -> Void)?
+    /// Starts a native drag of items from a row's view, with where in the panel it started.
+    @ObservationIgnored var beginDrag: (([FlixItem.ID], NSView, NSEvent, FlixActionOrigin) -> Void)?
 
     // MARK: Phase B1 (window reading, conversions, sensitive guard, web links)
     /// The page in the browser in front, for the **Save this page** card. Nil hides the card.
@@ -94,13 +144,16 @@ final class FlixPanelState {
     // MARK: The list
 
     /// The list as drawn. Cheap enough to rebuild per render: a filter pass over at most 5,000 items.
-    var list: FlixListResult {
-        FlixListBuilder.build(FlixListInput(
+    var list: FlixListResult { FlixListBuilder.build(listInput) }
+
+    /// What ``list`` is built from.
+    var listInput: FlixListInput {
+        FlixListInput(
             items: history.items, filter: filter, searchText: searchText, searchActive: searchActive,
             query: intelligence.query, moreLikeThis: intelligence.moreLikeThis, hidesNoise: settings.hidesNoise,
             showNoise: showNoise, annotations: intelligence.annotations, expandedVersions: expandedVersions,
             smartFilters: history.smartFilters, favorites: history.favorites, threads: intelligence.threads,
-            now: now, semantic: { [intelligence] topic, item in intelligence.semanticMatch(topic: topic, item: item) }))
+            now: now, semantic: { [intelligence] topic, item in intelligence.semanticMatch(topic: topic, item: item) })
     }
 
     /// The Fits card's rows, in its order, when it is ready.
@@ -169,6 +222,7 @@ final class FlixPanelState {
     func panelDidClose() {
         searchTask?.cancel()
         toastTask?.cancel()
+        settleTidy(undone: false)
         sheet = nil
         confirmation = nil
         drag = nil
@@ -184,7 +238,8 @@ final class FlixPanelState {
 
     /// A press on a row. Command toggles, Shift extends from the cursor, a plain press on an already
     /// selected row keeps the selection so a drag can carry all of it.
-    func press(_ id: FlixItem.ID, command: Bool, shift: Bool) {
+    func press(_ id: FlixItem.ID, command: Bool, shift: Bool, origin: FlixActionOrigin = .list) {
+        selectionOrigin = origin
         if command {
             if selection.contains(id) { selection.remove(id) } else { selection.insert(id) }
             cursor = id
@@ -214,6 +269,8 @@ final class FlixPanelState {
         let id = order[next]
         if extend { selection.insert(id) } else { selection = [id] }
         cursor = id
+        // The Fits rows come first in arrow-key order and are not repeated below.
+        selectionOrigin = fitItems.contains { $0.1.id == id } ? .fits : .list
         quickLookSelectionChanged?(selectedItems.compactMap(\.shareURL))
     }
 
@@ -265,18 +322,22 @@ final class FlixPanelState {
     /// Shows a toast in the footer for about four seconds, replacing any earlier one.
     func showToast(_ message: String, undo: (() -> Void)? = nil) {
         toastTask?.cancel()
+        // A newer toast ends the Undo window of the one it replaces.
+        settleTidy(undone: false)
         let toast = FlixToast(message: message, undo: undo)
         self.toast = toast
         toastTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(3.8))
             guard let self, !Task.isCancelled, self.toast?.id == toast.id else { return }
             self.toast = nil
+            settleTidy(undone: false)
         }
     }
 
     func performUndo() {
         let undo = toast?.undo
         toast = nil
+        settleTidy(undone: true)
         undo?()
     }
 }

@@ -61,6 +61,24 @@ nonisolated enum FlixURLSanitizer {
         return components.url
     }
 
+    /// How many credentials ``sanitize(_:)`` drops from `url`: a user name or password, a fragment
+    /// that carries a token, and each secret or signing query key. Click trackers are not counted.
+    static func removedSecretCount(_ url: URL) -> Int {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return 0 }
+        var count = (components.user != nil || components.password != nil) ? 1 : 0
+        if let fragment = components.fragment?.lowercased(),
+           secretKeys.contains(where: { fragment.contains($0 + "=") }) { count += 1 }
+        guard let items = components.queryItems else { return count }
+        let names = Set(items.map { $0.name.lowercased() })
+        let signed = names.contains("sig") || names.contains("signature") || names.contains("x-amz-signature")
+        count += items.count { item in
+            let name = item.name.lowercased()
+            return secretKeys.contains(name) || secretPrefixes.contains(where: name.hasPrefix)
+                || (signed && signingKeys.contains(name))
+        }
+        return count
+    }
+
     static func sanitize(_ string: String) -> URL? {
         URL(string: string).flatMap(sanitize)
     }

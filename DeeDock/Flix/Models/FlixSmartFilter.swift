@@ -15,14 +15,18 @@ nonisolated struct FlixSmartFilter: Codable, Identifiable, Hashable, Sendable {
     var emoji: String
     var match: Match
     var rules: [FlixSmartFilterRule]
+    /// How the filter was made, for analytics when it is added or deleted. Nil in filters saved
+    /// before it was recorded, which count as made by hand.
+    var origin: FlixSmartFilterOrigin?
 
     init(id: UUID = UUID(), name: String, emoji: String = "✨", match: Match = .all,
-         rules: [FlixSmartFilterRule]) {
+         rules: [FlixSmartFilterRule], origin: FlixSmartFilterOrigin? = nil) {
         self.id = id
         self.name = name
         self.emoji = emoji
         self.match = match
         self.rules = rules
+        self.origin = origin
     }
 
     /// Whether `item` belongs in this filter.
@@ -40,6 +44,16 @@ nonisolated struct FlixSmartFilter: Codable, Identifiable, Hashable, Sendable {
         case .any: return rules.contains { $0.matches(item, now: now, semantic: semantic) }
         }
     }
+}
+
+/// How a Smart Filter was made.
+nonisolated enum FlixSmartFilterOrigin: String, Codable, Sendable {
+    /// Written from a sentence in the New Smart Filter sheet.
+    case sentence
+    /// The sidebar's ✦ tip.
+    case tip
+    /// Built rule by rule.
+    case manual
 }
 
 /// One condition of a Smart Filter. Persisted with Swift's synthesized enum coding; add cases, never

@@ -1214,7 +1214,8 @@ final class DockCoordinator {
 extension DockCoordinator {
     /// Connects Flix Files to the docks, the other popovers, the Shelf, and Settings, then starts it.
     fileprivate func configureFlix() {
-        popovers.register(.flix) { [weak self] in self?.flix.close(restoreFocus: false) }
+        // Another popover opening means a click elsewhere in the dock.
+        popovers.register(.flix) { [weak self] in self?.flix.close(restoreFocus: false, reason: .clickedAway) }
         flix.tileAnchor = { [weak self] displayID in
             guard let self else { return nil }
             let id = displayID ?? DisplayPolicy.focusTarget(displays: enabledDisplays, pointer: NSEvent.mouseLocation)
@@ -1245,6 +1246,7 @@ extension DockCoordinator {
         flix.prepareSettings = { [weak self] in self?.settingsFlixRequest = true }
         flix.didOpen = { [weak self] in self?.discovery.markUsed(.flix) }
         dragging.keepInFlix = { [weak self] urls in self?.flix.keepDroppedFiles(urls) }
+        dragging.flixDropLanded = { [weak self] target in self?.flix.dockReceivedDrop(target) }
         // Phase B2's intelligence: Lookout for meaning, Robi's settings and key for Ask Robi.
         flix.installSmartProviders(lookout: hub.lookout, robi: robi.store)
         flix.start()

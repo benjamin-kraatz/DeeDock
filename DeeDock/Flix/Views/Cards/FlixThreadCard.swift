@@ -29,10 +29,10 @@ struct FlixThreadCard: View {
             }
             HStack(spacing: 6) {
                 FlixCardButton(title: String(localized: .flixThreadOpenAll(count)), primary: true) {
-                    state.open(members)
+                    state.openThread(thread)
                 }
                 if state.intelligence.canAskRobi {
-                    FlixCardButton(title: String(localized: .flixMenuAskRobi)) { state.askRobi(members) }
+                    FlixCardButton(title: String(localized: .flixMenuAskRobi)) { state.askRobi(members, origin: .threadCard) }
                 }
                 Text(.flixThreadDragHint)
                     .font(.system(size: 11))
@@ -42,8 +42,8 @@ struct FlixThreadCard: View {
             }
         }
         .background {
-            FlixRowInteraction(press: { _, _ in }, click: { _, _ in }, open: { state.open(members) },
-                               begin: { view, event in state.beginDrag?(members.map(\.id), view, event) },
+            FlixRowInteraction(press: { _, _ in }, click: { _, _ in }, open: { state.openThread(thread) },
+                               begin: { view, event in state.beginDrag?(members.map(\.id), view, event, .threadCard) },
                                menu: { nil })
                 .padding(.vertical, 6)
         }

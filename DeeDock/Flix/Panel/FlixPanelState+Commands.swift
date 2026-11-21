@@ -9,9 +9,11 @@ extension FlixPanelState {
             : String(localized: .flixLabelItems(items.count))
     }
 
-    func open(_ items: [FlixItem]? = nil) {
+    /// Opens items. `origin` is where they were opened from; nil means the selection's place.
+    func open(_ items: [FlixItem]? = nil, origin: FlixActionOrigin? = nil) {
         let items = items ?? selectedItems
         guard !items.isEmpty else { return }
+        reportAction(.open, items, origin: origin)
         FlixFileActions.open(items)
         close?(false)
     }
@@ -19,19 +21,22 @@ extension FlixPanelState {
     func reveal(_ items: [FlixItem]? = nil) {
         let items = (items ?? selectedItems).filter { $0.url != nil }
         guard !items.isEmpty else { return }
+        reportAction(.reveal, items, origin: nil)
         FlixFileActions.reveal(items)
         close?(false)
     }
 
     func quickLook() {
-        let urls = selectedItems.compactMap(\.url)
-        guard !urls.isEmpty else { return }
-        toggleQuickLook?(urls)
+        let items = selectedItems.filter { $0.url != nil }
+        guard !items.isEmpty else { return }
+        reportAction(.quickLook, items, origin: nil)
+        toggleQuickLook?(items.compactMap(\.url))
     }
 
     func copy(_ items: [FlixItem]? = nil) {
         let items = items ?? selectedItems
         guard !items.isEmpty else { return }
+        reportAction(.copy, items, origin: nil)
         FlixFileActions.copy(items)
         showToast(String(localized: .flixToastCopied(label(for: items))))
     }
@@ -39,6 +44,7 @@ extension FlixPanelState {
     func copyPaths(_ items: [FlixItem]? = nil) {
         let items = items ?? selectedItems
         guard !items.isEmpty else { return }
+        reportAction(.copy, items, origin: nil)
         FlixFileActions.copyPaths(items)
         showToast(String(localized: .flixToastCopiedPath(items.count)))
     }
@@ -48,13 +54,16 @@ extension FlixPanelState {
         let items = items ?? selectedItems
         guard let first = items.first else { return }
         let flag = !first.isFlagged
+        reportAction(flag ? .flag : .other, items, origin: nil)
         history.setFlagged(flag, for: Set(items.map(\.id)))
         showToast(String(localized: flag ? .flixToastFlagged(label(for: items)) : .flixToastUnflagged(label(for: items))))
     }
 
     func addToFavorites(_ items: [FlixItem]? = nil) {
-        let favorites = (items ?? selectedItems).compactMap(FlixFavorite.make)
+        let items = items ?? selectedItems
+        let favorites = items.compactMap(FlixFavorite.make)
         guard !favorites.isEmpty else { return }
+        reportAction(.favorite, items, origin: nil)
         favorites.forEach(history.addFavorite)
         showToast(String(localized: .flixToastFavoriteAdded(favorites.count == 1 ? favorites[0].name
             : String(localized: .flixLabelItems(favorites.count)))))
@@ -64,6 +73,7 @@ extension FlixPanelState {
     func remove(_ items: [FlixItem]? = nil) {
         let items = items ?? selectedItems
         guard !items.isEmpty else { return }
+        reportAction(.remove, items, origin: nil)
         let next = rowAfterRemoving(Set(items.map(\.id)))
         let removed = history.remove(Set(items.map(\.id)))
         selection = next.map { [$0] } ?? []
@@ -77,6 +87,7 @@ extension FlixPanelState {
     func trash(_ items: [FlixItem]? = nil) {
         let items = (items ?? selectedItems).filter { $0.url != nil }
         guard !items.isEmpty else { return }
+        reportAction(.trash, items, origin: nil)
         let message = String(localized: .flixToastTrashed(label(for: items)))
         Task { [weak self] in
             do {
@@ -97,6 +108,7 @@ extension FlixPanelState {
         let items = items ?? selectedItems
         let urls = items.compactMap(\.url)
         guard !urls.isEmpty else { return }
+        reportAction(.other, items, origin: nil)
         if sendToShelf?(urls) == true {
             showToast(String(localized: .flixToastShelf(label(for: items))))
         } else {
@@ -104,14 +116,17 @@ extension FlixPanelState {
         }
     }
 
-    /// Moves files into a folder, with Undo. Their history entries follow them.
-    func move(_ items: [FlixItem], into folder: URL) {
+    /// Moves files into a folder, with Undo. Their history entries follow them. `undone` runs when
+    /// the toast's Undo is pressed.
+    func move(_ items: [FlixItem], into folder: URL, undone: (() -> Void)? = nil) {
         do {
             let moves = try FlixFileActions.move(items, into: folder)
             guard !moves.isEmpty else { return }
+            reportAction(.other, items, origin: nil)
             for move in moves { history.relocate(move.item.id, to: move.to.path, name: move.to.lastPathComponent) }
             let folderName = FileManager.default.displayName(atPath: folder.path)
             showToast(String(localized: .flixToastMoved(label(for: items), folderName))) { [weak self] in
+                undone?()
                 guard let self else { return }
                 for restored in FlixFileActions.moveBack(moves) {
                     history.relocate(restored.item.id, to: restored.url.path, name: restored.url.lastPathComponent)
@@ -122,12 +137,14 @@ extension FlixPanelState {
         }
     }
 
-    /// Renames one file, with Undo.
-    func rename(_ item: FlixItem, to name: String) {
+    /// Renames one file, with Undo. `undone` runs when the toast's Undo is pressed.
+    func rename(_ item: FlixItem, to name: String, undone: (() -> Void)? = nil) {
         do {
             guard let original = item.url, let renamed = try FlixFileActions.rename(item, to: name) else { return }
+            reportAction(.other, [item], origin: nil)
             history.relocate(item.id, to: renamed.path, name: renamed.lastPathComponent)
             showToast(String(localized: .flixToastRenamed(renamed.lastPathComponent))) { [weak self] in
+                undone?()
                 guard let self, let current = history.item(item.id),
                       let back = try? FlixFileActions.rename(current, to: original.lastPathComponent) else { return }
                 history.relocate(item.id, to: back.path, name: back.lastPathComponent)
@@ -139,6 +156,7 @@ extension FlixPanelState {
 
     /// Opens files with an app, for a drop on an app favorite.
     func open(_ items: [FlixItem], withApplicationAt app: URL) {
+        reportAction(.open, items, origin: nil)
         FlixFileActions.open(items.compactMap(\.url), withApplicationAt: app)
         close?(false)
     }
@@ -158,10 +176,11 @@ extension FlixPanelState {
                                              contentTypeIdentifier: values?.contentType?.identifier))
             kept += 1
         }
-        for url in links where !url.isFileURL {
+        for original in links where !original.isFileURL {
             // Only web pages, without sign-in tokens or session parameters.
-            guard let url = FlixURLSanitizer.sanitize(url) else { continue }
+            guard let url = FlixURLSanitizer.sanitize(original) else { continue }
             let link = FlixLink(url: url, title: nil, browserBundleIdentifier: nil)
+            reportLinkKept(link, removedSecrets: FlixURLSanitizer.removedSecretCount(original))
             history.record(FlixActivityEvent(link: link, name: link.host, kind: .link, activity: .link, date: now))
             kept += 1
         }
@@ -175,6 +194,7 @@ extension FlixPanelState {
     func drop(_ ids: [FlixItem.ID], on favorite: FlixFavorite) {
         let items = ids.compactMap(history.item)
         guard !items.isEmpty else { return }
+        reportFavoriteDrop(items, on: favorite)
         switch favorite.kind {
         case .folder: move(items, into: favorite.url)
         case .app: open(items, withApplicationAt: favorite.url)
@@ -195,6 +215,7 @@ extension FlixPanelState {
     // MARK: Intelligence-backed commands
 
     func showMoreLikeThis(_ item: FlixItem) {
+        reportAction(.other, [item], origin: nil)
         if searchActive { setSearchActive(false) }
         intelligence.showMoreLikeThis(item, in: history.items)
     }
@@ -204,9 +225,12 @@ extension FlixPanelState {
         filter = .thread(thread.id)
     }
 
-    func askRobi(_ items: [FlixItem]? = nil) {
+    /// Opens Ask Robi for `items`. `origin` is where it was opened from (a thread card), else the
+    /// selection's place.
+    func askRobi(_ items: [FlixItem]? = nil, origin: FlixActionOrigin? = nil) {
         let items = items ?? selectedItems
         guard intelligence.canAskRobi, !items.isEmpty else { return }
+        robiOrigin = origin
         intelligence.resetRobi()
         sheet = .askRobi(items.map(\.id))
     }
@@ -219,16 +243,22 @@ extension FlixPanelState {
 
     /// Applies the checked Tidy suggestions with one Undo.
     func applyTidy(_ suggestions: [FlixTidySuggestion]) {
+        let shown = intelligence.tidy.filter { history.item($0.itemID) != nil }
+        var report = AnalyticsFlixTidy(shownMoves: shown.count { $0.moveTo != nil },
+                                       shownRenames: shown.count { $0.rename != nil })
+        report.unchecked = max(0, shown.count - suggestions.count)
         var undo: [() -> Void] = []
         for suggestion in suggestions {
             guard var item = history.item(suggestion.itemID), let original = item.url else { continue }
             if let name = suggestion.rename, let renamed = try? FlixFileActions.rename(item, to: name) {
                 history.relocate(item.id, to: renamed.path, name: renamed.lastPathComponent)
                 item.path = renamed.path
+                report.appliedRenames += 1
             }
             if let folder = suggestion.moveTo, let moves = try? FlixFileActions.move([item], into: URL(fileURLWithPath: folder)),
                let move = moves.first {
                 history.relocate(item.id, to: move.to.path, name: move.to.lastPathComponent)
+                report.appliedMoves += 1
             }
             let id = item.id
             undo.append { [weak self] in
@@ -237,17 +267,112 @@ extension FlixPanelState {
                 history.relocate(id, to: original.path, name: original.lastPathComponent)
             }
         }
+        tidyApplied = true
         sheet = nil
-        guard !undo.isEmpty else { return }
+        guard !undo.isEmpty else {
+            Analytics.track(.flixTidy(report))
+            return
+        }
         showToast(String(localized: .flixToastTidied(undo.count))) { undo.forEach { $0() } }
+        // After the toast: Undo, a newer toast, or its timeout settles it (`settleTidy(undone:)`).
+        pendingTidy = report
     }
 
-    /// Adds a Smart Filter and shows it.
-    func addSmartFilter(_ filter: FlixSmartFilter) {
+    /// Adds a Smart Filter and shows it. `generator` says what wrote one made from a sentence.
+    func addSmartFilter(_ filter: FlixSmartFilter, origin: FlixSmartFilterOrigin = .manual,
+                        generator: AnalyticsFlixGenerator? = nil) {
+        var filter = filter
+        filter.origin = origin
         history.saveSmartFilter(filter)
+        reportSmartFilterCreated(filter, generator: generator)
         sheet = nil
         intelligence.resetSmartFilterDraft()
         self.filter = .smart(filter.id)
+    }
+
+    /// Deletes a Smart Filter from the sidebar.
+    func removeSmartFilter(_ id: FlixSmartFilter.ID) {
+        guard let removed = history.smartFilters.first(where: { $0.id == id }) else { return }
+        if filter == .smart(id) { filter = .all }
+        history.removeSmartFilter(id)
+        Analytics.track(.flixSmartFilterRemoved(source: removed.origin?.analytics ?? .manual))
+    }
+
+    /// Accepts a row's ✦ folder suggestion, with Undo.
+    func moveToSuggestedFolder(_ item: FlixItem) {
+        guard let folder = intelligence.annotation(for: item.id)?.folderSuggestion else { return }
+        Analytics.track(.flixSuggestionActed(.move, action: .accepted, itemKind: item.analyticsKind))
+        move([item], into: URL(fileURLWithPath: folder)) {
+            Analytics.track(.flixSuggestionActed(.move, action: .undone, itemKind: item.analyticsKind))
+        }
+    }
+
+    /// Accepts a row's ✦ rename suggestion, with Undo.
+    func renameToSuggestion(_ item: FlixItem) {
+        guard let name = intelligence.annotation(for: item.id)?.renameSuggestion else { return }
+        Analytics.track(.flixSuggestionActed(.rename, action: .accepted, itemKind: item.analyticsKind))
+        rename(item, to: name) {
+            Analytics.track(.flixSuggestionActed(.rename, action: .undone, itemKind: item.analyticsKind))
+        }
+    }
+
+    /// Shows or hides a row's older versions. Showing them reports `flix_versions_expanded`.
+    func toggleVersions(_ group: String, count: Int) {
+        if expandedVersions.contains(group) {
+            expandedVersions.remove(group)
+        } else {
+            expandedVersions.insert(group)
+            Analytics.track(.flixVersionsExpanded(versionCount: count))
+        }
+    }
+
+    /// Asks Robi about `items`. `suggestionIndex` is the position of a suggested question, nil for
+    /// a typed one; only that position is reported, never the text.
+    func ask(_ question: String, about items: [FlixItem], suggestionIndex: Int?) {
+        reportAction(.robi, items, origin: robiOrigin)
+        if robiOrigin == .threadCard, let thread = items.first.flatMap({ intelligence.thread(containing: $0.id) }) {
+            reportThread(.robi, thread)
+        }
+        intelligence.ask(question, about: items, question: AnalyticsFlixRobiQuestion(suggestionIndex: suggestionIndex))
+    }
+
+    /// Runs a morning card button.
+    func runMorningAction(_ action: FlixMorningCard.Action, card: FlixMorningCard) {
+        switch action.target {
+        case .open(let ids):
+            metrics?.morningActed(.reopen, card: card)
+            intelligence.dismissMorning()
+            open(ids.compactMap(history.item), origin: .morningCard)
+        case .filter(let target):
+            metrics?.morningActed(.thread, card: card)
+            intelligence.dismissMorning()
+            filter = target
+        }
+    }
+
+    /// The morning card's ✕.
+    func dismissMorning(_ card: FlixMorningCard) {
+        metrics?.morningActed(.dismiss, card: card)
+        intelligence.dismissMorning()
+    }
+
+    /// The sidebar tip's Make Filter.
+    func acceptFilterTip(_ tip: FlixFilterTip) {
+        Analytics.track(.flixTipActed(.smartFilter, action: .accepted))
+        intelligence.dismissFilterTip()
+        addSmartFilter(tip.proposal, origin: .tip)
+    }
+
+    /// The sidebar tip's ✕.
+    func dismissFilterTip() {
+        Analytics.track(.flixTipActed(.smartFilter, action: .dismissed))
+        intelligence.dismissFilterTip()
+    }
+
+    /// A thread card's Open All.
+    func openThread(_ thread: FlixThread) {
+        reportThread(.openAll, thread)
+        open(thread.memberIDs.compactMap(history.item), origin: .threadCard)
     }
 
     func togglePin() {

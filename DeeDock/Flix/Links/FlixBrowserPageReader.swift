@@ -16,6 +16,9 @@ nonisolated struct FlixBrowserPage: Equatable, Sendable {
     var title: String?
     var privacy: Privacy
     var browserBundleIdentifier: String?
+    /// How many credentials cleaning removed from the address the browser showed, for the
+    /// `flix_link_tokens_stripped` counter.
+    var removedSecrets = 0
 
     var host: String {
         let host = url.host(percentEncoded: false) ?? url.absoluteString
@@ -99,7 +102,8 @@ nonisolated enum FlixBrowserPageReader {
         guard let raw = webURL ?? address.flatMap(url(fromAddress:)), let url = FlixURLSanitizer.sanitize(raw) else { return nil }
         let privacy = privacy(family: family, title: title, labels: labels, scanned: index,
                               foundAddress: webURL != nil || address != nil)
-        return FlixBrowserPage(url: url, title: cleanTitle(title), privacy: privacy, browserBundleIdentifier: bundleIdentifier)
+        return FlixBrowserPage(url: url, title: cleanTitle(title), privacy: privacy, browserBundleIdentifier: bundleIdentifier,
+                               removedSecrets: FlixURLSanitizer.removedSecretCount(raw))
     }
 
     static func privacy(family: FlixBrowserFamily, title: String?, labels: [String], scanned: Int,

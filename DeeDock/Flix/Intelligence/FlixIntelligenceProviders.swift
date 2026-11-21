@@ -40,6 +40,17 @@ nonisolated struct FlixFrontmostContext: Equatable, Sendable {
     /// Tokens for `text`, and optional per-item matches when searching by meaning.
     func understand(_ text: String, items: [FlixItem], now: Date) async
         -> (tokens: [FlixQueryToken], matches: [FlixItem.ID: FlixMatchKind]?)?
+    /// How the most recent ``understand(_:items:now:)`` went, read right after it returns. Nil when
+    /// the provider does not say.
+    var lastReport: FlixSearchReport? { get }
+}
+
+/// How one plain-words search was understood, for analytics: which parser answered, how long it
+/// took, and whether Lookout could match by meaning. No text.
+nonisolated struct FlixSearchReport: Equatable, Sendable {
+    var parser: AnalyticsFlixParser
+    var parseMs: Int
+    var lookoutAvailable: Bool
 }
 
 /// Groups activity into Threads.

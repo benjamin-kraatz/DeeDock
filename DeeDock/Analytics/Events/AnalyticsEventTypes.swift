@@ -157,6 +157,9 @@ nonisolated enum AnalyticsSettingArea: String, AnalyticsToken {
     case features
     /// Robi's own settings document, reported field by field.
     case robi
+    /// Flix Files' settings (`FlixSettings`), reflected with lists reduced to counts and the
+    /// shortcut to `shortcut_customized` and `shortcut_combo`.
+    case flix
 }
 
 nonisolated enum AnalyticsDisplayRole: String, AnalyticsToken {

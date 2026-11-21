@@ -34,6 +34,7 @@ final class FlixDragInterceptor: FlixDragIntercepting {
         }
         guard !prepared.isEmpty else { return nil }
         plan.label = Self.label(for: prepared)
+        plan.convertMs = prepared.map(\.durationMs).max()
         return plan
     }
 

@@ -8,7 +8,7 @@ import FoundationModels
 /// The prompts carry file names and file contents, so each call reports metadata only to AI
 /// observability (`AIObservability.capture(…, includesContent: false)`): the span name, latency,
 /// token limit, and an error message. Callers treat a nil result as "no answer" and use their rule
-/// fallback; nothing is retried.
+/// fallback; nothing is retried. Each such fallback counts toward `flix_ai_failures`.
 ///
 /// Main actor: sessions are created and awaited here; the model itself runs out of process.
 @MainActor
@@ -65,7 +65,10 @@ enum FlixLanguageModel {
         } onCancel: {
             work.cancel()
         }
-        return Task.isCancelled ? nil : output
+        if Task.isCancelled { return nil }
+        // A refusal, an error, or the time limit: the caller falls back to its rules.
+        if output == nil { Analytics.count(.aiFailures) }
+        return output
     }
 
     private static func observe(span: String, started: Date, limit: Int, error: Error?) async {

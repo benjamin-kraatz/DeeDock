@@ -32,6 +32,13 @@ struct FlixListView: View {
                 .animation(state.reduceMotion ? .easeOut(duration: 0.15) : FlixStyle.rowSpring, value: list.order)
             }
             .scrollIndicators(.automatic)
+            // Rows scrolled past the top, for `max_scrolled_rows`. Rounded to whole rows, so the
+            // callback runs once per row, not per pixel.
+            .onScrollGeometryChange(for: Int.self) { geometry in
+                max(0, Int(geometry.contentOffset.y / FlixStyle.rowHeight))
+            } action: { _, rows in
+                state.metrics?.scrolled(rows: rows)
+            }
             .onChange(of: state.cursor) { _, cursor in
                 guard let cursor else { return }
                 withAnimation(state.reduceMotion ? nil : .easeOut(duration: 0.15)) { proxy.scrollTo(cursor) }
@@ -57,7 +64,9 @@ struct FlixListView: View {
                                      dismiss: { state.accessCardDismissed = true })
             }
             if let morning = state.intelligence.morning {
-                FlixMorningCardView(card: morning, run: { run($0) }, dismiss: state.intelligence.dismissMorning)
+                FlixMorningCardView(card: morning, run: { state.runMorningAction($0, card: morning) },
+                                    dismiss: { state.dismissMorning(morning) })
+                    .onAppear { state.metrics?.morningShown() }
             }
             if let offer = state.pageOffer {
                 FlixSavePageCard(offer: offer, save: { state.savePage?() })
@@ -81,35 +90,20 @@ struct FlixListView: View {
             now: state.now, policy: state.readPolicy,
             press: { state.press(item.id, command: $0, shift: $1) },
             click: { state.click(item.id, command: $0, shift: $1) },
-            open: { state.open([item]) },
-            beginDrag: { view, event in state.beginDrag?(dragIDs(for: item.id), view, event) },
+            open: { state.open([item], origin: .list) },
+            beginDrag: { view, event in state.beginDrag?(dragIDs(for: item.id), view, event, .list) },
             menu: { FlixContextMenu.make(for: state) },
             toggleVersions: {
                 guard let group = row.versionGroup else { return }
-                if state.expandedVersions.contains(group) { state.expandedVersions.remove(group) }
-                else { state.expandedVersions.insert(group) }
+                state.toggleVersions(group, count: row.versionCount)
             },
-            moveSuggested: {
-                guard let folder = state.intelligence.annotation(for: item.id)?.folderSuggestion else { return }
-                state.move([item], into: URL(fileURLWithPath: folder))
-            },
-            renameSuggested: {
-                guard let name = state.intelligence.annotation(for: item.id)?.renameSuggestion else { return }
-                state.rename(item, to: name)
-            })
+            moveSuggested: { state.moveToSuggestedFolder(item) },
+            renameSuggested: { state.renameToSuggestion(item) })
     }
 
     /// A drag carries the whole selection when it starts on a selected row.
     private func dragIDs(for id: FlixItem.ID) -> [FlixItem.ID] {
         state.selection.contains(id) ? state.navigationOrder.filter(state.selection.contains) : [id]
-    }
-
-    private func run(_ action: FlixMorningCard.Action) {
-        state.intelligence.dismissMorning()
-        switch action.target {
-        case .open(let ids): state.open(ids.compactMap(state.history.item))
-        case .filter(let filter): state.filter = filter
-        }
     }
 }
 

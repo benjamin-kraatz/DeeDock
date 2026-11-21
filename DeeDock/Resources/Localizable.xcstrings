@@ -4549,6 +4549,24 @@
         }
       }
     },
+    "flixEngineRobiClaude" : {
+      "comment" : "Flix Files: Settings → What powers it, Robi row badge when Robi answers with Claude and a key is saved. Product name, not translated.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Claude"
+          }
+        }
+      }
+    },
     "flixEngineRobiHelp" : {
       "comment" : "Flix Files Settings: what Robi does for Flix Files. Transparent about what is sent.",
       "extractionState" : "manual",
@@ -4563,6 +4581,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Claude with your API key, only when you ask about files. The files you ask about are sent with your question."
+          }
+        }
+      }
+    },
+    "flixEngineRobiHelpOnDevice" : {
+      "comment" : "Flix Files: Settings → What powers it, Robi row subtitle when Robi's settings choose Apple Intelligence on this Mac.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence auf diesem Mac, nur wenn du zu Dateien fragst. Kein Schlüssel nötig, die Dateien bleiben auf diesem Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence on this Mac, only when you ask about files. No key needed, and the files stay on this Mac."
+          }
+        }
+      }
+    },
+    "flixEngineRobiOnDevice" : {
+      "comment" : "Flix Files: Settings → What powers it, Robi row badge when Robi answers with Apple Intelligence on this Mac.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Mac"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this Mac"
           }
         }
       }

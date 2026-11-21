@@ -28,13 +28,13 @@ struct FlixFitsSection: View {
                                     selected: state.selection.contains(item.id),
                                     dimmed: state.drag?.itemIDs.contains(item.id) == true,
                                     now: state.now, policy: state.readPolicy,
-                                    press: { state.press(item.id, command: $0, shift: $1) },
+                                    press: { state.press(item.id, command: $0, shift: $1, origin: .fits) },
                                     click: { state.click(item.id, command: $0, shift: $1) },
-                                    open: { state.open([item]) },
+                                    open: { state.open([item], origin: .fits) },
                                     beginDrag: { view, event in
                                         let ids = state.selection.contains(item.id)
                                             ? state.navigationOrder.filter(state.selection.contains) : [item.id]
-                                        state.beginDrag?(ids, view, event)
+                                        state.beginDrag?(ids, view, event, .fits)
                                     },
                                     menu: { FlixContextMenu.make(for: state) })
                     }

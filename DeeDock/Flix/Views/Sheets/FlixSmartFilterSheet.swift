@@ -52,7 +52,10 @@ struct FlixSmartFilterSheet: View {
                                                 state.intelligence.semanticMatch(topic: topic, item: item)
                                             }
                                         },
-                                        add: { state.addSmartFilter(proposal.filter) })
+                                        add: {
+                                            state.addSmartFilter(proposal.filter, origin: .sentence,
+                                                                 generator: proposal.generatedByModel ? .appleIntelligence : .rules)
+                                        })
         }
     }
 
@@ -88,7 +91,7 @@ struct FlixSmartFilterSheet: View {
                     .font(.system(size: 11.5))
                     .foregroundStyle(.secondary)
             }
-            Button { if let filter { state.addSmartFilter(filter) } } label: { Text(.flixSmartFilterAdd) }
+            Button { if let filter { state.addSmartFilter(filter, origin: .manual) } } label: { Text(.flixSmartFilterAdd) }
                 .buttonStyle(.borderedProminent)
                 .disabled(filter == nil)
                 .keyboardShortcut(.defaultAction)

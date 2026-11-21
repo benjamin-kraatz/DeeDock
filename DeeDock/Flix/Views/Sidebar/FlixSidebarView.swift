@@ -38,8 +38,7 @@ struct FlixSidebarView: View {
                                    selected: state.filter == .smart(filter.id)) { state.filter = .smart(filter.id) }
                         .contextMenu {
                             Button(role: .destructive) {
-                                if state.filter == .smart(filter.id) { state.filter = .all }
-                                state.history.removeSmartFilter(filter.id)
+                                state.removeSmartFilter(filter.id)
                             } label: { Text(.flixSmartFilterDelete) }
                         }
                 }
@@ -56,10 +55,7 @@ struct FlixSidebarView: View {
                     }
                 }
                 if let tip = state.intelligence.filterTip {
-                    FlixFilterTipCard(tip: tip, make: {
-                        state.intelligence.dismissFilterTip()
-                        state.addSmartFilter(tip.proposal)
-                    }, dismiss: state.intelligence.dismissFilterTip)
+                    FlixFilterTipCard(tip: tip, make: { state.acceptFilterTip(tip) }, dismiss: state.dismissFilterTip)
                 }
             }
             .padding(.horizontal, 8)

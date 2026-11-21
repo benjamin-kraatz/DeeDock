@@ -9,6 +9,13 @@ nonisolated struct FlixWindowReading: @unchecked Sendable {
     /// The window image, kept only when the chain ends at Apple Intelligence.
     var image: CGImage?
     var chain: FlixReaderChain
+    /// Words the accessibility read found, for analytics (never the words).
+    var accessibilityWords = 0
+    /// Words Vision recognized in the capture.
+    var recognizedWords = 0
+
+    /// Words in `text`, split on white space.
+    static func wordCount(_ text: String) -> Int { text.split(whereSeparator: \.isWhitespace).count }
 }
 
 /// Which window a reading belongs to. Fits are cached per key until the window changes: another
@@ -70,6 +77,11 @@ final class FlixWindowReader {
     func read(_ context: FlixFrontmostContext, step: @MainActor (FlixReaderChain) -> Void) async -> FlixWindowReading {
         var chain = FlixReaderChain()
         var text = ""
+        var axWords = 0
+        var ocrWords = 0
+        func reading(_ text: String, image: CGImage? = nil) -> FlixWindowReading {
+            FlixWindowReading(text: text, image: image, chain: chain, accessibilityWords: axWords, recognizedWords: ocrWords)
+        }
         if AXIsProcessTrusted() {
             chain.steps.append(.accessibility)
             step(chain)
@@ -79,29 +91,31 @@ final class FlixWindowReader {
                                              landmarkLimit: 0).text
             // Restored even after cancellation: the flag must never stay on.
             RobiWebAccessibility.restore(change)
+            axWords = FlixWindowReading.wordCount(text)
             if FlixWindowTextPolicy.isEnough(text) {
                 chain.succeeded = true
-                return FlixWindowReading(text: text, chain: chain)
+                return reading(text)
             }
         }
         guard !Task.isCancelled, CGPreflightScreenCaptureAccess(),
               let windowID = await Task.detached(operation: { Self.windowID(for: context) }).value
-        else { return FlixWindowReading(text: text, chain: chain) }
+        else { return reading(text) }
         chain.steps.append(.vision)
         step(chain)
         guard let image = await capture.image(windowID: windowID), !Task.isCancelled else {
-            return FlixWindowReading(text: text, chain: chain)
+            return reading(text)
         }
         let recognized = await capture.recognizeText(image)
+        ocrWords = FlixWindowReading.wordCount(recognized)
         if FlixWindowTextPolicy.isEnough(recognized) {
             chain.succeeded = true
-            return FlixWindowReading(text: recognized, chain: chain)
+            return reading(recognized)
         }
         if recognized.count > text.count { text = recognized }
-        guard Self.canSeeImages, !Task.isCancelled else { return FlixWindowReading(text: text, chain: chain) }
+        guard Self.canSeeImages, !Task.isCancelled else { return reading(text) }
         chain.steps.append(.appleIntelligence)
         step(chain)
-        return FlixWindowReading(text: text, image: image, chain: chain)
+        return reading(text, image: image)
     }
 
     /// The window server's number for the window `context` names: the one whose bounds match the

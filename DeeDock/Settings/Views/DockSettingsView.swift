@@ -155,7 +155,7 @@ struct DockSettingsView: View {
             }
         case .flix:
             if let flix = coordinator?.flix {
-                FlixSettingsPane(flix: flix, robi: coordinator?.robi.store)
+                FlixSettingsPane(flix: flix)
             }
         case .display(let id):
             displayOverview(SettingsOverrideContext(profiles: profiles, id: id)).id(id)

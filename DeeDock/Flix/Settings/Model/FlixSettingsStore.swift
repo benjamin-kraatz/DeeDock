@@ -1,8 +1,9 @@
 import Foundation
 import Observation
 
-/// The live Flix Files settings. Saves on every change and tells the coordinator, which restarts
-/// only the parts that changed.
+/// The live Flix Files settings. Saves on every change, reports it as `setting_changed` (area
+/// `flix`, see `FlixSettings.analyticsProperties`), and tells the coordinator, which restarts only
+/// the parts that changed.
 ///
 /// Phase B reads the intelligence and link switches from ``settings`` (for example
 /// `settings.tracksLinks`, `settings.suggestsForFrontWindow`) and observes ``changed`` or the
@@ -13,6 +14,11 @@ final class FlixSettingsStore {
         didSet {
             guard settings != oldValue else { return }
             try? repository?.save(settings)
+            // `setting_changed` (area `flix`): counts for lists, the shortcut as a token, never paths.
+            if repository != nil {
+                Analytics.shared.settingsChanged(from: oldValue.analyticsProperties, to: settings.analyticsProperties,
+                                                 area: .flix)
+            }
             changed?(oldValue, settings)
         }
     }

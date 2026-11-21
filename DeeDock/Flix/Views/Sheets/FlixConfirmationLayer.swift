@@ -72,7 +72,7 @@ private struct FlixConfirmationDialog: View {
     @ViewBuilder private var buttons: some View {
         switch pending.confirmation {
         case .sensitive(let id, _, _):
-            dialogButton(String(localized: .flixConfirmSendAnyway)) { confirm(pending.itemIDs) }
+            dialogButton(String(localized: .flixConfirmSendAnyway)) { confirm(pending.itemIDs, .sendAnyway) }
             if let markNotSensitive = state.markNotSensitive {
                 dialogButton(String(localized: .flixConfirmNotSensitive)) { markNotSensitive(id) }
             }
@@ -82,9 +82,9 @@ private struct FlixConfirmationDialog: View {
                 let ids = pending.itemIDs.map { $0 == id ? newer : $0 }
                 state.selection = Set(ids)
                 state.cursor = newer
-                confirm(ids)
+                confirm(ids, .useNewest)
             }
-            dialogButton(String(localized: .flixConfirmSendOlder(name(id)))) { confirm(pending.itemIDs) }
+            dialogButton(String(localized: .flixConfirmSendOlder(name(id)))) { confirm(pending.itemIDs, .sendAnyway) }
         }
     }
 
@@ -103,9 +103,8 @@ private struct FlixConfirmationDialog: View {
         .font(.system(size: 12.5))
     }
 
-    private func confirm(_ ids: [FlixItem.ID]) {
-        state.confirmation = nil
-        state.confirmDrag?(ids)
+    private func confirm(_ ids: [FlixItem.ID], _ resolution: AnalyticsFlixWarningResolution) {
+        state.resolveConfirmation(resolution, ids: ids)
         state.showToast(String(localized: .flixToastDragAgain))
     }
 }

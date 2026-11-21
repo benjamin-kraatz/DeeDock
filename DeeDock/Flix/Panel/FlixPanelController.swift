@@ -51,6 +51,11 @@ final class FlixPanelController {
     var applicationResigned: (() -> Void)?
     /// The open or close animation finished, with the panel's visibility afterwards.
     var visibilityChanged: ((Bool) -> Void)?
+    /// A mouse button went down inside the panel (for `keyboard_only`).
+    var pointerPressed: (() -> Void)?
+    /// The panel's first frame after ``show(body:growth:)`` is on screen: the turn after SwiftUI drew
+    /// the entering pose in the newly sized window.
+    var firstFrame: (() -> Void)?
 
     init<Content: View>(state: FlixPanelState, content: Content) {
         self.state = state
@@ -102,6 +107,7 @@ final class FlixPanelController {
         // Spring from the entering pose once SwiftUI has drawn it in the newly sized window.
         DispatchQueue.main.async { [weak self] in
             guard let self, generation == token else { return }
+            firstFrame?()
             withAnimation(state.reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.34, dampingFraction: 0.78)) {
                 self.state.phase = .shown
             }
@@ -165,7 +171,10 @@ final class FlixPanelController {
         let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
             guard let self else { return event }
-            if belongsToPanel(event) { return event }
+            if belongsToPanel(event) {
+                pointerPressed?()
+                return event
+            }
             return outsideClick?(event) == true ? nil : event
         }
         globalMouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
@@ -198,7 +207,7 @@ final class FlixPanelController {
     /// Closes immediately and releases the window's content. The controller must not be used after.
     func stop() {
         close(animated: false)
-        outsideClick = nil; applicationResigned = nil; visibilityChanged = nil
+        outsideClick = nil; applicationResigned = nil; visibilityChanged = nil; pointerPressed = nil; firstFrame = nil
         window.resignedKey = nil
         window.contentView = nil
     }

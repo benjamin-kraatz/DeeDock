@@ -6,7 +6,6 @@ import SwiftUI
 /// are the only controls that read a protected folder, and only when pressed.
 struct FlixSettingsPane: View {
     let flix: FlixCoordinator
-    var robi: RobiStore?
 
     var body: some View {
         FlixSettingsContent(store: flix.settingsStore, shortcutStatus: flix.shortcutStatus,
@@ -17,7 +16,6 @@ struct FlixSettingsPane: View {
                             addFolder: { flix.addWatchedFolder($0) },
                             forgetDragMemory: { flix.intelligence.forgetDragMemory() },
                             clearHistory: { flix.history.clear() })
-        .task { flix.intelligence.engines = .current(robi: robi) }
     }
 }
 
