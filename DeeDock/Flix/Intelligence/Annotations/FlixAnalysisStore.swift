@@ -9,7 +9,8 @@ nonisolated struct FlixAnalysisRecord: Codable, Equatable, Sendable {
     /// 2: no facts from data and code files; key words as whole words; model facts need the text.
     /// 3: the auto-debit fact.
     /// 4: Apple Intelligence reads every document and decides its kind and facts.
-    static let currentVersion = 4
+    /// 5: the document's kind and payment state decide which facts apply; dates need wording.
+    static let currentVersion = 5
 
     var version = FlixAnalysisRecord.currentVersion
     var stamp: FlixFileStamp

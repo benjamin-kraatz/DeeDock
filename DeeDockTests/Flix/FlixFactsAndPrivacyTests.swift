@@ -7,11 +7,12 @@ import Testing
 extension FlixGeneratedDocument {
     /// A reading with only the given facts; everything else empty.
     static func reading(kind: FlixGeneratedDocumentKind = .invoice, due: (String, String)? = nil,
+                        validUntil: (String, String)? = nil,
                         total: (Double, String)? = nil, payment: FlixGeneratedPayment = .none,
                         paymentEvidence: String? = nil, signature: FlixGeneratedSignature = .none,
                         signatureEvidence: String? = nil) -> FlixGeneratedDocument {
         FlixGeneratedDocument(caption: "", fileName: "", kind: kind, payment: payment, paymentEvidence: paymentEvidence,
-                              dueDate: due?.0, dueDateEvidence: due?.1, validUntil: nil, validUntilEvidence: nil,
+                              dueDate: due?.0, dueDateEvidence: due?.1, validUntil: validUntil?.0, validUntilEvidence: validUntil?.1,
                               total: total?.0, totalEvidence: total?.1, signature: signature,
                               signatureEvidence: signatureEvidence)
     }
@@ -60,6 +61,24 @@ struct FlixFactsAndPrivacyTests {
                                               pageCount: 3, isPresentation: false)
         // None of the evidence is in the text.
         #expect(facts == [.pages(3)])
+    }
+
+    /// A direct-debit invoice (seen on an IONOS bill): the model offered its own date as the due
+    /// date, the contract term as "valid until", and "signed". Only the total and Auto-debit stay.
+    @Test func aDirectDebitInvoiceShowsNoDueDateValidityOrSignature() {
+        let text = """
+            Rechnung 27.10.2026
+            Vertragslaufzeit 31.01.2025 bis zum 30.01.2027
+            Zu zahlender Betrag 14,90 EUR
+            Entsprechend Ihrem SEPA-Lastschriftmandat buchen wir den Rechnungsbetrag von Ihrem Konto ab.
+            """
+        let document = FlixGeneratedDocument.reading(
+            due: ("2026-10-27", "27.10.2026"), validUntil: ("2027-01-30", "31.01.2025 bis zum 30.01.2027"),
+            total: (14.9, "Zu zahlender Betrag 14,90 EUR"), payment: .directDebit,
+            paymentEvidence: "SEPA-Lastschriftmandat buchen wir den Rechnungsbetrag", signature: .signed,
+            signatureEvidence: "Rechnung 27.10.2026")
+        let facts = FlixDocumentReading.facts(from: document, text: text, pageCount: nil, isPresentation: false)
+        #expect(facts == [.amount(14.9, currency: "EUR"), .autoDebit])
     }
 
     /// A data file's timestamp and counts are never a due date and a total (seen on a manifest.json).

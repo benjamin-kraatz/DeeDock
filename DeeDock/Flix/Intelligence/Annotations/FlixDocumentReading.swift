@@ -73,6 +73,14 @@ nonisolated enum FlixDocumentKind: String, Codable, Sendable {
         }
     }
 
+    /// A document whose "valid until" date matters: an offer runs out, a contract ends. On an
+    /// invoice the same words name something else, such as the contract term the bill belongs to.
+    var hasValidUntil: Bool { self == .quote || self == .contract }
+
+    /// A document that is signed or asks to be: never an invoice, receipt, or statement, whatever
+    /// a signature line or "signed" in its text suggests.
+    var takesSignature: Bool { self == .contract || self == .form || self == .quote }
+
     /// A document that asks for, confirms, or offers a payment. It prints bank details to be paid,
     /// and is made to be passed on (to an accountant, an expense report).
     var isPaymentDocument: Bool {
@@ -87,10 +95,18 @@ nonisolated enum FlixDocumentKind: String, Codable, Sendable {
 /// proves: the model decides what a document is and what matters in it, and each fact must come
 /// with the words it was read from, which must appear in the text and contain the fact itself.
 ///
-/// - A due or valid-until date: the evidence is in the text and writes that day out.
+/// - A due or valid-until date: the evidence is in the text, writes that day out, and says more
+///   than the date (a bare "27.10.2026" is usually the document's own date).
 /// - A total: the evidence is in the text and shows that amount with a currency; the evidence's
 ///   currency wins over the model's.
 /// - Paid, auto-debit, signature needed, signed: the evidence is in the text.
+///
+/// The model's own reading also decides which facts apply at all:
+/// - No due date when the payment is settled (proven paid or direct debit): nothing has to be done
+///   by that day, and the Paid or Auto-debit chip says why.
+/// - Valid until only on a quote or contract (``FlixDocumentKind/hasValidUntil``).
+/// - Signature chips only on a contract, form, or quote (``FlixDocumentKind/takesSignature``). They
+///   no longer hide the payment chip.
 ///
 /// So a timestamp in a data file, an order number, or a date the model guessed never becomes a
 /// chip. Page and slide counts come from the file, not the model, and stay last.
@@ -102,26 +118,36 @@ nonisolated enum FlixDocumentReading {
             guard let evidence, normalized(evidence).count >= 4, normalizedText.contains(normalized(evidence)) else { return nil }
             return evidence
         }
+        /// Proven, and more than a bare date.
+        func worded(_ evidence: String?) -> String? {
+            proven(evidence).flatMap { FlixFactExtractor.saysMoreThanDates($0) ? $0 : nil }
+        }
+        let kind = FlixDocumentKind(document.kind)
+        let stated: FlixFactValue? = switch document.payment {
+        case .alreadyPaid: .paid
+        case .directDebit: .autoDebit
+        case .open, .none: nil
+        }
+        let settled = proven(document.paymentEvidence) == nil ? nil : stated
         var facts: [FlixFactValue] = []
-        if let due = day(document.dueDate, provenBy: proven(document.dueDateEvidence)) { facts.append(.due(due)) }
-        if let valid = day(document.validUntil, provenBy: proven(document.validUntilEvidence)) {
+        if settled == nil, let due = day(document.dueDate, provenBy: worded(document.dueDateEvidence)) {
+            facts.append(.due(due))
+        }
+        if kind.hasValidUntil, let valid = day(document.validUntil, provenBy: worded(document.validUntilEvidence)) {
             facts.append(.validUntil(valid))
         }
         if let total = FlixNumbers.amount(document.total), let evidence = proven(document.totalEvidence),
            let shown = FlixFactExtractor.amounts(in: evidence).first(where: { abs($0.value - total) < 0.005 }) {
             facts.append(.amount(shown.value, currency: shown.currency))
         }
-        if document.signature == .signed, proven(document.signatureEvidence) != nil {
-            facts.append(.signed)
-        } else if document.signature == .needed, proven(document.signatureEvidence) != nil {
-            facts.append(.needsSignature)
-        } else if proven(document.paymentEvidence) != nil {
-            switch document.payment {
-            case .alreadyPaid: facts.append(.paid)
-            case .directDebit: facts.append(.autoDebit)
-            case .open, .none: break
+        if kind.takesSignature, proven(document.signatureEvidence) != nil {
+            switch document.signature {
+            case .signed: facts.append(.signed)
+            case .needed: facts.append(.needsSignature)
+            case .none: break
             }
         }
+        if let settled { facts.append(settled) }
         if let pageCount, pageCount > 1 { facts.append(isPresentation ? .slides(pageCount) : .pages(pageCount)) }
         // Counts stay last, so the chips that need attention come first.
         let counts = facts.filter { if case .pages = $0 { true } else if case .slides = $0 { true } else { false } }

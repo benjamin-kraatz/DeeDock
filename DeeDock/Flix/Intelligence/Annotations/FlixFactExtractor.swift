@@ -270,6 +270,16 @@ nonisolated enum FlixFactExtractor {
         return found.sorted { $0.1 < $1.1 }.map { (date: $0.0, location: $0.1) }
     }
 
+    /// Whether `text` says more than its dates: at least three letters remain once every date in it
+    /// is taken out. A bare "27.10.2026" or "27. Okt. 2026" does not; "Zahlbar bis 27.10.2026" does.
+    static func saysMoreThanDates(_ text: String) -> Bool {
+        var rest = fold(text)
+        for (pattern, _) in datePatterns {
+            rest = pattern.stringByReplacingMatches(in: rest, range: NSRange(rest.startIndex..., in: rest), withTemplate: " ")
+        }
+        return rest.filter(\.isLetter).count >= 3
+    }
+
     /// The first date within 50 characters after one of `words`.
     static func date(after words: [String], in text: String) -> Date? {
         let folded = fold(text) as NSString
