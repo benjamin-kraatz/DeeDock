@@ -59,6 +59,9 @@ struct FlixListView: View {
             if let morning = state.intelligence.morning {
                 FlixMorningCardView(card: morning, run: { run($0) }, dismiss: state.intelligence.dismissMorning)
             }
+            if let offer = state.pageOffer {
+                FlixSavePageCard(offer: offer, save: { state.savePage?() })
+            }
             FlixFitsSection(state: state)
         }
     }
@@ -70,7 +73,8 @@ struct FlixListView: View {
             context: FlixRowContext(match: row.match, isChild: row.isChild, versionCount: row.versionCount,
                                     versionGroup: row.versionGroup,
                                     isExpanded: row.versionGroup.map(state.expandedVersions.contains) ?? false,
-                                    isNoise: row.isNoise),
+                                    isNoise: row.isNoise,
+                                    relation: item.link == nil ? nil : state.linkRelation?(item)),
             annotation: state.intelligence.annotation(for: item.id),
             selected: state.selection.contains(item.id),
             dimmed: state.drag?.itemIDs.contains(item.id) == true,

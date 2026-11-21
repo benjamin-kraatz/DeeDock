@@ -2,14 +2,20 @@ import Foundation
 
 /// What the sidebar has selected, which decides the list before search narrows it.
 nonisolated enum FlixFilter: Hashable, Sendable {
-    /// The Activity section: All, Opened, Downloaded, New, Saved, Flagged.
+    /// The Activity section: All, Opened, Downloaded, New, Saved, Links, Flagged.
     nonisolated enum Activity: String, CaseIterable, Sendable {
-        case all, opened, downloaded, created, saved, flagged
+        case all, opened, downloaded, created, saved
+        /// Web pages (phase B1). The sidebar shows it while web links are on or links exist.
+        case links
+        case flagged
     }
 
     /// The Kinds section.
     nonisolated enum Kind: String, CaseIterable, Sendable {
-        case screenshots, images, documents, folders, apps
+        case screenshots, images, documents
+        /// Google Docs, Figma, Notion, Linear, Office, and Atlassian pages (phase B1).
+        case webDocuments
+        case folders, apps
     }
 
     case activity(Activity)
@@ -46,6 +52,7 @@ extension FlixFilter.Activity {
         case .downloaded: item.activity == .downloaded
         case .created: item.activity == .created
         case .saved: item.activity == .saved
+        case .links: item.kind == .link
         case .flagged: item.isFlagged
         }
     }
@@ -57,6 +64,7 @@ extension FlixFilter.Activity {
         case .downloaded: .flixFilterDownloaded
         case .created: .flixFilterNew
         case .saved: .flixFilterSaved
+        case .links: .flixFilterLinks
         case .flagged: .flixFilterFlagged
         }
     }
@@ -68,6 +76,7 @@ extension FlixFilter.Activity {
         case .downloaded: "arrow.down"
         case .created: "plus"
         case .saved: "pencil"
+        case .links: "link"
         case .flagged: "flag.fill"
         }
     }
@@ -79,6 +88,7 @@ extension FlixFilter.Kind {
         case .screenshots: item.kind == .screenshot
         case .images: item.kind == .image || item.kind == .screenshot
         case .documents: item.kind == .document
+        case .webDocuments: item.link.map { FlixWebDocuments.isWebDocument($0.url) } ?? false
         case .folders: item.kind == .folder
         case .apps: item.kind == .app
         }
@@ -89,6 +99,7 @@ extension FlixFilter.Kind {
         case .screenshots: .flixKindScreenshots
         case .images: .flixKindImages
         case .documents: .flixKindDocuments
+        case .webDocuments: .flixKindWebDocuments
         case .folders: .flixKindFolders
         case .apps: .flixKindApps
         }
@@ -99,6 +110,7 @@ extension FlixFilter.Kind {
         case .screenshots: "camera.viewfinder"
         case .images: "photo"
         case .documents: "doc.text"
+        case .webDocuments: "doc.richtext"
         case .folders: "folder"
         case .apps: "app"
         }

@@ -415,11 +415,11 @@ Hover never opens the panel. Opening it closes DOKK's other popovers and an anch
 
 ### The tile
 
-The tile shows the newest item's picture. A red badge counts what arrived by itself since you last looked, such as downloads and new screenshots; opening the panel clears it. A plain drag of the tile carries the newest item, so you can drop the file you just downloaded into a browser without opening anything. Option-drag moves the tile among the other utilities. Drop a file from Finder on the tile to keep it in Flix Files. A purple **✦ N fit here** pill above the tile names items that fit the window in front; that suggestion comes with Flix Files' intelligence (see below) and stays hidden until then.
+The tile shows the newest item's picture. A red badge counts what arrived by itself since you last looked, such as downloads and new screenshots; opening the panel clears it. A plain drag of the tile carries the newest item, so you can drop the file you just downloaded into a browser without opening anything. Option-drag moves the tile among the other utilities. Drop a file from Finder on the tile to keep it in Flix Files. A purple **✦ N fit here** pill above the tile counts items that fit the window in front (see [Fits this window](#fits-this-window)); it reads only the window's accessibility text, when you switch windows.
 
 ### The panel
 
-The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved**, and **Flagged**, then **Kinds** (Screenshots, Images, Documents, Folders, Apps), **Smart Filters**, and **Favorites**. Counts follow the noise switch in the footer. The list groups items into **Just Now**, **Today**, **Yesterday**, and **Earlier**. Each row shows the item's picture, its name, what happened ("Downloaded from billing.example.com", "New screenshot", "Saved"), the folder it is in, a flag when flagged, and when.
+The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved**, **Links** (while web links are on or pages are kept), and **Flagged**, then **Kinds** (Screenshots, Images, Documents, Web documents, Folders, Apps), **Smart Filters**, and **Favorites**. Counts follow the noise switch in the footer. The list groups items into **Just Now**, **Today**, **Yesterday**, and **Earlier**. Each row shows the item's picture, its name, what happened ("Downloaded from billing.example.com", "New screenshot", "Saved"), the folder it is in, a flag when flagged, and when.
 
 - **Select** with a click, Command-click to add or remove, Shift-click for a range. Up and Down move the selection; Shift extends it.
 - **Drag** one row or the whole selection out of the panel. As the pointer leaves the panel it fades aside so you can reach the window underneath. After a drop outside, the panel closes; pin it with the header's pin button (or choose **Stay open** in Settings) to keep it open. A cancelled drag brings it back.
@@ -441,9 +441,29 @@ Reduce Motion replaces the springs with crossfades. Reduce Transparency draws a 
 - **New, saved, and downloaded files** in the watched folders: Desktop, Documents, Downloads, and iCloud Drive by default. Downloads carry the page they came from. macOS asks before DOKK may read these folders, so Flix Files waits for you: the panel shows a card with **Allow…** buttons, and **Settings → Flix Files** lists each folder with its own button. Nothing is read before you press one. Folders Lookout already reads with your permission are watched without asking again.
 - **Apps** you bring to the front, at most once every five minutes per app.
 
-### Intelligence (planned)
+### Fits this window
 
-The panel already has room for the ✦ features in the approved design: suggestions for the window in front, search in your own words, Threads, captions and better names, key facts, versions, Tidy, Where were you?, More like this, a guard for sensitive files, and Ask Robi. They arrive with the next phases of DEE-163 and stay hidden until then. Their switches are already in **Settings → Flix Files**. Web link tracking (off by default) is planned the same way; dropped web addresses are kept already.
+When the panel opens, Flix Files reads the window that was in front and shows **✦ Fits portal.example.com** at the top of the list: up to three items, each with the window's own words ("asks for “the signed contract”"). The label on the right says how the window was read: **read via Accessibility**, or **~~Accessibility~~ → Vision** when the window's text was not available and Flix Files recognized the text in a picture of that one window, or **→ Apple Intelligence** when Apple Intelligence looked at the picture itself. The card shimmers while it reads and disappears when the window asks for nothing. Opening the panel again on the same window reuses the reading; a new page or conversation is read afresh.
+
+Flix Files needs Accessibility permission to read a window's text and Screen Recording for the picture; without them it skips those readers and never asks. Apple Intelligence understands what the window asks for when it is available; otherwise plain rules do (request words such as "attach" or "upload", file types, and size limits, in English and German). Turn it off with **Suggest files for the window in front**; **Show "fits here" on the tile** controls the tile's pill, which uses only the window's accessibility text and plain rules, never a picture or a model.
+
+### Uploads that fit
+
+When the window in front states limits ("PDF only · max 5 MB"), Flix Files prepares copies that fit before you drag: pictures (including HEIC) become a PDF or a JPEG, RTF, plain text, Markdown, HTML, and Word documents become a PDF, and pictures over the limit are scaled down. A Fits row shows the copy ("as PDF · 1.2 MB"), and the drag picture says **✦ Upload as PDF · 1.2 MB**. The copy keeps the original's name with its new extension; the original never changes. Pages, Numbers, Keynote, and other formats go out unchanged. A copy that is not ready yet when the drag starts is skipped too.
+
+### Sensitive files
+
+With **Sensitive file guard** on, Flix Files checks each file once in the background for an ID or passport, bank details (an IBAN, account and routing numbers, a card), or a key or password file, and blurs its picture in the panel and on the tile. Dragging one into a browser, mail, or chat first asks **Send Anyway**, **Not Sensitive** (never asks about that file again), or **Cancel**; after **Send Anyway**, drag it again. Dragging it into Finder or another app on the Mac asks nothing. Only files Flix Files may read are checked, and nothing leaves the Mac.
+
+### Web links
+
+**Settings → Flix Files → Track web links** (off by default) keeps the pages around your files: the page a download came from ("Source of “Invoice.pdf”"), a page you dropped a Flix file into ("↑ You sent 2 files here"), and web documents such as Google Docs, Figma, Notion, Linear, Office, and Atlassian pages that stay in front for 30 seconds. **Pages you read**, a separate switch, also keeps any page that stays in front for two minutes while you use the Mac. With a browser in front, **Save this page** at the top of the panel keeps its page, and a web address dragged onto the panel is kept too.
+
+Private and incognito windows are never tracked. Safari does not show which of its windows are private, so Safari pages are kept only when you save them or download from them. Banking and health sites are left out (**Leave out banking and health sites**), and you can add your own sites. Flix Files keeps only the address, title, and time, with sign-in tokens and session codes removed. Link rows show the site's first letter, or its icon with **Load site icons** on; they open in the browser they came from and drag out as a web address (a `.webloc` in Finder).
+
+### More intelligence (planned)
+
+The panel also has room for search in your own words, Threads, captions and better names, key facts, versions, Tidy, Where were you?, More like this, and Ask Robi. They arrive with the next phase of DEE-163 and stay hidden until then. Their switches are already in **Settings → Flix Files**.
 
 ## App badges
 

@@ -61,6 +61,9 @@ final class FlixCoordinator {
     /// Items confirmed by a drop question, so the next drag of them goes ahead. Expires quickly.
     @ObservationIgnored private var confirmedDrag: (ids: Set<FlixItem.ID>, until: Date)?
     @ObservationIgnored private var lookoutFolders: () -> [String]
+    /// Phase B1's window reading, conversions, sensitive guard, and web links. Set by ``live()``;
+    /// nil in previews and tests, where Flix Files runs without them.
+    @ObservationIgnored var contextServices: FlixContextServices?
 
     /// - Parameters:
     ///   - lookoutFolders: Folders Lookout's setup read with permission; DOKK may read them too.
@@ -74,11 +77,14 @@ final class FlixCoordinator {
 
     /// The live coordinator, reading DOKK's own defaults and Application Support.
     static func live() -> FlixCoordinator {
-        FlixCoordinator(settings: FlixSettingsStore(repository: FlixSettingsRepository(defaults: .standard)),
-                        history: .live()) {
+        let history = FlixHistory.live()
+        let coordinator = FlixCoordinator(settings: FlixSettingsStore(repository: FlixSettingsRepository(defaults: .standard)),
+                                          history: history) {
             let lookout = LookoutSettingsRepository(defaults: .standard).loadOrDefault()
             return lookout.setupCompleted ? lookout.folders : []
         }
+        coordinator.contextServices = FlixContextServices(history: history, folder: FlixStorageLocation.folder())
+        return coordinator
     }
 
     var settings: FlixSettings { settingsStore.settings }
@@ -95,6 +101,7 @@ final class FlixCoordinator {
         history.load()
         settingsStore.changed = { [weak self] old, new in self?.apply(new, previous: old) }
         configurePanelState()
+        contextServices?.start(with: self)
         apply(settings, previous: nil)
     }
 
@@ -112,6 +119,7 @@ final class FlixCoordinator {
         statusItem = nil
         nowTimer?.invalidate()
         nowTimer = nil
+        contextServices?.stop()
         intelligence.stop()
         tile.stop()
         history.didChange = nil
@@ -123,6 +131,7 @@ final class FlixCoordinator {
     private func apply(_ new: FlixSettings, previous old: FlixSettings?) {
         intelligence.settings = new
         readPolicy = FlixReadPolicy(settings: new, lookoutFolders: lookoutFolders())
+        contextServices?.apply(new)
         let enabled = new.isEnabled
         if enabled, new.tracksOpenedFiles { spotlight.start(includingFolders: new.tracksFolders) } else { spotlight.stop() }
         restartWatcher()
@@ -189,14 +198,16 @@ final class FlixCoordinator {
         }
         guard !kept.isEmpty else { return }
         history.record(kept)
+        contextServices?.recorded(kept)
     }
 
-    /// An app came to the front. Refreshes the tile's ✦ pill when a provider can read the window, and
-    /// records the app at most every five minutes, so switching back and forth does not bury the
-    /// files. Window switches inside one app are phase B1's to observe.
+    /// An app came to the front. Records the app at most every five minutes, so switching back and
+    /// forth does not bury the files. Without phase B1's services it also refreshes the tile's ✦
+    /// pill; with them, `FlixFrontWindowObserver` does that for app and window switches alike.
     func applicationActivated(_ app: NSRunningApplication) {
         guard started, settings.isEnabled, app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return }
-        if !isPanelOpen, settings.showsFitsOnTile, intelligence.providers.fits != nil {
+        // With phase B1's services, their front-window observer refreshes the pill instead.
+        if contextServices == nil, !isPanelOpen, settings.showsFitsOnTile, intelligence.providers.fits != nil {
             intelligence.frontWindowChanged(FlixFrontmostContext.capture(fallback: nil), items: history.items)
         }
         guard settings.tracksApps, app.activationPolicy == .regular, let id = app.bundleIdentifier,
@@ -210,14 +221,21 @@ final class FlixCoordinator {
     }
 
     private func historyDidChange() {
+        refreshTile()
+        intelligence.historyChanged(items: history.items)
+        contextServices?.historyChanged(history.items)
+    }
+
+    /// Redraws the tile (and the menu bar item) from the history and the intelligence slots.
+    func refreshTile() {
         let hiding = settings.hidesNoise
         let newest = history.newest(hidingNoise: hiding)
+        let guarded = settings.guardsSensitiveFiles
         tile.update(newest: newest, unseen: isPanelOpen ? 0 : history.unseenCount(hidingNoise: hiding),
-                    sensitive: newest.flatMap { intelligence.annotations[$0.id]?.isSensitive } ?? false,
+                    sensitive: guarded && (newest.flatMap { intelligence.annotations[$0.id]?.isSensitive } ?? false),
                     policy: readPolicy)
         tile.fitCount = isPanelOpen ? nil : intelligence.tileFitCount
         statusItem?.update()
-        intelligence.historyChanged(items: history.items)
     }
 
     // MARK: Folder access
@@ -290,6 +308,7 @@ final class FlixCoordinator {
         let panel = panel ?? makePanel()
         panelState.prepareForOpen(mode: mode, frontmost: context, policy: readPolicy)
         intelligence.panelOpened(context: context, items: history.items)
+        contextServices?.panelOpened(context)
         anchoredDisplayID = mode == .anchored ? displayID : nil
         panel.show(body: body, growth: growth)
         history.markSeen()
@@ -385,6 +404,7 @@ final class FlixCoordinator {
         let icons = Dictionary(uniqueKeysWithValues: items.map { ($0.id, FlixIconProvider.icon(for: $0, policy: readPolicy)) })
         panelState.drag = FlixDragActivity(itemIDs: ids)
         let started = FlixDragSession.begin(items: items, substitutions: plan?.substitutions ?? [:], icons: icons,
+                                            label: plan?.label,
                                             from: view, event: event,
                                             moved: { [weak self] point in self?.dragMoved(to: point) },
                                             ended: { [weak self] accepted, _ in self?.dragEnded(items, accepted: accepted) })
@@ -407,12 +427,15 @@ final class FlixCoordinator {
                 .map { FlixPendingConfirmation(confirmation: $0, itemIDs: [newest.id]) }
             return
         }
-        let plan = intelligence.dragPlan(for: [newest], context: FlixFrontmostContext.capture(fallback: nil))
+        let front = FlixFrontmostContext.capture(fallback: nil)
+        let plan = intelligence.dragPlan(for: [newest], context: front)
         let icon = tile.thumbnail ?? FlixIconProvider.typeIcon(for: newest)
         FlixDragSession.begin(items: [newest], substitutions: plan?.substitutions ?? [:], icons: [newest.id: icon],
-                              from: view, event: event, moved: { _ in },
+                              label: plan?.label, from: view, event: event, moved: { _ in },
                               ended: { [weak self] accepted, _ in
-                                  if accepted { self?.intelligence.recordDrop(of: [newest], context: nil) }
+                                  guard accepted else { return }
+                                  self?.intelligence.recordDrop(of: [newest], context: nil)
+                                  self?.contextServices?.dropped([newest], context: front)
                               })
     }
 
@@ -431,7 +454,10 @@ final class FlixCoordinator {
         panelState.drag = nil
         guard let panel, panel.isVisible else { return }
         guard wasOutside else { return }
-        if accepted { intelligence.recordDrop(of: items, context: panelState.frontmost) }
+        if accepted {
+            intelligence.recordDrop(of: items, context: panelState.frontmost)
+            contextServices?.dropped(items, context: panelState.frontmost)
+        }
         if accepted, !panelState.staysOpenAfterDrag {
             close(restoreFocus: false, animated: false)
         } else {

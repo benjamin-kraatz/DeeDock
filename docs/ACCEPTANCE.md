@@ -3700,3 +3700,38 @@ Phase A, built on `codex/dee-163-flix-files` after the confirmed mockups `docs/m
 - [ ] Reduce Motion: crossfades instead of springs and pops. Reduce Transparency: solid panel and tile. Light and dark appearance. VoiceOver reads rows, the tile's value, and toasts.
 - [ ] Two displays with different edges and a display with a negative origin; Spaces and a full-screen app; unplugging the display the panel is anchored to; sleep and wake with the panel open.
 - [ ] Discovery: the Flix Files tip appears after the earlier tips and **Open Flix Files** opens the panel; opening it any other way suppresses the tip.
+
+### Phase B1: window reading, conversions, sensitive guard, web links
+
+Built on `codex/dee-163-b1`. How each part works, the per-browser table, and the limits are in [FLIX.md](FLIX.md#window-reading-and-fits-this-window).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix files (all Flix sources recompiled).
+- New tests compile, **not run**: token stripping, excluded sites, web documents, private-window markers, omnibox values, link relations (`FlixLinkRulesTests`); fallback parsing, size limits, the text threshold, scoring, synonyms, ranking, upload-page filtering (`FlixWindowFitsTests`); conversion decisions, copy names, drag labels, ID, IBAN, card, and key rules, outside targets (`FlixConversionAndSensitiveTests`).
+- The app was not launched. No browser, Accessibility tree, capture, model call, conversion, or drag below has been exercised.
+
+#### Hands-on acceptance
+
+- [ ] Safari on an upload page that says "Attach the signed contract and this month's invoice. PDF only · max 5 MB": opening the panel shows **✦ Fits portal.example.com** with both items and "read via Accessibility"; reopening on the same page does not read again.
+- [ ] A Chromium browser and an Electron app: the read turns on the web tree for the read only (`AXEnhancedUserInterface` is off again afterwards, window animations unaffected).
+- [ ] A window without accessibility text (a canvas or a remote desktop) with Screen Recording granted: the chain reads **~~Accessibility~~ → Vision**; without Screen Recording it stops quietly and no prompt appears.
+- [ ] A window of icons only on a Mac with Apple Intelligence: the chain ends at **Apple Intelligence**. With Apple Intelligence off, the rules still find the items on the upload page.
+- [ ] Mail draft "attaching the moodboard and the packaging quote": the card names **Mail · <subject>** and suggests those files.
+- [ ] Tile pill: switch between the upload tab and another tab, then to another app: the pill appears and disappears within a second, without any capture (no Screen Recording indicator) and without focus moving.
+- [ ] Turning off **Suggest files for the window in front** hides the card; turning off **Show "fits here" on the tile** hides the pill and stops the observer.
+- [ ] Drag a HEIC photo from the Fits card into the PDF-only portal: the drag picture says **✦ Upload as PDF · …**, the portal receives `<name>.pdf`, and the original is unchanged. A 12 MB JPEG for a 5 MB limit arrives smaller. A `.pages` file goes out unchanged.
+- [ ] Drag an RTF, a Markdown file, an HTML file, and a `.docx` into the portal: each arrives as a readable PDF.
+- [ ] Converted copies sit in `…/T/DOKK Flix Conversions/` and are gone after quitting DOKK.
+- [ ] A passport scan, an IBAN screenshot, and a `.pem` file in an allowed folder are blurred in the panel and, when newest, on the tile, within a minute of arriving. A protected folder that was not allowed is never read and never prompts.
+- [ ] Drag the passport scan into a browser: the question appears with **Send Anyway**, **Not Sensitive**, and **Cancel**. Into Finder or Preview: no question. **Not Sensitive** removes the blur and the question for good, also after a relaunch.
+- [ ] Turning the sensitive guard off removes every blur.
+- [ ] Track web links on: a download from Chrome adds a link row "Source of “<file>”"; dropping a Flix file into a Chrome page adds "↑ You sent 1 file here".
+- [ ] A Google Doc in Chrome kept in front for 30 seconds is kept and listed under **Web documents**; switching tabs before 30 seconds keeps nothing.
+- [ ] **Pages you read** on: a page read for two minutes is kept; a page left in front while away from the Mac is not.
+- [ ] An Incognito window in Chrome, an InPrivate window in Edge, a Private window in Brave and Firefox, and Arc's incognito: nothing is kept automatically. Repeat with the browser's UI in German. Safari: nothing is kept automatically from any window.
+- [ ] Banking and health sites (a bank's login, a patient portal) and a site on the user's list are never kept automatically.
+- [ ] A page whose address carries `?token=…`, `?code=…&state=…`, or a signed S3 link is stored without those parameters.
+- [ ] With a browser in front, **Save this page** keeps the page and turns into **Saved**; it also works in Safari and in a private window, because it is deliberate.
+- [ ] Link rows show a monogram; with **Load site icons** on, the site's icon after a moment and no request while it is off. A click opens the page in the browser it came from; dragging a link into Finder makes a `.webloc`, into a browser opens the page.
+- [ ] VoiceOver reads the Fits rows with their conversion, the sensitive reason, link relation lines, and the Save this page card. Reduce Motion: the card and chips appear without animation beyond a fade.

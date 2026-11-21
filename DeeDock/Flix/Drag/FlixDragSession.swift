@@ -27,12 +27,13 @@ final class FlixDragSession: NSObject, NSDraggingSource {
     /// - Parameters:
     ///   - substitutions: Files to carry instead of an item's own (phase B1's conversions).
     ///   - icons: Drag images by item; the type icon is used when missing.
+    ///   - label: A line under the first icon, such as "✦ Upload as PDF · 1.2 MB" (phase B1).
     ///   - moved: Each pointer move, in screen coordinates.
     ///   - ended: Once, with whether a destination took the drop.
     /// - Returns: False when nothing in `items` can be dragged.
     @discardableResult
     static func begin(items: [FlixItem], substitutions: [FlixItem.ID: URL] = [:], icons: [FlixItem.ID: NSImage],
-                      from view: NSView, event: NSEvent,
+                      label: String? = nil, from view: NSView, event: NSEvent,
                       moved: @escaping (CGPoint) -> Void,
                       ended: @escaping (Bool, CGPoint) -> Void) -> Bool {
         let draggable = items.filter { substitutions[$0.id] != nil || $0.shareURL != nil }
@@ -57,8 +58,14 @@ final class FlixDragSession: NSObject, NSDraggingSource {
             let icon = icons[item.id] ?? FlixIconProvider.typeIcon(for: item)
             // Fan the icons a little so several items read as a stack.
             let offset = CGFloat(min(index, 4)) * 5
-            dragItem.setDraggingFrame(CGRect(x: origin.x - size / 2 + offset, y: origin.y - size / 2 - offset,
-                                             width: size, height: size), contents: icon)
+            if index == 0, let label {
+                let labelled = FlixDragLabelImage.make(icon: icon, iconSize: size, label: label)
+                dragItem.setDraggingFrame(CGRect(x: origin.x - labelled.size.width / 2, y: origin.y - labelled.size.height + size / 2,
+                                                 width: labelled.size.width, height: labelled.size.height), contents: labelled)
+            } else {
+                dragItem.setDraggingFrame(CGRect(x: origin.x - size / 2 + offset, y: origin.y - size / 2 - offset,
+                                                 width: size, height: size), contents: icon)
+            }
             dragItems.append(dragItem)
         }
         let dragging = view.beginDraggingSession(with: dragItems, event: event, source: session)
@@ -89,5 +96,26 @@ final class FlixDragSession: NSObject, NSDraggingSource {
         ended(!operation.isEmpty, screenPoint)
         retained = nil
         if Self.current === self { Self.current = nil }
+    }
+}
+
+/// The first drag icon with a pill under it naming what the drag does ("✦ Upload as PDF · 1.2 MB"),
+/// in the intelligence violet the panel uses.
+@MainActor
+enum FlixDragLabelImage {
+    static func make(icon: NSImage, iconSize: CGFloat, label: String) -> NSImage {
+        let font = NSFont.systemFont(ofSize: 11, weight: .semibold)
+        let text = NSAttributedString(string: label, attributes: [.font: font, .foregroundColor: NSColor.white])
+        let textSize = text.size()
+        let pill = CGSize(width: ceil(textSize.width) + 16, height: 20)
+        let size = CGSize(width: max(iconSize, pill.width), height: iconSize + 4 + pill.height)
+        return NSImage(size: size, flipped: true) { _ in
+            icon.draw(in: CGRect(x: (size.width - iconSize) / 2, y: 0, width: iconSize, height: iconSize))
+            let rect = CGRect(x: (size.width - pill.width) / 2, y: iconSize + 4, width: pill.width, height: pill.height)
+            NSColor(red: 0.545, green: 0.424, blue: 1, alpha: 0.95).setFill()
+            NSBezierPath(roundedRect: rect, xRadius: pill.height / 2, yRadius: pill.height / 2).fill()
+            text.draw(at: CGPoint(x: rect.minX + 8, y: rect.minY + (pill.height - textSize.height) / 2))
+            return true
+        }
     }
 }

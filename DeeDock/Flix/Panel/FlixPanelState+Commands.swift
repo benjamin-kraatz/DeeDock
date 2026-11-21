@@ -159,8 +159,8 @@ extension FlixPanelState {
             kept += 1
         }
         for url in links where !url.isFileURL {
-            let scheme = url.scheme?.lowercased()
-            guard scheme == "http" || scheme == "https" else { continue }
+            // Only web pages, without sign-in tokens or session parameters.
+            guard let url = FlixURLSanitizer.sanitize(url) else { continue }
             let link = FlixLink(url: url, title: nil, browserBundleIdentifier: nil)
             history.record(FlixActivityEvent(link: link, name: link.host, kind: .link, activity: .link, date: now))
             kept += 1

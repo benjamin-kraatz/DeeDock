@@ -71,8 +71,11 @@ private struct FlixConfirmationDialog: View {
 
     @ViewBuilder private var buttons: some View {
         switch pending.confirmation {
-        case .sensitive:
+        case .sensitive(let id, _, _):
             dialogButton(String(localized: .flixConfirmSendAnyway)) { confirm(pending.itemIDs) }
+            if let markNotSensitive = state.markNotSensitive {
+                dialogButton(String(localized: .flixConfirmNotSensitive)) { markNotSensitive(id) }
+            }
             dialogButton(String(localized: .flixCancel), primary: true) { state.confirmation = nil }
         case .newerVersion(let id, let newer):
             dialogButton(String(localized: .flixConfirmUseNewer(name(newer))), primary: true) {

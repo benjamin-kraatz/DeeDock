@@ -22,7 +22,8 @@ struct FlixFitsSection: View {
                         FlixRowView(item: item,
                                     context: FlixRowContext(fitPhrase: fit.phrase,
                                                             memory: fit.memory ?? state.intelligence.dragReason(
-                                                                for: item, context: state.frontmost)),
+                                                                for: item, context: state.frontmost),
+                                                            conversion: state.conversionChip?(item)),
                                     annotation: state.intelligence.annotation(for: item.id),
                                     selected: state.selection.contains(item.id),
                                     dimmed: state.drag?.itemIDs.contains(item.id) == true,

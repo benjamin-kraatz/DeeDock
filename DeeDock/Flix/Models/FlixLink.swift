@@ -2,8 +2,8 @@ import Foundation
 
 /// A web page Flix Files keeps as an item.
 ///
-/// Phase A stores links only when you drop a URL on the panel. Phase B1 adds link tracking (off by
-/// default) and renders link rows with a site monogram; this model is already what it stores.
+/// Links come from a URL dropped on the panel, **Save this page**, and `FlixLinkTracker`'s web
+/// link tracking (off by default). Rows draw them with a site monogram (`FlixSiteIconView`).
 /// Only the URL, the title, and the browser that showed it are kept: never page contents.
 nonisolated struct FlixLink: Codable, Hashable, Sendable {
     /// The page address, with tracking and session parameters already removed by whoever recorded it.

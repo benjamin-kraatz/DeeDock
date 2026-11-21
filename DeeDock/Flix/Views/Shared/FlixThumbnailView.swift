@@ -22,7 +22,9 @@ struct FlixThumbnailView: View {
 
     var body: some View {
         ZStack {
-            if let thumbnail, wantsThumbnail {
+            if item.kind == .link, let link = item.link {
+                FlixSiteIconView(host: link.host, size: size)
+            } else if let thumbnail, wantsThumbnail {
                 Image(nsImage: thumbnail)
                     .resizable()
                     .aspectRatio(contentMode: .fit)

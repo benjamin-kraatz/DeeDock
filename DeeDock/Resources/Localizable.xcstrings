@@ -3805,6 +3805,24 @@
         }
       }
     },
+    "flixConfirmNotSensitive" : {
+      "comment" : "Flix Files: button in the sensitive-file question that removes the sensitive mark from this file for good.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht vertraulich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Sensitive"
+          }
+        }
+      }
+    },
     "flixConfirmSendAnyway" : {
       "comment" : "Flix Files: dialog button that allows the sensitive file to be dragged.",
       "extractionState" : "manual",
@@ -3909,6 +3927,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Use “%@”"
+          }
+        }
+      }
+    },
+    "flixConvertChip" : {
+      "comment" : "Flix Files: small chip on a Fits row saying how the file will be uploaded. %1$@ is a format (PDF), %2$@ a size (1.2 MB).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "als %1$@ · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "as %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "flixConvertLabel" : {
+      "comment" : "Flix Files: label on the drag picture when a file is converted for the window in front. %1$@ is a format name such as PDF, %2$@ a file size such as 1.2 MB.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Als %1$@ hochladen · %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Upload as %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "flixConvertLabelCount" : {
+      "comment" : "Flix Files: drag label when several files are converted to one format. %1$@ is the format (PDF), %2$lld the number of files, always 2 or more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Als %1$@ hochladen · %2$lld umgewandelt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Upload as %1$@ · %2$lld converted"
+          }
+        }
+      }
+    },
+    "flixConvertLabelMixed" : {
+      "comment" : "Flix Files: drag label when several files are converted to different formats. %lld is 2 or more.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ %lld für den Upload umgewandelt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ %lld converted for upload"
+          }
+        }
+      }
+    },
+    "flixConvertLabelResized" : {
+      "comment" : "Flix Files: drag label when a picture is only made smaller to fit the page's size limit. %@ is the new size.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Verkleinert hochladen · %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✦ Upload smaller · %@"
           }
         }
       }
@@ -4477,6 +4585,24 @@
         }
       }
     },
+    "flixFilterLinks" : {
+      "comment" : "Flix Files: sidebar Activity entry listing web pages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        }
+      }
+    },
     "flixFilterNew" : {
       "comment" : "Flix Files: sidebar entry for files that appeared in a watched folder, such as screenshots.",
       "extractionState" : "manual",
@@ -4843,6 +4969,24 @@
         }
       }
     },
+    "flixKindWebDocuments" : {
+      "comment" : "Flix Files: sidebar Kinds entry for web documents such as Google Docs, Figma, Notion, or Linear pages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web-Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web documents"
+          }
+        }
+      }
+    },
     "flixLabelItems" : {
       "comment" : "Flix Files: how toasts name several items. Plural.",
       "extractionState" : "manual",
@@ -4917,6 +5061,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Like %@"
+          }
+        }
+      }
+    },
+    "flixLinkSent" : {
+      "comment" : "Flix Files: line on a link row: files from Flix Files were dropped on this page. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "↑ %lld Datei hierher gesendet"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "↑ %lld Dateien hierher gesendet"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "↑ You sent %lld file here"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "↑ You sent %lld files here"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixLinkSourceOf" : {
+      "comment" : "Flix Files: line on a link row: a file was downloaded from this page. %@ is the quoted file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelle von %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source of %@"
+          }
+        }
+      }
+    },
+    "flixLinkSourceOfMany" : {
+      "comment" : "Flix Files: line on a link row: several files were downloaded from this page. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quelle von %lld Datei"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quelle von %lld Dateien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Source of %lld file"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Source of %lld files"
+                }
+              }
+            }
           }
         }
       }
@@ -5995,6 +6241,78 @@
         }
       }
     },
+    "flixSavePageButton" : {
+      "comment" : "Flix Files: button on the Save this page card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "flixSavePageHelp" : {
+      "comment" : "Flix Files: VoiceOver hint and tooltip of the Save button. %@ is the page title or host.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behält %@ in Flix Files"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps %@ in Flix Files"
+          }
+        }
+      }
+    },
+    "flixSavePageSaved" : {
+      "comment" : "Flix Files: the Save this page card after the page was kept.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesichert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "flixSavePageTitle" : {
+      "comment" : "Flix Files: card at the top of the panel offering to keep the page open in the browser in front.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite sichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save this page"
+          }
+        }
+      }
+    },
     "flixSearchHelp" : {
       "comment" : "Flix Files: help and VoiceOver label of the search button and field.",
       "extractionState" : "manual",
@@ -6045,6 +6363,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ask in your own words"
+          }
+        }
+      }
+    },
+    "flixSensitiveReasonBank" : {
+      "comment" : "Flix Files: why a file is treated as sensitive: it shows an IBAN, account numbers, or a card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht nach Bankdaten aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks like bank details"
+          }
+        }
+      }
+    },
+    "flixSensitiveReasonIdentity" : {
+      "comment" : "Flix Files: why a file is treated as sensitive. Shown on the row and read by VoiceOver.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht aus wie ein Ausweisdokument"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks like an ID document"
+          }
+        }
+      }
+    },
+    "flixSensitiveReasonSecret" : {
+      "comment" : "Flix Files: why a file is treated as sensitive: a private key, certificate, or password store.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieht nach einem Schlüssel oder einer Passwortdatei aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Looks like a key or password file"
           }
         }
       }
@@ -6704,19 +7076,19 @@
       }
     },
     "flixSettingsSensitiveGuardHelp" : {
-      "comment" : "Flix Files Settings: subtitle.",
+      "comment" : "Flix Files: Settings help under the sensitive file guard switch.",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwischt Ausweise, Bankdaten und Schlüssel und fragt, bevor sie in eine andere App gehen."
+            "value" : "Verwischt Ausweise, Bankdaten und Schlüssel und fragt, bevor sie in einen Browser, eine Mail oder einen Chat gehen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blurs IDs, bank details, and keys, and asks before they go to another app."
+            "value" : "Blurs IDs, bank details, and keys, and asks before they go to a browser, mail, or chat."
           }
         }
       }
@@ -7063,6 +7435,24 @@
         }
       }
     },
+    "flixSettingsWebLinksAccess" : {
+      "comment" : "Flix Files: Settings note under Web links when DOKK lacks Accessibility permission.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web-Links lesen die Adresse im Browser über die Bedienungshilfen. Ohne sie bleiben nur gesicherte Seiten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web links read the browser's address through Accessibility. Without it, only pages you save are kept."
+          }
+        }
+      }
+    },
     "flixSettingsWebLinksFootnote" : {
       "comment" : "Flix Files Settings: footnote of the web links card. Neutral and transparent.",
       "extractionState" : "manual",
@@ -7077,6 +7467,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flix Files keeps only a page's address, title, and time, never what it shows. Private windows are never tracked, and sign-in tokens are removed from addresses."
+          }
+        }
+      }
+    },
+    "flixSettingsWebLinksSafari" : {
+      "comment" : "Flix Files: Settings note under Web links explaining the Safari limitation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safari zeigt nicht, welche seiner Fenster privat sind. Seiten aus Safari bleiben deshalb nur, wenn sie gesichert werden oder ein Download von ihnen stammt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safari does not show which of its windows are private, so Safari pages are kept only when you save them or download from them."
           }
         }
       }
@@ -8359,6 +8767,24 @@
         }
       }
     },
+    "flixToastMarkedNotSensitive" : {
+      "comment" : "Flix Files: toast after the person marked a file as not sensitive. %@ is the quoted file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ gilt nicht mehr als vertraulich. Zum Senden noch einmal ziehen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is no longer marked as sensitive. Drag it again to send it."
+          }
+        }
+      }
+    },
     "flixToastMoved" : {
       "comment" : "Flix Files: toast with Undo. First argument names the items, second is a folder name.",
       "extractionState" : "manual",
@@ -8373,6 +8799,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moved %1$@ to %2$@."
+          }
+        }
+      }
+    },
+    "flixToastPageSaved" : {
+      "comment" : "Flix Files: toast after a page was saved. %@ is the page title or host.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ gesichert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved %@."
           }
         }
       }

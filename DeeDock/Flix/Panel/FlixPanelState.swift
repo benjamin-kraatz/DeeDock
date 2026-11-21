@@ -65,6 +65,18 @@ final class FlixPanelState {
     /// Starts a native drag of items from a row's view.
     @ObservationIgnored var beginDrag: (([FlixItem.ID], NSView, NSEvent) -> Void)?
 
+    // MARK: Phase B1 (window reading, conversions, sensitive guard, web links)
+    /// The page in the browser in front, for the **Save this page** card. Nil hides the card.
+    var pageOffer: FlixPageOffer?
+    /// Keeps ``pageOffer``'s page.
+    @ObservationIgnored var savePage: (() -> Void)?
+    /// A link row's "Source of …" / "↑ You sent 2 files here" line.
+    @ObservationIgnored var linkRelation: ((FlixItem) -> String?)?
+    /// A Fits row's "as PDF · 1.2 MB" chip, once its converted copy is ready.
+    @ObservationIgnored var conversionChip: ((FlixItem) -> String?)?
+    /// The sensitive question's **Not Sensitive**.
+    @ObservationIgnored var markNotSensitive: ((FlixItem.ID) -> Void)?
+
     @ObservationIgnored private var searchTask: Task<Void, Never>?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
 
@@ -142,6 +154,7 @@ final class FlixPanelState {
         isDropTargeted = false
         intelligence.clearMoreLikeThis()
         intelligence.clearQuery()
+        pageOffer = nil
         foldersAwaitingAccess = settings.tracksWatchedFolders
             ? settings.enabledWatchedFolders.filter { $0.access == .unknown && policy.isProtected($0.path) } : []
         selection = []

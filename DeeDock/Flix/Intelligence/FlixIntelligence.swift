@@ -27,7 +27,9 @@ final class FlixIntelligence {
 
     private(set) var fits: FlixFitsState = .hidden
     /// The tile's "✦ N fit here" pill. Nil hides it.
-    private(set) var tileFitCount: Int?
+    private(set) var tileFitCount: Int? {
+        didSet { if tileFitCount != oldValue { slotsChanged?() } }
+    }
     private(set) var query: FlixQueryState = .idle
     private(set) var threads: [FlixThread] = []
     private(set) var annotations: [FlixItem.ID: FlixItemAnnotation] = [:]
@@ -50,6 +52,9 @@ final class FlixIntelligence {
     @ObservationIgnored private var robiTask: Task<Void, Never>?
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var lastMorningDay: Date?
+    /// Phase B1: the tile's pill or an annotation the tile draws (the sensitive blur) changed. The
+    /// coordinator redraws the tile; the tile is not a SwiftUI observer of this model.
+    @ObservationIgnored var slotsChanged: (() -> Void)?
 
     init() {}
 
@@ -170,7 +175,14 @@ final class FlixIntelligence {
             if let annotations {
                 let fresh = await annotations.annotations(for: items, known: known)
                 guard let self, !Task.isCancelled else { return }
-                self.annotations.merge(fresh) { _, new in new }
+                // The sensitive fields belong to phase B1's guard (`reviseAnnotation`); a fresh
+                // annotation from another provider keeps them.
+                self.annotations.merge(fresh) { old, new in
+                    var merged = new
+                    merged.isSensitive = old.isSensitive
+                    merged.sensitiveReason = old.sensitiveReason
+                    return merged
+                }
             }
             if let threads {
                 let groups = await threads.threads(for: items)
@@ -178,6 +190,17 @@ final class FlixIntelligence {
                 self.threads = groups
             }
         }
+    }
+
+    /// Changes one item's annotation in place, creating it when missing. Phase B1's sensitive guard
+    /// writes its verdicts through here as they arrive, outside the coalesced provider pass.
+    func reviseAnnotation(for id: FlixItem.ID, _ change: (inout FlixItemAnnotation) -> Void) {
+        var annotation = annotations[id] ?? FlixItemAnnotation()
+        let before = annotation
+        change(&annotation)
+        guard annotation != before else { return }
+        annotations[id] = annotation
+        slotsChanged?()
     }
 
     /// Forgets annotations for items no longer in the history.
@@ -303,9 +326,11 @@ final class FlixIntelligence {
     ///
     /// Phase A's own rules run when no provider answers: an annotated sensitive item (while the
     /// sensitive guard is on), then an older version of a document with a newer one in the history.
+    /// With a drag provider installed (phase B1), the provider alone decides the sensitive question,
+    /// because it asks only for outside targets (a browser, mail, a chat).
     func dropConfirmation(for items: [FlixItem], context: FlixFrontmostContext?) -> FlixDropConfirmation? {
         if let answer = providers.drag?.confirmation(for: items, context: context) { return answer }
-        if settings.guardsSensitiveFiles,
+        if settings.guardsSensitiveFiles, providers.drag == nil,
            let sensitive = items.first(where: { annotations[$0.id]?.isSensitive == true }) {
             return .sensitive(itemID: sensitive.id, reason: annotations[sensitive.id]?.sensitiveReason,
                               destination: context?.applicationName)

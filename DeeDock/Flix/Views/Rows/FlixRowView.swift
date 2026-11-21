@@ -11,6 +11,10 @@ struct FlixRowContext: Equatable {
     /// Set in the Fits card: the window's words this item answers.
     var fitPhrase: String?
     var memory: FlixDragReason?
+    /// Set in the Fits card when the item will go out converted: "as PDF · 1.2 MB" (phase B1).
+    var conversion: String?
+    /// A link row's relation to files: "Source of “Invoice.pdf”" (phase B1).
+    var relation: String?
 }
 
 /// One activity row: picture, name, event line, chips, a ✦ action, flag, and time.
@@ -129,6 +133,9 @@ struct FlixRowView: View {
                 if let memory = context.memory {
                     Text(verbatim: "· ↺ " + memory.text).opacity(0.8)
                 }
+                if let conversion = context.conversion {
+                    FlixConversionChip(text: conversion, selected: selected)
+                }
             } else if let caption = annotation?.caption {
                 FlixSparkle(size: 10)
                 Text(verbatim: caption)
@@ -138,6 +145,7 @@ struct FlixRowView: View {
             } else {
                 FlixEventLabel(item: item, selected: selected)
                 if let folder = item.folderName { Text(verbatim: "· " + folder) }
+                if let relation = context.relation { Text(verbatim: "· " + relation) }
             }
             ForEach(Array((annotation?.facts ?? []).prefix(2).enumerated()), id: \.offset) { _, fact in
                 FlixFactChip(fact: fact, selected: selected)
@@ -160,6 +168,9 @@ struct FlixRowView: View {
     private var accessibilityValue: String {
         var parts = [FlixEventLabel.text(for: item), FlixRelativeTime.string(for: item.date, now: now)]
         if let caption = annotation?.caption { parts.insert(caption, at: 0) }
+        if let relation = context.relation { parts.append(relation) }
+        if let conversion = context.conversion { parts.append(conversion) }
+        if annotation?.isSensitive == true, let reason = annotation?.sensitiveReason { parts.append(reason) }
         if item.isFlagged { parts.append(String(localized: .flixFilterFlagged)) }
         if context.match == .meaning { parts.append(String(localized: .flixByMeaning)) }
         return parts.joined(separator: ", ")

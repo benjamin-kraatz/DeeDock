@@ -11,7 +11,7 @@ struct FlixSidebarView: View {
         let base = baseItems
         ScrollView {
             VStack(alignment: .leading, spacing: 1) {
-                ForEach(FlixFilter.Activity.allCases, id: \.self) { activity in
+                ForEach(FlixFilter.Activity.allCases.filter { showsLinkFilter($0 == .links, base: base) }, id: \.self) { activity in
                     FlixSidebarRow(title: Text(activity.title), glyph: .symbol(activity.symbol),
                                    count: base.count(where: activity.matches),
                                    selected: state.filter == .activity(activity)) { state.filter = .activity(activity) }
@@ -26,7 +26,7 @@ struct FlixSidebarView: View {
                     }
                 }
                 FlixSidebarHeader(title: Text(.flixSidebarKinds))
-                ForEach(FlixFilter.Kind.allCases, id: \.self) { kind in
+                ForEach(FlixFilter.Kind.allCases.filter { showsLinkFilter($0 == .webDocuments, base: base) }, id: \.self) { kind in
                     FlixSidebarRow(title: Text(kind.title), glyph: .symbol(kind.symbol),
                                    count: base.count(where: kind.matches),
                                    selected: state.filter == .kind(kind)) { state.filter = .kind(kind) }
@@ -71,6 +71,11 @@ struct FlixSidebarView: View {
 
     private var semantic: (String, FlixItem) -> Bool? {
         { [intelligence = state.intelligence] topic, item in intelligence.semanticMatch(topic: topic, item: item) }
+    }
+
+    /// Links and Web documents appear while web links are on, or while links are in the history.
+    private func showsLinkFilter(_ isLinkFilter: Bool, base: [FlixItem]) -> Bool {
+        !isLinkFilter || state.settings.tracksLinks || base.contains { $0.kind == .link }
     }
 
     /// The items counts are taken from: noise left out while it is hidden.

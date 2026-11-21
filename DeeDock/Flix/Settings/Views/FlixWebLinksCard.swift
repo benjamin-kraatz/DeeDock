@@ -1,11 +1,13 @@
+import ApplicationServices
 import SwiftUI
 
 /// Web links: off by default, with "pages you read" as a separate opt-in and a list of sites
 /// never tracked.
 ///
-/// These are the switches phase B1's link tracking obeys. Until it ships they are saved but
-/// nothing is tracked; a URL dropped on Flix Files is kept either way, because that is a deliberate
-/// save.
+/// These are the switches `FlixLinkTracker` obeys. A URL dropped on Flix Files, or a page kept
+/// with **Save this page**, is kept either way, because that is a deliberate save. Two notes explain
+/// the limits: Safari pages are kept only when saved or downloaded from (Safari's private windows
+/// cannot be told apart), and without Accessibility permission only saved pages are kept.
 struct FlixWebLinksCard: View {
     @Binding var settings: FlixSettings
     @State private var newSite = ""
@@ -43,6 +45,12 @@ struct FlixWebLinksCard: View {
             .padding(.horizontal, SettingsMetrics.rowInset)
             .padding(.vertical, 10)
             .disabled(!settings.tracksLinks)
+            if settings.tracksLinks {
+                FlixWebLinksNote(text: .flixSettingsWebLinksSafari, symbol: "safari")
+                if !AXIsProcessTrusted() {
+                    FlixWebLinksNote(text: .flixSettingsWebLinksAccess, symbol: "accessibility")
+                }
+            }
         }
     }
 
@@ -59,5 +67,20 @@ struct FlixWebLinksCard: View {
         let candidate = trimmed.contains("://") ? trimmed : "https://" + trimmed
         guard let host = URLComponents(string: candidate)?.host, host.contains(".") else { return nil }
         return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+    }
+}
+
+/// A quiet note under the web link switches.
+private struct FlixWebLinksNote: View {
+    let text: LocalizedStringResource
+    let symbol: String
+
+    var body: some View {
+        Label { Text(text) } icon: { Image(systemName: symbol).foregroundStyle(.secondary) }
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, SettingsMetrics.rowInset)
+            .padding(.bottom, 10)
     }
 }
