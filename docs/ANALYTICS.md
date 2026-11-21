@@ -536,6 +536,9 @@ the window in front is off), or `no_permission` (neither Accessibility nor Scree
 | `flix_pick_used` | A row was used. `picker_kind`, `rank` (1-based), `trigger` (`click`, `option_click`, `double_click`, `drag`, `accessibility` for a VoiceOver action), `route` (`listed_row`, `go_to_folder`, `drag`, `already_there`), `confirmed` (the picker's default button was pressed), `result` (`selected`, `failed`), `failure_reason` (`secure_input`, `modifiers_held`, `not_frontmost`, `no_path_field`, `not_verified`, `picker_closed`; with `result = selected` only `not_verified`, when the jump worked but the button was not pressed; absent when nothing went wrong), `duration_ms`. A double-click reports once, as `double_click` |
 | `flix_pick_picker_closed` | A picker Flix Pick showed beside closed. `picker_kind`, `outcome` (`picked_via_flix_pick`, `picked_elsewhere`, `cancelled`, `unknown` for a close by the keyboard or anything Flix Pick cannot tell apart), `chosen_rank` (only when the chosen file or folder was a row) |
 | `flix_pick_disabled_for_app` | **Not in** from Flix Pick's menu. `app_category` |
+| `flix_pick_expanded` | The rail opened under the pointer, once per picker. `picker_kind`, `candidate_count` |
+| `flix_pick_settings_opened` | **Flix Pick Settings…** from Flix Pick's menu. `picker_kind` |
+| `flix_pick_no_candidates` | A picker appeared, but Flix Pick had nothing likely for it and stayed hidden. Once per picker. `picker_kind`, `app_category` |
 
 `combo` is a token such as `ctrl_opt_cmd_f`: the modifiers in the order `ctrl`, `opt`, `shift`,
 `cmd`, then the key's name from a fixed list (letters, digits, `space`, `f1`–`f20`, arrows, and

@@ -37,6 +37,9 @@ final class FlixPickCoordinator {
         var evidence: FlixPickClosingEvidence
         /// The panel showed for this picker, so its closing is reported.
         var shown = false
+        /// Reported once per picker: the rail opened, and the picker had nothing likely.
+        var expanded = false
+        var reportedNoCandidates = false
         /// The rows shown, by standardized path, for the chosen row's rank when it closes.
         var rowPaths: [String] = []
     }
@@ -86,6 +89,9 @@ final class FlixPickCoordinator {
         state.hoverChanged = { [weak self] inside in self?.hoverChanged(inside) }
         state.disableForApp = { [weak self] in self?.disableForCurrentApp() }
         state.prepareSettings = { [weak self] in
+            if let kind = self?.session?.picker.kind {
+                Analytics.track(.flixPickSettingsOpened(picker: AnalyticsFlixPickerKind(kind)))
+            }
             self?.flix?.prepareSettings?()
             self?.hide()
         }
@@ -222,7 +228,14 @@ final class FlixPickCoordinator {
     private func show(_ rows: [FlixPickRow], appName: String) {
         guard var current = session, let flix else { return }
         // Nothing likely: no panel, but the picker is still followed so a pick there is learned.
-        guard !rows.isEmpty else { return }
+        guard !rows.isEmpty else {
+            if !current.shown, !current.reportedNoCandidates {
+                session?.reportedNoCandidates = true
+                Analytics.track(.flixPickNoCandidates(picker: AnalyticsFlixPickerKind(current.picker.kind),
+                                                      appCategory: current.category))
+            }
+            return
+        }
         state.refreshAccessibilityOptions()
         state.kind = current.picker.kind
         state.appName = appName
@@ -497,6 +510,12 @@ final class FlixPickCoordinator {
         if inside {
             collapseTask?.cancel()
             panel?.setOpen(true)
+            if var current = session, current.shown, !current.expanded {
+                current.expanded = true
+                session = current
+                Analytics.track(.flixPickExpanded(picker: AnalyticsFlixPickerKind(current.picker.kind),
+                                                  candidateCount: current.rowPaths.count))
+            }
         } else {
             scheduleCollapse()
         }

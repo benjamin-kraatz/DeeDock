@@ -123,6 +123,9 @@ extension AnalyticsEvent {
         case .flixPickUsed: "flix_pick_used"
         case .flixPickPickerClosed: "flix_pick_picker_closed"
         case .flixPickDisabledForApp: "flix_pick_disabled_for_app"
+        case .flixPickExpanded: "flix_pick_expanded"
+        case .flixPickSettingsOpened: "flix_pick_settings_opened"
+        case .flixPickNoCandidates: "flix_pick_no_candidates"
         case .focusDockEntered: "focus_dock_entered"
         case .focusDockCommand: "focus_dock_command"
         case let .update(event, _): event.name
@@ -412,6 +415,12 @@ extension AnalyticsEvent {
             ["picker_kind": .init(picker), "outcome": .init(outcome), "chosen_rank": chosenRank.map(AnalyticsValue.init)]
         case let .flixPickDisabledForApp(appCategory):
             ["app_category": .init(appCategory)]
+        case let .flixPickExpanded(picker, candidateCount):
+            ["picker_kind": .init(picker), "candidate_count": .init(candidateCount)]
+        case let .flixPickSettingsOpened(picker):
+            ["picker_kind": .init(picker)]
+        case let .flixPickNoCandidates(picker, appCategory):
+            ["picker_kind": .init(picker), "app_category": .init(appCategory)]
         case let .focusDockEntered(trigger):
             ["trigger": .init(trigger)]
         case let .focusDockCommand(command):

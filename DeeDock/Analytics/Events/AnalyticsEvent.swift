@@ -270,6 +270,13 @@ enum AnalyticsEvent {
     case flixPickPickerClosed(picker: AnalyticsFlixPickerKind, outcome: AnalyticsFlixPickOutcome, chosenRank: Int?)
     /// **Not in <App>** in Flix Pick's menu.
     case flixPickDisabledForApp(appCategory: FlixAppCategory)
+    /// Flix Pick's rail opened under the pointer, once per picker.
+    case flixPickExpanded(picker: AnalyticsFlixPickerKind, candidateCount: Int)
+    /// **Flix Pick Settings…** in Flix Pick's menu.
+    case flixPickSettingsOpened(picker: AnalyticsFlixPickerKind)
+    /// A picker appeared but Flix Pick had nothing likely for it, so it stayed hidden. Once per
+    /// picker. The app as a category only.
+    case flixPickNoCandidates(picker: AnalyticsFlixPickerKind, appCategory: FlixAppCategory)
 
     // Focus Dock
     case focusDockEntered(trigger: AnalyticsTrigger)
