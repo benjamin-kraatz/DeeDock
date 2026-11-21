@@ -97,8 +97,10 @@ struct FlixHistoryBatchTests {
         var settings = FlixSettings()
         settings.tracksLinks = true
         var document = FlixHistoryDocument()
-        var download = event("/d/invoice.pdf", .downloaded, at: 0)
-        download.sourcePage = URL(string: "https://billing.example.com/invoices")
+        // As the sources build it: the page goes through the initializer, which derives the host.
+        let download = FlixActivityEvent(path: "/d/invoice.pdf", name: "invoice.pdf", kind: .document,
+                                         activity: .downloaded, date: t0,
+                                         sourcePage: URL(string: "https://billing.example.com/invoices"))
         document.record(batch: [download, event("/d/other.pdf", .downloaded, at: 1)])
         let invoice = document.items.first { $0.name == "invoice.pdf" }
         #expect(invoice?.sourcePage == nil && invoice?.sourceHost == "billing.example.com")

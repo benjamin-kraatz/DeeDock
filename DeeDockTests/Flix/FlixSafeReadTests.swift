@@ -128,10 +128,17 @@ struct FlixSafeReadTests {
         defer { try? FileManager.default.removeItem(at: home) }
         let policy = FlixReadPolicy(home: home.path, allowedRoots: [])
         let link = home.appending(path: "Projects/alias.swift")
-        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: home.appending(path: "Projects/main.swift"))
-        #expect(policy.readableURL(link.path)?.path == home.appending(path: "Projects/main.swift").path)
+        let target = home.appending(path: "Projects/main.swift")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+        // The resolver returns the real path (`/private/var/…`), which `resolvingSymlinksInPath()`
+        // in `makeHome` deliberately shortens back to `/var/…`; compare against `realpath`.
+        let expected = try #require(realpath(target.path, nil).map { pointer in
+            defer { free(pointer) }
+            return String(cString: pointer)
+        })
+        #expect(policy.readableURL(link.path)?.path == expected)
         let file = try #require(FlixSafeFile.open(link.path, policy: policy))
-        #expect(file.path == home.appending(path: "Projects/main.swift").path)
+        #expect(file.path == expected)
     }
 
     @Test func specialFilesAreNeverRead() throws {
