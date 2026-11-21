@@ -31,6 +31,11 @@ nonisolated enum Rules {
     ]
     static let projectBundleExtensions: Set<String> = ["xcodeproj", "xcworkspace"]
 
+    /// Build output folders, not walked inside a code project (`isProjectRoot`, found at the folder's parent or above).
+    /// Outside one, a folder with one of these names may hold your own files, so it's walked like any other. A folder
+    /// with one of these names that is itself a project root, with nothing above it, is a project and walked.
+    static let buildOutputFolderNames: Set<String> = ["build", "dist", "target", "out"]
+
     /// Documents, read as text (`DocExtractor`). Markup formats (reStructuredText, AsciiDoc, Org, Textile, MDX) are
     /// read as they are written, subtitles without their cue numbers and timings, LaTeX without its commands, and
     /// Safari web archives and XHTML through the HTML path (`DocumentText`).

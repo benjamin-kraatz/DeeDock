@@ -85,7 +85,7 @@ Lookout skips these:
 - XML, JSON, YAML, CSV, TSV, property lists, logs, and configuration files, as data. EPUB, mail files, and Pages, Numbers, and Keynote documents aren't read either.
 - Folders such as `node_modules`, `DerivedData`, and `Pods`, folders whose names end in `.noindex`, and `~/Library`, except iCloud Drive and cloud storage folders chosen as roots.
 - iCloud and cloud storage files that aren't downloaded, because reading a placeholder downloads it.
-- Code projects, except the screenshots in them.
+- Code projects, except the screenshots in them. Lookout doesn't walk into their `build`, `dist`, `target`, and `out` folders at all. Outside a code project, folders with those names are walked like any other.
 - Folders of 300 or more images where at least 70% have machine-made names. They look like datasets. A folder the person chose is never treated as one.
 
 The backfill can read a file hours after the crawl queued it, so `QueuedFileGate` checks each file again just before it's read. The stored path must still pass the settings and the crawl's folder rules. The file must be a regular file and not a link, and `lstat` and the opened descriptor must agree. `F_GETPATH` on the descriptor gives where the open file really is, which catches a folder on the way that became a link. Any other path than the stored one must pass the same rules itself and be the queued inode. Paths are never compared by spelling, because on a case-sensitive volume `Notes` linked to its sibling `NOTES` differs only in case. The extractors read the bytes from that descriptor, never the path, so the check and the read can't race. A file whose inode changed is queued again with its new identity. A file that fails a check is skipped, and the next sync settles it.

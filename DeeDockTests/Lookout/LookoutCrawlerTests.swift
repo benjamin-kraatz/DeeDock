@@ -136,6 +136,17 @@ struct LookoutCrawlerTests {
         #expect(report.skipped["inside a code project"] == 2)
     }
 
+    @Test func buildOutputIsNotWalkedInsideACodeProjectOnly() throws {
+        try folder.write("project/package.json")
+        try folder.write("project/dist/Screenshot 2026-10-01 at 9.41.07 PM.png")
+        try folder.write("project/app/target/Screenshot 2026-10-02 at 9.41.07 PM.png")
+        try folder.write("project/docs/Screenshot 2026-10-03 at 9.41.07 PM.png")
+        try folder.write("school/out/essay.md")
+        let report = Crawler.crawl([folder.url], options: IndexOptions(), readsLastUsed: false)
+        #expect(names(report) == ["project/docs/Screenshot 2026-10-03 at 9.41.07 PM.png", "school/out/essay.md"])
+        #expect(report.skippedFolders["build output"] == 2)
+    }
+
     @Test func nestedRootsAreCrawledOnceAndTheDiskNever() throws {
         let inner = try folder.folder("inner")
         try folder.write("inner/trip.txt")
