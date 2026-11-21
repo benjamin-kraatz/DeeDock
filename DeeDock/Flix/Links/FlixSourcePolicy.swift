@@ -41,6 +41,7 @@ nonisolated enum FlixSourcePolicy {
         guard event.sourcePage != nil || event.sourceHost != nil else { return event }
         var event = event
         (event.sourcePage, event.sourceHost) = allowed(page: event.sourcePage, host: event.sourceHost, settings: settings)
+        if event.sourcePage == nil { event.sourcePageIdentity = nil }
         return event
     }
 

@@ -36,10 +36,12 @@ nonisolated enum FlixDocumentImport {
         guard let documentType = documentType(for: type) else { return nil }
         if file.isDirectory {
             guard documentType == .rtfd, packageIsPlain(file.url) else { return nil }
-            guard let wrapper = try? FileWrapper(url: file.url, options: .immediate) else { return nil }
+            // `.withoutMapping`: the wrapper copies each file's bytes instead of mapping them, so a
+            // file rewritten or a share lost mid-import fails the read rather than crashing.
+            guard let wrapper = try? FileWrapper(url: file.url, options: [.immediate, .withoutMapping]) else { return nil }
             return NSAttributedString(rtfdFileWrapper: wrapper, documentAttributes: nil)
         }
-        guard let data = file.mapped(maximumBytes: maximumBytes) else { return nil }
+        guard let data = try? file.contents(maximumBytes: maximumBytes) else { return nil }
         return try? NSAttributedString(data: data, options: [.documentType: documentType], documentAttributes: nil)
     }
 

@@ -118,7 +118,9 @@ final class FlixRobiProvider: FlixRobiProviding {
             var file = RobiFileContext(name: item.name, kind: Self.kindLabel(item), text: "")
             if let link = item.link {
                 file.text = [link.title, link.url.absoluteString].compactMap { $0 }.joined(separator: "\n")
-            } else if let path = item.path, policy.canRead(path) {
+            } else if let path = item.path, policy.spellingIsReadable(path) {
+                // Spelling only on the main actor; the readers below resolve the path off it
+                // (`FlixSafeFile`, `readableURL`) and return nothing when it is not readable.
                 if item.kind == .folder {
                     let names = await FlixContentReader.names(in: path, policy: policy).sorted().prefix(60)
                     file.text = names.joined(separator: "\n")

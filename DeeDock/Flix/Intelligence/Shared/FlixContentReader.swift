@@ -41,8 +41,11 @@ nonisolated enum FlixContentReader {
     static let pictureSide = 1_024
     /// PDF pages read for text.
     static let pdfPages = 4
-    /// The largest picture or PDF mapped for reading.
-    static let maximumMappedBytes: Int64 = 200_000_000
+    /// The largest picture read for a model or a scan. Read into memory (``FlixSafeFile`` never
+    /// maps a file), so the cap is also the most one picture read holds.
+    static let maximumPictureBytes: Int64 = 64_000_000
+    /// The largest PDF read for its text, for the same reason.
+    static let maximumPDFBytes: Int64 = 64_000_000
 
     /// The modification date and size of each path that exists and the policy lets Flix read.
     @concurrent static func stamps(_ paths: [String], policy: FlixReadPolicy) async -> [String: FlixFileStamp] {
@@ -98,7 +101,7 @@ nonisolated enum FlixContentReader {
     }
 
     private static func readPDF(_ file: FlixSafeFile, limit: Int, into content: inout FlixFileContent) {
-        guard let data = file.mapped(maximumBytes: maximumMappedBytes), let document = PDFDocument(data: data) else { return }
+        guard let data = try? file.contents(maximumBytes: maximumPDFBytes), let document = PDFDocument(data: data) else { return }
         content.pageCount = document.pageCount
         var text = ""
         for index in 0..<min(document.pageCount, pdfPages) {
@@ -109,9 +112,10 @@ nonisolated enum FlixContentReader {
     }
 
     /// A downscaled picture, decoded through ImageIO's thumbnail path so a 50-megapixel photo never
-    /// decodes at full size. The bytes come from the descriptor that was checked.
-    static func picture(in file: FlixSafeFile, side: Int = pictureSide) -> CGImage? {
-        guard let data = file.mapped(maximumBytes: maximumMappedBytes),
+    /// decodes at full size. The bytes are copied from the descriptor that was checked, at most
+    /// `maximumBytes`; nil when the file is larger or cannot be read.
+    static func picture(in file: FlixSafeFile, side: Int = pictureSide, maximumBytes: Int64 = maximumPictureBytes) -> CGImage? {
+        guard let data = try? file.contents(maximumBytes: maximumBytes),
               let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,

@@ -57,7 +57,7 @@ enum FlixThreadNamer {
     /// else their most common distinctive name word, else their kind.
     static func fallbackName(_ members: [Member], catchAll: Set<String>) -> String {
         let folders = members.compactMap(\.folder).filter { !catchAll.contains($0) }
-        if let folder = mostCommon(folders) { return FileManager.default.displayName(atPath: folder) }
+        if let folder = mostCommon(folders) { return FlixFolderNames.displayName(of: folder) }
         let words = members.flatMap { FlixWords.distinctive($0.name) }
         if let word = mostCommon(words), let member = members.first(where: { FlixWords.distinctive($0.name).contains(word) }) {
             // The word as the name spells it ("Berlin", not "berlin").

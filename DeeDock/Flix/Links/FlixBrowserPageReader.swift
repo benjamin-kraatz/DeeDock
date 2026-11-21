@@ -19,6 +19,9 @@ nonisolated struct FlixBrowserPage: Equatable, Sendable {
     /// How many credentials cleaning removed from the address the browser showed, for the
     /// `flix_link_tokens_stripped` counter.
     var removedSecrets = 0
+    /// The address exactly as the browser showed it, query included, before cleaning. In memory
+    /// only, for the download check (`FlixLinkTracker.vouches(for:front:)`); never stored.
+    var pageIdentity: URL?
 
     var host: String {
         let host = url.host(percentEncoded: false) ?? url.absoluteString
@@ -128,7 +131,8 @@ nonisolated enum FlixBrowserPageReader {
             return nil
         }
         return FlixBrowserPage(url: url, title: cleanTitle(evidence.title), privacy: privacy(family: family, evidence: evidence),
-                               browserBundleIdentifier: bundleIdentifier, removedSecrets: cleaned.removedSecrets)
+                               browserBundleIdentifier: bundleIdentifier, removedSecrets: cleaned.removedSecrets,
+                               pageIdentity: raw)
     }
 
     /// One attribute read that keeps the difference between "the element has none" and "the read

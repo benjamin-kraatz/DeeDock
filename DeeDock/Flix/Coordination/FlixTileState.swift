@@ -46,10 +46,12 @@ final class FlixTileState {
         thumbnailTask?.cancel()
         guard let item else { thumbnail = nil; return }
         thumbnail = FlixIconProvider.typeIcon(for: item)
-        // Resolved now, right before the request, so the thumbnail reads the file the policy
-        // checked and never follows a link into a folder DOKK was not allowed.
-        guard let path = item.path, let url = policy.readableURL(path) else { return }
+        guard let path = item.path else { return }
         thumbnailTask = Task { [weak self] in
+            // Resolved right before the request, off the main actor (the check walks the path with
+            // `lstat`), so the thumbnail reads the file the policy checked and never follows a link
+            // into a folder DOKK was not allowed.
+            guard let url = await policy.readableURLInBackground(path), !Task.isCancelled else { return }
             let image = await HubThumbnailCache.shared.thumbnail(for: url, size: CGSize(width: 64, height: 64),
                                                                  scale: NSScreen.main?.backingScaleFactor ?? 2)
             guard let self, !Task.isCancelled, newest?.id == item.id, let image else { return }

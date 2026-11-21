@@ -42,7 +42,8 @@ nonisolated enum FlixConversionFidelity: Equatable, Sendable {
         case tooManyPages
         /// Pictures or other attachments the text export does not draw.
         case attachments
-        /// Pictures, objects, headers, or footers the importer drops.
+        /// Pictures, objects, headers, footers, footnotes, text boxes, frames, comments, or tracked
+        /// changes the importer or the text layout drops.
         case unsupportedParts
         case unreadable
     }
@@ -74,21 +75,25 @@ nonisolated enum FlixConversionDecision: Hashable, Sendable {
 /// - Pictures that ImageIO can read (HEIC, PNG, TIFF, WebP, JPEG, GIF…) become a PDF when PDFs are
 ///   accepted, else a JPEG, else a PNG. A picture over the size limit is scaled down (JPEG, or PNG
 ///   when only PNG is accepted).
-/// - Text documents that `NSAttributedString` reads off the main thread (RTF, RTFD, plain text,
-///   Markdown, Word `.docx`, OpenDocument text) become a PDF when PDFs are accepted. HTML and web
-///   archives are not converted: their importer needs the main thread and loads external resources
-///   (`FlixDocumentImport`). Legacy Word `.doc` is not converted either: its binary format cannot be
-///   checked for pictures or headers the text export would drop.
+/// - Plain text (Markdown included, laid out as written) and flat RTF become a PDF when PDFs are
+///   accepted (``convertibleTextTypes``). Nothing else that holds text is converted.
+/// - Word (`.docx`, `.doc`), OpenDocument text, and RTFD are never converted automatically: AppKit's
+///   importers silently drop footnotes, endnotes, text boxes, comments, tracked changes, fields, and
+///   more, and no check of the file's parts can vouch for all of them. RTFD exists to carry
+///   attachments, and its inner RTF is not checked. HTML and web archives are not converted either:
+///   their importer needs the main thread and loads external resources (`FlixDocumentImport`).
 /// - Everything else is unconvertible: iWork files (Pages, Numbers, Keynote) and other formats
 ///   need their own app to export, and a PDF or document over the limit cannot be made smaller here.
 ///
 /// The type alone cannot say whether a copy would be faithful, so the converter checks the content
 /// before writing one (``picture(frameCount:isAnimated:format:)``, ``text(attachmentCount:)``,
 /// ``documentParts(in:type:)``). When a copy would leave something out — a page of a multi-page
-/// TIFF, a picture in a Word file, a header — it declines, and the original goes out unchanged:
-/// a portal refusing the file is better than one silently receiving less than the person sent.
+/// TIFF, a picture, footnote, or text box in an RTF file, a header — it declines, and the original
+/// goes out unchanged: a portal refusing the file is better than one silently receiving less than
+/// the person sent.
 nonisolated enum FlixConversionPlanner {
-    /// The text types Flix Files imports with `NSAttributedString` off the main thread.
+    /// The text types Flix Files imports with `NSAttributedString` off the main thread, for the
+    /// sensitive scanner and captions. Only ``convertibleTextTypes`` of them are converted.
     static let textTypes: [UTType] = [
         .rtf, .rtfd, .flatRTFD, .plainText,
         UTType("net.daringfireball.markdown"), UTType("org.openxmlformats.wordprocessingml.document"),
@@ -136,8 +141,10 @@ nonisolated enum FlixConversionPlanner {
         return .unconvertible
     }
 
-    /// Text types read for scanning and captions that are never converted (``isConvertibleText(_:)``).
-    static let unconvertedTextTypes: [UTType] = [UTType("com.microsoft.word.doc")].compactMap { $0 }
+    /// The text types converted to a PDF: plain text (which Markdown and source code conform to)
+    /// and flat RTF, whose control words ``documentParts(in:type:)`` can check. Word, OpenDocument,
+    /// and RTFD are read for scanning and captions but never converted (see the type's notes).
+    static let convertibleTextTypes: [UTType] = [.plainText, UTType("net.daringfireball.markdown"), .rtf].compactMap { $0 }
 
     /// The most pages a multi-page picture (TIFF, multi-image HEIC) becomes; more is declined.
     static let maximumPictureFrames = 30
@@ -159,24 +166,62 @@ nonisolated enum FlixConversionPlanner {
         attachmentCount == 0 ? .faithful(pages: 0) : .declined(.attachments)
     }
 
-    /// Whether a flat document holds parts the importer or the text export leaves out, from its raw
-    /// bytes: pictures, embedded objects, and headers or footers. Word and OpenDocument files are
-    /// ZIP archives whose part names are stored uncompressed, so their names are enough; RTF names
-    /// them as control words. Other types (plain text, Markdown) have no such parts.
-    static func documentParts(in data: Data, type: UTType) -> FlixConversionFidelity {
-        let markers: [String]
-        if let docx = UTType("org.openxmlformats.wordprocessingml.document"), type.conforms(to: docx) {
-            markers = ["word/media/", "word/charts/", "word/embeddings/", "word/diagrams/", "word/header",
-                       "word/footer", "word/comments.xml"]
-        } else if let odt = UTType("org.oasis-open.opendocument.text"), type.conforms(to: odt) {
-            markers = ["Pictures/", "Object ", "ObjectReplacements/"]
-        } else if type.conforms(to: .rtf) && !type.conforms(to: .rtfd) {
-            markers = ["\\pict", "\\object", "\\header", "\\footer", "\\shp"]
-        } else {
-            return .faithful(pages: 0)
+    /// RTF control words for content the importer or the Core Text layout leaves out: pictures
+    /// (`\pict`, `\shppict`), embedded objects (`\object`), headers and footers (`\header`,
+    /// `\footerl`, …), footnotes and endnotes (`\footnote`), shapes and text boxes (`\shp`,
+    /// `\shptxt`, drawing objects `\do` and their text boxes `\dptxbx`), positioned frames and
+    /// paragraphs (`\posx…`, `\posy…`, `\posnegx`, `\absw`, `\phmrg`, `\pvpara`, …), comments
+    /// (`\annotation`, `\atnid`, `\atrfstart`), and tracked changes (`\revised`, `\deleted`).
+    ///
+    /// Matched as whole control words (``rtfControlWords(in:)``), so section formatting that Word
+    /// writes into every RTF file, such as the header distance `\headery708`, does not count as a
+    /// header.
+    static let rtfUnsupportedControlWords: Set<String> = [
+        "pict", "shppict", "object",
+        "header", "headerl", "headerr", "headerf", "footer", "footerl", "footerr", "footerf",
+        "footnote",
+        "shp", "shpgrp", "shptxt", "do", "dptxbx",
+        "posx", "posxc", "posxi", "posxo", "posxl", "posxr", "posy", "posyc", "posyin", "posyout", "posyt",
+        "posyb", "posyil", "posnegx", "posnegy", "absw", "absh", "phmrg", "phpg", "phcol", "pvmrg", "pvpg",
+        "pvpara", "frame",
+        "annotation", "atnid", "atnauthor", "atrfstart", "atrfend",
+        "revised", "deleted",
+    ]
+
+    /// The control words of an RTF file that are in `words`, read from its raw bytes: a backslash,
+    /// then letters, ended by anything else (a numeric parameter, a space, a brace). An escaped
+    /// backslash (`\\`) is text, not the start of a word.
+    static func rtfControlWords(in data: Data, among words: Set<String> = rtfUnsupportedControlWords) -> Set<String> {
+        var found = Set<String>()
+        let backslash = UInt8(ascii: "\\")
+        func isLetter(_ byte: UInt8) -> Bool { (65...90).contains(byte) || (97...122).contains(byte) }
+        data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) in
+            var index = 0
+            while index < bytes.count {
+                guard bytes[index] == backslash else { index += 1; continue }
+                var end = index + 1
+                if end < bytes.count, bytes[end] == backslash { index = end + 1; continue }
+                // Control words are at most 32 letters long (the RTF specification's limit).
+                while end < bytes.count, end - index <= 32, isLetter(bytes[end]) { end += 1 }
+                if end > index + 1, let word = String(bytes: bytes[(index + 1)..<end], encoding: .ascii),
+                   words.contains(word) {
+                    found.insert(word)
+                }
+                index = end
+            }
         }
-        for marker in markers where data.range(of: Data(marker.utf8)) != nil { return .declined(.unsupportedParts) }
-        return .faithful(pages: 0)
+        return found
+    }
+
+    /// Whether a flat RTF file holds parts the importer or the text export leaves out, from its raw
+    /// bytes (``rtfUnsupportedControlWords``). Plain text and Markdown have no such parts. Any other
+    /// type is declined: it is not converted (``convertibleTextTypes``), so nothing vouches for it.
+    static func documentParts(in data: Data, type: UTType) -> FlixConversionFidelity {
+        if type.conforms(to: .rtfd) || type.conforms(to: .flatRTFD) { return .declined(.unsupportedParts) }
+        if type.conforms(to: .rtf) {
+            return rtfControlWords(in: data).isEmpty ? .faithful(pages: 0) : .declined(.unsupportedParts)
+        }
+        return isConvertibleText(type) ? .faithful(pages: 0) : .declined(.unsupportedParts)
     }
 
     static func isImage(_ type: UTType) -> Bool {
@@ -188,9 +233,11 @@ nonisolated enum FlixConversionPlanner {
         return textTypes.contains { type.conforms(to: $0) }
     }
 
-    /// Text types the converter turns into a PDF: ``isText(_:)`` without legacy Word.
+    /// Text types the converter turns into a PDF: plain text, Markdown, and flat RTF
+    /// (``convertibleTextTypes``). Never Word, OpenDocument, RTFD, HTML, or a web archive.
     static func isConvertibleText(_ type: UTType) -> Bool {
-        isText(type) && !unconvertedTextTypes.contains { type.conforms(to: $0) }
+        guard isText(type), !type.conforms(to: .rtfd), !type.conforms(to: .flatRTFD) else { return false }
+        return convertibleTextTypes.contains { type.conforms(to: $0) }
     }
 
     /// The copy's file name: the original's name with the new extension ("Scan.heic" → "Scan.pdf").

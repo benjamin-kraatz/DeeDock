@@ -35,11 +35,22 @@ struct FlixConversionAndSensitiveTests {
             == .convert(FlixConversionRecipe(format: .jpeg, maximumBytes: 5_000_000, isResizeOnly: false)))
     }
 
-    @Test(arguments: [UTType.rtf, .rtfd, .plainText, UTType("net.daringfireball.markdown")!,
-                      UTType("org.openxmlformats.wordprocessingml.document")!])
+    @Test(arguments: [UTType.rtf, .plainText, UTType("net.daringfireball.markdown")!])
     func textDocumentsBecomePDF(type: UTType) {
         #expect(FlixConversionPlanner.decision(type: type, byteSize: 40_000, isFile: true, demand: demand([.pdf]))
             == .convert(FlixConversionRecipe(format: .pdf)))
+    }
+
+    /// Word and OpenDocument importers drop footnotes, text boxes, comments, tracked changes, and
+    /// fields; RTFD exists to carry attachments. None of them is converted automatically.
+    @Test(arguments: [UTType("org.openxmlformats.wordprocessingml.document")!, UTType("com.microsoft.word.doc")!,
+                      UTType("org.oasis-open.opendocument.text")!, UTType.rtfd, UTType.flatRTFD])
+    func wordOpenDocumentAndRTFDAreNeverConverted(type: UTType) {
+        #expect(FlixConversionPlanner.decision(type: type, byteSize: 40_000, isFile: true, demand: demand([.pdf]))
+            == .unconvertible)
+        #expect(!FlixConversionPlanner.isConvertibleText(type))
+        // Still read for the sensitive guard and captions.
+        #expect(FlixConversionPlanner.isText(type))
     }
 
     @Test func unconvertibleFilesAreSaidSo() {

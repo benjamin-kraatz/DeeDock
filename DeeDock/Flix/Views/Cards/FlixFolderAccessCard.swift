@@ -32,7 +32,7 @@ struct FlixFolderAccessCard: View {
             FlixFlow {
                 ForEach(folders.prefix(4)) { folder in
                     FlixCardButton(title: String(localized: .flixAccessAllowFolder(
-                        FileManager.default.displayName(atPath: folder.path)))) { allow(folder.path) }
+                        FlixFolderNames.displayName(of: folder.path)))) { allow(folder.path) }
                 }
             }
             .padding(.top, 2)

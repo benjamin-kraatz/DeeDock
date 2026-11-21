@@ -103,7 +103,8 @@ enum FlixFileAnalyzer {
         }
         guard cryptic else { return record }
         record.caption = caption.map(clean).flatMap { $0.isEmpty ? nil : String($0.prefix(90)) }
-        if let fileName, let folder = item.url?.deletingLastPathComponent().path, policy.canRead(folder) {
+        // Spelling only here, on the main actor; `names(in:)` resolves the folder off it.
+        if let fileName, let folder = item.url?.deletingLastPathComponent().path, policy.spellingIsReadable(folder) {
             let taken = await FlixContentReader.names(in: folder, policy: policy)
             record.suggestedName = FlixFileNaming.sanitizedName(fileName, keepingExtensionOf: item.name, taken: taken)
         }

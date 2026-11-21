@@ -3,7 +3,9 @@ import SwiftUI
 /// The question asked before items leave for another app: a sensitive file, or an older version.
 ///
 /// Shown in the panel because the question runs at drag start (see `FlixCoordinator.beginDrag`).
-/// Answering lets the next drag of the same items go ahead; the toast says so. The dialog scales
+/// Answering lets the next drag past that question go ahead; the toast says so. When the items
+/// still have another question (a newer version swapped in that is itself flagged), that question
+/// shows next instead of the toast. The dialog scales
 /// in from 90 % with ``FlixMotion/dialog``; with Reduce Motion it crossfades.
 struct FlixConfirmationLayer: View {
     let state: FlixPanelState
@@ -112,7 +114,8 @@ private struct FlixConfirmationDialog: View {
     }
 
     private func confirm(_ ids: [FlixItem.ID], _ resolution: AnalyticsFlixWarningResolution) {
-        state.resolveConfirmation(resolution, ids: ids)
+        // A follow-up question replaces the dialog; only a drag with nothing left to ask gets the toast.
+        guard !state.resolveConfirmation(resolution, ids: ids) else { return }
         state.showToast(String(localized: .flixToastDragAgain))
     }
 }

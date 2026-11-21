@@ -23,8 +23,9 @@ nonisolated enum FlixShareLinkDenylist {
         "bit.ly", "t.co", "tinyurl.com", "goo.gl", "ow.ly", "buff.ly", "rebrand.ly", "is.gd", "cutt.ly",
         "lnkd.in", "t.ly", "rb.gy", "tiny.cc", "shorturl.at", "aka.ms", "forms.gle", "g.co",
         // File sharing whose addresses are the share key
-        "wetransfer.com", "we.tl", "docsend.com", "1drv.ms", "mega.nz", "mega.io", "send.firefox.com",
-        "notion.site",
+        "wetransfer.com", "we.tl", "docsend.com", "1drv.ms", "mega.nz", "mega.io", "mega.co.nz", "send.firefox.com",
+        "notion.site", "db.tt", "dropboxusercontent.com", "pcloud.link", "filedn.com", "drive.usercontent.google.com",
+        "my.microsoftpersonalcontent.com",
     ]
 
     /// Path prefixes, by host, that are invitations or share links on otherwise ordinary sites.
@@ -35,9 +36,22 @@ nonisolated enum FlixShareLinkDenylist {
         "teams.microsoft.com": [["l", "meetup-join"], ["meet"]],
         "slack.com": [["shared_invite"]],
         "icloud.com": [["share"], ["iclouddrive"], ["photos"], ["keynote"], ["pages"], ["numbers"], ["notes"],
-                       ["freeform"], ["reminders"], ["invites"]],
-        "box.com": [["s"]], "app.box.com": [["s"]],
-        "dropbox.com": [["s"], ["scl"], ["sh"], ["t"]],
+                       ["freeform"], ["reminders"], ["invites"], ["attachment"], ["sharedalbum"]],
+        // Box: shared links (`/s/`), custom shared links (`/v/`), direct links (`/shared/static/`),
+        // and file requests (`/f/`).
+        "box.com": [["s"], ["v"], ["shared"], ["f"]],
+        // Dropbox: shared links old and new (`/s/`, `/sh/`, `/scl/fi/`, `/scl/fo/`), transfers
+        // (`/t/`), short links (`/l/`), and file requests (`/request/`).
+        "dropbox.com": [["s"], ["scl"], ["sh"], ["t"], ["l"], ["request"]],
+        // MediaFire: files, folders, viewers, and downloads by their key.
+        "mediafire.com": [["file"], ["file_premium"], ["folder"], ["view"], ["download"], ["i"], ["imgbnc.php"], ["convkey"]],
+        // pCloud's public links on its own domain (`/publink/show?code=…`).
+        "pcloud.com": [["publink"]],
+        // OneDrive's share redirects and embeds (`/redir?resid=…&authkey=…`).
+        "onedrive.live.com": [["redir"], ["embed"], ["download"]],
+        // Google Docs files published to the web (`/document/d/e/<key>/pub`) and direct downloads (`/uc`).
+        "docs.google.com": [["document", "d", "e"], ["spreadsheets", "d", "e"], ["presentation", "d", "e"],
+                            ["forms", "d", "e"], ["uc"]],
         "webex.com": [["meet"], ["join"]],
     ]
 
@@ -69,10 +83,34 @@ nonisolated enum FlixShareLinkDenylist {
             return true
         }
         if within(host, "drive.google.com") { return !isPlainDriveFile(lower, query: query) }
-        // SharePoint and OneDrive for work sharing links (`/:w:/g/…`, `/:x:/s/…`) carry the share key;
-        // `/:w:/r/…` addresses the document itself.
-        if within(host, "sharepoint.com"), let first = lower.first, first.count == 3, first.hasPrefix(":"),
-           first.hasSuffix(":"), lower.count > 1, lower[1] != "r" { return true }
+        if within(host, "mediafire.com"), isMediaFireShare(host: host, segments: lower, query: query) { return true }
+        // `onedrive.live.com/?redeem=<encoded sharing link>`: the query is the share link itself. A
+        // document address (`edit.aspx?resid=…`) is kept; cleaning drops its `authkey`.
+        if within(host, "onedrive.live.com"), query.contains(where: { $0.name.lowercased() == "redeem" }) { return true }
+        // OneDrive's new sharing links use SharePoint's form (below).
+        if within(host, "onedrive.live.com") || within(host, "sharepoint.com"), isSharePointShare(lower) { return true }
+        return false
+    }
+
+    /// SharePoint and OneDrive sharing links (`/:w:/g/…`, `/:x:/s/…`) carry the share key;
+    /// `/:w:/r/…` addresses the document itself.
+    private static func isSharePointShare(_ segments: [String]) -> Bool {
+        guard let first = segments.first, first.count == 3, first.hasPrefix(":"), first.hasSuffix(":"),
+              segments.count > 1 else { return false }
+        return segments[1] != "r"
+    }
+
+    /// MediaFire addresses that open a file or folder by its key: the routes in ``deniedRoutes``,
+    /// the classic `mediafire.com/?<key>` and `mediafire.com/<key>` forms, and every subdomain but
+    /// `www` (download servers such as `download1234.mediafire.com/<key>/…`, and the web app
+    /// `app.mediafire.com/<folder key>`).
+    private static func isMediaFireShare(host: String, segments: [String], query: [URLQueryItem]) -> Bool {
+        if host != "mediafire.com", host != "www.mediafire.com" { return true }
+        // `/?<key>`: a bare query item names the file.
+        if segments.isEmpty { return !query.isEmpty }
+        // `/<key>` alone, a run of letters and digits without a page name's dashes or dots.
+        if segments.count == 1, let only = segments.first, only.count >= 10,
+           only.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber) }) { return true }
         return false
     }
 

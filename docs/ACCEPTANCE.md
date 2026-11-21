@@ -3898,3 +3898,33 @@ Fixes for the second cross-model review of PR #432, on the same branch. Details 
 - [ ] Mark a file as sensitive (a `.pem` key), open Flix Files with Finder in front, and drag it to the Desktop: the question appears.
 - [ ] Drag a converted Fits row into Hub Files, onto the Hub Apps tab, and onto Vapor: each gets the original.
 - [ ] Turn Flix Files off: the tile disappears and no Quick Look thumbnail is requested (no `quicklookd` activity for the newest file); turn it on: the tile shows the newest item again.
+
+### Review fixes (R3)
+
+Fixes for the third cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- A Flix drag keeps the file identity each row listed when the drag began. The dock's Trash compares them with the files at their paths in the payload's background read and refuses the drop when one changed, with the Trash's failure message naming the file; it checks once more off the main actor right before recycling. Folder and drive tiles check before a Shift move (copies are not checked), and drops on folder favorites move with the drag's identities. Each refusal refreshes the rows, so dragging again acts on the file as it is now.
+- Background readers no longer map files. `FlixSafeFile` copies bytes with `pread` in 4 MB chunks, with a cap per use (pictures and PDFs for captions 64 MB, the sensitive scanner 60 MB, conversion pictures 100 MB, documents 25 MB), and reports a failed or short read as an error instead of crashing with `SIGBUS`. RTFD packages are read without mapping.
+- Drop answers are scoped to the question kind (sensitive or older version), the item, and the file identity its row listed (`FlixDropApprovals`). **Use Newer** grants nothing and the new set is asked again at once, so a flagged newer version asks its sensitive question; a flagged older version asks both questions in turn.
+- Word (`.docx`, `.doc`), OpenDocument, and RTFD files are no longer converted for uploads. Plain text and Markdown (laid out as written) and flat RTF still are; the RTF check now reads whole control words and also declines footnotes, shapes and text boxes, positioned frames, comments, and tracked changes, without mistaking Word's `\headery` for a header.
+- Nothing in Flix Files touches the disk on the main actor any more except spelling checks: the sensitive guard queues from memory and resolves on its worker; thumbnails and file icons resolve in the background; the watcher resolves its folders on its own queue; Tidy, captions, Ask Robi, and conversions resolve off the main actor; dropped files are read on the file worker; folder names come from the path, with localized home folder names looked up in the background.
+- MediaFire's file, folder, view, download, and key routes and its subdomains are never stored, and the other file shares gained their standard routes: Dropbox `/l`, `/request`, and direct links; Box `/v`, `/shared`, `/f`; pCloud public links; Drive downloads; published Google Docs; OneDrive redirects, embeds, downloads, and `?redeem=`; iCloud Mail Drop and shared albums; `mega.co.nz`.
+- A download's page is verified against the full addresses as read, queries included, kept in memory only; the stored addresses stay cleaned.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R3`), every touched file recompiled: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixDropSafetyTests` (scoped approvals, Use Newer re-asking the sensitive question, both questions in turn, stale dragged files), `FlixSafeReadTests` (truncated after open, empty, folder, chunked reads, folder names from the path, the guard skipping protected spellings), `FlixConversionFidelityTests` and `FlixConversionAndSensitiveTests` (Word, OpenDocument, and RTFD never converted; RTF control words; an RTF footnote declined; Markdown as written), `FlixShareLinkDenylistTests` (file-share routes through the sanitizer), and `FlixLinkRulesTests` (download pages verified by their full address).
+- The Trash and folder-tile refusals need a live drag and have no unit test beyond `FlixDraggedFiles`.
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] List `Invoice.pdf` in Flix Files, replace it in Finder with another file of the same name, then drag the old row onto the dock's Trash: the drag slides back, the dock says “Invoice.pdf” changed, and nothing is in the Trash. Drag it again: the new file is trashed.
+- [ ] Do the same with Shift held onto a folder tile in the dock: nothing moves and the folder stack shows the message. Without Shift, the copy goes ahead.
+- [ ] Mark the newer of two versions as sensitive (a `.pem` pair, or a passport scan v1/v2), drag the older one, and choose **Use Newer**: the sensitive question appears next.
+- [ ] Drag a `.docx` onto a PDF-only upload form: no "Upload as PDF" label, and the Word file goes out. Drag an RTF with a footnote: likewise. Drag a Markdown file: the PDF shows the Markdown as written, links included.
+- [ ] Open Flix Files while a network share with listed files is disconnecting: the dock and panel stay responsive, rows show type icons, and DOKK does not crash while captions or the sensitive guard read files from it.
+- [ ] Save `https://www.mediafire.com/file/<key>/x.pdf/file` with **Save this page**: nothing is kept.

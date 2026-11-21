@@ -108,6 +108,34 @@ struct FlixLinkRulesTests {
                                           URL(string: "https://onedrive.live.com/?resid=2")!))
     }
 
+    /// Cleaning drops queries, so the stored addresses of two different pages can be equal; the
+    /// download check compares the full addresses as they were read instead.
+    @Test func aDownloadIsVouchedForOnlyByItsFullPageAddress() throws {
+        let source = try #require(FlixPaths.sourcePageAndIdentity(fromWhereFroms: [
+            "https://cdn.example.com/f.pdf?sig=abc", "https://portal.example.com/invoices?invoice=1",
+        ]))
+        #expect(source.page.absoluteString == "https://portal.example.com/invoices")
+        #expect(source.identity.absoluteString == "https://portal.example.com/invoices?invoice=1")
+        let event = FlixActivityEvent(path: "/w/Invoice.pdf", name: "Invoice.pdf", kind: .document, activity: .downloaded,
+                                      date: .now, sourcePage: source.page, sourcePageIdentity: source.identity)
+        func front(_ address: String) -> FlixBrowserPage {
+            let raw = URL(string: address)!
+            return FlixBrowserPage(url: FlixURLSanitizer.sanitize(raw)!, title: nil, privacy: .normal,
+                                   browserBundleIdentifier: nil, pageIdentity: raw)
+        }
+        #expect(FlixLinkTracker.vouches(for: event, front: front("https://portal.example.com/invoices?invoice=1")))
+        // The same cleaned page, but another invoice: not the page the file came from.
+        #expect(!FlixLinkTracker.vouches(for: event, front: front("https://portal.example.com/invoices?invoice=2")))
+        // Without the full address on either side there is nothing to verify against.
+        var unread = front("https://portal.example.com/invoices?invoice=1")
+        unread.pageIdentity = nil
+        #expect(!FlixLinkTracker.vouches(for: event, front: unread))
+        // A page the settings strip loses its full address with it.
+        var settings = FlixSettings()
+        settings.tracksLinks = false
+        #expect(FlixSourcePolicy.apply(to: event, settings: settings).sourcePageIdentity == nil)
+    }
+
     // MARK: Excluded sites
 
     @Test func userSitesMatchOnLabelBoundaries() {

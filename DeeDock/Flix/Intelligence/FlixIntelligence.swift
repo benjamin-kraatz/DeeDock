@@ -368,18 +368,28 @@ final class FlixIntelligence {
         return providers.drag?.plan(for: items, context: context, fits: result)
     }
 
-    /// The question to ask before `items` leave for another app, or nil.
+    /// The next question to ask before `items` leave for another app, or nil when every question
+    /// was answered (`approvals`) or none applies.
     ///
-    /// Phase A's own rules run when no provider answers: an annotated sensitive item (while the
-    /// sensitive guard is on), then an older version of a document with a newer one in the history.
-    /// With a drag provider installed (phase B1), the provider alone decides the sensitive question;
-    /// it asks for every drag of a flagged file, since the destination is unknown at drag start.
-    func dropConfirmation(for items: [FlixItem], context: FlixFrontmostContext?) -> FlixDropConfirmation? {
-        if let answer = providers.drag?.confirmation(for: items, context: context) { return answer }
-        if settings.guardsSensitiveFiles, providers.drag == nil,
-           let sensitive = items.first(where: { annotations[$0.id]?.isSensitive == true }) {
-            return .sensitive(itemID: sensitive.id, reason: annotations[sensitive.id]?.sensitiveReason,
-                              destination: context?.applicationName)
+    /// The sensitive question comes first, for flagged items whose sensitive question was not
+    /// answered for that file. With a drag provider installed (phase B1) the provider alone decides
+    /// it, asking for every drag of a flagged file since the destination is unknown at drag start;
+    /// without one, phase A's rule asks for an annotated sensitive item while the guard is on. Then
+    /// the version question, for an older version of a document with a newer one in the history,
+    /// unless that question was answered for that file and that newer version. An answer to one
+    /// kind never skips the other (``FlixDropApprovals``).
+    func dropConfirmation(for items: [FlixItem], context: FlixFrontmostContext?,
+                          approvals: FlixDropApprovals = FlixDropApprovals()) -> FlixDropConfirmation? {
+        let unanswered = items.filter { !approvals.coversSensitive($0) }
+        if !unanswered.isEmpty {
+            if let provider = providers.drag {
+                if let answer = provider.confirmation(for: unanswered, context: context),
+                   !isAnswered(answer, among: items, approvals: approvals) { return answer }
+            } else if settings.guardsSensitiveFiles,
+                      let sensitive = unanswered.first(where: { annotations[$0.id]?.isSensitive == true }) {
+                return .sensitive(itemID: sensitive.id, reason: annotations[sensitive.id]?.sensitiveReason,
+                                  destination: context?.applicationName)
+            }
         }
         for item in items {
             guard let annotation = annotations[item.id], let group = annotation.versionGroup,
@@ -387,11 +397,16 @@ final class FlixIntelligence {
             let newer = annotations
                 .filter { $0.value.versionGroup == group && ($0.value.versionRank ?? .min) > rank }
                 .max { ($0.value.versionRank ?? 0) < ($1.value.versionRank ?? 0) }
-            if let newer, !items.contains(where: { $0.id == newer.key }) {
-                return .newerVersion(itemID: item.id, newerID: newer.key)
-            }
+            guard let newer, !items.contains(where: { $0.id == newer.key }) else { continue }
+            let question = FlixDropConfirmation.newerVersion(itemID: item.id, newerID: newer.key)
+            if !approvals.covers(question, item: item) { return question }
         }
         return nil
+    }
+
+    private func isAnswered(_ question: FlixDropConfirmation, among items: [FlixItem], approvals: FlixDropApprovals) -> Bool {
+        let id = FlixDropApprovals.subject(of: question).itemID
+        return items.first { $0.id == id }.map { approvals.covers(question, item: $0) } ?? false
     }
 
     /// Items were dropped outside Flix Files. Drag memory learns from it.

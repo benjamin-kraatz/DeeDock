@@ -91,7 +91,7 @@ private struct FlixTidyRow: View {
     private var detail: AttributedString {
         var parts: [String] = []
         if let rename = suggestion.rename { parts.append(String(localized: .flixTidyRenameTo(rename))) }
-        if let folder = suggestion.moveTo { parts.append(String(localized: .flixTidyMoveTo(FileManager.default.displayName(atPath: folder)))) }
+        if let folder = suggestion.moveTo { parts.append(String(localized: .flixTidyMoveTo(FlixFolderNames.displayName(of: folder)))) }
         var text = (try? AttributedString(markdown: parts.joined(separator: " · "))) ?? AttributedString(parts.joined(separator: " · "))
         // The suggested name and folder stand out in the intelligence violet, as in the mockup.
         for run in text.runs where run.inlinePresentationIntent?.contains(.stronglyEmphasized) == true {

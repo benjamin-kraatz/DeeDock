@@ -69,6 +69,12 @@ nonisolated struct FlixReadPolicy: Equatable, Sendable {
         resolve(path).map { URL(fileURLWithPath: $0) }
     }
 
+    /// ``readableURL(_:)`` off the caller's actor. For main-actor callers (rows, the tile): the walk
+    /// examines each component with `lstat`, which can wait for seconds on a share that went away.
+    @concurrent func readableURLInBackground(_ path: String) async -> URL? {
+        readableURL(path)
+    }
+
     /// `path` with every symbolic link resolved, when it can be read without a prompt; nil when it
     /// cannot.
     ///

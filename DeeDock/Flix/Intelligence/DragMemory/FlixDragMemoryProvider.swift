@@ -73,7 +73,7 @@ final class FlixDragMemoryProvider: FlixDragMemoryProviding {
         let id = FlixDragMemory.tipID(folder: candidate.folder, part: candidate.part)
         memory.offeredTips.insert(id)
         save()
-        let name = FileManager.default.displayName(atPath: candidate.folder)
+        let name = FlixFolderNames.displayName(of: candidate.folder)
         let part = switch candidate.part {
         case .morning: String(localized: .flixTipPartMornings)
         case .afternoon: String(localized: .flixTipPartAfternoons)

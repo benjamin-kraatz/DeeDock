@@ -14,10 +14,12 @@ struct FlixFavoriteRow: View {
     @State private var targeted = false
     /// Bumped by each accepted drop.
     @State private var received = 0
+    /// The folder's or app's own icon, read in the background; the type icon shows until then.
+    @State private var loadedIcon: NSImage?
 
     var body: some View {
         let reduceMotion = state.reduceMotion
-        FlixSidebarRow(title: Text(verbatim: favorite.name), glyph: .image(icon), count: count,
+        FlixSidebarRow(title: Text(verbatim: favorite.name), glyph: .image(loadedIcon ?? icon), count: count,
                        selected: state.filter == .favorite(favorite.id), targeted: targeted,
                        selectionNamespace: selectionNamespace) {
             state.activate(favorite)
@@ -43,17 +45,19 @@ struct FlixFavoriteRow: View {
             } label: { Text(.flixFavoriteRemove) }
         }
         .help(Text(verbatim: favorite.name))
+        .task(id: favorite.path) {
+            loadedIcon = await FlixIconProvider.loadIcon(forPath: favorite.path, policy: state.readPolicy)
+        }
         .accessibilityHint(Text(favorite.kind == .folder ? .flixFavoriteFolderHint : .flixFavoriteAppHint))
     }
 
     /// Only Flix's own drags land here; a folder or app favorite takes them.
     private var accepts: Bool { state.drag != nil && favorite.kind != .file }
 
+    /// The type icon, from the favorite's kind and name alone: nothing here reads the disk.
     private var icon: NSImage {
         let item = FlixItem(path: favorite.path, name: favorite.name,
-                            kind: favorite.kind == .folder ? .folder : favorite.kind == .app ? .app : .other,
-                            activity: .opened, date: .distantPast,
-                            bundleIdentifier: favorite.kind == .app ? Bundle(path: favorite.path)?.bundleIdentifier : nil)
+                            kind: favorite.kind == .folder ? .folder : .other, activity: .opened, date: .distantPast)
         return FlixIconProvider.icon(for: item, policy: state.readPolicy)
     }
 }

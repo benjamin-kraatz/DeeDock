@@ -144,8 +144,10 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
             guard !Task.isCancelled else { break }
             // Re-checked per file: switching Flix Files or captions off stops the worker at once.
             guard services.settings.isEnabled else { break }
+            // Spelling only on the main actor; `stamps` resolves the path off it and skips what the
+            // policy refuses, so an unreadable file is never analyzed.
             guard services.settings.writesCaptions, let item = services.item(id), let path = item.path,
-                  services.readPolicy.canRead(path),
+                  services.readPolicy.spellingIsReadable(path),
                   let stamp = await FlixContentReader.stamps([path], policy: services.readPolicy)[path] else { continue }
             guard needsAnalysis(item, record: services.analyses[path], stamp: stamp) else {
                 // Read meanwhile (an earlier pass queued it twice): the cached analysis stands.

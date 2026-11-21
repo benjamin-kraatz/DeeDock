@@ -56,7 +56,7 @@ final class FlixContextMenu: NSObject {
             intelligence.append(intelligent(String(localized: .flixMenuRenameTo(rename)), action: #selector(renameSuggested)))
         }
         if one != nil, let folder = annotation?.folderSuggestion {
-            let name = FileManager.default.displayName(atPath: folder)
+            let name = FlixFolderNames.displayName(of: folder)
             intelligence.append(intelligent(String(localized: .flixMenuMoveTo(name)), action: #selector(moveSuggested)))
         }
         if let one, let thread = state.intelligence.thread(containing: one.id) {

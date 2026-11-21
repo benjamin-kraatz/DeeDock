@@ -58,7 +58,7 @@ private struct FlixWatchedFolderRow: View {
         HStack(spacing: 10) {
             LookoutFolderGlyph(size: 20)
             VStack(alignment: .leading, spacing: 1) {
-                Text(verbatim: FileManager.default.displayName(atPath: folder.path)).lineLimit(1)
+                Text(verbatim: FlixFolderNames.displayName(of: folder.path)).lineLimit(1)
                 Text(status).font(.caption).foregroundStyle(statusColor).lineLimit(1)
             }
             Spacer(minLength: 8)

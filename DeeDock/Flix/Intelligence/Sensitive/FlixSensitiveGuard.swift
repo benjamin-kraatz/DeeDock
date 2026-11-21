@@ -33,7 +33,11 @@ nonisolated struct FlixSensitiveDocument: Codable, Sendable {
 ///   path and modification date in `sensitive.json`, so a file is read once, not once per launch.
 /// - **What it reads**: only files ``FlixReadPolicy`` allows, so the guard can never make macOS ask
 ///   for folder access; at most one file at a time, at utility priority, through
-///   ``FlixSensitiveScanner``.
+///   ``FlixSensitiveScanner``. Queueing looks only at memory: the path's spelling
+///   (`FlixReadPolicy.spellingIsReadable`) and the cached verdicts. The policy's full check, which
+///   follows links with `lstat` and can wait for seconds on a share that went away, runs on the
+///   worker when the file is opened (``FlixSafeFile``). A path the worker could not open is not
+///   queued again until the item changes or the policy does.
 /// - **Results**: pushed through ``verdictChanged`` as they arrive; the coordinator writes them into
 ///   the item's annotation (`isSensitive`, `sensitiveReason`), which blurs the row, the tile, and the
 ///   drag picture.
@@ -62,6 +66,9 @@ final class FlixSensitiveGuard {
     /// The read policy of the latest update, handed to each check so the worker re-validates every
     /// file when it reads it, not only when it was queued.
     private var policy = FlixReadPolicy(allowedRoots: [])
+    /// Paths the worker could not open (gone, unreadable, refused by the policy), with the item date
+    /// it tried. Not queued again until the item has a newer date or the policy changes.
+    private var unopened: [String: Date] = [:]
 
     /// - Parameter folder: Where `sensitive.json` lives; nil keeps verdicts in memory.
     init(folder: URL?) {
@@ -86,6 +93,7 @@ final class FlixSensitiveGuard {
     func update(items: [FlixItem], policy: FlixReadPolicy) {
         guard isEnabled else { return }
         loadIfNeeded()
+        if policy != self.policy { unopened = [:] }
         self.policy = policy
         var added = 0
         for item in items {
@@ -99,7 +107,9 @@ final class FlixSensitiveGuard {
                 let written = item.activity == .saved || item.activity == .created || item.activity == .downloaded
                 guard written, let checked = entry.modified, item.date.timeIntervalSince(checked) > 1 else { continue }
             }
-            guard added < Self.passLimit, policy.canRead(path) else { continue }
+            // Spelling only, in memory: the worker resolves the path when it opens the file.
+            guard added < Self.passLimit, policy.spellingIsReadable(path) else { continue }
+            if let tried = unopened[path], item.date <= tried { continue }
             if queued.insert(path).inserted {
                 queue.append(item)
                 added += 1
@@ -162,7 +172,11 @@ final class FlixSensitiveGuard {
                 let outcome = await Self.check(path: path, type: type, kind: item.kind, policy: policy,
                                                previous: previous)
                 guard !Task.isCancelled else { break }
-                guard let outcome else { continue }
+                guard let outcome else {
+                    unopened[path] = item.date
+                    continue
+                }
+                unopened[path] = nil
                 document.entries[path] = outcome
                 document.trim()
                 save()

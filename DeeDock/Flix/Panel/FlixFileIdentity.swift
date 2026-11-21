@@ -11,7 +11,9 @@ import Foundation
 /// History items carry one (`FlixItem.fileIdentity`), recorded with the event that saw the file or
 /// captured in the background soon after, and every destructive command (Trash, Move, Rename,
 /// Tidy, a ✦ suggestion, a drop on a folder favorite) compares it with what is at the path right
-/// before it acts (``FlixFileOperations/check(_:)``). An app saving with a safe save replaces the
+/// before it acts (``FlixFileOperations/check(_:)``). A drag of rows carries the identities too
+/// (`FlixDraggedFiles`), so the dock's Trash and its folder and drive tiles, when they move, refuse
+/// a row whose file was replaced. An app saving with a safe save replaces the
 /// file, so an edited file no longer matches: the command refuses once, the row takes the new
 /// identity, and doing it again acts on the file as it is now.
 nonisolated struct FlixFileIdentity: Codable, Hashable, Sendable {

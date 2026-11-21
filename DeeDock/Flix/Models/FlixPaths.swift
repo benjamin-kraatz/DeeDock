@@ -25,8 +25,18 @@ nonisolated enum FlixPaths {
     /// This is what a source reports; whether any of it is stored is decided later by
     /// ``FlixSourcePolicy`` from the web-link settings.
     static func sourcePage(fromWhereFroms whereFroms: [String]) -> URL? {
+        sourcePageAndIdentity(fromWhereFroms: whereFroms)?.page
+    }
+
+    /// ``sourcePage(fromWhereFroms:)`` with the address it was cleaned from (`identity`, query
+    /// included), for `FlixActivityEvent.sourcePageIdentity`. Kept in memory only.
+    static func sourcePageAndIdentity(fromWhereFroms whereFroms: [String]) -> (page: URL, identity: URL)? {
         let candidates = whereFroms.count > 1 ? [whereFroms[1], whereFroms[0]] : whereFroms
-        return candidates.lazy.compactMap { FlixURLSanitizer.sanitize($0) }.first
+        for candidate in candidates {
+            guard let raw = URL(string: candidate), let page = FlixURLSanitizer.sanitize(raw) else { continue }
+            return (page, raw)
+        }
+        return nil
     }
 
     /// A page's host without `www.`, as the "Downloaded from …" line shows it.

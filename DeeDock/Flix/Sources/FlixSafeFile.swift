@@ -12,13 +12,20 @@ import Foundation
 ///    step 1, the open fails instead of following it;
 /// 3. the descriptor's real path (`F_GETPATH`) is checked against the policy once more.
 ///
-/// Readers then read through the descriptor (``read(upTo:)``, ``mapped(maximumBytes:)``), so what
+/// Readers then read through the descriptor (``read(upTo:)``, ``contents(maximumBytes:)``), so what
 /// they decode is exactly what was checked. APIs that only take a URL (an RTFD package's file
 /// wrapper) get ``url``, the checked path; those few reads keep a narrow window and are noted where
 /// they happen. The descriptor closes when the value is released.
+///
+/// Bytes are always copied into memory the reader owns, never mapped. A mapping stays backed by
+/// the file: if a network share disconnects or another app rewrites or truncates the file while a
+/// decoder walks the mapping, the next page fault raises `SIGBUS` and the whole app crashes. A
+/// copied read fails with an error instead (``ReadError``), which every reader treats as "could
+/// not read this file". Each use names its own size cap, so a background read never holds more
+/// than that cap in memory.
 nonisolated final class FlixSafeFile: @unchecked Sendable {
-    // `@unchecked`: the descriptor is only read through `pread`/`mmap`, which are thread-safe, and
-    // closed once in `deinit`.
+    // `@unchecked`: the descriptor is only read through `pread`, which is thread-safe, and closed
+    // once in `deinit`.
     let descriptor: Int32
     /// The real, link-free path that was opened.
     let path: String
@@ -61,29 +68,72 @@ nonisolated final class FlixSafeFile: @unchecked Sendable {
         return FlixSafeFile(descriptor: descriptor, path: real, info: info)
     }
 
-    /// Up to `count` bytes from the start of the file.
+    /// Why ``contents(maximumBytes:)`` returned no bytes.
+    nonisolated enum ReadError: Error, Equatable {
+        /// A folder has no bytes to read.
+        case directory
+        case empty
+        /// Larger than the caller's cap; nothing was read.
+        case tooLarge
+        /// The file became shorter while it was read (rewritten or truncated in place).
+        case truncated
+        /// `pread` failed, with its `errno` (a share that went away reports `EIO` or `ENXIO`).
+        case failed(Int32)
+        /// The reading task was cancelled between chunks.
+        case cancelled
+    }
+
+    /// Bytes read per `pread` call, so a cancelled task stops within one chunk on a slow share.
+    static let chunkBytes = 4 * 1_024 * 1_024
+
+    /// Up to `count` bytes from the start of the file, copied into memory. Shorter when the file is
+    /// (or became) shorter; empty when it cannot be read.
     func read(upTo count: Int) -> Data {
         guard !isDirectory, count > 0 else { return Data() }
         let length = Int(min(Int64(count), size))
         guard length > 0 else { return Data() }
-        var data = Data(count: length)
-        let read = data.withUnsafeMutableBytes { pread(descriptor, $0.baseAddress, length, 0) }
-        guard read > 0 else { return Data() }
-        if read < length { data.removeSubrange(read...) }
+        return (try? readPrefix(length)) ?? Data()
+    }
+
+    /// The whole file, copied into memory, when it is at most `maximumBytes`.
+    ///
+    /// - Throws: ``ReadError``: the file is a folder, empty, over the cap, became shorter than it
+    ///   was at open, could not be read, or the task was cancelled. Never a crash: a share that
+    ///   disconnects mid-read makes `pread` fail, and that failure is returned.
+    func contents(maximumBytes: Int64) throws(ReadError) -> Data {
+        guard !isDirectory else { throw .directory }
+        guard size > 0 else { throw .empty }
+        guard size <= maximumBytes, size <= Int64(Int.max) else { throw .tooLarge }
+        let data = try readPrefix(Int(size))
+        guard data.count == Int(size) else { throw .truncated }
         return data
     }
 
-    /// The whole file, memory-mapped from the descriptor, when it is at most `maximumBytes`. The
-    /// mapping is private and read-only and is released with the returned data.
-    func mapped(maximumBytes: Int64) -> Data? {
-        guard !isDirectory, size > 0, size <= maximumBytes else { return nil }
-        let length = Int(size)
-        guard let pointer = mmap(nil, length, PROT_READ, MAP_PRIVATE, descriptor, 0), pointer != MAP_FAILED else {
-            return nil
+    /// Reads `length` bytes from offset 0 in chunks, retrying interrupted calls. Stops early at the
+    /// end of the file (the result is then shorter).
+    private func readPrefix(_ length: Int) throws(ReadError) -> Data {
+        var data = Data(count: length)
+        var offset = 0
+        var failure: ReadError?
+        data.withUnsafeMutableBytes { buffer in
+            guard let base = buffer.baseAddress else { return }
+            while offset < length {
+                if Task.isCancelled { failure = .cancelled; return }
+                let wanted = min(Self.chunkBytes, length - offset)
+                let read = pread(descriptor, base + offset, wanted, off_t(offset))
+                if read > 0 {
+                    offset += read
+                } else if read == 0 {
+                    return
+                } else if errno != EINTR {
+                    failure = .failed(errno)
+                    return
+                }
+            }
         }
-        return Data(bytesNoCopy: pointer, count: length, deallocator: .custom { pointer, length in
-            munmap(pointer, length)
-        })
+        if let failure { throw failure }
+        if offset < length { data.removeSubrange(offset...) }
+        return data
     }
 
     /// The path the kernel reports for an open descriptor.

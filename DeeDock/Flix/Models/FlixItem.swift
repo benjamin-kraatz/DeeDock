@@ -89,11 +89,12 @@ nonisolated struct FlixItem: Codable, Identifiable, Hashable, Sendable {
         return (path as NSString).pathExtension.uppercased()
     }
 
-    /// The containing folder's name, for the event line ("· Downloads").
+    /// The containing folder's name, for the event line ("· Downloads"). From the path alone
+    /// (``FlixFolderNames``), so drawing a row never reads the disk.
     var folderName: String? {
         guard let path else { return nil }
         let parent = (path as NSString).deletingLastPathComponent
-        return parent.isEmpty ? nil : FileManager.default.displayName(atPath: parent)
+        return parent.isEmpty ? nil : FlixFolderNames.displayName(of: parent)
     }
 
     /// Whether the item lies inside `folder` (a standardized absolute path), at any depth.
@@ -122,11 +123,17 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
     var bundleIdentifier: String?
     /// The file as the source saw it, when the source read it from disk (the folder watcher).
     var fileIdentity: FlixFileIdentity?
+    /// The download page exactly as `kMDItemWhereFroms` named it, query included, before cleaning.
+    /// In memory only: the link tracker compares it with the address the browser shows, so two pages
+    /// that differ only in what cleaning removes (`?id=1`, `?id=2`) never vouch for each other. It
+    /// is never stored, and ``FlixSourcePolicy`` drops it with ``sourcePage``.
+    var sourcePageIdentity: URL?
 
     /// - Parameter sourceHost: Defaults to `sourcePage`'s host.
     init(path: String? = nil, link: FlixLink? = nil, name: String, kind: FlixItemKind, activity: FlixActivity,
-         date: Date, sourcePage: URL? = nil, sourceHost: String? = nil, contentTypeIdentifier: String? = nil,
-         byteSize: Int64? = nil, bundleIdentifier: String? = nil, fileIdentity: FlixFileIdentity? = nil) {
+         date: Date, sourcePage: URL? = nil, sourcePageIdentity: URL? = nil, sourceHost: String? = nil,
+         contentTypeIdentifier: String? = nil, byteSize: Int64? = nil, bundleIdentifier: String? = nil,
+         fileIdentity: FlixFileIdentity? = nil) {
         self.path = path.map(FlixPaths.standardized)
         self.link = link
         self.name = name
@@ -139,6 +146,7 @@ nonisolated struct FlixActivityEvent: Sendable, Equatable {
         self.byteSize = byteSize
         self.bundleIdentifier = bundleIdentifier
         self.fileIdentity = fileIdentity
+        self.sourcePageIdentity = sourcePage == nil ? nil : sourcePageIdentity
     }
 
     var key: String { FlixItem.key(path: path, link: link?.url) }

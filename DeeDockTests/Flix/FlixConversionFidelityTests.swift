@@ -6,8 +6,9 @@ import UniformTypeIdentifiers
 @testable import DeeDock
 
 /// Automatic upload conversions never leave content out: every frame of a multi-page picture
-/// becomes a page, and anything the text export cannot show (attachments, pictures, headers) makes
-/// the converter decline so the original goes out instead.
+/// becomes a page, anything the text export cannot show (pictures, headers, footnotes, text boxes,
+/// frames) makes the converter decline so the original goes out instead, and Word, OpenDocument,
+/// and RTFD files are never converted at all.
 @Suite(.serialized)
 struct FlixConversionFidelityTests {
     // MARK: Planner rules
@@ -29,23 +30,27 @@ struct FlixConversionFidelityTests {
         #expect(FlixConversionPlanner.text(attachmentCount: 1) == .declined(.attachments))
     }
 
-    @Test func documentsWithPartsTheExportDropsAreDeclined() throws {
-        let docx = try #require(UTType("org.openxmlformats.wordprocessingml.document"))
-        let odt = try #require(UTType("org.oasis-open.opendocument.text"))
-        func bytes(_ text: String) -> Data { Data(("PK\u{3}\u{4}" + text).utf8) }
-        #expect(FlixConversionPlanner.documentParts(in: bytes("word/document.xml word/styles.xml"), type: docx).isFaithful)
-        for part in ["word/media/image1.png", "word/header1.xml", "word/footer2.xml", "word/charts/chart1.xml",
-                     "word/embeddings/oleObject1.bin", "word/comments.xml"] {
-            #expect(FlixConversionPlanner.documentParts(in: bytes("word/document.xml " + part), type: docx)
-                    == .declined(.unsupportedParts))
+    @Test func rtfWithPartsTheExportDropsIsDeclined() {
+        func parts(_ rtf: String) -> FlixConversionFidelity {
+            FlixConversionPlanner.documentParts(in: Data(rtf.utf8), type: .rtf)
         }
-        #expect(FlixConversionPlanner.documentParts(in: bytes("content.xml Pictures/1.png"), type: odt)
-                == .declined(.unsupportedParts))
-        #expect(FlixConversionPlanner.documentParts(in: Data(#"{\rtf1 Hello}"#.utf8), type: .rtf).isFaithful)
-        #expect(FlixConversionPlanner.documentParts(in: Data(#"{\rtf1 {\pict\pngblip 89504e47}}"#.utf8), type: .rtf)
-                == .declined(.unsupportedParts))
-        #expect(FlixConversionPlanner.documentParts(in: Data(#"{\rtf1 {\header Page}}"#.utf8), type: .rtf)
-                == .declined(.unsupportedParts))
+        #expect(parts(#"{\rtf1 Hello}"#).isFaithful)
+        // Word writes the header and footer distance into every section: that is not a header.
+        #expect(parts(#"{\rtf1\sectd\headery708\footery708 Hello}"#).isFaithful)
+        // Text that only mentions a control word is escaped and is not one.
+        #expect(parts(#"{\rtf1 Type \\footnote to add one}"#).isFaithful)
+        for rtf in [
+            #"{\rtf1 {\pict\pngblip 89504e47}}"#, #"{\rtf1 {\header Page}}"#, #"{\rtf1 {\footerl Left}}"#,
+            #"{\rtf1 Claim{\super\chftn}{\footnote\pard\plain Source.}}"#,
+            #"{\rtf1 {\shp{\*\shpinst{\shptxt Box}}}}"#, #"{\rtf1 {\*\do\dobxpage\dptxbx{Box}}}"#,
+            #"{\rtf1 \pard\posx1440\posy720\absw2000 Framed\par}"#, #"{\rtf1 \pard\phmrg\pvpara Framed\par}"#,
+            #"{\rtf1 {\*\atnid A}{\*\annotation Comment}}"#, #"{\rtf1 {\deleted gone} {\revised new}}"#,
+        ] {
+            #expect(parts(rtf) == .declined(.unsupportedParts), "\(rtf)")
+        }
+        // Types that are not converted are never vouched for.
+        #expect(FlixConversionPlanner.documentParts(in: Data(), type: .rtfd) == .declined(.unsupportedParts))
+        #expect(FlixConversionPlanner.documentParts(in: Data("text".utf8), type: .plainText).isFaithful)
     }
 
     @Test func legacyWordFilesAreNotConverted() throws {
@@ -112,7 +117,7 @@ struct FlixConversionFidelityTests {
         }
     }
 
-    @Test func anRTFDWithAPictureIsDeclinedAndPlainTextConverts() async throws {
+    @Test func anRTFDIsNotConvertedAndPlainTextIs() async throws {
         let folder = try makeFolder()
         defer { try? FileManager.default.removeItem(at: folder) }
         let text = NSMutableAttributedString(string: "Lease agreement\n")
@@ -122,7 +127,7 @@ struct FlixConversionFidelityTests {
         let rtfd = folder.appending(path: "Lease.rtfd")
         let wrapper = try #require(text.rtfdFileWrapper(from: NSRange(location: 0, length: text.length), documentAttributes: [:]))
         try wrapper.write(to: rtfd, options: .atomic, originalContentsURL: nil)
-        await #expect(throws: FlixFileConverter.ConversionError.wouldOmitContent(.attachments)) {
+        await #expect(throws: FlixFileConverter.ConversionError.unsupported) {
             _ = try await convert(rtfd, type: .rtfd, format: .pdf, into: folder)
         }
 
@@ -139,6 +144,40 @@ struct FlixConversionFidelityTests {
         try Data(#"{\rtf1\ansi Memo {\pict\pngblip 89504e470d0a1a0a}}"#.utf8).write(to: rtf)
         await #expect(throws: FlixFileConverter.ConversionError.wouldOmitContent(.unsupportedParts)) {
             _ = try await convert(rtf, type: .rtf, format: .pdf, into: folder)
+        }
+    }
+
+    @Test func anRTFWithAFootnoteIsDeclined() async throws {
+        let folder = try makeFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let rtf = folder.appending(path: "Paper.rtf")
+        try Data(#"{\rtf1\ansi Claim{\super\chftn}{\footnote\pard\plain{\super\chftn} Source.}\par}"#.utf8).write(to: rtf)
+        await #expect(throws: FlixFileConverter.ConversionError.wouldOmitContent(.unsupportedParts)) {
+            _ = try await convert(rtf, type: .rtf, format: .pdf, into: folder)
+        }
+    }
+
+    @Test func markdownIsLaidOutAsWritten() async throws {
+        let folder = try makeFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let notes = folder.appending(path: "Notes.md")
+        try Data("See [the spec](https://example.com/spec) and **this**.".utf8).write(to: notes)
+        let markdown = try #require(UTType("net.daringfireball.markdown"))
+        let pdf = try await convert(notes, type: markdown, format: .pdf, into: folder)
+        // The link's address stays in the copy: Markdown is not interpreted.
+        let text = try #require(PDFDocument(url: pdf)?.string)
+        #expect(text.contains("https://example.com/spec"))
+        #expect(text.contains("**this**"))
+    }
+
+    @Test func aWordFileIsRefusedByTheConverterToo() async throws {
+        let folder = try makeFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let docx = try #require(UTType("org.openxmlformats.wordprocessingml.document"))
+        let file = folder.appending(path: "Report.docx")
+        try Data("PK\u{3}\u{4}word/document.xml".utf8).write(to: file)
+        await #expect(throws: FlixFileConverter.ConversionError.unsupported) {
+            _ = try await convert(file, type: docx, format: .pdf, into: folder)
         }
     }
 }

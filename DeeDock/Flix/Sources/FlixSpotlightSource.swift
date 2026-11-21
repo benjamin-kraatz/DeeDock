@@ -95,12 +95,13 @@ final class FlixSpotlightSource {
         let name = item.value(forAttribute: NSMetadataItemDisplayNameKey) as? String
             ?? (path as NSString).lastPathComponent
         let whereFroms = item.value(forAttribute: NSMetadataItemWhereFromsKey) as? [String] ?? []
+        let source = FlixPaths.sourcePageAndIdentity(fromWhereFroms: whereFroms)
         return FlixActivityEvent(path: path, name: name,
                                  kind: FlixItemKind.classify(contentType: type, isDirectory: isFolder,
                                                              isPackage: type?.conforms(to: .package) == true,
                                                              isScreenshot: isScreenshot),
                                  activity: .opened, date: lastUsed,
-                                 sourcePage: FlixPaths.sourcePage(fromWhereFroms: whereFroms),
+                                 sourcePage: source?.page, sourcePageIdentity: source?.identity,
                                  contentTypeIdentifier: typeIdentifier,
                                  byteSize: (item.value(forAttribute: NSMetadataItemFSSizeKey) as? NSNumber)?.int64Value)
     }

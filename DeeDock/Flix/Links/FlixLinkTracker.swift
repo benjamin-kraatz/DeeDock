@@ -106,7 +106,7 @@ final class FlixLinkTracker {
             }
             let exclusions = FlixSiteExclusions(settings: settings)
             for event in downloads {
-                guard let source = event.sourcePage, let path = event.path, Self.samePage(source, front.url) else { continue }
+                guard let source = event.sourcePage, let path = event.path, Self.vouches(for: event, front: front) else { continue }
                 guard !exclusions.excludes(source) else {
                     Analytics.count(.linksExcludedSkipped)
                     continue
@@ -118,9 +118,19 @@ final class FlixLinkTracker {
         }
     }
 
-    /// Whether two cleaned addresses name the same page: the same host (ignoring `www.`), the same
-    /// path (ignoring a trailing slash), and the same kept query. Both come from
-    /// ``FlixURLSanitizer``, so tokens and fragments are already gone.
+    /// Whether the browser window in front shows the page a download came from. Compares the full
+    /// addresses as they were read (``FlixActivityEvent/sourcePageIdentity`` and
+    /// ``FlixBrowserPage/pageIdentity``, queries included), not the cleaned ones that are stored:
+    /// cleaning drops queries, so `?invoice=1` and `?invoice=2` would otherwise look the same. Either
+    /// address missing means no verification.
+    static func vouches(for event: FlixActivityEvent, front: FlixBrowserPage) -> Bool {
+        guard let download = event.sourcePageIdentity, let shown = front.pageIdentity else { return false }
+        return samePage(download, shown)
+    }
+
+    /// Whether two addresses name the same page: the same host (ignoring `www.`), the same path
+    /// (ignoring a trailing slash), and the same query. The fragment is ignored: it only scrolls
+    /// within a page.
     static func samePage(_ a: URL, _ b: URL) -> Bool {
         guard let first = FlixPaths.displayHost(of: a), let second = FlixPaths.displayHost(of: b), first == second
         else { return false }

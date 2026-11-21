@@ -46,11 +46,10 @@ nonisolated enum FlixSensitiveScanner {
         guard let type else { return nil }
         let size = file.size
         if type.conforms(to: .pdf) {
-            guard size <= maximumImageBytes else { return nil }
             return await scanPDF(file)
         }
         if type.conforms(to: .image) {
-            guard size <= maximumImageBytes, let image = FlixContentReader.picture(in: file, side: 1_600) else { return nil }
+            guard let image = FlixContentReader.picture(in: file, side: 1_600, maximumBytes: maximumImageBytes) else { return nil }
             return await scanPicture(image)
         }
         if type.conforms(to: .plainText) || type.conforms(to: .sourceCode) || type.conforms(to: .json)
@@ -66,7 +65,7 @@ nonisolated enum FlixSensitiveScanner {
     }
 
     private static func scanPDF(_ file: FlixSafeFile) async -> FlixSensitiveKind? {
-        guard let data = file.mapped(maximumBytes: maximumImageBytes), let document = PDFDocument(data: data) else { return nil }
+        guard let data = try? file.contents(maximumBytes: maximumImageBytes), let document = PDFDocument(data: data) else { return nil }
         // A locked PDF cannot be read without its password.
         guard !document.isLocked else { return nil }
         var text = ""

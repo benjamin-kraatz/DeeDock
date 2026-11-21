@@ -110,8 +110,9 @@ final class FlixPanelState {
     @ObservationIgnored var sendToShelf: (([URL]) -> Bool)?
     @ObservationIgnored var requestFolderAccess: ((String) -> Void)?
     @ObservationIgnored var prepareSettings: (() -> Void)?
-    /// Lets the next drag of these items skip the drop questions, after one was answered.
-    @ObservationIgnored var confirmDrag: (([FlixItem.ID]) -> Void)?
+    /// Records an answer to a drop question for the drag of these items and asks the next question
+    /// for them, if any (`FlixCoordinator.answerDrop`). Returns true when a follow-up is showing.
+    @ObservationIgnored var answerDrop: ((FlixDropConfirmation, AnalyticsFlixWarningResolution, [FlixItem.ID]) -> Bool)?
     /// Starts a native drag of items from a row's view, with where in the panel it started.
     @ObservationIgnored var beginDrag: (([FlixItem.ID], NSView, NSEvent, FlixActionOrigin) -> Void)?
 

@@ -36,13 +36,17 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
 
     init() {}
 
-    /// Watches `folders` (standardized, readable) and reports settled events through `deliver`, on
-    /// the main actor. Replaces any earlier stream; an empty list just stops.
-    /// - Parameter policy: Checked again for every event path before it is read.
+    /// Watches `folders` (standardized) and reports settled events through `deliver`, on the main
+    /// actor. Replaces any earlier stream; an empty list just stops.
+    /// - Parameter policy: Resolves each folder on the watcher's queue (a folder the policy refuses,
+    ///   or that leads through a link into one, is not watched), and is checked again for every
+    ///   event path before it is read.
     func start(folders: [String], policy: FlixReadPolicy,
                deliver: @escaping @MainActor @Sendable ([FlixActivityEvent]) -> Void) {
         queue.async { [self] in
             stopOnQueue()
+            // `lstat` walks, on this queue rather than the main actor: a share can be slow.
+            let folders = folders.filter(policy.canRead)
             roots = folders
             self.policy = policy
             guard !folders.isEmpty else { return }
@@ -133,11 +137,12 @@ nonisolated final class FlixFolderWatcher: @unchecked Sendable {
         }
         let date = isNew ? max(created, values.contentModificationDate ?? created) : (values.contentModificationDate ?? now)
         let type = values.contentType
+        let source = FlixPaths.sourcePageAndIdentity(fromWhereFroms: whereFroms)
         return FlixActivityEvent(path: path, name: values.localizedName ?? url.lastPathComponent,
                                  kind: FlixItemKind.classify(contentType: type, isDirectory: isDirectory,
                                                              isPackage: isPackage, isScreenshot: isScreenshot),
                                  activity: activity, date: min(date, now),
-                                 sourcePage: FlixPaths.sourcePage(fromWhereFroms: whereFroms),
+                                 sourcePage: source?.page, sourcePageIdentity: source?.identity,
                                  contentTypeIdentifier: type?.identifier,
                                  byteSize: values.fileSize.map(Int64.init),
                                  fileIdentity: FlixFileIdentity.of(url))

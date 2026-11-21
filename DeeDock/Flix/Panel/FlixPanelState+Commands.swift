@@ -160,7 +160,7 @@ extension FlixPanelState {
         refreshStale(report.stale)
         let movedItems = report.moved.map(\.item)
         reportAction(.other, movedItems, origin: nil)
-        let folderName = FileManager.default.displayName(atPath: folder.path)
+        let folderName = FlixFolderNames.displayName(of: folder.path)
         var message = String(localized: .flixToastMoved(label(for: movedItems), folderName))
         if let failedLabel { message += " " + String(localized: .flixToastNotMoved(failedLabel)) }
         if !report.stale.isEmpty { message += " " + staleMessage(report.stale) }
@@ -266,30 +266,49 @@ extension FlixPanelState {
     }
 
     /// Keeps dropped files or pages as items: a deliberate save.
+    ///
+    /// Pages are kept at once. What each file is (its type, name, and identity) is read on the file
+    /// worker, off the main actor, because a file dropped from a share can take seconds to answer;
+    /// the files join the list, and the toast shows, when that read is done.
     func keep(files: [URL], links: [URL]) {
         let now = Date.now
-        var kept = 0
-        for url in files where url.isFileURL {
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey, .contentTypeKey, .localizedNameKey])
-            // The person handed this file over, so reading what it is now is theirs to ask for.
-            history.record(FlixActivityEvent(path: url.path, name: values?.localizedName ?? url.lastPathComponent,
-                                             kind: FlixItemKind.classify(contentType: values?.contentType,
-                                                                         isDirectory: values?.isDirectory == true,
-                                                                         isPackage: values?.isPackage == true,
-                                                                         isScreenshot: false),
-                                             activity: .kept, date: now,
-                                             contentTypeIdentifier: values?.contentType?.identifier,
-                                             fileIdentity: FlixFileIdentity.of(url)))
-            kept += 1
-        }
+        var keptLinks = 0
         for original in links where !original.isFileURL {
             // Only web pages, without sign-in tokens or session parameters.
             guard let url = FlixURLSanitizer.sanitize(original) else { continue }
             let link = FlixLink(url: url, title: nil, browserBundleIdentifier: nil)
             reportLinkKept(link, removedSecrets: FlixURLSanitizer.removedSecretCount(original))
             history.record(FlixActivityEvent(link: link, name: link.host, kind: .link, activity: .link, date: now))
-            kept += 1
+            keptLinks += 1
         }
+        let fileURLs = files.filter(\.isFileURL)
+        guard !fileURLs.isEmpty else {
+            finishKeeping(keptLinks)
+            return
+        }
+        Task { [weak self] in
+            let events = await FlixFileWorker.shared.run { fileURLs.map { Self.keptEvent(for: $0, date: now) } }
+            guard let self else { return }
+            events.forEach { self.history.record($0) }
+            finishKeeping(keptLinks + events.count)
+        }
+    }
+
+    /// A kept file as an event. The person handed this file over, so reading what it is now is
+    /// theirs to ask for. Reads the disk: call it on the file worker.
+    nonisolated static func keptEvent(for url: URL, date: Date) -> FlixActivityEvent {
+        let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey, .contentTypeKey, .localizedNameKey])
+        return FlixActivityEvent(path: url.path, name: values?.localizedName ?? url.lastPathComponent,
+                                 kind: FlixItemKind.classify(contentType: values?.contentType,
+                                                             isDirectory: values?.isDirectory == true,
+                                                             isPackage: values?.isPackage == true,
+                                                             isScreenshot: false),
+                                 activity: .kept, date: date,
+                                 contentTypeIdentifier: values?.contentType?.identifier,
+                                 fileIdentity: FlixFileIdentity.of(url))
+    }
+
+    private func finishKeeping(_ kept: Int) {
         guard kept > 0 else { return }
         filter = .all
         selectFirst()
@@ -297,9 +316,22 @@ extension FlixPanelState {
     }
 
     /// Drops onto a sidebar favorite: a folder moves, an app opens.
+    ///
+    /// A folder move checks each file against the identity its row listed when the drag began (the
+    /// drag session keeps it), so a row whose file was replaced during or before the drag moves
+    /// nothing (`FlixFileOperations.move`).
     func drop(_ ids: [FlixItem.ID], on favorite: FlixFavorite) {
-        let items = ids.compactMap(history.item)
+        var items = ids.compactMap(history.item)
         guard !items.isEmpty else { return }
+        if favorite.kind == .folder, let dragged = FlixDragSession.draggedFiles(on: NSPasteboard(name: .drag)) {
+            items = items.map { item in
+                var item = item
+                if let path = item.path, let listed = dragged.identities[FlixPaths.standardized(path)] {
+                    item.fileIdentity = listed
+                }
+                return item
+            }
+        }
         reportFavoriteDrop(items, on: favorite)
         switch favorite.kind {
         case .folder: move(items, into: favorite.url)

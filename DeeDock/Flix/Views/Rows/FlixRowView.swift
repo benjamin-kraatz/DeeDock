@@ -156,7 +156,7 @@ struct FlixRowView: View {
 
     @ViewBuilder private var actionPill: some View {
         if let folder = annotation?.folderSuggestion, item.activity == .downloaded {
-            FlixActionPill(title: String(localized: .flixActionMoveTo(FileManager.default.displayName(atPath: folder))),
+            FlixActionPill(title: String(localized: .flixActionMoveTo(FlixFolderNames.displayName(of: folder))),
                            selected: selected, action: moveSuggested)
                 .frame(maxWidth: 190)
         } else if annotation?.renameSuggestion != nil, hovered || selected {

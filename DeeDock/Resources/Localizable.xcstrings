@@ -4417,6 +4417,24 @@
         }
       }
     },
+    "flixDragFileChanged" : {
+      "comment" : "Flix Files: shown after the Trash or a folder or drive in the dock refused a file dragged from Flix Files, because the file at its place is no longer the one the row listed (replaced or saved again since). Nothing was trashed or moved; the row was refreshed, so dragging again acts on the file as it is now. The argument is the file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ hat sich geändert, seit Flix Files es aufgelistet hat, daher wurde nichts getan. Erneut ziehen, um den aktuellen Stand zu verwenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” changed since Flix Files listed it, so nothing was done. Drag it again to use it as it is now."
+          }
+        }
+      }
+    },
     "flixDragKeep" : {
       "comment" : "Flix Files: dock drop hint while a file drag is over the Flix Files tile.",
       "extractionState" : "manual",

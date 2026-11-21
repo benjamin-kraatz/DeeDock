@@ -3,7 +3,9 @@ import SwiftUI
 /// A row's picture: a Quick Look thumbnail for pictures and documents the read policy allows,
 /// otherwise the file's or type's icon. A sensitive item is blurred under a lock.
 ///
-/// The thumbnail loads in a task tied to the view, so a row scrolled away cancels its render.
+/// The thumbnail and the file's own icon load in a task tied to the view, so a row scrolled away
+/// cancels its render. Nothing here reads the disk on the main actor: the read policy's check (an
+/// `lstat` walk) and the icon read run in the background, and the type icon shows meanwhile.
 struct FlixThumbnailView: View {
     let item: FlixItem
     var size: CGFloat = FlixStyle.iconSize
@@ -11,6 +13,7 @@ struct FlixThumbnailView: View {
     var sensitive = false
 
     @State private var thumbnail: NSImage?
+    @State private var fileIcon: NSImage?
     @Environment(\.displayScale) private var scale
 
     private var wantsThumbnail: Bool {
@@ -31,7 +34,7 @@ struct FlixThumbnailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 3, style: .continuous))
                     .shadow(color: .black.opacity(0.25), radius: 1.5, y: 0.5)
             } else {
-                Image(nsImage: FlixIconProvider.icon(for: item, policy: policy))
+                Image(nsImage: fileIcon ?? FlixIconProvider.icon(for: item, policy: policy))
                     .resizable()
                     .aspectRatio(contentMode: .fit)
             }
@@ -48,8 +51,12 @@ struct FlixThumbnailView: View {
         }
         .accessibilityHidden(true)
         .task(id: item.path) {
-            // Resolved right before the request, so Quick Look reads the place the policy checked.
-            guard wantsThumbnail, let path = item.path, let url = policy.readableURL(path) else { return }
+            guard let path = item.path, item.kind != .link else { return }
+            if item.kind != .app { fileIcon = await FlixIconProvider.loadIcon(forPath: path, policy: policy) }
+            // Resolved right before the request, off the main actor, so Quick Look reads the place
+            // the policy checked.
+            guard wantsThumbnail, !Task.isCancelled, let url = await policy.readableURLInBackground(path),
+                  !Task.isCancelled else { return }
             thumbnail = await HubThumbnailCache.shared.thumbnail(for: url, size: CGSize(width: size, height: size),
                                                                  scale: scale)
         }

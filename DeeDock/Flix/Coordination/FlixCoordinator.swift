@@ -73,8 +73,9 @@ final class FlixCoordinator {
     /// The read policy the watcher was started with; it re-checks every event path against it.
     @ObservationIgnored private var watchedPolicy = FlixReadPolicy(allowedRoots: [])
     @ObservationIgnored private var nowTimer: Timer?
-    /// Items confirmed by a drop question, so the next drag of them goes ahead. Expires quickly.
-    @ObservationIgnored private var confirmedDrag: (ids: Set<FlixItem.ID>, until: Date)?
+    /// The drop questions answered, per question kind and file, so the next drag past exactly those
+    /// questions goes ahead. Expires quickly (``FlixDropApprovals``).
+    @ObservationIgnored private var dropApprovals = FlixDropApprovals()
     /// When the open in progress was asked for (a tile click or the shortcut), until its first frame.
     @ObservationIgnored private var openRequestedAt: ContinuousClock.Instant?
     /// What DOKK's dock said it received from the drag in flight.
@@ -166,6 +167,11 @@ final class FlixCoordinator {
         if !enabled, old?.isEnabled != false { suspendBackgroundWork() }
         intelligence.settings = new
         readPolicy = FlixReadPolicy(settings: new, lookoutFolders: lookoutFolders())
+        if enabled {
+            // Localized names of home folders now readable, off the main actor (FlixFolderNames).
+            let policy = readPolicy
+            Task { await FlixFolderNames.warm(policy: policy) }
+        }
         contextServices?.apply(new)
         // At launch this also migrates download pages stored under the earlier, looser policy.
         if old == nil || old?.isEnabled != new.isEnabled || old?.tracksLinks != new.tracksLinks
@@ -228,8 +234,9 @@ final class FlixCoordinator {
     }
 
     private func restartWatcher() {
+        // Spelling only here; the watcher resolves each root on its own queue (`FlixFolderWatcher.start`).
         let roots = settings.isEnabled && settings.tracksWatchedFolders
-            ? settings.enabledWatchedFolders.map(\.path).filter(readPolicy.canRead) : []
+            ? settings.enabledWatchedFolders.map(\.path).filter(readPolicy.spellingIsReadable) : []
         guard roots != watchedRoots || readPolicy != watchedPolicy else { return }
         watchedRoots = roots
         watchedPolicy = readPolicy
@@ -251,7 +258,9 @@ final class FlixCoordinator {
         panelState.beginDrag = { [weak self] ids, view, event, origin in
             self?.beginDrag(ids, from: view, event: event, origin: origin)
         }
-        panelState.confirmDrag = { [weak self] ids in self?.confirmDrag(ids) }
+        panelState.answerDrop = { [weak self] confirmation, resolution, ids in
+            self?.answerDrop(confirmation, resolution: resolution, ids: ids) ?? false
+        }
     }
 
     // MARK: Sources
@@ -584,16 +593,16 @@ final class FlixCoordinator {
     /// The drop questions (a sensitive file, an older version) run here, before the drag starts:
     /// macOS never tells a drag source where the drop will land. A flagged file is asked about on
     /// every drag, whichever app is in front (`FlixDragInterceptor.confirmation(for:context:)`).
-    /// Answering lets the next drag of the same items go ahead for 30 seconds. Phase B1's conversions replace files on the pasteboard through the plan, but only
-    /// while the window the panel read is still the one in front: the copies are for that upload.
+    /// An answer lets later drags past that one question, for that file, for 30 seconds
+    /// (``FlixDropApprovals``); every other question still asks. Phase B1's conversions replace files
+    /// on the pasteboard through the plan, but only while the window the panel read is still the one
+    /// in front: the copies are for that upload.
     func beginDrag(_ ids: [FlixItem.ID], from view: NSView, event: NSEvent, origin: FlixActionOrigin = .list) {
         let items = ids.compactMap(history.item)
         guard !items.isEmpty else { return }
         panelState.dragOrigin = origin
         panelState.dragFromTile = false
-        let set = Set(ids)
-        let confirmed = confirmedDrag.map { $0.until > .now && set.isSubset(of: $0.ids) } ?? false
-        if !confirmed, let question = intelligence.dropConfirmation(for: items, context: panelState.frontmost) {
+        if let question = intelligence.dropConfirmation(for: items, context: panelState.frontmost, approvals: dropApprovals) {
             panelState.confirmation = FlixPendingConfirmation(confirmation: question, itemIDs: ids)
             return
         }
@@ -614,25 +623,48 @@ final class FlixCoordinator {
                                             ended: { [weak self] accepted, point in
                                                 self?.dragEnded(items, accepted: accepted, at: point, plan: plan,
                                                                 place: place, warning: warning)
-                                            })
+                                            },
+                                            changed: { [weak self] urls in self?.refreshIdentities(of: urls) })
         if !started { panelState.drag = nil }
     }
 
-    /// Lets the next drag of `ids` skip the drop questions, after the person answered one.
-    func confirmDrag(_ ids: [FlixItem.ID]) {
-        confirmedDrag = (Set(ids), Date.now.addingTimeInterval(30))
+    /// The person answered `confirmation` for a drag of `ids` (the set the drag will now carry:
+    /// **Use Newer** has already swapped the newer version in).
+    ///
+    /// **Send Anyway** and **Send Older** approve exactly that question for the file it named.
+    /// **Use Newer** approves nothing: the question was about an item no longer in the drag. Then the
+    /// new set is evaluated again, so a newer version that is itself flagged, or a second question
+    /// for the same items, is asked right away rather than skipped.
+    /// - Returns: True when a follow-up question is now showing.
+    @discardableResult
+    func answerDrop(_ confirmation: FlixDropConfirmation, resolution: AnalyticsFlixWarningResolution,
+                    ids: [FlixItem.ID]) -> Bool {
+        if resolution != .useNewest { approveDrop(confirmation) }
+        let items = ids.compactMap(history.item)
+        guard !items.isEmpty,
+              let next = intelligence.dropConfirmation(for: items, context: panelState.frontmost, approvals: dropApprovals)
+        else { return false }
+        panelState.confirmation = FlixPendingConfirmation(confirmation: next, itemIDs: ids)
+        return true
+    }
+
+    /// Lets later drags past `confirmation`, for the file it names as the history lists it now.
+    func approveDrop(_ confirmation: FlixDropConfirmation) {
+        guard let item = history.item(FlixDropApprovals.subject(of: confirmation).itemID) else { return }
+        dropApprovals.approve(confirmation, item: item)
     }
 
     /// Drags the newest item straight off the tile.
     func beginTileDrag(from view: NSView, event: NSEvent) {
         guard let newest = history.newest(hidingNoise: settings.hidesNoise) else { return }
-        if intelligence.dropConfirmation(for: [newest], context: FlixFrontmostContext.capture(fallback: nil)) != nil,
-           confirmedDrag.map({ $0.until > .now && $0.ids.contains(newest.id) }) != true {
+        if intelligence.dropConfirmation(for: [newest], context: FlixFrontmostContext.capture(fallback: nil),
+                                         approvals: dropApprovals) != nil {
             // The question needs the panel; open it on the tile with the question showing.
             openFromAnywhere(trigger: .tileDrag)
             panelState.dragOrigin = nil
             panelState.dragFromTile = true
-            panelState.confirmation = intelligence.dropConfirmation(for: [newest], context: panelState.frontmost)
+            panelState.confirmation = intelligence.dropConfirmation(for: [newest], context: panelState.frontmost,
+                                                                    approvals: dropApprovals)
                 .map { FlixPendingConfirmation(confirmation: $0, itemIDs: [newest.id]) }
             return
         }
@@ -650,7 +682,23 @@ final class FlixCoordinator {
                                              warning: warning, predicted: predicted)
                                   intelligence.recordDrop(of: [newest], context: nil)
                                   contextServices?.dropped([newest], context: front)
-                              })
+                              },
+                              changed: { [weak self] urls in self?.refreshIdentities(of: urls) })
+    }
+
+    /// A DOKK destination refused dragged files because their rows no longer match the files at
+    /// their paths (`FlixDraggedFiles.changed(among:)`). The rows take what is there now, read off
+    /// the main actor, so the next drag acts on the file as it is, as a refused panel command does.
+    private func refreshIdentities(of urls: [URL]) {
+        let paths = Set(urls.map { FlixPaths.standardized($0.path) })
+        let rows = history.items.compactMap { item in item.path.flatMap { paths.contains($0) ? (item.id, $0) : nil } }
+        guard !rows.isEmpty else { return }
+        let policy = readPolicy
+        let lookup = Array(paths)
+        Task { [weak self] in
+            let found = await FlixFileWorker.shared.run { FlixFileOperations.identities(of: lookup, policy: policy) }
+            self?.history.setIdentities(rows.map { ($0.0, $0.1, found[$0.1]) })
+        }
     }
 
     private func dragMoved(to point: CGPoint) {

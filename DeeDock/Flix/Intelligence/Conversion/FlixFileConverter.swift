@@ -4,23 +4,25 @@ import ImageIO
 import UniformTypeIdentifiers
 
 /// Writes converted copies of files for an upload: pictures to PDF, JPEG, or PNG (scaled down to a
-/// size limit), and text documents to PDF.
+/// size limit), and plain text, Markdown, and flat RTF to PDF.
 ///
-/// Runs entirely off the main actor (`@concurrent`) and is bounded: pictures decode through
-/// ImageIO's thumbnail path at most ``maximumPixels`` long, plain text and Markdown are read only up
-/// to ``maximumTextBytes``, documents only up to `FlixDocumentImport.maximumBytes`, and a text over
-/// ``maximumCharacters`` is refused rather than laid out on thousands of pages. HTML and web
-/// archives are never converted: AppKit's HTML importer needs the main thread and loads a page's
-/// external resources (`FlixDocumentImport`). Text documents are laid out with Core Text on A4
-/// pages with 54-point margins. The original is never changed, and is opened through
-/// ``FlixSafeFile`` so a link swapped in after the conversion was queued is never followed.
+/// Runs entirely off the main actor (`@concurrent`) and is bounded: pictures are read up to
+/// ``maximumPictureBytes`` and decode through ImageIO's thumbnail path at most ``maximumPixels``
+/// long, plain text and Markdown are read only up to ``maximumTextBytes``, RTF only up to
+/// `FlixDocumentImport.maximumBytes`, and a text over ``maximumCharacters`` is refused rather than
+/// laid out on thousands of pages. Word, OpenDocument, RTFD, HTML, and web archives are never
+/// converted (`FlixConversionPlanner.isConvertibleText`): their importers drop content or need the
+/// main thread. Text is laid out with Core Text on A4 pages with 54-point margins; Markdown is laid
+/// out as written, so nothing its syntax holds (a link's address, an image's source) is dropped.
+/// The original is never changed, and is opened through ``FlixSafeFile`` so a link swapped in after
+/// the conversion was queued is never followed, and read into memory, never mapped.
 ///
 /// A copy is written only when it shows everything the original does (`FlixConversionFidelity`):
 /// a multi-page TIFF or multi-image HEIC becomes one PDF page per frame (up to
 /// `FlixConversionPlanner.maximumPictureFrames`), and the converter declines
-/// (``ConversionError/wouldOmitContent``) an animation, several frames for JPEG or PNG, and a text
-/// document with pictures, attachments, embedded objects, headers, or footers the text layout would
-/// drop. A declined file goes out unchanged.
+/// (``ConversionError/wouldOmitContent``) an animation, several frames for JPEG or PNG, and an RTF
+/// file with pictures, objects, headers, footers, footnotes, text boxes, frames, comments, or
+/// tracked changes (`FlixConversionPlanner.documentParts`). A declined file goes out unchanged.
 nonisolated enum FlixFileConverter {
     enum ConversionError: Error, Equatable {
         case unreadable
@@ -36,14 +38,16 @@ nonisolated enum FlixFileConverter {
     static let maximumTextBytes: Int64 = 4_000_000
     /// The longest text laid out as a PDF.
     static let maximumCharacters = 2_000_000
-    /// The largest picture read for a conversion.
-    static let maximumPictureBytes: Int64 = 200_000_000
+    /// The largest picture read for a conversion. Read into memory, so this is also the most one
+    /// conversion holds of the original.
+    static let maximumPictureBytes: Int64 = 100_000_000
 
     /// Converts the file at `path` into `folder`, named after `name` with the new extension.
-    /// - Returns: The copy's URL and its size in bytes.
+    /// - Returns: The copy's URL, its size in bytes, and the original's modification date as it was
+    ///   when it was opened for this copy.
     /// - Throws: ``ConversionError``; `wouldOmitContent` when a faithful copy is not possible.
     @concurrent static func convert(_ path: String, policy: FlixReadPolicy, type: UTType, recipe: FlixConversionRecipe,
-                                    name: String, into folder: URL) async throws -> (url: URL, bytes: Int64) {
+                                    name: String, into folder: URL) async throws -> (url: URL, bytes: Int64, sourceModified: Date) {
         try Task.checkCancellation()
         guard let file = FlixSafeFile.open(path, policy: policy) else { throw ConversionError.unreadable }
         let data: Data
@@ -60,13 +64,13 @@ nonisolated enum FlixFileConverter {
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let target = folder.appending(path: FlixConversionPlanner.convertedName(for: name, format: recipe.format))
         try data.write(to: target, options: .atomic)
-        return (target, Int64(data.count))
+        return (target, Int64(data.count), file.modified)
     }
 
     // MARK: Pictures
 
     private static func imageData(_ file: FlixSafeFile, type: UTType, recipe: FlixConversionRecipe) throws -> Data {
-        guard let bytes = file.mapped(maximumBytes: maximumPictureBytes),
+        guard let bytes = try? file.contents(maximumBytes: maximumPictureBytes),
               let imageSource = CGImageSourceCreateWithData(bytes as CFData, nil) else { throw ConversionError.unreadable }
         let frames = CGImageSourceGetCount(imageSource)
         switch FlixConversionPlanner.picture(frameCount: frames, isAnimated: isAnimation(imageSource, type: type, frames: frames),
@@ -177,19 +181,28 @@ nonisolated enum FlixFileConverter {
 
     /// The document as attributed text, once it is known that the text layout keeps all of it.
     private static func attributedText(_ file: FlixSafeFile, type: UTType) throws -> NSAttributedString {
-        // Never HTML or a web archive, even when the planner was handed one (see the type's notes).
-        if type.conforms(to: .html) || type.conforms(to: .webArchive) { throw ConversionError.unsupported }
-        if let markdown = UTType("net.daringfireball.markdown"), type.conforms(to: markdown) {
-            return try markdownText(boundedText(file))
-        }
-        if type.conforms(to: .plainText) {
+        // Only plain text, Markdown, and flat RTF, even when handed something else (see the type's notes).
+        guard FlixConversionPlanner.isConvertibleText(type), !file.isDirectory else { throw ConversionError.unsupported }
+        if !type.conforms(to: .rtf) {
+            // Plain text and Markdown, as written: Markdown's syntax would drop link addresses and
+            // image sources if it were interpreted.
             return NSAttributedString(string: try boundedText(file), attributes: [.font: bodyFont])
         }
-        if !file.isDirectory, let bytes = file.mapped(maximumBytes: FlixDocumentImport.maximumBytes),
-           case .declined(let reason) = FlixConversionPlanner.documentParts(in: bytes, type: type) {
+        let bytes: Data
+        do {
+            bytes = try file.contents(maximumBytes: FlixDocumentImport.maximumBytes)
+        } catch FlixSafeFile.ReadError.tooLarge {
+            throw ConversionError.tooLarge
+        } catch {
+            throw ConversionError.unreadable
+        }
+        if case .declined(let reason) = FlixConversionPlanner.documentParts(in: bytes, type: type) {
             throw ConversionError.wouldOmitContent(reason)
         }
-        guard let text = FlixDocumentImport.attributedString(file, type: type) else { throw ConversionError.unreadable }
+        // The bytes just checked are the ones imported, so a rewrite between check and import is impossible.
+        guard let documentType = FlixDocumentImport.documentType(for: type),
+              let text = try? NSAttributedString(data: bytes, options: [.documentType: documentType], documentAttributes: nil)
+        else { throw ConversionError.unreadable }
         var attachments = 0
         text.enumerateAttribute(.attachment, in: NSRange(location: 0, length: text.length)) { value, _, _ in
             if value != nil { attachments += 1 }
@@ -203,31 +216,10 @@ nonisolated enum FlixFileConverter {
     /// A UTF-8 text file, refused above ``maximumTextBytes``.
     private static func boundedText(_ file: FlixSafeFile) throws -> String {
         guard file.size <= maximumTextBytes else { throw ConversionError.tooLarge }
-        return String(decoding: file.read(upTo: Int(maximumTextBytes)), as: UTF8.self)
-    }
-
-    /// Markdown's inline styles (bold, italic, code) become fonts; block syntax such as headings
-    /// stays as written.
-    private static func markdownText(_ string: String) throws -> NSAttributedString {
-        let parsed = (try? AttributedString(markdown: string, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-            ?? AttributedString(string)
-        let output = NSMutableAttributedString()
-        for run in parsed.runs {
-            let text = String(parsed[run.range].characters)
-            var font = bodyFont
-            if let intent = run.inlinePresentationIntent {
-                if intent.contains(.code) {
-                    font = CTFontCreateUIFontForLanguage(.userFixedPitch, 10.5, nil) ?? bodyFont
-                } else {
-                    var traits: CTFontSymbolicTraits = []
-                    if intent.contains(.stronglyEmphasized) { traits.insert(.traitBold) }
-                    if intent.contains(.emphasized) { traits.insert(.traitItalic) }
-                    if !traits.isEmpty { font = CTFontCreateCopyWithSymbolicTraits(bodyFont, 0, nil, traits, traits) ?? bodyFont }
-                }
-            }
-            output.append(NSAttributedString(string: text, attributes: [.font: font]))
-        }
-        return output
+        guard file.size > 0 else { return "" }
+        // A failed or short read is an error, never a copy of half the text.
+        guard let data = try? file.contents(maximumBytes: maximumTextBytes) else { throw ConversionError.unreadable }
+        return String(decoding: data, as: UTF8.self)
     }
 
     private static var bodyFont: CTFont {

@@ -14,6 +14,13 @@ import AppKit
 /// Vapor) map them back to the originals with ``originalURLs(for:on:)`` or ``fileURLs(on:)`` while
 /// the drag is in flight, so a temporary copy is never staged, trashed, moved, or copied, and Flix's
 /// cleanup of its copies can never delete something DOKK kept.
+///
+/// The session also keeps the file identity each dragged row listed when the drag began
+/// (`FlixItem.fileIdentity`). A row can be stale: the file at its path may have been replaced since
+/// Flix Files listed it. DOKK's destructive destinations — the Trash, and folder or drive tiles when
+/// they move — ask ``draggedFiles(on:)`` and refuse when the file at a path is no longer the one
+/// the row listed (``FlixDraggedFiles/changed(among:)``), so a stale row can never trash or move a
+/// replacement. Copies and opens are not checked: they leave the file where it is.
 @MainActor
 final class FlixDragSession: NSObject, NSDraggingSource {
     static let pasteboardType = NSPasteboard.PasteboardType("de.benjaminkraatz.DeeDock.flix-drag")
@@ -23,12 +30,16 @@ final class FlixDragSession: NSObject, NSDraggingSource {
     private var retained: FlixDragSession?
     /// Each converted copy on the pasteboard, standardized, with the original it stands in for.
     private var originals: [URL: URL] = [:]
+    /// The dragged files and the identity each row listed when the drag began.
+    private var files: FlixDraggedFiles
     /// The session in flight, if any. One drag at a time is all AppKit allows.
     private(set) static weak var current: FlixDragSession?
 
-    private init(moved: @escaping (CGPoint) -> Void, ended: @escaping (Bool, CGPoint) -> Void) {
+    private init(moved: @escaping (CGPoint) -> Void, ended: @escaping (Bool, CGPoint) -> Void,
+                 changed: @escaping @MainActor @Sendable ([URL]) -> Void) {
         self.moved = moved
         self.ended = ended
+        files = FlixDraggedFiles(identities: [:], reportChanged: changed)
     }
 
     /// Starts a drag of `items`.
@@ -39,18 +50,24 @@ final class FlixDragSession: NSObject, NSDraggingSource {
     ///   - label: A line under the first icon, such as "✦ Upload as PDF · 1.2 MB" (phase B1).
     ///   - moved: Each pointer move, in screen coordinates.
     ///   - ended: Once, with whether a destination took the drop.
+    ///   - changed: A destination refused files whose rows are stale (see the type's notes), so the
+    ///     rows can take what is at their paths now. May arrive after the drag ended.
     /// - Returns: False when nothing in `items` can be dragged.
     @discardableResult
     static func begin(items: [FlixItem], substitutions: [FlixItem.ID: URL] = [:], icons: [FlixItem.ID: NSImage],
                       label: String? = nil, from view: NSView, event: NSEvent,
                       moved: @escaping (CGPoint) -> Void,
-                      ended: @escaping (Bool, CGPoint) -> Void) -> Bool {
+                      ended: @escaping (Bool, CGPoint) -> Void,
+                      changed: @escaping @MainActor @Sendable ([URL]) -> Void = { _ in }) -> Bool {
         let draggable = items.filter { substitutions[$0.id] != nil || $0.shareURL != nil }
         guard !draggable.isEmpty else { return false }
-        let session = FlixDragSession(moved: moved, ended: ended)
+        let session = FlixDragSession(moved: moved, ended: ended, changed: changed)
         for item in draggable {
             if let copy = substitutions[item.id], let original = item.url {
                 session.originals[copy.standardizedFileURL] = original
+            }
+            if let path = item.path, item.link == nil {
+                session.files.identities[FlixPaths.standardized(path)] = .some(item.fileIdentity)
             }
         }
         let origin = view.convert(event.locationInWindow, from: nil)
@@ -113,6 +130,13 @@ final class FlixDragSession: NSObject, NSDraggingSource {
         originalURLs(for: urls, on: NSPasteboard(name: .drag))
     }
 
+    /// The files of the Flix drag in flight with the identity each row listed, when `pasteboard` is
+    /// that drag's; nil for any other drag (Finder's, the Shelf's) and once the drag ended.
+    static func draggedFiles(on pasteboard: NSPasteboard) -> FlixDraggedFiles? {
+        guard let current, pasteboard.string(forType: pasteboardType) != nil else { return nil }
+        return current.files
+    }
+
     /// The Flix item identifiers on a pasteboard, empty for any other drag.
     static func itemIDs(on pasteboard: NSPasteboard) -> [UUID] {
         (pasteboard.string(forType: pasteboardType) ?? "").split(separator: ",").compactMap { UUID(uuidString: String($0)) }
@@ -134,6 +158,37 @@ final class FlixDragSession: NSObject, NSDraggingSource {
         retained = nil
         if Self.current === self { Self.current = nil }
     }
+}
+
+/// The files of one Flix drag, with the identity each row listed when the drag began, so a
+/// destination that removes or moves files can tell a stale row from the file it listed.
+nonisolated struct FlixDraggedFiles: Sendable {
+    /// Standardized paths of the dragged originals, with the row's identity (nil: the row had none
+    /// yet, so it cannot vouch for the file).
+    var identities: [String: FlixFileIdentity?]
+    /// Tells Flix Files which files a destination refused as changed, so their rows take the
+    /// identity of what is at their paths now and the next drag acts on the file as it is.
+    var reportChanged: @MainActor @Sendable ([URL]) -> Void = { _ in }
+
+    /// The dragged files among `urls` whose file is not the one the row listed: replaced, rewritten,
+    /// gone, or never identified. URLs that are not part of this drag are ignored.
+    ///
+    /// Reads each path with `lstat` (``FlixFileIdentity/of(_:)``), so call it off the main actor: on
+    /// a share that went away a single `lstat` can wait for seconds.
+    func changed(among urls: [URL]) -> [URL] {
+        urls.filter { url in
+            guard let listed = identities[FlixPaths.standardized(url.path)] else { return false }
+            guard let listed else { return true }
+            return !listed.matches(url)
+        }
+    }
+}
+
+/// An error a destination reports when a Flix drag carried a file that changed since its row was
+/// listed (``FlixDraggedFiles/changed(among:)``). Its message names the first such file.
+nonisolated struct FlixDraggedFileChanged: LocalizedError, Sendable {
+    let name: String
+    var errorDescription: String? { String(localized: .flixDragFileChanged(name)) }
 }
 
 /// The first drag icon with a pill under it naming what the drag does ("✦ Upload as PDF · 1.2 MB"),

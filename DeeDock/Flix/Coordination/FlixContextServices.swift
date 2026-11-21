@@ -178,7 +178,7 @@ final class FlixContextServices {
         if let pending = coordinator.panelState.confirmation {
             coordinator.panelState.resolveConfirmation(.sendAnyway, ids: pending.itemIDs)
         } else {
-            coordinator.confirmDrag([id])
+            coordinator.approveDrop(.sensitive(itemID: id, reason: nil, destination: nil))
         }
         coordinator.panelState.showToast(String(localized: .flixToastMarkedNotSensitive(
             String(localized: .flixLabelQuoted(item.name)))))

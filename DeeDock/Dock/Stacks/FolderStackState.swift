@@ -395,20 +395,26 @@ final class FolderStackState {
         let operation = dropOperation(info)
         dropTargetChanged(nil, destination: "")
         guard !operation.isEmpty, let urls = FolderFileDrop.urls(info) else { return false }
-        return accept(urls, into: url ?? directory, move: operation == .move, target: target)
+        // A move of a Flix Files drag checks each row's file before anything moves (FolderFileDrop.copy).
+        let verifying = operation == .move ? FlixDragSession.draggedFiles(on: info.draggingPasteboard) : nil
+        return accept(urls, into: url ?? directory, move: operation == .move, target: target, verifying: verifying)
     }
 
     /// Accepts a file drop without an `NSDraggingInfo`. A tile drop can arrive before the folder resolves.
-    func accept(_ urls: [URL], into destination: URL, move: Bool, target: AnalyticsDropTarget) -> Bool {
+    /// - Parameter verifying: A Flix Files drag's rows, for a move: the batch moves only when every
+    ///   file is still the one its row listed.
+    func accept(_ urls: [URL], into destination: URL, move: Bool, target: AnalyticsDropTarget,
+                verifying: FlixDraggedFiles? = nil) -> Bool {
         guard destination == rootURL || destination == directory || history.contains(destination) || entries.contains(where: {
             $0.reference.url == destination && $0.reference.isFolder
         }) else { return false }
         if let access {
-            beginCopy(urls, to: destination, move: move, target: target, access: access)
+            beginCopy(urls, to: destination, move: move, target: target, access: access, verifying: verifying)
             return true
         }
         guard !stopped, openTask != nil else { return false }
-        pendingDrop = PendingDrop(urls: urls, destination: destination, move: move, target: target, failed: copyFailed)
+        pendingDrop = PendingDrop(urls: urls, destination: destination, move: move, target: target, failed: copyFailed,
+                                  verifying: verifying)
         receivedDrop = true
         return true
     }
@@ -420,6 +426,7 @@ final class FolderStackState {
         let target: AnalyticsDropTarget
         /// Captured at accept time. `stop` clears `copyFailed` while the volume read is still running.
         let failed: ((String) -> Void)?
+        let verifying: FlixDraggedFiles?
     }
 
     /// Copies into the resolved root. `listing` is false when the panel will not appear.
@@ -433,17 +440,17 @@ final class FolderStackState {
         let destination = pending.destination.standardizedFileURL == folder.url.standardizedFileURL
             ? opened.access.url : pending.destination
         beginCopy(pending.urls, to: destination, move: pending.move, target: pending.target,
-                  access: opened.access, listing: listing, failed: pending.failed)
+                  access: opened.access, listing: listing, failed: pending.failed, verifying: pending.verifying)
     }
 
     private func beginCopy(_ urls: [URL], to destination: URL, move: Bool, target: AnalyticsDropTarget,
                            access: FolderResourceAccess, listing: Bool = true,
-                           failed: ((String) -> Void)? = nil) {
+                           failed: ((String) -> Void)? = nil, verifying: FlixDraggedFiles? = nil) {
         receivedDrop = true
         copying = true
         let failure = failed ?? copyFailed
         let fileType = AnalyticsFileType.common(of: urls)
-        FolderFileDrop.copy(urls, to: destination, lease: access, move: move) { [weak self] error in
+        FolderFileDrop.copy(urls, to: destination, lease: access, move: move, verifying: verifying) { [weak self] error in
             Analytics.track(.stackDrop(move ? .move : .copy, itemCount: urls.count, fileType: fileType,
                                        target: target, outcome: error == nil ? .succeeded : .failed))
             self?.copying = false

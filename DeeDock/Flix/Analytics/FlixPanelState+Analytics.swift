@@ -162,15 +162,18 @@ extension FlixPanelState {
         }
     }
 
-    /// Answers the question on screen: lets the next drag of `ids` go ahead and remembers the answer
-    /// for its drop report. Cancelling is closing the question (``confirmation`` = nil).
-    func resolveConfirmation(_ resolution: AnalyticsFlixWarningResolution, ids: [FlixItem.ID]) {
-        guard let pending = confirmation else { return }
+    /// Answers the question on screen for a drag of `ids`, remembers the answer for its drop report,
+    /// and shows the next question for those items when one applies (an answer covers only its own
+    /// question; see `FlixDropApprovals`). Cancelling is closing the question (``confirmation`` = nil).
+    /// - Returns: True when a follow-up question is showing instead of none.
+    @discardableResult
+    func resolveConfirmation(_ resolution: AnalyticsFlixWarningResolution, ids: [FlixItem.ID]) -> Bool {
+        guard let pending = confirmation else { return false }
         answeredWarning = FlixAnsweredWarning(itemIDs: Set(ids), warning: pending.confirmation.analyticsWarning,
                                               resolution: resolution)
         confirmationAnswered = true
         confirmation = nil
-        confirmDrag?(ids)
+        return answerDrop?(pending.confirmation, resolution, ids) ?? false
     }
 
     /// The answer that applies to a drag of `ids`, consumed by the drag.
