@@ -12,10 +12,12 @@ nonisolated enum FlixFactValue: Codable, Hashable, Sendable {
     case needsSignature
     case signed
     case paid
+    /// The amount is collected automatically (direct debit): nothing to pay by hand.
+    case autoDebit
 }
 
 /// Finds key facts in a file's text and metadata without a model: due dates, totals with their
-/// currency, "needs signature" or "signed", "paid", and page or slide counts.
+/// currency, "needs signature" or "signed", "paid" or "auto-debit", and page or slide counts.
 ///
 /// English and German wording. Deterministic and cheap, so it runs for every readable document a
 /// person reads (``readsFacts(contentType:name:)``); Apple Intelligence's structured facts
@@ -103,7 +105,8 @@ nonisolated enum FlixFactExtractor {
         let folded = fold(text)
         if let due = date(after: dueWords, in: text) { facts.append(.due(due)) }
         if let valid = date(after: validWords, in: text) { facts.append(.validUntil(valid)) }
-        if looksFinancial(folded, name: name), let total = total(in: text) {
+        let financial = looksFinancial(folded, name: name)
+        if financial, let total = total(in: text) {
             facts.append(.amount(total.value, currency: total.currency))
         }
         let foldedName = fold(name)
@@ -114,6 +117,10 @@ nonisolated enum FlixFactExtractor {
             facts.append(.needsSignature)
         } else if paidWords.contains(where: { containsWord($0, in: folded) }) {
             facts.append(.paid)
+        } else if financial, autoDebitWords.contains(where: { containsWord($0, in: folded) }),
+                  !statementWords.contains(where: { containsWord($0, in: folded) }) {
+            // A bill collected by direct debit; a bank statement lists debits without being one.
+            facts.append(.autoDebit)
         }
         if let pageCount, pageCount > 1 { facts.append(isPresentation ? .slides(pageCount) : .pages(pageCount)) }
         return Array(facts.prefix(limit))
@@ -215,6 +222,12 @@ nonisolated enum FlixFactExtractor {
                                       "signiert von*", "elektronisch signiert*"]
     /// In a file name, the word alone is enough: "Signed contract.pdf", "Vertrag_unterschrieben.pdf".
     private static let signedNameWords = ["signed", "unterschrieben*", "signiert*"]
+    /// Wording of a bill whose amount is collected automatically ("SEPA-Lastschriftmandat",
+    /// "wird von Ihrem Konto abgebucht", "paid by direct debit").
+    private static let autoDebitWords = ["direct debit", "will be debited", "debited from your account", "lastschrift*",
+                                         "abgebucht*", "abbuchung*"]
+    private static let statementWords = ["kontoauszug*", "account statement", "bank statement", "kreditkartenabrechnung*",
+                                         "card statement"]
     private static let paidWords = ["paid in full", "payment received", "status: paid", "already paid", "bereits bezahlt*",
                                     "zahlung erhalten*", "betrag erhalten*"]
 

@@ -19,6 +19,9 @@ struct FlixFactsAndPrivacyTests {
         let text = "Rechnung Nr. 4711\nGesamtbetrag: 3.980,00 €\nZahlbar bis 15.12.2026"
         let facts = FlixFactExtractor.facts(text: text, name: "scan.pdf", pageCount: nil, isPresentation: false)
         #expect(facts == [.due(day(2026, 12, 15)), .amount(3_980, currency: "EUR")])
+        let debit = "Rechnung\nZu zahlender Betrag 14,90 EUR\nGemäß Ihrem SEPA-Lastschriftmandat buchen wir den Betrag ab."
+        #expect(FlixFactExtractor.facts(text: debit, name: "scan.pdf", pageCount: 3, isPresentation: false)
+                == [.amount(14.9, currency: "EUR"), .autoDebit, .pages(3)])
     }
 
     @Test func signaturesAndCountsFromMetadata() {

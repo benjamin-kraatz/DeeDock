@@ -5143,6 +5143,24 @@
         }
       }
     },
+    "flixFactAutoDebit" : {
+      "comment" : "Flix Files: short chip on an invoice whose amount is collected automatically by direct debit, so nothing needs paying by hand.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird abgebucht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-debit"
+          }
+        }
+      }
+    },
     "flixFactDue" : {
       "comment" : "Flix Files: key fact chip on a row, the payment due date. %@ is a short date such as “Dec 4”.",
       "extractionState" : "manual",
@@ -5175,6 +5193,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total amount, read from the file’s text"
+          }
+        }
+      }
+    },
+    "flixFactHelpAutoDebit" : {
+      "comment" : "Flix Files: tooltip on the \"Auto-debit\" chip of an invoice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laut Text der Datei wird der Betrag per Lastschrift eingezogen; du musst nichts überweisen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file’s text says the amount is collected by direct debit; nothing to pay by hand"
           }
         }
       }

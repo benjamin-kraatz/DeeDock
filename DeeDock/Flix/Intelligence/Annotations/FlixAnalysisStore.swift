@@ -7,7 +7,8 @@ import Foundation
 nonisolated struct FlixAnalysisRecord: Codable, Equatable, Sendable {
     /// Bump to analyze every file again after the analysis changes.
     /// 2: no facts from data and code files; key words as whole words; model facts need the text.
-    static let currentVersion = 2
+    /// 3: the auto-debit fact.
+    static let currentVersion = 3
 
     var version = FlixAnalysisRecord.currentVersion
     var stamp: FlixFileStamp

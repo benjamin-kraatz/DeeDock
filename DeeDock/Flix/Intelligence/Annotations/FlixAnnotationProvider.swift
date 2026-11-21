@@ -206,6 +206,7 @@ final class FlixAnnotationProvider: FlixAnnotationProviding {
                      help: String(localized: .flixFactHelpNeedsSignature))
         case .signed: FlixFact(text: String(localized: .flixFactSigned), style: .money, help: String(localized: .flixFactHelpSigned))
         case .paid: FlixFact(text: String(localized: .flixFactPaid), help: String(localized: .flixFactHelpPaid))
+        case .autoDebit: FlixFact(text: String(localized: .flixFactAutoDebit), help: String(localized: .flixFactHelpAutoDebit))
         }
     }
 }
