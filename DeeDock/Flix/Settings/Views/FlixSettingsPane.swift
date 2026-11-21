@@ -15,7 +15,16 @@ struct FlixSettingsPane: View {
                             requestAccess: { flix.requestAccess($0) },
                             addFolder: { flix.addWatchedFolder($0) },
                             forgetDragMemory: { flix.intelligence.forgetDragMemory() },
-                            clearHistory: { flix.history.clear() })
+                            clearHistory: { flix.history.clear() },
+                            resetMorningCard: resetMorningCard)
+    }
+
+    private var resetMorningCard: () -> Void {
+        #if DEBUG
+        { [flix] in flix.intelligence.resetMorningCard() }
+        #else
+        {}
+        #endif
     }
 }
 
@@ -31,6 +40,8 @@ struct FlixSettingsContent: View {
     var addFolder: (URL) -> Void = { _ in }
     var forgetDragMemory: () -> Void = {}
     var clearHistory: () -> Void = {}
+    /// Debug builds only show the control that calls it.
+    var resetMorningCard: () -> Void = {}
 
     var body: some View {
         SettingsPageScaffold {
@@ -48,6 +59,9 @@ struct FlixSettingsContent: View {
                 FlixWebLinksCard(settings: $store.settings)
                 FlixIntelligenceCard(settings: $store.settings, engines: engines, forgetDragMemory: forgetDragMemory)
                 FlixHistoryCard(count: historyCount, clear: clearHistory)
+                #if DEBUG
+                FlixDebugCard(resetMorningCard: resetMorningCard)
+                #endif
             }
             .disabled(!store.settings.isEnabled)
             FlixPrivacyNote()

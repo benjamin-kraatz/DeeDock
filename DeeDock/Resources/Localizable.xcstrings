@@ -8077,6 +8077,114 @@
         }
       }
     },
+    "flixSettingsDebug" : {
+      "comment" : "Flix Files settings, debug builds only: title of the card with tools for testing.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        }
+      }
+    },
+    "flixSettingsDebugHelp" : {
+      "comment" : "Flix Files settings, debug builds only: footnote under the debug card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur in Debug-Builds."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only in debug builds."
+          }
+        }
+      }
+    },
+    "flixSettingsDebugMorning" : {
+      "comment" : "Flix Files settings, debug builds only: row title for showing the morning card (\"Where were you?\") again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karte „Wo warst du?“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“Where were you?” card"
+          }
+        }
+      }
+    },
+    "flixSettingsDebugMorningDone" : {
+      "comment" : "Flix Files settings, debug builds only: the Show Again button after it was pressed; the card appears on the next open.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim nächsten Öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows Next Open"
+          }
+        }
+      }
+    },
+    "flixSettingsDebugMorningHelp" : {
+      "comment" : "Flix Files settings, debug builds only: subtitle explaining the Show Again button for the morning card.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erscheint sonst einmal am Tag. Beim nächsten Öffnen von Flix Files erneut zeigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normally shown once a day. Show it again the next time Flix Files opens."
+          }
+        }
+      }
+    },
+    "flixSettingsDebugMorningReset" : {
+      "comment" : "Flix Files settings, debug builds only: button that lets the morning card show again.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut zeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Again"
+          }
+        }
+      }
+    },
     "flixSettingsDockTile" : {
       "comment" : "Flix Files Settings: toggle.",
       "extractionState" : "manual",

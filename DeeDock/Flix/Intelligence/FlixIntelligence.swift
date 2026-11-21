@@ -418,6 +418,18 @@ final class FlixIntelligence {
 
     func forgetDragMemory() { providers.dragMemory?.forget() }
 
+    #if DEBUG
+    /// Debug builds only: lets "Where were you?" appear again on the next open of the panel, as if
+    /// today had not shown it yet. Clears both gates: this session's ``lastMorningDay`` and the day
+    /// ``FlixMorningProvider`` remembers in DOKK's defaults. The card still needs its usual
+    /// conditions (three items on a day with activity in the last four days).
+    func resetMorningCard() {
+        lastMorningDay = nil
+        morning = nil
+        UserDefaults.standard.removeObject(forKey: FlixMorningProvider.defaultsKey)
+    }
+    #endif
+
     // MARK: Teardown
 
     func stop() {

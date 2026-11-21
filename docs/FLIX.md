@@ -274,7 +274,7 @@ The panel debounces typing (420 ms); `FlixIntelligence` cancels the previous sea
 
 `FlixThreadProvider` clusters the last seven days (files and folders, no apps, links, or noise; at most 300 items) off the main actor. Two items link within 72 hours when their Lookout vectors are related or their names share a distinctive word, or within 12 hours when they share a working folder that is not a catch-all one (home, Desktop, Documents, Downloads, Pictures, Movies, Music, iCloud Drive). Connected groups of three or more are threads; at most eight, 40 members each, newest first.
 
-Identity: a cluster keeps the previous thread it overlaps most when they share at least a third of their members (Jaccard); otherwise it is named `thread-<oldest member's id>`. Threads are saved in `threads.json`. Names start as the most common working folder or shared word with an emoji for the kind; the provider's worker then asks Apple Intelligence (`FlixGeneratedThread`: name, emoji, summary) from member names, captions, and folders, one thread at a time, and again when fewer than 60 % of the members are the ones it named.
+Identity: a cluster keeps the previous thread it overlaps most when they share at least a third of their members (Jaccard); otherwise it is named `thread-<oldest member's id>`. Threads are saved in `threads.json`. Names start as the most common working folder or shared word with an emoji for the kind; the provider's worker then asks Apple Intelligence (`FlixGeneratedThread`: name, emoji, summary) from member names, captions, and folders, one thread at a time, and again when fewer than 60 % of the members are the ones it named. The model also sees the names the other threads carry and is asked for one that tells this group apart ("Craft Anything icons" next to "Craft Anything"). Threads that still share a name, ignoring case, accents, and spaces, are shown as one (`FlixThreadProvider.displayThreads`): the newest keeps its identity, name, emoji, and summary, and the members are joined newest first, at most 40.
 
 ### Annotations
 
@@ -298,7 +298,7 @@ The **filter tip** comes from drag memory's open counts: a working folder opened
 
 ### Where was I?
 
-`FlixMorningProvider` runs on the first open of a day (remembered in `flix.morning.lastShownDay`, so a relaunch doesn't repeat it), when the last day with activity is at most four days back and had at least three items. Apple Intelligence writes one or two sentences from the threads' names, summaries, and member names; a message naming none of the threads is dropped for the fallback, which names up to two threads or the newest file. Actions: **Reopen** the main thread's files (at most ten) and show the second thread.
+`FlixMorningProvider` runs on the first open of a day (remembered in `flix.morning.lastShownDay`, so a relaunch doesn't repeat it), when the last day with activity is at most four days back and had at least three items. Apple Intelligence writes one or two sentences from the threads' names, summaries, and member names; a message naming none of the threads is dropped for the fallback, which names up to two threads or the newest file. Actions: **Reopen** the main thread's files (at most ten) and show the second thread. Debug builds add **Settings → Flix Files → Debug → Show Again** (`FlixDebugCard`, `FlixIntelligence.resetMorningCard()`), which clears the remembered day and the session's own once-a-day check so the next open asks again.
 
 ### More like this
 
