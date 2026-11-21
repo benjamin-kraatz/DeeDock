@@ -2,14 +2,21 @@ import Foundation
 import Testing
 @testable import DeeDock
 
-/// Folder results: three or more matching direct children make a folder, scored as the average of its best three plus
-/// 0.25 a file beyond them, the bonus capped at 1.
+/// Folder results: three or more matching direct children make a folder, scored as the average of its best three. A
+/// bonus per file beyond them exists (`folderBonusPerFile`, capped at `folderBonusCap`), but is off since DEE-166: with
+/// it a folder outranked the file someone was looking for.
 struct LookoutFolderGroupingTests {
-    @Test func theScoreAveragesTheBestThreeAndCapsTheBonus() {
+    @Test func theScoreAveragesTheBestThree() {
         #expect(LookoutFolderGrouping.score(fileScores: [1, 3, 2]) == 2)
-        #expect(LookoutFolderGrouping.score(fileScores: [3, 2, 1, 0.5]) == 2.25)
-        #expect(LookoutFolderGrouping.score(fileScores: [5, 4, 3, 1, 1, 1, 1, 1, 1]) == 5)   // 6 × 0.25 capped at 1
-        #expect(LookoutFolderGrouping.score(fileScores: [5, 4, 3, 1, 1, 1, 1]) == 5)   // exactly at the cap
+        #expect(LookoutFolderGrouping.score(fileScores: [3, 2, 1, 0.5]) == 2)
+        #expect(LookoutFolderGrouping.score(fileScores: [5, 4, 3, 1, 1, 1, 1, 1, 1]) == 4)
+    }
+
+    @Test func aBonusPerFileIsCappedWhenTurnedOn() {
+        var tuning = LookoutRanking.Tuning()
+        tuning.folderBonusCap = 1
+        #expect(LookoutFolderGrouping.score(fileScores: [3, 2, 1, 0.5], tuning: tuning) == 2.25)
+        #expect(LookoutFolderGrouping.score(fileScores: [5, 4, 3, 1, 1, 1, 1, 1, 1], tuning: tuning) == 5)   // capped
     }
 
     @Test func onlyDirectChildrenCountAndTheExcludedFolderIsSkipped() {
@@ -34,9 +41,9 @@ struct LookoutFolderGroupingTests {
         let results = try index.searcher().search("budget", queryVector: nil, limit: 100)
         let folders = results.all.filter(\.isFolder)
         #expect(folders.map(\.path) == [index.path("eight"), index.path("four")])
-        #expect(folders.map(\.score) == [3, 2.25])   // every file scores 2: +1 (capped), +0.25
+        #expect(folders.map(\.score) == [2, 2])   // every file scores 2, and so does each folder
         #expect(folders.map { $0.folder?.matchingFiles } == [8, 4])
-        #expect(Array(results.all.prefix(2)) == folders)   // they outrank their files here
+        #expect(Array(results.all.suffix(2)) == folders)   // on equal scores files go first
         #expect(results.all.filter { !$0.isFolder }.count == 14)
     }
 }

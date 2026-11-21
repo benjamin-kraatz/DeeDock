@@ -5,8 +5,9 @@ import Foundation
 ///
 /// A folder qualifies when at least `LookoutRanking.folderMinimumFiles` of its direct children qualify (deeper files
 /// count for their own folder only). Its score is the average of its best `folderMinimumFiles` file scores, plus
-/// `folderBonusPerFile` for each matching file beyond them, the bonus capped at `folderBonusCap`. The files stay in
-/// the list too.
+/// `folderBonusPerFile` for each matching file beyond them, the bonus capped at `folderBonusCap` (0 since DEE-166, so
+/// a folder ranks just below its best file instead of above the file someone is looking for). The files stay in the
+/// list too.
 nonisolated enum LookoutFolderGrouping {
     /// A qualifying file, as far as grouping needs it.
     struct Member: Sendable {
@@ -22,24 +23,26 @@ nonisolated enum LookoutFolderGrouping {
     /// - Parameters:
     ///   - members: Every qualifying file (not only the ones that make the page), already filtered.
     ///   - excluding: A folder never to return: the scope being searched ("Current folder" must not offer itself).
-    static func folders(from members: [Member], excluding: String? = nil) -> [LookoutHit] {
+    ///   - tuning: The folder numbers (`LookoutRanking.Tuning`).
+    static func folders(from members: [Member], excluding: String? = nil,
+                        tuning: LookoutRanking.Tuning = .init()) -> [LookoutHit] {
         let excluded = excluding.map(Self.trimmed)
         var byFolder: [String: [Member]] = [:]
         for member in members {
             byFolder[(member.path as NSString).deletingLastPathComponent, default: []].append(member)
         }
         return byFolder.compactMap { folder, files -> LookoutHit? in
-            guard files.count >= LookoutRanking.folderMinimumFiles, folder != excluded, !folder.isEmpty else {
+            guard files.count >= tuning.folderMinimumFiles, folder != excluded, !folder.isEmpty else {
                 return nil
             }
             let best = files.sorted { $0.score > $1.score || ($0.score == $1.score && $0.path < $1.path) }
-            let top = Array(best.prefix(LookoutRanking.folderMinimumFiles))
+            let top = Array(best.prefix(tuning.folderMinimumFiles))
             let meaning = files.contains { $0.match != .words }
             let words = files.contains { $0.match != .meaning }
             return LookoutHit(
                 path: folder, kind: nil,
                 folder: .init(matchingFiles: files.count, topFiles: top.map(\.path)),
-                score: score(fileScores: files.map(\.score)),
+                score: score(fileScores: files.map(\.score), tuning: tuning),
                 z: best.first?.z, cosine: nil, coverage: best.first?.coverage ?? 0, keywordRank: nil,
                 match: .init(meaning: meaning, words: words),
                 segment: nil, segmentID: nil, loc: nil, locEnd: nil, snippet: nil, excerpt: nil,
@@ -48,12 +51,12 @@ nonisolated enum LookoutFolderGrouping {
     }
 
     /// A folder's score from its matching files' scores (any order). Meaningful for `folderMinimumFiles` or more.
-    static func score(fileScores: [Double]) -> Double {
+    static func score(fileScores: [Double], tuning: LookoutRanking.Tuning = .init()) -> Double {
         let sorted = fileScores.sorted(by: >)
-        let top = sorted.prefix(LookoutRanking.folderMinimumFiles)
+        let top = sorted.prefix(tuning.folderMinimumFiles)
         let average = top.reduce(0, +) / Double(max(top.count, 1))
-        let extra = Double(max(sorted.count - LookoutRanking.folderMinimumFiles, 0))
-        return average + min(extra * LookoutRanking.folderBonusPerFile, LookoutRanking.folderBonusCap)
+        let extra = Double(max(sorted.count - tuning.folderMinimumFiles, 0))
+        return average + min(extra * tuning.folderBonusPerFile, tuning.folderBonusCap)
     }
 
     private static func trimmed(_ path: String) -> String {

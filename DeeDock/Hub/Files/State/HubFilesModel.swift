@@ -82,6 +82,8 @@ final class HubFilesModel: HubTabModel {
     @ObservationIgnored var searchSerial = 0
     /// The current search session has been counted for analytics (`endLookoutSearchSession`).
     @ObservationIgnored var lookoutSearchCounted = false
+    /// The current search is in the click log already (`LookoutClickLog`): opened from, or ended.
+    @ObservationIgnored var lookoutSearchLogged = false
     /// The `didUnmountNotification` observer, registered while the tab is visible.
     @ObservationIgnored private var unmountObserver: NSObjectProtocol?
     @ObservationIgnored var dropOperationCache: (key: String, operation: NSDragOperation)?
@@ -178,6 +180,7 @@ final class HubFilesModel: HubTabModel {
         refreshActivation()
         if isSearching {
             lookoutSearchCounted = false
+            lookoutSearchLogged = false
             runSearch()
         }
         lookout.hubFilesDidAppear()
@@ -450,7 +453,12 @@ final class HubFilesModel: HubTabModel {
             quickLook.close()
             refreshActivation()
             // Lookout still shows the old query's results here: count the search that ends, before they're cleared.
-            if wasSearching { endLookoutSearchSession() } else { lookoutSearchCounted = false }
+            if wasSearching {
+                endLookoutSearchSession()
+            } else {
+                lookoutSearchCounted = false
+                lookoutSearchLogged = false
+            }
         }
         searchSelection.clear()
         lookoutSelection = nil

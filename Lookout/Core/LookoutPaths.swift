@@ -69,6 +69,8 @@ nonisolated struct LookoutPaths: Sendable, Equatable {
     var indexFiles: [URL] {
         ["", "-wal", "-shm", "-journal"].map { base.appending(path: IndexStore.mainFile + $0, directoryHint: .notDirectory) }
     }
+    /// The developer click log (`LookoutClickLog`, DEE-166), present only where `~/.dokk/controller` turned it on.
+    var learning: URL { base.appending(path: "Learning", directoryHint: .isDirectory) }
     /// The services' logs: llama.cpp's warnings and errors (`LlamaLog`).
     var logs: URL { base.appending(path: "Logs", directoryHint: .isDirectory) }
 

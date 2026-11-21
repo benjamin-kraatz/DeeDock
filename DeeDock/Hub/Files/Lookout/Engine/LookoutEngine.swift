@@ -63,6 +63,8 @@ final class LookoutEngine {
     @ObservationIgnored private let power: any LookoutPowerPolicing
     /// Where the index and the models live.
     @ObservationIgnored let paths: LookoutPaths
+    /// The developer click log, when `~/.dokk/controller` turned it on at launch (`LookoutClickLog`); nil otherwise.
+    @ObservationIgnored let clickLog: LookoutClickLog?
     @ObservationIgnored private let canRun: Bool
     @ObservationIgnored private var syncPacer: LookoutSyncPacer
     @ObservationIgnored private let releaseDelay: Duration
@@ -95,6 +97,7 @@ final class LookoutEngine {
     ///   - releaseDelay: The vector release delay; tests shorten it.
     ///   - progressInterval: The progress throttle; tests shorten it.
     ///   - now: The clock the progress's pace is measured with; tests pass their own.
+    ///   - clickLog: Where searches and opens are logged for the reranker; nil logs nothing.
     init(settings: LookoutSettings, repository: LookoutSettingsRepository?, connection: any LookoutIndexControlling,
          encoder: any LookoutQueryEncoding, reader: any LookoutIndexSearching, monitor: any LookoutMonitoring,
          power: any LookoutPowerPolicing, paths: LookoutPaths, canRun: Bool,
@@ -102,8 +105,9 @@ final class LookoutEngine {
          syncTiming: LookoutSyncPacer.Timing? = nil,
          releaseDelay: Duration = LookoutEngine.vectorReleaseDelay,
          progressInterval: Duration = LookoutEngine.progressInterval,
-         now: @escaping () -> Date = Date.init) {
+         now: @escaping () -> Date = Date.init, clickLog: LookoutClickLog? = nil) {
         self.settings = settings
+        self.clickLog = clickLog
         self.repository = repository
         self.connection = connection
         self.encoder = encoder
@@ -133,7 +137,7 @@ final class LookoutEngine {
             connection: LookoutIndexConnection(serviceName: LookoutServiceNames.index(appBundleIdentifier: bundleID)),
             encoder: LookoutQueryEncoder(serviceName: LookoutServiceNames.query(appBundleIdentifier: bundleID)),
             reader: LookoutIndexReader(directory: paths.index), monitor: LookoutMonitor(), power: LookoutPowerPolicy(),
-            paths: paths, canRun: true)
+            paths: paths, canRun: true, clickLog: LookoutClickLog.ifEnabled(paths: paths))
     }
 
     /// An engine that never runs and never saves: previews, tests of other features, the test host.
