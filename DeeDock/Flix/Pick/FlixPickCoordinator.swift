@@ -45,7 +45,7 @@ final class FlixPickCoordinator {
     /// A picker that closed while an action that may press its default button was still running.
     /// Its closing is resolved when that action reports whether the press went through, so a
     /// rejected press (Save with an empty name) is never learned as a pick.
-    private var closingDuringConfirm: (session: Session, at: Date)?
+    private var closingDuringConfirm: (session: Session, at: Date, pressedAt: Date?)?
     /// A picker that lost focus without closing, kept so it is recognized when focus returns.
     private var parked: Session?
     /// The action running on a row; a double-click on it upgrades it to a confirm.
@@ -161,9 +161,9 @@ final class FlixPickCoordinator {
                   name.map({ $0.localizedCaseInsensitiveCompare(Self.folderName(placed)) != .orderedSame }) ?? true
             else { return }
             session?.evidence.placedByFlix = nil
-        case .closed(let serial, let destroyed):
+        case .closed(let serial, let destroyed, let pressedAt):
             guard session?.picker.serial == serial else { return }
-            closed(destroyed: destroyed)
+            closed(destroyed: destroyed, pressedAt: pressedAt)
         }
     }
 
@@ -249,8 +249,9 @@ final class FlixPickCoordinator {
         return controller
     }
 
-    /// The picker closed (`destroyed`) or only lost focus.
-    private func closed(destroyed: Bool) {
+    /// The picker closed (`destroyed`) or only lost focus. `pressedAt` is set when its destruction
+    /// proves Flix Pick's own press closed it (see `FlixPickEvent.closed`).
+    private func closed(destroyed: Bool, pressedAt: Date?) {
         guard let current = session else { return }
         rowsTask?.cancel()
         actionTask?.cancel()
@@ -262,11 +263,22 @@ final class FlixPickCoordinator {
             return
         }
         parked = nil
+        // The action that pressed may not have reported its press yet, even though the task was
+        // just cancelled: it always finishes, and resolves this closing then.
         if running?.confirm == true {
-            closingDuringConfirm = (current, .now)
+            closingDuringConfirm = (current, .now, pressedAt)
             return
         }
-        resolveClosing(current, at: .now)
+        var closing = current
+        Self.credit(&closing.evidence, pressedAt: pressedAt)
+        resolveClosing(closing, at: .now)
+    }
+
+    /// Flix Pick's own press counts as the pick only when the picker's destruction proved that
+    /// very press closed it.
+    private static func credit(_ evidence: inout FlixPickClosingEvidence, pressedAt: Date?) {
+        guard let pressedAt, let pressed = evidence.flixPressed, pressed.at == pressedAt else { return }
+        evidence.confirmedByFlix = pressed
     }
 
     /// Decides how the picker closed, learns the pick, and reports it.
@@ -323,7 +335,19 @@ final class FlixPickCoordinator {
         let primaryMaxY = NSScreen.screens.first?.frame.maxY ?? 0
         // AppKit (bottom-left, y up) to Accessibility (top-left, y down): only y flips.
         let target = picker.target(at: CGPoint(x: point.x, y: primaryMaxY - point.y))
-        session?.evidence.lastPress = (target, clickCount, .now)
+        let at = Date.now
+        session?.evidence.lastPress = (target, clickCount, at)
+        session?.evidence.folderAtPress = nil
+        // A Save picker's folder is learned only as its listed rows prove it at the press, never
+        // by its name. Read now, before the button's release closes the picker.
+        guard target == .confirm, picker.kind == .save else { return }
+        let serial = picker.serial
+        let observer = observer
+        Task { [weak self] in
+            let folder = await observer.run { $0.listedFolder(serial: serial) }
+            guard let self, session?.picker.serial == serial, session?.evidence.lastPress?.at == at else { return }
+            session?.evidence.folderAtPress = folder
+        }
     }
 
     // MARK: Rows
@@ -368,8 +392,9 @@ final class FlixPickCoordinator {
             if !confirm, running?.confirm == true, result.selected, !Task.isCancelled {
                 let second = await FlixPickRouter.perform(path: row.path, picker: picker, confirm: true,
                                                           observer: observer)
-                result.confirmed = second.confirmed
-                result.failure = second.failure
+                // The whole confirmation, including when the press went through.
+                result = FlixPickActionResult(route: result.route, selected: true, confirmed: second.confirmed,
+                                              failure: second.failure, confirmedAt: second.confirmedAt)
             }
             finish(running ?? action, result: result, serial: picker.serial)
         }
@@ -380,13 +405,14 @@ final class FlixPickCoordinator {
         actionTask = nil
         if state.busyRowID == action.row.id { state.busyRowID = nil }
         let path = FlixPaths.standardized(action.row.path)
-        // Only a press that went through and closed the picker counts as Flix Pick's pick, at the
-        // time of the press itself.
-        let confirmed = result.confirmed && result.closedByPress ? result.confirmedAt.map { (path, $0) } : nil
-        if let confirmed { session?.evidence.confirmedByFlix = confirmed }
+        // A press that went through, at the time the Accessibility thread took right after it. It
+        // becomes the pick only when the picker's destruction proves it closed it (`credit`).
+        let pressed = result.confirmed ? result.confirmedAt.map { (path: path, at: $0) } : nil
+        if let pressed { session?.evidence.flixPressed = pressed }
         if var closing = closingDuringConfirm, closing.session.picker.serial == serial {
             closingDuringConfirm = nil
-            if let confirmed { closing.session.evidence.confirmedByFlix = confirmed }
+            if let pressed { closing.session.evidence.flixPressed = pressed }
+            Self.credit(&closing.session.evidence, pressedAt: closing.pressedAt)
             resolveClosing(closing.session, at: closing.at)
         }
         if session?.picker.serial == serial {

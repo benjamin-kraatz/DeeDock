@@ -70,8 +70,12 @@ nonisolated enum FlixPickEvent: Sendable {
     /// The picker's current folder changed: the `where popup` shows a new name.
     case folderChanged(serial: Int, name: String?)
     /// The picker went away. `destroyed` is false when it only lost focus or its app moved to the
-    /// back, so it may come back as `appeared(_, returning: true)`.
-    case closed(serial: Int, destroyed: Bool)
+    /// back (or whether it is gone could not be told), so it may come back as
+    /// `appeared(_, returning: true)`. `pressedAt` is the time of Flix Pick's own press of its
+    /// default button when the picker's destruction is proof that press closed it: destroyed
+    /// within ``FlixPickSession/pressCloseWindow`` of the press, with no sheet (a "Replace?" prompt)
+    /// appearing on it in between.
+    case closed(serial: Int, destroyed: Bool, pressedAt: Date?)
 }
 
 /// Where in the picker a mouse press landed, for telling a confirm from a cancel when it closes.

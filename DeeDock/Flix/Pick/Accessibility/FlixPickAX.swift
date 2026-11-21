@@ -36,7 +36,15 @@ nonisolated enum FlixPickAX {
         RobiAX.value(element, attribute) as? String
     }
 
-    /// Whether the element still exists in its app.
+    /// Whether the element is definitely gone: its app answered that it is invalid. A timeout or
+    /// any other error is not proof.
+    static func isGone(_ element: AXUIElement) -> Bool {
+        var value: CFTypeRef?
+        return AXUIElementCopyAttributeValue(element, kAXRoleAttribute as CFString, &value) == .invalidUIElement
+    }
+
+    /// Whether the element still exists in its app. A timeout counts as not alive, so an action
+    /// refuses rather than guesses.
     static func isAlive(_ element: AXUIElement) -> Bool {
         var value: CFTypeRef?
         let error = AXUIElementCopyAttributeValue(element, kAXRoleAttribute as CFString, &value)
@@ -139,11 +147,11 @@ nonisolated enum FlixPickAX {
         return nil
     }
 
-    /// How many rows the list has selected, and the file when exactly one is.
-    static func selection(in list: AXUIElement, deadline: Deadline) -> (count: Int, url: URL?) {
+    /// How many rows the list has selected, and the row and its file when exactly one is.
+    static func selection(in list: AXUIElement, deadline: Deadline) -> (count: Int, row: AXUIElement?, url: URL?) {
         let rows = elements(list, kAXSelectedRowsAttribute) ?? []
-        guard rows.count == 1 else { return (rows.count, nil) }
-        return (1, url(ofRow: rows[0], deadline: deadline))
+        guard rows.count == 1 else { return (rows.count, nil, nil) }
+        return (1, rows[0], url(ofRow: rows[0], deadline: deadline))
     }
 
     /// The folder the list shows, from its first row's parent. Nil for an empty folder or a list

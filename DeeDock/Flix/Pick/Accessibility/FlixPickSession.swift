@@ -89,6 +89,10 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         var buttonTitle: String?
         var registered: [(element: AXUIElement, name: String)] = []
         var rediscovered = false
+        /// When Flix Pick's own press of `OKButton` went through, measured here right after it.
+        var pressedAt: Date?
+        /// A sheet appeared in the app after that press: a "Replace?" prompt, not a close.
+        var sheetAfterPress = false
         /// The controls' frames and the picker's frame when they were read. A move shifts them by
         /// the picker's offset instead of reading them again; a resize reads them again.
         var controlFrames: (confirm: CGRect?, cancel: CGRect?, list: CGRect?) = (nil, nil, nil)
@@ -155,7 +159,7 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
     private func removeObserver() {
         if let current {
             unregister(current)
-            post(.closed(serial: current.serial, destroyed: false))
+            post(.closed(serial: current.serial, destroyed: false, pressedAt: nil))
             previous = (current.element, current.serial)
             self.current = nil
         }
@@ -193,7 +197,8 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
                 refresh(current)
                 return
             }
-            close(current, destroyed: !FlixPickAX.isAlive(current.element))
+            // Destroyed only when the app says the element is invalid; a timeout is not proof.
+            close(current, destroyed: FlixPickAX.isGone(current.element))
         }
         guard let found else { return }
         let returning = previous.map { CFEqual($0.element, found.element) } ?? false
@@ -233,9 +238,15 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         post(.changed(snapshot(picker)))
     }
 
+    /// How soon after Flix Pick's own press the picker must be destroyed for the press to count as
+    /// what closed it.
+    static let pressCloseWindow: TimeInterval = 0.6
+
     private func close(_ picker: Picker, destroyed: Bool) {
         unregister(picker)
-        post(.closed(serial: picker.serial, destroyed: destroyed))
+        let byPress = destroyed && !picker.sheetAfterPress
+            && picker.pressedAt.map { Date.now.timeIntervalSince($0) <= Self.pressCloseWindow } == true
+        post(.closed(serial: picker.serial, destroyed: destroyed, pressedAt: byPress ? picker.pressedAt : nil))
         previous = destroyed ? nil : (picker.element, picker.serial)
         if current === picker { current = nil }
     }
@@ -331,6 +342,7 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
             guard let current, let popup = current.controls[FlixPickAX.wherePopup], CFEqual(element, popup) else { return }
             post(.folderChanged(serial: current.serial, name: FlixPickAX.string(popup, kAXValueAttribute)))
         case kAXWindowCreatedNotification, "AXSheetCreated":
+            if name == "AXSheetCreated", let current, current.pressedAt != nil { current.sheetAfterPress = true }
             scheduleEvaluate(after: 0.06)
         default:
             scheduleEvaluate(after: 0.02)
@@ -363,12 +375,13 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         if !listAlive || picker.controls[FlixPickAX.okButton] == nil { discoverControls(picker) }
     }
 
-    /// The app with keyboard focus, from the system-wide element.
-    private func focusedPID() -> pid_t? {
-        let system = AXUIElementCreateSystemWide()
-        guard let focused = RobiAX.element(system, kAXFocusedApplicationAttribute) else { return nil }
-        var pid: pid_t = 0
-        return AXUIElementGetPid(focused, &pid) == .success ? pid : nil
+    /// Whether the observed app is the frontmost app, the one with keyboard focus, from its own
+    /// application element's `AXFrontmost`. That element carries the messaging timeout; a
+    /// system-wide element is not used, because setting a timeout on it would change the timeout
+    /// of every Accessibility call in DOKK. A timeout answers false, so the action refuses.
+    private func appIsFrontmost() -> Bool {
+        guard let app else { return false }
+        return (RobiAX.value(app, kAXFrontmostAttribute) as? Bool) == true
     }
 
     /// The last checks before an irreversible action (a posted key, `AXConfirm`, an `AXPress`),
@@ -377,7 +390,8 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
     /// keyboard focus. Callers check the picker's focus and the exact selection, folder, or field
     /// value just before this.
     private func stillInFront(_ generation: Int) -> Bool {
-        isCurrent(generation) && focusedPID() == pid
+        // The generation again after the focus lookup, which is the one call that can wait.
+        isCurrent(generation) && appIsFrontmost() && isCurrent(generation)
     }
 
     private func focused(_ picker: Picker) -> Bool {
@@ -527,33 +541,49 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         _ = AXUIElementPerformAction(button, kAXPressAction as CFString)
     }
 
-    /// Presses `OKButton`. Discovery and the button's enabled state are read first; then, with
-    /// nothing else read in between, the final checks: the picker focused, exactly `path` selected
-    /// (Open) or the picker's listed rows inside `path` (Save), the attachment the action started
-    /// under unchanged, and the picker's app holding keyboard focus. `done` only when the press
-    /// went through.
-    func confirm(_ path: String, isSave: Bool, serial: Int, generation: Int) -> FlixPickGuardResult {
-        guard isCurrent(generation) else { return .notFrontmost }
-        guard let picker = live(serial) else { return .gone }
+    /// Presses `OKButton`. Discovery, the button's enabled state, and the selected row's file are
+    /// read first; then the final checks: the picker focused, exactly `path` selected (Open) or
+    /// the picker's listed rows inside `path` (Save), the attachment unchanged, the picker's app
+    /// holding keyboard focus, and, as the very last read for Open, the selected rows again, which
+    /// must still be that one row (a ⌘-click in between would add a second file). The press time
+    /// is taken here, right after the press went through.
+    func confirm(_ path: String, isSave: Bool, serial: Int, generation: Int) -> (result: FlixPickGuardResult, at: Date?) {
+        guard isCurrent(generation) else { return (.notFrontmost, nil) }
+        guard let picker = live(serial) else { return (.gone, nil) }
         ensureControls(picker)
-        guard let list = picker.controls[FlixPickAX.listView] else { return .notVerified }
+        guard let list = picker.controls[FlixPickAX.listView] else { return (.notVerified, nil) }
         guard let ok = picker.controls[FlixPickAX.okButton],
-              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? false else { return .unavailable }
-        // Final checks, then the press, with no other read in between.
-        guard focused(picker) else { return .notFrontmost }
+              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? false else { return (.unavailable, nil) }
+        guard focused(picker) else { return (.notFrontmost, nil) }
         let deadline = FlixPickAX.Deadline(seconds: 0.5)
+        var selectedRow: AXUIElement?
         if isSave {
             guard let shown = FlixPickAX.listedFolder(in: list, deadline: deadline), FlixPickAX.same(shown, path)
-            else { return .notVerified }
+            else { return (.notVerified, nil) }
         } else {
             let selected = FlixPickAX.selection(in: list, deadline: deadline)
-            guard selected.count == 1, let url = selected.url, FlixPickAX.same(url, path) else { return .notVerified }
+            guard selected.count == 1, let row = selected.row, let url = selected.url, FlixPickAX.same(url, path)
+            else { return (.notVerified, nil) }
+            selectedRow = row
         }
-        guard stillInFront(generation) else { return .notFrontmost }
-        return AXUIElementPerformAction(ok, kAXPressAction as CFString) == .success ? .done : .unavailable
+        guard stillInFront(generation) else { return (.notFrontmost, nil) }
+        if let selectedRow {
+            guard let rows = FlixPickAX.elements(list, kAXSelectedRowsAttribute), rows.count == 1,
+                  CFEqual(rows[0], selectedRow) else { return (.notVerified, nil) }
+        }
+        guard AXUIElementPerformAction(ok, kAXPressAction as CFString) == .success else { return (.unavailable, nil) }
+        let at = Date.now
+        picker.pressedAt = at
+        picker.sheetAfterPress = false
+        return (.done, at)
     }
 
-    /// Whether the picker still exists and has focus in its app, for telling whether a press
-    /// closed it.
-    func exists(serial: Int) -> Bool { live(serial) != nil }
+    /// The folder the picker lists now, from its first row, standardized; nil when it cannot be
+    /// told (an empty folder, no list view). For learning a Save picker's folder at a press on
+    /// `OKButton`.
+    func listedFolder(serial: Int) -> String? {
+        guard let picker = live(serial), let list = picker.controls[FlixPickAX.listView],
+              let folder = FlixPickAX.listedFolder(in: list, deadline: FlixPickAX.Deadline(seconds: 0.3)) else { return nil }
+        return FlixPaths.standardized(folder.standardizedFileURL.path)
+    }
 }
