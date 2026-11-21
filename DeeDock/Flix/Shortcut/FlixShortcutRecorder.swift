@@ -76,6 +76,7 @@ struct FlixShortcutRecorder: View {
     let reset: () -> Void
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: FlixStyle.controlRadius, style: .continuous)
         HStack(spacing: 6) {
             Button {
                 model.isRecording ? model.end() : model.begin()
@@ -94,11 +95,14 @@ struct FlixShortcutRecorder: View {
                 .font(.system(size: 12))
                 .padding(.horizontal, 8)
                 .frame(minWidth: 110, minHeight: 26)
-                .background(Color.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .strokeBorder(model.isRecording ? Color.accentColor : Color.primary.opacity(0.15),
-                                  lineWidth: model.isRecording ? 1.5 : 0.5))
+                .background(FlixStyle.field, in: shape)
+                .overlay(shape.strokeBorder(model.isRecording ? Color.accentColor : FlixStyle.outline,
+                                            lineWidth: model.isRecording ? 1.5 : 0.5))
+                // A soft accent halo while recording, like a focused field.
+                .overlay(shape.inset(by: -2.5).strokeBorder(Color.accentColor.opacity(model.isRecording ? 0.25 : 0), lineWidth: 2.5))
                 .contentShape(.rect)
+                .contentShape(.focusEffect, shape)
+                .animation(FlixMotion.hover, value: model.isRecording)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(.flixShortcutTitle))
@@ -127,8 +131,9 @@ struct FlixKeycaps: View {
                     .font(.system(size: 11, weight: .medium))
                     .frame(minWidth: 18, minHeight: 18)
                     .padding(.horizontal, 3)
-                    .background(Color.primary.opacity(0.09), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
+                    .background(FlixStyle.key, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).strokeBorder(FlixStyle.outline, lineWidth: 0.5))
+                    .shadow(color: Color.primary.opacity(0.15), radius: 0, y: 1)
             }
         }
         .accessibilityHidden(true)

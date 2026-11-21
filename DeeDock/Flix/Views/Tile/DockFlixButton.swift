@@ -7,6 +7,10 @@ import SwiftUI
 /// A click opens the panel above the tile (or closes it). A plain drag carries the newest item;
 /// Option-drag moves the tile among the other utilities. Hover never opens anything. The badge and
 /// thumbnail come from the shared `FlixTileState`, so a new item redraws this tile alone.
+///
+/// The badge is drawn by ``FlixTileArtwork`` (the dock's own `DockAppBadge`, in the same corner)
+/// rather than by `DockIconPresentation`, so it can pop with each arrival. The pill pops in and
+/// out; with Reduce Motion it fades.
 struct DockFlixButton: View {
     let size: CGFloat
     let selected: Bool
@@ -23,6 +27,12 @@ struct DockFlixButton: View {
     private var tile: FlixTileState? { interaction.flix }
     private var unseen: Int { tile?.unseenCount ?? 0 }
 
+    /// The pill's count while it shows: hidden under the pointer and while the panel is open.
+    private var pillCount: Int? {
+        guard let count = tile?.fitCount, tile?.isPanelOpen != true, !hovered else { return nil }
+        return count
+    }
+
     private var artworkOpacity: Double {
         DockAppearanceOpacity(settings: interaction.idleFade.settings, idleFraction: interaction.idleFade.fraction,
                               reduceTransparency: reduceTransparency).icons
@@ -32,12 +42,11 @@ struct DockFlixButton: View {
         DockIconPresentation(size: size, edge: interaction.layout.edge, available: true,
                              running: tile?.isPanelOpen == true ? .running : .notRunning, launching: false,
                              keyboardSelected: selected, artworkOpacity: artworkOpacity,
-                             artworkAnimation: interaction.idleFade.animation,
-                             badgeLabel: unseen > 0 ? DockNotificationFeedButton.badgeLabel(unseen) : nil,
-                             badgeStyle: .count, badgeAttention: unseen > 0) {
+                             artworkAnimation: interaction.idleFade.animation) {
             FlixTileArtwork(size: size, thumbnail: tile?.thumbnail, sensitive: tile?.newestIsSensitive == true,
-                            arrivals: tile?.arrivals ?? 0, reduceMotion: reduceMotion,
-                            reduceTransparency: reduceTransparency)
+                            arrivals: tile?.arrivals ?? 0,
+                            badge: unseen > 0 ? DockNotificationFeedButton.badgeLabel(unseen) : nil,
+                            reduceMotion: reduceMotion, reduceTransparency: reduceTransparency)
         }
         .overlay {
             if interaction.flixTargeted {
@@ -45,13 +54,14 @@ struct DockFlixButton: View {
             }
         }
         .overlay(alignment: .top) {
-            if let count = tile?.fitCount, tile?.isPanelOpen != true, !hovered {
+            if let count = pillCount {
                 FlixFitsPill(count: count)
                     .offset(y: -size * 0.62)
                     .allowsHitTesting(false)
-                    .transition(reduceMotion ? .opacity : .scale(scale: 0.8).combined(with: .opacity))
+                    .transition(FlixMotion.pop(reduceMotion: reduceMotion))
             }
         }
+        .animation(FlixMotion.resolved(FlixMotion.dialog, reduceMotion: reduceMotion), value: pillCount)
         .contentShape(.rect)
         .overlay {
             FlixTileSource(hasItem: tile?.newest != nil,
@@ -209,8 +219,13 @@ private struct FlixTileMenuBridge: NSViewRepresentable {
     interaction.flix = FlixTileState(preview: FlixPreviewData.items[0],
                                      thumbnail: NSImage(systemSymbolName: "photo", accessibilityDescription: nil),
                                      unseen: 3, fits: 2)
+    let sensitive = DockInteraction()
+    sensitive.flix = FlixTileState(preview: FlixPreviewData.items[5],
+                                   thumbnail: NSImage(systemSymbolName: "person.text.rectangle", accessibilityDescription: nil),
+                                   unseen: 12, fits: nil)
     return HStack(spacing: 24) {
         DockFlixButton(size: 50, selected: false, interaction: interaction, menuTracking: { _ in }, accessibilityFocus: { _ in })
+        DockFlixButton(size: 50, selected: false, interaction: sensitive, menuTracking: { _ in }, accessibilityFocus: { _ in })
         DockFlixButton(size: 50, selected: true, interaction: DockInteraction(), menuTracking: { _ in },
                        accessibilityFocus: { _ in })
     }

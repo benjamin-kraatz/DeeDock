@@ -3,51 +3,63 @@ import SwiftUI
 /// The question asked before items leave for another app: a sensitive file, or an older version.
 ///
 /// Shown in the panel because the question runs at drag start (see `FlixCoordinator.beginDrag`).
-/// Answering lets the next drag of the same items go ahead; the toast says so.
+/// Answering lets the next drag of the same items go ahead; the toast says so. The dialog scales
+/// in from 90 % with ``FlixMotion/dialog``; with Reduce Motion it crossfades.
 struct FlixConfirmationLayer: View {
     let state: FlixPanelState
 
     var body: some View {
         ZStack {
             if let pending = state.confirmation {
-                Color.black.opacity(0.18)
+                Color.black.opacity(0.22)
                     .onTapGesture { state.confirmation = nil }
+                    .transition(.opacity)
                     .accessibilityHidden(true)
                 FlixConfirmationDialog(pending: pending, state: state)
                     .transition(state.reduceMotion ? .opacity : .scale(scale: 0.9).combined(with: .opacity))
+                    .id(pending.id)
             }
         }
-        .animation(state.reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.3, dampingFraction: 0.7),
-                   value: state.confirmation)
+        .animation(FlixMotion.resolved(FlixMotion.dialog, reduceMotion: state.reduceMotion), value: state.confirmation)
     }
 }
 
+/// The dialog itself: a tinted symbol, the question, and stacked buttons.
 private struct FlixConfirmationDialog: View {
     let pending: FlixPendingConfirmation
     let state: FlixPanelState
 
     var body: some View {
         VStack(spacing: 8) {
-            Image(systemName: symbol).font(.system(size: 28)).foregroundStyle(Color.accentColor)
-            Text(title).font(.system(size: 13.5, weight: .semibold)).multilineTextAlignment(.center)
-            Text(message).font(.system(size: 12)).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            FlixDialogSymbol(name: symbol, tint: isSensitive ? .orange : .accentColor)
+                .padding(.bottom, 2)
+            Text(title)
+                .font(.system(size: 13.5, weight: .semibold))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
+            Text(message)
+                .font(.system(size: 12))
+                .lineSpacing(2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             VStack(spacing: 6) { buttons }
-                .padding(.top, 4)
+                .padding(.top, 6)
         }
         .padding(16)
         .frame(width: 300)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
-        .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+        .modifier(FlixFloatingSurface())
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)
     }
 
-    private var symbol: String {
-        if case .sensitive = pending.confirmation { return "lock.shield" }
-        return "doc.on.doc"
+    private var isSensitive: Bool {
+        if case .sensitive = pending.confirmation { return true }
+        return false
     }
+
+    private var symbol: String { isSensitive ? "lock.shield.fill" : "doc.on.doc.fill" }
 
     private func name(_ id: FlixItem.ID) -> String { state.history.item(id)?.name ?? "" }
 
@@ -91,16 +103,12 @@ private struct FlixConfirmationDialog: View {
     private func dialogButton(_ title: String, primary: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(verbatim: title)
+                .font(.system(size: 12.5, weight: primary ? .semibold : .regular))
                 .lineLimit(1)
                 .truncationMode(.middle)
-                .frame(maxWidth: .infinity)
-                .frame(height: 28)
-                .foregroundStyle(primary ? Color.white : .primary)
-                .background(primary ? Color.accentColor : FlixStyle.chipHover,
-                            in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .buttonStyle(.plain)
-        .font(.system(size: 12.5))
+        .buttonStyle(FlixCardButtonStyle(primary: primary, expands: true, height: 28, radius: 8))
+        .help(Text(verbatim: title))
     }
 
     private func confirm(_ ids: [FlixItem.ID], _ resolution: AnalyticsFlixWarningResolution) {
@@ -108,3 +116,30 @@ private struct FlixConfirmationDialog: View {
         state.showToast(String(localized: .flixToastDragAgain))
     }
 }
+
+/// The dialog's symbol on a soft disc of its tint.
+private struct FlixDialogSymbol: View {
+    let name: String
+    let tint: Color
+
+    var body: some View {
+        Image(systemName: name)
+            .font(.system(size: 20, weight: .medium))
+            .foregroundStyle(tint)
+            .frame(width: 44, height: 44)
+            .background(tint.opacity(0.15), in: .circle)
+            .accessibilityHidden(true)
+    }
+}
+
+#if DEBUG
+#Preview("Sensitive question") {
+    FlixPanelView(state: FlixPreviewData.panelState(.sensitiveQuestion)).frame(width: 760, height: 608)
+}
+
+#Preview("Newer version question, German, light") {
+    FlixPanelView(state: FlixPreviewData.panelState(.newerVersionQuestion)).frame(width: 760, height: 608)
+        .environment(\.locale, Locale(identifier: "de"))
+        .preferredColorScheme(.light)
+}
+#endif

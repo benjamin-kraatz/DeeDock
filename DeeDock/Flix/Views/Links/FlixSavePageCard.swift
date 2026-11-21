@@ -2,15 +2,17 @@ import SwiftUI
 
 /// **Save this page**: a slim card at the top of the list while a browser was in front when the
 /// panel opened, with web links on. One press keeps the page as a link item; the card then says
-/// "Saved". Saving is deliberate, so it works for any browser and any site.
+/// "Saved", the check popping in (a crossfade with Reduce Motion). Saving is deliberate, so it works
+/// for any browser and any site.
 struct FlixSavePageCard: View {
     let offer: FlixPageOffer
+    var reduceMotion = false
     let save: () -> Void
 
     private var name: String { offer.page.title ?? offer.page.host }
 
     var body: some View {
-        let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: FlixStyle.cardRadius, style: .continuous)
         HStack(spacing: 10) {
             FlixSiteIconView(host: offer.page.host, size: 28)
             VStack(alignment: .leading, spacing: 1) {
@@ -24,24 +26,27 @@ struct FlixSavePageCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             if offer.isSaved {
-                Label { Text(.flixSavePageSaved) } icon: { Image(systemName: "checkmark") }
-                    .labelStyle(FlixCompactLabelStyle())
-                    .font(.system(size: 11.5, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .transition(.opacity)
+                Label { Text(.flixSavePageSaved) } icon: {
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                }
+                .labelStyle(FlixCompactLabelStyle())
+                .font(.system(size: 11.5, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .transition(FlixMotion.pop(reduceMotion: reduceMotion))
             } else {
                 FlixCardButton(title: String(localized: .flixSavePageButton), primary: true, action: save)
                     .help(Text(.flixSavePageHelp(name)))
                     .accessibilityHint(Text(.flixSavePageHelp(name)))
+                    .transition(.opacity)
             }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(shape.fill(FlixStyle.pane).allowsHitTesting(false))
-        .overlay(shape.strokeBorder(Color.primary.opacity(0.12), lineWidth: 0.5).allowsHitTesting(false))
+        .overlay(shape.strokeBorder(FlixStyle.outline, lineWidth: 0.5).allowsHitTesting(false))
         .padding(.top, 6)
         .padding(.bottom, 2)
-        .animation(.easeOut(duration: 0.18), value: offer.isSaved)
+        .animation(FlixMotion.resolved(FlixMotion.dialog, reduceMotion: reduceMotion), value: offer.isSaved)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(.flixSavePageTitle))
     }

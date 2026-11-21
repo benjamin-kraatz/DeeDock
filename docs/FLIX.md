@@ -62,6 +62,33 @@ Before anything takes focus, the coordinator captures the app and window in fron
 
 Monitors exist only while the panel is on screen: a local key monitor that offers every key to `FlixPanelState.handleKey`, local and global mouse-down monitors for outside clicks (a dock click closes the panel and is consumed), and an observer that closes it when DOKK stops being active. None of them closes the panel during a drag out or while Quick Look is up. An anchored panel registers as the `.flix` popover, which closes the other popovers and holds the docks revealed.
 
+### Look and motion
+
+The look and motion follow `docs/mockups/flix-files-ai.html`. Measurements and colours are in `FlixStyle`, springs and transitions in `FlixMotion`; views use those names, not their own numbers.
+
+The panel is Liquid Glass tinted with the window background colour, the way the Hub draws its glass (`FlixPanelGlass`). Sheets, the drop question, and the toast are opaque. Reduce Transparency makes the panel opaque too, and Increase Contrast strengthens the tint, the rim, and the hairlines.
+
+| Motion | Normal | Reduce Motion |
+| --- | --- | --- |
+| Panel opens | Spring (response 0.34, damping 0.78) from 90 %, blurred, at the tile or pointer | Fade |
+| First rows on open | Rise 7 points, 50 ms then 14 ms apart, first twelve elements | Appear with the panel |
+| List changes | Staying rows slide; arriving rows, versions, and cards fade up 8 points; leaving ones fade | Crossfade |
+| New item while open | Accent rim and wash, fading over 1.6 s | Same |
+| Sidebar selection | The pill slides to the new row | Jumps |
+| New Smart Filter | Violet wash on its row, fading over 1.4 s | Same |
+| Search field | Grows out of the search button | Appears |
+| Tokens | Pop in; a removed one shrinks and the rest close up | Crossfade |
+| Fits and other loading | A violet band sweeps the placeholder rows | Still placeholders |
+| ✦ Rename | The new name resolves out of a blur | Changes at once |
+| Sheets | Spring in from 10 points away; ease out | Crossfade |
+| Drop question | Scales in from 90 % | Crossfade |
+| Toast | Slides up over the footer | Crossfade |
+| Drag leaves the panel | Window fades to 6 %, content eases to 97 % | Window fades |
+| Drop on a Favorite | The row dips and settles | Nothing |
+| Tile | Thumbnail pops from 60 %; the badge pops in and bumps per arrival; the pill pops | Fades |
+
+Changes made while the panel is hidden or still opening do not animate (`FlixPanelState.motion`), so the reset before each open never slides under the open spring. Reduce Motion is read from `NSWorkspace` on every open (`FlixPanelState.reduceMotion`) and from the environment on the dock tile.
+
 ### Dragging out
 
 Rows, the selection, a Thread card, and the tile start a `FlixDragSession`: file URLs, web URLs for links, and a private type listing item IDs. As the pointer leaves the panel it fades to 6 % and lets the pointer through; after a drop outside it closes unless pinned or set to stay open; a cancelled drag brings it back. A drop on a dock app opens the files there, as any file drag does.
@@ -321,4 +348,4 @@ Nothing in Flix Files' analytics has been sent from a running app yet; the tests
 
 ## Not yet exercised by hand
 
-Phases A, B1, B2, and C were built and their tests compiled; the app was not launched and the tests were not run. No Flix Files analytics event has been sent or checked in PostHog. No Apple Intelligence, Claude, or Lookout call from Flix Files has run. Phase B1's window reading, captures, Apple Intelligence calls, conversions, sensitive checks, browser reading and private-window checks, link triggers, Save this page, and the drag labels have not run against a real window or browser. None of the following has been seen on screen either: the tile and its badge, pop, and Option-drag; the panel's spring, stepping aside, and closing after a drop; the shortcut at the pointer; the menu bar item; Quick Look; drops on favorites, the panel, and the tile; the folder access card and prompts; the Settings page and recorder; Reduce Motion and Reduce Transparency; multiple displays, Spaces, full-screen apps, and sleep. The [acceptance checklist](ACCEPTANCE.md#dee-163-flix-files) lists them.
+Phases A, B1, B2, C, and D (the look and motion pass) were built and their tests compiled; the app was not launched and the tests were not run. Nothing in "Look and motion" above has been seen on screen: the glass, the shadow drawn outside it, every spring, and the German layouts were checked in code and previews only. No Flix Files analytics event has been sent or checked in PostHog. No Apple Intelligence, Claude, or Lookout call from Flix Files has run. Phase B1's window reading, captures, Apple Intelligence calls, conversions, sensitive checks, browser reading and private-window checks, link triggers, Save this page, and the drag labels have not run against a real window or browser. None of the following has been seen on screen either: the tile and its badge, pop, and Option-drag; the panel's spring, stepping aside, and closing after a drop; the shortcut at the pointer; the menu bar item; Quick Look; drops on favorites, the panel, and the tile; the folder access card and prompts; the Settings page and recorder; Reduce Motion and Reduce Transparency; multiple displays, Spaces, full-screen apps, and sleep. The [acceptance checklist](ACCEPTANCE.md#dee-163-flix-files) lists them.

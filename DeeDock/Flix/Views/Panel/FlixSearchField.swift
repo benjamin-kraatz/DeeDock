@@ -4,6 +4,8 @@ import SwiftUI
 ///
 /// Its placeholder invites a sentence when a provider understands them ("✦ Ask in your own words")
 /// and a name otherwise. Focus mirrors into the state so typed keys reach the field, not the list.
+/// The field is up to 220 points wide and gives way down to 120 when the header is crowded. With
+/// Reduce Motion it appears at once.
 struct FlixSearchField: View {
     @Bindable var state: FlixPanelState
     @FocusState private var focused: Bool
@@ -11,9 +13,10 @@ struct FlixSearchField: View {
     private var plainWords: Bool { state.intelligence.searchesInPlainWords }
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: FlixStyle.controlRadius, style: .continuous)
         HStack(spacing: 6) {
             if plainWords { FlixSparkle(size: 11) } else {
-                Image(systemName: "magnifyingglass").font(.system(size: 11)).foregroundStyle(.secondary)
+                Image(systemName: "magnifyingglass").font(.system(size: 11, weight: .medium)).foregroundStyle(.secondary)
             }
             TextField(text: $state.searchText) {
                 Text(plainWords ? .flixSearchPlaceholderWords : .flixSearchPlaceholder)
@@ -24,12 +27,14 @@ struct FlixSearchField: View {
             .accessibilityLabel(Text(.flixSearchHelp))
         }
         .padding(.horizontal, 8)
-        .frame(width: state.searchActive ? 220 : 0, height: 26)
-        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5))
+        .frame(minWidth: state.searchActive ? 120 : 0, maxWidth: state.searchActive ? 220 : 0)
+        .frame(height: 26)
+        .background(FlixStyle.field, in: shape)
+        .overlay(shape.strokeBorder(focused ? Color.accentColor.opacity(0.7) : FlixStyle.outline, lineWidth: focused ? 1 : 0.5))
         .opacity(state.searchActive ? 1 : 0)
         .clipped()
-        .animation(state.reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.85), value: state.searchActive)
+        .animation(state.reduceMotion ? nil : FlixMotion.field, value: state.searchActive)
+        .animation(state.reduceMotion ? nil : FlixMotion.hover, value: focused)
         .accessibilityHidden(!state.searchActive)
         .onChange(of: state.searchFocusRequest) { _, _ in focused = true }
         .onChange(of: focused) { _, value in

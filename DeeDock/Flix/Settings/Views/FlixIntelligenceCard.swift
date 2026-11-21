@@ -16,7 +16,7 @@ struct FlixIntelligenceCard: View {
                           state: engines.appleIntelligence, readyLabel: { _ in .flixEngineAvailable })
             FlixEngineRow(title: .flixEngineRobi,
                           subtitle: engines.robiOnDevice ? .flixEngineRobiHelpOnDevice : .flixEngineRobiHelp,
-                          state: engines.robi,
+                          state: engines.robi, readyTint: engines.robiOnDevice ? .green : .accentColor,
                           readyLabel: { _ in engines.robiOnDevice ? .flixEngineRobiOnDevice : .flixEngineRobiClaude })
         }
         SettingsCard {
@@ -51,17 +51,21 @@ private struct FlixEngineRow: View {
     let title: LocalizedStringResource
     let subtitle: LocalizedStringResource
     let state: FlixEngineStatus.State
+    /// Green for what runs on this Mac; the accent colour for Robi with Claude, as in the mockup.
+    var readyTint: Color = .green
     let readyLabel: (Int?) -> LocalizedStringResource
 
     var body: some View {
         SettingsRow(title: title, subtitle: subtitle) {
             Text(label)
                 .font(.system(size: 11, weight: .semibold))
+                .lineLimit(1)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 2)
                 .foregroundStyle(tint)
                 .background(tint.opacity(0.15), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
                 .fixedSize()
+                .accessibilityLabel(Text(label))
         }
     }
 
@@ -76,7 +80,7 @@ private struct FlixEngineRow: View {
 
     private var tint: Color {
         switch state {
-        case .ready: .green
+        case .ready: readyTint
         case .off, .unavailable: .secondary
         case .needsSetup: .accentColor
         }

@@ -12,26 +12,32 @@ struct FlixFolderAccessCard: View {
     var body: some View {
         FlixCard {
             HStack(spacing: 8) {
-                Image(systemName: "folder.badge.questionmark").foregroundStyle(Color.accentColor)
-                Text(.flixAccessCardTitle).font(.system(size: 13, weight: .semibold))
+                Image(systemName: "folder.badge.questionmark")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.accentColor)
+                    .accessibilityHidden(true)
+                Text(.flixAccessCardTitle)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                    .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 0)
-                Button(action: dismiss) {
-                    Image(systemName: "xmark").font(.system(size: 10, weight: .semibold)).foregroundStyle(.tertiary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text(.flixDismiss))
+                FlixCloseButton(action: dismiss)
             }
             Text(.flixAccessCardMessage)
                 .font(.system(size: 12))
+                .lineSpacing(2)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 6) {
+            // One button per folder; they wrap when the names are long.
+            FlixFlow {
                 ForEach(folders.prefix(4)) { folder in
                     FlixCardButton(title: String(localized: .flixAccessAllowFolder(
                         FileManager.default.displayName(atPath: folder.path)))) { allow(folder.path) }
                 }
             }
+            .padding(.top, 2)
         }
+        .accessibilityElement(children: .contain)
     }
 }
 

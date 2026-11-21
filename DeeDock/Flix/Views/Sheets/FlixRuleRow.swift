@@ -60,8 +60,9 @@ struct FlixRuleRow: View {
             value
             Spacer(minLength: 0)
             if let remove {
-                Button(action: remove) { Image(systemName: "minus.circle") }
+                Button(action: remove) { Image(systemName: "minus.circle.fill").symbolRenderingMode(.hierarchical) }
                     .buttonStyle(.borderless)
+                    .help(Text(.flixSmartFilterRemoveRule))
                     .accessibilityLabel(Text(.flixSmartFilterRemoveRule))
             }
         }
@@ -90,7 +91,7 @@ struct FlixRuleRow: View {
             .labelsHidden()
             .fixedSize()
         case .days:
-            Stepper(value: $rule.days, in: 1...90) { Text(.flixRuleDaysValue(rule.days)) }
+            Stepper(value: $rule.days, in: 1...90) { Text(.flixRuleDaysValue(rule.days)).monospacedDigit() }
         case .flagged:
             EmptyView()
         }

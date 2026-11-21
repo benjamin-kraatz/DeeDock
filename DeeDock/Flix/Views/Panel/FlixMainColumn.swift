@@ -8,9 +8,9 @@ struct FlixMainColumn: View {
         let list = state.list
         VStack(spacing: 0) {
             FlixHeaderView(state: state, count: list.count)
-            Divider().opacity(0.6)
+            FlixHairline()
             FlixListView(state: state, list: list)
-            Divider().opacity(0.6)
+            FlixHairline()
             FlixFooterView(state: state, noiseCount: list.noiseCount)
         }
         .overlay { FlixSheetLayer(state: state) }

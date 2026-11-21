@@ -108,7 +108,7 @@ final class FlixPanelController {
         DispatchQueue.main.async { [weak self] in
             guard let self, generation == token else { return }
             firstFrame?()
-            withAnimation(state.reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.34, dampingFraction: 0.78)) {
+            withAnimation(FlixMotion.resolved(FlixMotion.panel, reduceMotion: state.reduceMotion)) {
                 self.state.phase = .shown
             }
         }

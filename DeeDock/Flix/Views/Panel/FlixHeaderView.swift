@@ -1,6 +1,9 @@
 import SwiftUI
 
-/// Title and count, ✦ Tidy, the search field that grows from its button, and the pin.
+/// Title and count, the search field that grows from its button, ✦ Tidy, search, and the pin.
+///
+/// The title keeps its width first and the search field gives way, so a long German title or
+/// count never pushes the buttons out: the field shrinks from 220 points down to 120.
 struct FlixHeaderView: View {
     let state: FlixPanelState
     let count: Int
@@ -10,15 +13,24 @@ struct FlixHeaderView: View {
             Text(verbatim: state.title)
                 .font(.system(size: 14, weight: .bold))
                 .lineLimit(1)
+                .truncationMode(.tail)
                 .frame(maxWidth: 220, alignment: .leading)
+                .fixedSize(horizontal: !state.searchActive, vertical: false)
+                .layoutPriority(2)
                 .accessibilityAddTraits(.isHeader)
+                .help(Text(verbatim: state.title))
             Text(.flixItemCount(count))
                 .font(.system(size: 11.5))
-                .foregroundStyle(.tertiary)
+                .monospacedDigit()
+                .foregroundStyle(FlixStyle.faint)
                 .lineLimit(1)
                 .fixedSize()
+                .layoutPriority(3)
+                .contentTransition(state.reduceMotion ? .identity : .numericText(value: Double(count)))
+                .animation(state.reduceMotion ? nil : state.motion(FlixMotion.row), value: count)
             Spacer(minLength: 4)
             FlixSearchField(state: state)
+                .layoutPriority(1)
             if state.intelligence.canTidy {
                 FlixHeaderButton(help: .flixTidyHelp, action: state.openTidy) {
                     HStack(spacing: 4) {
@@ -26,15 +38,19 @@ struct FlixHeaderView: View {
                         Text(.flixTidy)
                     }
                 }
+                .layoutPriority(3)
             }
             FlixHeaderButton(help: .flixSearchHelp, active: state.searchActive,
                              action: { state.setSearchActive(!state.searchActive) }) {
                 Image(systemName: "magnifyingglass")
             }
+            .layoutPriority(3)
             FlixHeaderButton(help: state.isPinned ? .flixUnpinHelp : .flixPinHelp, active: state.isPinned,
                              action: state.togglePin) {
                 Image(systemName: state.isPinned ? "pin.fill" : "pin")
+                    .contentTransition(state.reduceMotion ? .identity : .symbolEffect(.replace))
             }
+            .layoutPriority(3)
         }
         .padding(.leading, 16)
         .padding(.trailing, 10)
@@ -42,29 +58,58 @@ struct FlixHeaderView: View {
     }
 }
 
-/// A small borderless header button, tinted while its mode is on.
+/// A small borderless header button, tinted while its mode is on. Hover and press only highlight.
 struct FlixHeaderButton<Label: View>: View {
     let help: LocalizedStringResource
     var active = false
     let action: () -> Void
     @ViewBuilder var label: Label
-    @State private var hovered = false
 
     var body: some View {
-        Button(action: action) {
-            label
-                .font(.system(size: 12))
-                .padding(.horizontal, 6)
-                .frame(minWidth: 28, minHeight: 26)
-                .foregroundStyle(active ? Color.accentColor : hovered ? .primary : .secondary)
-                .background(active ? Color.accentColor.opacity(0.2) : hovered ? FlixStyle.hover : .clear,
-                            in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovered = $0 }
-        .help(Text(help))
-        .accessibilityLabel(Text(help))
-        .accessibilityAddTraits(active ? .isSelected : [])
+        Button(action: action) { label }
+            .buttonStyle(FlixHeaderButtonStyle(active: active))
+            .help(Text(help))
+            .accessibilityLabel(Text(help))
+            .accessibilityAddTraits(active ? .isSelected : [])
     }
 }
+
+/// The header button's look: quiet until hovered, accent-tinted while on, dimmed while pressed.
+private struct FlixHeaderButtonStyle: ButtonStyle {
+    let active: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        let shape = RoundedRectangle(cornerRadius: FlixStyle.controlRadius, style: .continuous)
+        FlixHover { hovered in
+            configuration.label
+                .font(.system(size: 12, weight: .medium))
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 6)
+                .frame(minWidth: 28, minHeight: 26)
+                .foregroundStyle(active ? Color.accentColor : hovered ? Color.primary : Color.secondary)
+                .background(active ? FlixStyle.accentSoft : hovered ? FlixStyle.hover : .clear, in: shape)
+                .opacity(configuration.isPressed ? 0.6 : 1)
+                .contentShape(.rect)
+                .contentShape(.focusEffect, shape)
+                .animation(FlixMotion.hover, value: active)
+        }
+    }
+}
+
+#if DEBUG
+#Preview("Header") {
+    VStack(spacing: 0) {
+        FlixHeaderView(state: FlixPreviewData.panelState(withIntelligence: true), count: 12)
+        FlixHairline()
+        FlixHeaderView(state: FlixPreviewData.panelState(.tokens), count: 3)
+    }
+    .frame(width: 516)
+}
+
+#Preview("Header, German, searching") {
+    FlixHeaderView(state: FlixPreviewData.panelState(.tokens), count: 128)
+        .frame(width: 516)
+        .environment(\.locale, Locale(identifier: "de"))
+}
+#endif

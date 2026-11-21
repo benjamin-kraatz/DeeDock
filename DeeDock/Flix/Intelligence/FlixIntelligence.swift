@@ -410,13 +410,19 @@ final class FlixIntelligence {
     /// Fills slots directly, for previews. Never called in a running app.
     func applyPreview(fits: FlixFitsState = .hidden, threads: [FlixThread] = [],
                       annotations: [FlixItem.ID: FlixItemAnnotation] = [:], morning: FlixMorningCard? = nil,
-                      tidy: [FlixTidySuggestion] = [], filterTip: FlixFilterTip? = nil) {
+                      tidy: [FlixTidySuggestion] = [], filterTip: FlixFilterTip? = nil,
+                      query: FlixQueryState = .idle, moreLikeThis: FlixMoreLikeThis? = nil,
+                      smartFilterDraft: FlixSmartFilterDraftState = .idle, robi: FlixRobiAnswerState = .idle) {
         self.fits = fits
         self.threads = threads
         self.annotations = annotations
         self.morning = morning
         self.tidy = tidy
         self.filterTip = filterTip
+        self.query = query
+        self.moreLikeThis = moreLikeThis
+        self.smartFilterDraft = smartFilterDraft
+        self.robi = robi
     }
     #endif
 

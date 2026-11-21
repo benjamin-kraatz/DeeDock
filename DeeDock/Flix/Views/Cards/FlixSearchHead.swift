@@ -10,25 +10,41 @@ struct FlixSearchHead: View {
         if state.intelligence.searchesInPlainWords {
             if state.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
                 FlixAskSuggestions(examples: state.intelligence.searchExamples, run: state.runSearch)
+                    .transition(FlixMotion.rise(reduceMotion: state.reduceMotion))
             } else {
                 switch state.intelligence.query {
                 case .idle:
                     EmptyView()
                 case .understanding:
-                    HStack(spacing: 5) {
-                        FlixSparkle(size: 11)
-                        Text(.flixUnderstanding)
-                    }
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
-                    .padding(.horizontal, 6)
-                    .padding(.top, 8)
-                    FlixShimmer(reduceMotion: state.reduceMotion)
-                    FlixShimmer(reduceMotion: state.reduceMotion).opacity(0.6)
+                    FlixUnderstanding(reduceMotion: state.reduceMotion)
+                        .transition(.opacity)
                 case .understood(let tokens, _):
-                    FlixTokensBar(tokens: tokens, remove: state.intelligence.removeToken)
+                    FlixTokensBar(tokens: tokens, reduceMotion: state.reduceMotion, remove: state.intelligence.removeToken)
+                        .transition(.opacity)
                 }
             }
+        }
+    }
+}
+
+/// "✦ Understanding…" over two shimmering rows.
+private struct FlixUnderstanding: View {
+    let reduceMotion: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 5) {
+                FlixSparkle(size: 11)
+                Text(.flixUnderstanding)
+            }
+            .font(.system(size: 11))
+            .foregroundStyle(FlixStyle.faint)
+            .padding(.horizontal, 6)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            .accessibilityElement(children: .combine)
+            FlixLoadingRows(reduceMotion: reduceMotion)
+                .accessibilityHidden(true)
         }
     }
 }
@@ -42,23 +58,22 @@ struct FlixAskSuggestions: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(.flixAskInYourOwnWords)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(FlixStyle.faint)
                 .padding(.horizontal, 2)
                 .padding(.bottom, 4)
+                .accessibilityAddTraits(.isHeader)
             ForEach(examples, id: \.self) { example in
                 Button { run(example) } label: {
                     HStack(spacing: 8) {
                         FlixSparkle(size: 11)
                         Text(verbatim: example)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                         Spacer(minLength: 0)
                     }
-                    .font(.system(size: 12.5))
-                    .padding(.horizontal, 10)
-                    .frame(height: 30)
-                    .background(FlixStyle.pane, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .contentShape(.rect)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(FlixSuggestionStyle())
+                .accessibilityLabel(Text(verbatim: example))
             }
         }
         .padding(.horizontal, 6)
@@ -66,68 +81,27 @@ struct FlixAskSuggestions: View {
     }
 }
 
-/// "Understood as  [↓ Downloaded ✕] [Last 7 days ✕]".
-struct FlixTokensBar: View {
-    let tokens: [FlixQueryToken]
-    let remove: (FlixQueryToken.ID) -> Void
-
-    var body: some View {
-        HStack(spacing: 5) {
-            Text(.flixUnderstoodAs)
-            ForEach(tokens) { token in
-                FlixTokenChip(label: token.label) { remove(token.id) }
-            }
+/// A full-width suggestion row: a faint pane that lightens on hover.
+private struct FlixSuggestionStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        FlixHover { hovered in
+            configuration.label
+                .font(.system(size: 12.5))
+                .padding(.horizontal, 10)
+                .frame(height: 30)
+                .background(hovered ? FlixStyle.hover : FlixStyle.pane, in: shape)
+                .opacity(configuration.isPressed ? 0.7 : 1)
+                .contentShape(.rect)
+                .contentShape(.focusEffect, shape)
         }
-        .font(.system(size: 11))
-        .foregroundStyle(.tertiary)
-        .padding(.horizontal, 6)
-        .padding(.top, 8)
-        .padding(.bottom, 4)
     }
 }
 
-/// One removable token.
-struct FlixTokenChip: View {
-    let label: String
-    var intelligent = false
-    let remove: () -> Void
-
-    var body: some View {
-        HStack(spacing: 5) {
-            Text(verbatim: label).lineLimit(1)
-            Button(action: remove) {
-                Image(systemName: "xmark").font(.system(size: 8, weight: .bold)).frame(width: 16, height: 16)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text(.flixRemoveToken(label)))
-        }
-        .font(.system(size: 11.5, weight: .semibold))
-        .padding(.leading, 9)
-        .padding(.trailing, 4)
-        .frame(height: 22)
-        .foregroundStyle(intelligent ? FlixStyle.aiViolet : Color.accentColor)
-        .background(intelligent ? FlixStyle.aiSoft : Color.accentColor.opacity(0.2), in: .capsule)
-        .fixedSize()
-    }
+#if DEBUG
+#Preview("Search head: suggestions") {
+    FlixAskSuggestions(examples: ["contract Mike sent last week", "screenshot with the build error", "photos from Berlin",
+                                  "invoices over €1,000"], run: { _ in })
+        .frame(width: 500)
 }
-
-/// "✦ Like IMG_4821.HEIC ✕  4 by meaning · Lookout".
-struct FlixMoreLikeThisBar: View {
-    let name: String
-    let count: Int?
-    let loading: Bool
-    let clear: () -> Void
-
-    var body: some View {
-        HStack(spacing: 6) {
-            FlixTokenChip(label: "✦ " + String(localized: .flixLikeToken(name)), intelligent: true, remove: clear)
-            if loading { ProgressView().controlSize(.mini) }
-            else if let count { Text(.flixMoreLikeThisCount(count)) }
-        }
-        .font(.system(size: 11))
-        .foregroundStyle(.tertiary)
-        .padding(.horizontal, 6)
-        .padding(.top, 8)
-        .padding(.bottom, 4)
-    }
-}
+#endif

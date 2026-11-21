@@ -6,6 +6,8 @@ struct FlixEventLabel: View {
     var selected = false
     /// Drops the "from …" part, for the caption line.
     var short = false
+    /// In the line's own colour instead of the activity's, after a caption.
+    var plain = false
 
     static func text(for item: FlixItem, short: Bool = false) -> String {
         switch item.activity {
@@ -28,8 +30,8 @@ struct FlixEventLabel: View {
                 .font(.system(size: 8.5, weight: .bold))
         }
         .labelStyle(FlixCompactLabelStyle())
-        .fontWeight(.semibold)
-        .foregroundStyle(selected ? Color.white : item.activity.tint)
+        .fontWeight(plain ? .regular : .semibold)
+        .foregroundStyle(selected ? AnyShapeStyle(Color.white) : plain ? AnyShapeStyle(.secondary) : AnyShapeStyle(item.activity.tint))
     }
 }
 
@@ -65,7 +67,7 @@ struct FlixFactChip: View {
             .padding(.vertical, 1)
             .foregroundStyle(selected ? Color.white : tint ?? .secondary)
             .background(selected ? Color.white.opacity(0.2) : (tint?.opacity(0.15) ?? FlixStyle.chip),
-                        in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+                        in: RoundedRectangle(cornerRadius: FlixStyle.chipRadius, style: .continuous))
             .fixedSize()
     }
 }
@@ -77,11 +79,11 @@ struct FlixMeaningChip: View {
     var body: some View {
         Text(.flixByMeaning)
             .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 1)
-            .foregroundStyle(selected ? Color.white : FlixStyle.aiViolet)
-            .background(selected ? Color.white.opacity(0.2) : FlixStyle.aiSoft,
-                        in: RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .fixedSize()
+        .padding(.horizontal, 6)
+        .padding(.vertical, 1)
+        .foregroundStyle(selected ? Color.white : FlixStyle.aiViolet)
+        .background(selected ? Color.white.opacity(0.2) : FlixStyle.aiSoft,
+                    in: RoundedRectangle(cornerRadius: FlixStyle.chipRadius, style: .continuous))
+        .fixedSize()
     }
 }
