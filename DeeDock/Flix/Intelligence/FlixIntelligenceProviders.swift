@@ -84,8 +84,11 @@ nonisolated struct FlixFrontmostContext: Equatable, Sendable {
 /// Ask Robi about files. Sends the files you asked about with your question, with your key; and
 /// nothing else. Must opt the call out of AI observability content capture.
 @MainActor protocol FlixRobiProviding: AnyObject {
-    /// A key is saved and Robi can answer.
+    /// Robi can answer, or can at least say what is missing (a Claude key). False hides Ask Robi.
     var isReady: Bool { get }
+    /// Robi's settings choose the on-device model, so nothing leaves the Mac; the sheet's privacy
+    /// line says so.
+    var answersOnDevice: Bool { get }
     /// Suggested questions for these items.
     func questions(for items: [FlixItem]) -> [String]
     /// Streams the answer as growing text.
@@ -100,6 +103,9 @@ nonisolated struct FlixFrontmostContext: Equatable, Sendable {
     func recordDrop(of items: [FlixItem], context: FlixFrontmostContext?) -> String?
     /// A Smart Filter tip for the sidebar, or nil.
     func filterTip(items: [FlixItem], now: Date) -> FlixFilterTip?
+    /// The item most likely wanted by the app in front, from earlier drops: the newest of the kind
+    /// usually sent there. A ranking hint for the Fits card (phase B1). Synchronous and cached.
+    func likelyItem(for context: FlixFrontmostContext?, among items: [FlixItem]) -> FlixItem.ID?
     /// Settings' **Forget**.
     func forget()
 }

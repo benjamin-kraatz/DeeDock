@@ -61,6 +61,8 @@ final class FlixIntelligence {
     var canGenerateSmartFilters: Bool { providers.smartFilters != nil }
     var smartFilterExamples: [String] { providers.smartFilters?.examples ?? [] }
     var canAskRobi: Bool { providers.robi?.isReady == true }
+    /// Ask Robi answers on this Mac (Robi's settings choose the on-device model).
+    var robiAnswersOnDevice: Bool { providers.robi?.answersOnDevice ?? false }
     var canShowMoreLikeThis: Bool { providers.similarity != nil }
     var hasThreads: Bool { settings.groupsThreads && !threads.isEmpty }
 
@@ -86,6 +88,12 @@ final class FlixIntelligence {
     func dragReason(for item: FlixItem, context: FlixFrontmostContext?) -> FlixDragReason? {
         guard settings.learnsDragDestinations else { return nil }
         return providers.dragMemory?.reason(for: item, context: context)
+    }
+
+    /// The item drag memory expects the app in front to want, for ranking the Fits card.
+    func likelyItem(for context: FlixFrontmostContext?, among items: [FlixItem]) -> FlixItem.ID? {
+        guard settings.learnsDragDestinations else { return nil }
+        return providers.dragMemory?.likelyItem(for: context, among: items)
     }
 
     // MARK: Panel lifecycle

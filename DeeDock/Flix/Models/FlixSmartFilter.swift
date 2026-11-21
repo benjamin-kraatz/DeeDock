@@ -64,6 +64,20 @@ nonisolated enum FlixSmartFilterRule: Codable, Hashable, Sendable {
     /// The item is about this topic. Answered by meaning when phase B2's provider can, otherwise by
     /// matching every word against the name and location.
     case about(String)
+    /// The file's total (a key fact phase B2 read from it) is above this amount. Answered through
+    /// the same cached lookup as `.about`, asked with ``amountTopic(_:)``; without an answer nothing
+    /// matches.
+    case amountOver(Double)
+
+    /// The lookup topic an `.amountOver` rule asks the semantic closure. Never shown.
+    static func amountTopic(_ amount: Double) -> String { amountTopicPrefix + String(amount) }
+
+    /// The amount in a topic made by ``amountTopic(_:)``, or nil for an ordinary topic.
+    static func amount(inTopic topic: String) -> Double? {
+        topic.hasPrefix(amountTopicPrefix) ? Double(topic.dropFirst(amountTopicPrefix.count)) : nil
+    }
+
+    private static let amountTopicPrefix = "\u{1}amount>"
 
     func matches(_ item: FlixItem, now: Date, semantic: (String, FlixItem) -> Bool?) -> Bool {
         switch self {
@@ -94,6 +108,8 @@ nonisolated enum FlixSmartFilterRule: Codable, Hashable, Sendable {
             let haystack = [item.name, item.path ?? "", item.sourceHost ?? "", item.link?.title ?? ""]
                 .joined(separator: " ")
             return words.allSatisfy { haystack.localizedStandardContains($0) }
+        case .amountOver(let amount):
+            return semantic(Self.amountTopic(amount), item) ?? false
         }
     }
 }

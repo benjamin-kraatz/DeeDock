@@ -289,9 +289,15 @@ final class LookoutEngine {
     /// The Files tab hid or the Hub closed: release the vectors `vectorReleaseDelay` from now unless the tab comes back
     /// first.
     func hubDidClose() {
+        filesVisible = false
+        scheduleVectorRelease()
+    }
+
+    /// Releases the in-memory vectors `releaseDelay` from now, replacing an earlier release. Does nothing while
+    /// Lookout doesn't run.
+    private func scheduleVectorRelease() {
         releaseTask?.cancel()
         releaseTask = nil
-        filesVisible = false
         guard isRunning else { return }
         let reader = reader
         let delay = releaseDelay
@@ -352,6 +358,53 @@ final class LookoutEngine {
     /// For each chosen folder, how many of its files are searchable by content, for Settings.
     func searchableFileCounts() async -> [String: Int] {
         await reader.searchableFileCounts(under: settings.folders)
+    }
+
+    // MARK: Other features
+
+    // Narrow, read-only accessors for features outside the Hub (Flix Files). Each answers only while Lookout runs
+    // (set up, on, and started) and returns nil or nothing otherwise, so a caller never starts Lookout or reads an
+    // index the person turned off. None of them changes what the Hub shows.
+
+    /// The query vector for `text` (`LookoutQueryEncoding.embed(query:)`: 768 L2-normalized floats), comparable with
+    /// the stored vectors of `storedVectors(forPaths:)`. Calling it launches the query service when it isn't
+    /// running; the service exits by itself 120 s after its last call.
+    ///
+    /// - Returns: Nil while Lookout doesn't run or `text` is blank.
+    /// - Throws: `LookoutEncoderError`, or `CancellationError` when the calling task is cancelled.
+    func embed(text: String) async throws -> [Float]? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isRunning, !trimmed.isEmpty else { return nil }
+        return try await encoder.embed(query: trimmed)
+    }
+
+    /// The whole-file vectors the index holds for `paths` (`Searcher.fileVectors`: a file's segment vectors
+    /// averaged), keyed by the caller's spelling of each path. Reads the index store directly and loads none of the
+    /// in-memory vectors, so it is cheap enough for a few hundred paths at a time.
+    ///
+    /// - Returns: Empty while Lookout doesn't run; files without a vector are left out.
+    func storedVectors(forPaths paths: [String]) async -> [String: LookoutFileVector] {
+        guard isRunning, !paths.isEmpty else { return [:] }
+        return await reader.fileVectors(paths)
+    }
+
+    /// Lookout's own hybrid search (meaning and words, the Files tab's ranking and gates) for `text`, across every
+    /// chosen folder under the person's settings. Falls back to words alone when the query vector can't be made.
+    ///
+    /// A meaning search loads the in-memory vectors; unless the Files tab is showing, they are released again
+    /// `vectorReleaseDelay` after the call, as after the Hub closes.
+    ///
+    /// - Returns: Nil while Lookout doesn't run, `text` is blank, there's no index yet, or the search failed.
+    func contentMatches(for text: String, limit: Int = 60) async -> LookoutResultSet? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard isRunning, !trimmed.isEmpty else { return nil }
+        let vector = try? await encoder.embed(query: trimmed)
+        guard !Task.isCancelled else { return nil }
+        let request = LookoutSearchRequest(text: trimmed, vector: vector, scope: nil, kinds: nil, filter: filter(),
+                                           prefixLast: false, limit: limit)
+        let results = try? await reader.search(request)
+        if vector != nil, !filesVisible { scheduleVectorRelease() }
+        return results
     }
 
     // MARK: Events

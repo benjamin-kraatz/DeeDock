@@ -46,6 +46,9 @@ final class FlixCoordinator {
     @ObservationIgnored var prepareSettings: (() -> Void)?
     /// The panel was opened by any route, for Discovery.
     @ObservationIgnored var didOpen: (() -> Void)?
+    /// Stops phase B providers' own background work and flushes their caches; whoever installs
+    /// providers appends here (see `installSmartProviders(lookout:robi:)`). Run by ``stop()``.
+    @ObservationIgnored var stopProviders: [() -> Void] = []
 
     @ObservationIgnored private let spotlight = FlixSpotlightSource()
     @ObservationIgnored private let watcher = FlixFolderWatcher()
@@ -113,6 +116,7 @@ final class FlixCoordinator {
         nowTimer?.invalidate()
         nowTimer = nil
         intelligence.stop()
+        for stopProvider in stopProviders { stopProvider() }
         tile.stop()
         history.didChange = nil
         settingsStore.changed = nil
@@ -296,8 +300,17 @@ final class FlixCoordinator {
         tile.isPanelOpen = true
         openChanged?(true, anchoredDisplayID)
         performOnOpen()
+        showPendingNotice()
         startClock()
         didOpen?()
+    }
+
+    /// Shows drag memory's "Flix noticed" message as a toast, once: right after the drop when the
+    /// panel stays open, otherwise on the next open.
+    private func showPendingNotice() {
+        guard let notice = intelligence.notice else { return }
+        intelligence.notice = nil
+        panelState.showToast(notice)
     }
 
     /// Closes the panel. `restoreFocus` reactivates the app that was in front before it opened.
@@ -435,6 +448,7 @@ final class FlixCoordinator {
         if accepted, !panelState.staysOpenAfterDrag {
             close(restoreFocus: false, animated: false)
         } else {
+            showPendingNotice()
             DispatchQueue.main.asyncAfter(deadline: .now() + (accepted ? 0.26 : 0)) { [weak panel] in
                 panel?.stepAside(false)
             }

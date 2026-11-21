@@ -3679,6 +3679,24 @@
         }
       }
     },
+    "flixAskRobiNeedsKey" : {
+      "comment" : "Flix Files: Ask Robi answer when Robi is set to Claude but no API key is saved.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge in den Robi-Einstellungen einen Claude-Schlüssel hinzu, um zu Dateien zu fragen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Claude key in Robi settings to ask about files."
+          }
+        }
+      }
+    },
     "flixAskRobiPlaceholder" : {
       "comment" : "Flix Files: placeholder of the Ask Robi question field.",
       "extractionState" : "manual",
@@ -3711,6 +3729,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sent to Claude with your API key, only the files you asked about. Nothing else leaves this Mac."
+          }
+        }
+      }
+    },
+    "flixAskRobiPrivacyOnDevice" : {
+      "comment" : "Flix Files: privacy line in Ask Robi when Robi uses the on-device model.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird auf diesem Mac von Apple Intelligence beantwortet. Nichts verlässt diesen Mac."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answered on this Mac by Apple Intelligence. Nothing leaves this Mac."
           }
         }
       }
@@ -3945,6 +3981,222 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep in Flix Files"
+          }
+        }
+      }
+    },
+    "flixDragKindApps" : {
+      "comment" : "Flix Files: plural kind of item in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "apps"
+          }
+        }
+      }
+    },
+    "flixDragKindArchives" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages, such as zip files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "archives"
+          }
+        }
+      }
+    },
+    "flixDragKindDocuments" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "documents"
+          }
+        }
+      }
+    },
+    "flixDragKindFiles" : {
+      "comment" : "Flix Files: plural kind of item in drag memory messages, for anything else.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "files"
+          }
+        }
+      }
+    },
+    "flixDragKindFolders" : {
+      "comment" : "Flix Files: plural kind of item in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordner"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "folders"
+          }
+        }
+      }
+    },
+    "flixDragKindLinks" : {
+      "comment" : "Flix Files: plural kind of item in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "links"
+          }
+        }
+      }
+    },
+    "flixDragKindPDFs" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFs"
+          }
+        }
+      }
+    },
+    "flixDragKindPictures" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pictures"
+          }
+        }
+      }
+    },
+    "flixDragKindPresentations" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Präsentationen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "presentations"
+          }
+        }
+      }
+    },
+    "flixDragKindSpreadsheets" : {
+      "comment" : "Flix Files: plural kind of file in drag memory messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "spreadsheets"
+          }
+        }
+      }
+    },
+    "flixDragNoticed" : {
+      "comment" : "Flix Files: message after Flix Files learned where a kind of file usually goes. %1$@ is a plural kind such as PDFs; %2$@ is an app name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix hat bemerkt: %1$@ gehen an %2$@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flix noticed: %1$@ go to %2$@."
+          }
+        }
+      }
+    },
+    "flixDragReason" : {
+      "comment" : "Flix Files: why a file suits the app in front, from earlier drags. %@ is a plural kind such as PDFs. Shown after “↺ ”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du hast %@ schon hierher geschickt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "you've sent %@ here before"
           }
         }
       }
@@ -4365,6 +4617,180 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saved"
+          }
+        }
+      }
+    },
+    "flixFactDue" : {
+      "comment" : "Flix Files: key fact chip on a row, the payment due date. %@ is a short date such as “Dec 4”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fällig %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Due %@"
+          }
+        }
+      }
+    },
+    "flixFactNeedsSignature" : {
+      "comment" : "Flix Files: key fact chip on a row, the document asks to be signed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterschrift fehlt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs signature"
+          }
+        }
+      }
+    },
+    "flixFactPages" : {
+      "comment" : "Flix Files: key fact chip on a row, the number of pages in a document. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Seite"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Seiten"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld page"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pages"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixFactPaid" : {
+      "comment" : "Flix Files: key fact chip on a row, the invoice is marked as paid.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezahlt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paid"
+          }
+        }
+      }
+    },
+    "flixFactSigned" : {
+      "comment" : "Flix Files: key fact chip on a row, the document has been signed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterschrieben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed"
+          }
+        }
+      }
+    },
+    "flixFactSlides" : {
+      "comment" : "Flix Files: key fact chip on a row, the number of slides in a presentation. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Folie"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Folien"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld slide"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld slides"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixFactValidUntil" : {
+      "comment" : "Flix Files: key fact chip on a row, the date a quote or offer stays valid. %@ is a short date.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gültig bis %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valid till %@"
           }
         }
       }
@@ -5293,6 +5719,78 @@
         }
       }
     },
+    "flixMorningFiles" : {
+      "comment" : "Flix Files: “Where were you?” card when no Thread formed. %1$@ is “Yesterday” or “On Tuesday”; %2$@ is a file name, shown bold (keep the **).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hast du zuletzt an **%2$@** gearbeitet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ you last worked on **%2$@**."
+          }
+        }
+      }
+    },
+    "flixMorningOne" : {
+      "comment" : "Flix Files: “Where were you?” card. %1$@ is “Yesterday” or “On Tuesday”; %2$@ is a Thread name, shown bold (keep the **).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hast du an **%2$@** gearbeitet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ you worked on **%2$@**."
+          }
+        }
+      }
+    },
+    "flixMorningOpenItem" : {
+      "comment" : "Flix Files: button on the “Where were you?” card that opens the last file. %@ is the file name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %@"
+          }
+        }
+      }
+    },
+    "flixMorningReopen" : {
+      "comment" : "Flix Files: button on the “Where were you?” card that opens a Thread's files again. %@ is the Thread name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wieder öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen %@"
+          }
+        }
+      }
+    },
     "flixMorningTitle" : {
       "comment" : "Flix Files: title of the morning card that recaps yesterday.",
       "extractionState" : "manual",
@@ -5307,6 +5805,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Where were you?"
+          }
+        }
+      }
+    },
+    "flixMorningTwo" : {
+      "comment" : "Flix Files: “Where were you?” card. %1$@ is “Yesterday” or “On Tuesday”; %2$@ and %3$@ are Thread names, shown bold (keep the **).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hast du an **%2$@** und **%3$@** gearbeitet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ you worked on **%2$@** and **%3$@**."
+          }
+        }
+      }
+    },
+    "flixMorningWhenDay" : {
+      "comment" : "Flix Files: start of the “Where were you?” card's sentence, for an earlier day. %@ is a weekday such as Tuesday.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On %@"
+          }
+        }
+      }
+    },
+    "flixMorningWhenYesterday" : {
+      "comment" : "Flix Files: start of the “Where were you?” card's sentence, for yesterday. Followed by what was worked on.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
           }
         }
       }
@@ -5773,6 +6325,186 @@
         }
       }
     },
+    "flixRobiAskChanged" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for several versions of one document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was hat sich zwischen den Versionen geändert?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What changed between these versions?"
+          }
+        }
+      }
+    },
+    "flixRobiAskCommon" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for several files.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was haben sie gemeinsam?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do these have in common?"
+          }
+        }
+      }
+    },
+    "flixRobiAskDraftMessage" : {
+      "comment" : "Flix Files: suggested request in Ask Robi.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht dazu entwerfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draft a message that mentions them"
+          }
+        }
+      }
+    },
+    "flixRobiAskDue" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for invoices.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann ist jede fällig?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When is each one due?"
+          }
+        }
+      }
+    },
+    "flixRobiAskImportant" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for one file.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist hier wichtig?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's important here?"
+          }
+        }
+      }
+    },
+    "flixRobiAskLatest" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for several versions of one document.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche ist die neueste?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which one is the latest?"
+          }
+        }
+      }
+    },
+    "flixRobiAskSummarize" : {
+      "comment" : "Flix Files: suggested request in Ask Robi.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammenfassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summarize"
+          }
+        }
+      }
+    },
+    "flixRobiAskTextInPicture" : {
+      "comment" : "Flix Files: suggested request in Ask Robi for pictures and screenshots.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text herausschreiben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy out the text"
+          }
+        }
+      }
+    },
+    "flixRobiAskTotal" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for invoices.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie hoch ist die Summe?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's the total?"
+          }
+        }
+      }
+    },
+    "flixRobiAskWhatsShown" : {
+      "comment" : "Flix Files: suggested question in Ask Robi for pictures.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist auf den Bildern?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's in these pictures?"
+          }
+        }
+      }
+    },
     "flixRuleActivity" : {
       "comment" : "Flix Files: Smart Filter rule, the latest activity.",
       "extractionState" : "manual",
@@ -5905,6 +6637,42 @@
         }
       }
     },
+    "flixRuleJoinAnd" : {
+      "comment" : "Flix Files: a Smart Filter proposal's later rule, when every rule must match. %@ is the rule, such as “kind is Images”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "und %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "and %@"
+          }
+        }
+      }
+    },
+    "flixRuleJoinOr" : {
+      "comment" : "Flix Files: a Smart Filter proposal's later rule, when any rule may match. %@ is the rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oder %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or %@"
+          }
+        }
+      }
+    },
     "flixRuleKind" : {
       "comment" : "Flix Files: Smart Filter rule, the item kind.",
       "extractionState" : "manual",
@@ -5977,6 +6745,228 @@
         }
       }
     },
+    "flixRuleTextAbout" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal, matched by what files are about (Lookout). Keep the backticks around %@.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "über `%@` nach Bedeutung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about `%@` by meaning"
+          }
+        }
+      }
+    },
+    "flixRuleTextAboutWords" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal, matched by words when Lookout is off. Keep the backticks around %@.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "über `%@`"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about `%@`"
+          }
+        }
+      }
+    },
+    "flixRuleTextActivity" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal. %@ is an activity such as Downloaded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "letzte Aktivität ist %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "last activity is %@"
+          }
+        }
+      }
+    },
+    "flixRuleTextAmount" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal, the file's total is above an amount. %@ is a money amount.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summe über %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "total over %@"
+          }
+        }
+      }
+    },
+    "flixRuleTextDays" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal, recent activity. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "am letzten Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in den letzten %lld Tagen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in the last day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "in the last %lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixRuleTextExtension" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal. %@ is an uppercase file extension such as PDF.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endung ist %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "extension is %@"
+          }
+        }
+      }
+    },
+    "flixRuleTextFlagged" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal, flagged items.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "markiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "flagged"
+          }
+        }
+      }
+    },
+    "flixRuleTextKept" : {
+      "comment" : "Flix Files: the activity of items dropped on Flix Files to keep them, inside a Smart Filter rule.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kept"
+          }
+        }
+      }
+    },
+    "flixRuleTextKind" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal. %@ is a kind such as Images.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Art ist %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kind is %@"
+          }
+        }
+      }
+    },
+    "flixRuleTextLocation" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal; the file's folders contain the text. Keep the backticks around %@.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ort enthält `%@`"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "location contains `%@`"
+          }
+        }
+      }
+    },
+    "flixRuleTextName" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal; reads after “and”/“or” too. Markdown: keep the backticks around %@, the typed text.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name enthält `%@`"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "name contains `%@`"
+          }
+        }
+      }
+    },
     "flixRuleTextPlaceholder" : {
       "comment" : "Flix Files: placeholder of a rule's text field.",
       "extractionState" : "manual",
@@ -5991,6 +6981,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Text"
+          }
+        }
+      }
+    },
+    "flixRuleTextSource" : {
+      "comment" : "Flix Files: a Smart Filter rule in a proposal; downloaded from a site. Keep the backticks around %@, a host.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "von `%@`"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "from `%@`"
+          }
+        }
+      }
+    },
+    "flixSearchExampleInvoices" : {
+      "comment" : "Flix Files: example sentence under “Ask in your own words”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechnungen über 1.000 €"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "invoices over €1,000"
+          }
+        }
+      }
+    },
+    "flixSearchExamplePhotos" : {
+      "comment" : "Flix Files: example sentence under “Ask in your own words”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos von gestern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "photos from yesterday"
+          }
+        }
+      }
+    },
+    "flixSearchExampleScreenshot" : {
+      "comment" : "Flix Files: example sentence under “Ask in your own words”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfoto mit dem Build-Fehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "screenshot with the build error"
+          }
+        }
+      }
+    },
+    "flixSearchExampleSent" : {
+      "comment" : "Flix Files: example sentence under “Ask in your own words”; clicking it runs the search.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertrag, letzte Woche geschickt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "contract sent last week"
           }
         }
       }
@@ -7531,6 +8611,78 @@
         }
       }
     },
+    "flixSmartFilterExampleCode" : {
+      "comment" : "Flix Files: example description in New Smart Filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmfotos von Code"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "screenshots of code"
+          }
+        }
+      }
+    },
+    "flixSmartFilterExampleInvoices" : {
+      "comment" : "Flix Files: example description in New Smart Filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechnungen von diesem Monat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "invoices from this month"
+          }
+        }
+      }
+    },
+    "flixSmartFilterExampleTaxes" : {
+      "comment" : "Flix Files: example description in New Smart Filter; clicking it makes a proposal.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Steuerkram"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tax stuff"
+          }
+        }
+      }
+    },
+    "flixSmartFilterExampleTrips" : {
+      "comment" : "Flix Files: example description in New Smart Filter.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos von Reisen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "photos from trips"
+          }
+        }
+      }
+    },
     "flixSmartFilterFailed" : {
       "comment" : "Flix Files: shown when no filter could be made from the sentence.",
       "extractionState" : "manual",
@@ -7683,6 +8835,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "or drag this card to carry all of them"
+          }
+        }
+      }
+    },
+    "flixThreadFallbackName" : {
+      "comment" : "Flix Files: name of a Thread (a group of related recent files) when neither a folder nor a shared word names it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Arbeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent work"
           }
         }
       }
@@ -8149,6 +9319,24 @@
         }
       }
     },
+    "flixTipMessage" : {
+      "comment" : "Flix Files: sidebar tip offering a Smart Filter. %1$@ is a folder name; %2$@ is mornings, afternoons, or evenings.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du öffnest Dateien aus „%1$@“ meistens %2$@. Einen intelligenten Filter dafür erstellen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You open “%1$@” files most %2$@. Make a Smart Filter for them?"
+          }
+        }
+      }
+    },
     "flixTipNotNow" : {
       "comment" : "Flix Files: tip card button.",
       "extractionState" : "manual",
@@ -8163,6 +9351,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not now"
+          }
+        }
+      }
+    },
+    "flixTipPartAfternoons" : {
+      "comment" : "Flix Files: part of the filter tip sentence, “most afternoons”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nachmittags"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "afternoons"
+          }
+        }
+      }
+    },
+    "flixTipPartEvenings" : {
+      "comment" : "Flix Files: part of the filter tip sentence, “most evenings”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "abends"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "evenings"
+          }
+        }
+      }
+    },
+    "flixTipPartMornings" : {
+      "comment" : "Flix Files: part of the filter tip sentence, “most mornings”.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "morgens"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mornings"
           }
         }
       }
@@ -8559,6 +9801,210 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flix Files closes after you drag something out."
+          }
+        }
+      }
+    },
+    "flixTokenAbout" : {
+      "comment" : "Flix Files: search token, what the file is about, matched by name and meaning. %@ is the person's words.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "über „%@“"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "about “%@”"
+          }
+        }
+      }
+    },
+    "flixTokenExtension" : {
+      "comment" : "Flix Files: search token for files of one type. %@ is an uppercase file extension such as PDF.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@-Dateien"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ files"
+          }
+        }
+      }
+    },
+    "flixTokenFromSite" : {
+      "comment" : "Flix Files: search token, the file was downloaded from a site. %@ is a host such as github.com.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From %@"
+          }
+        }
+      }
+    },
+    "flixTokenInFolder" : {
+      "comment" : "Flix Files: search token, the file lies in a folder. %@ is the folder name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@"
+          }
+        }
+      }
+    },
+    "flixTokenLastDays" : {
+      "comment" : "Flix Files: search token for activity in the last few days. Plural.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Letzter Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Letzte %lld Tage"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Last %lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flixTokenLinks" : {
+      "comment" : "Flix Files: search token for web links.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        }
+      }
+    },
+    "flixTokenOther" : {
+      "comment" : "Flix Files: search token for items of no particular kind.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sonstiges"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        }
+      }
+    },
+    "flixTokenOver" : {
+      "comment" : "Flix Files: search token, the file's total is above an amount. %@ is a money amount such as €1,000.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over %@"
+          }
+        }
+      }
+    },
+    "flixTokenSinceYesterday" : {
+      "comment" : "Flix Files: search token for activity since yesterday.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit gestern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since yesterday"
+          }
+        }
+      }
+    },
+    "flixTokenToday" : {
+      "comment" : "Flix Files: search token for activity today.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
           }
         }
       }
