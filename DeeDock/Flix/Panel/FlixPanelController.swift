@@ -124,6 +124,11 @@ final class FlixPanelController {
     }
 
     /// Animates away and orders out. `completion` runs once it is off screen.
+    ///
+    /// The window lets clicks through from the moment it starts leaving, and orders out when the
+    /// fade's completion runs or, at the latest, shortly after the fade's duration. SwiftUI does
+    /// not always run an animation's completion, and a window left on screen at zero opacity
+    /// swallows every click over where the panel was.
     func close(animated: Bool = true, completion: (() -> Void)? = nil) {
         guard isVisible else { completion?(); return }
         generation += 1
@@ -132,8 +137,11 @@ final class FlixPanelController {
         quickLook.close()
         ExplicitWindowPresenter.shared.cancel(window)
         isVisible = false
+        window.ignoresMouseEvents = true
+        var finished = false
         let finish = { [weak self] in
-            guard let self, generation == token else { return }
+            guard let self, generation == token, !finished else { return }
+            finished = true
             window.orderOut(nil)
             window.alphaValue = 1
             window.ignoresMouseEvents = false
@@ -141,8 +149,10 @@ final class FlixPanelController {
         }
         visibilityChanged?(false)
         guard animated else { finish(); return }
-        let animation: Animation = state.reduceMotion ? .easeOut(duration: 0.12) : .easeIn(duration: 0.16)
+        let duration = state.reduceMotion ? 0.12 : 0.16
+        let animation: Animation = state.reduceMotion ? .easeOut(duration: duration) : .easeIn(duration: duration)
         withAnimation(animation) { state.phase = .leaving } completion: { finish() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration + 0.15) { finish() }
     }
 
     /// Fades the panel to a ghost and lets the pointer through while a drag is outside it, so the

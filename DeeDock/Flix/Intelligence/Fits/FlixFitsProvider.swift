@@ -23,6 +23,9 @@ import AppKit
 final class FlixFitsProvider: FlixFitsProviding {
     private struct Entry {
         var demand: FlixWindowDemand
+        /// The tile's Accessibility-only demand that a panel reading replaced. Its word matches
+        /// stand in when the full reading matches nothing, so the panel shows what the tile counted.
+        var tileDemand: FlixWindowDemand?
         var chain: FlixReaderChain
         var label: String
         /// False for the tile's Accessibility-only reading, which the panel replaces.
@@ -82,12 +85,12 @@ final class FlixFitsProvider: FlixFitsProviding {
                                   milliseconds: Self.milliseconds(since: readStarted))
             let demand = await interpret(reading, context: context)
             guard !Task.isCancelled else { return nil }
-            entry = Entry(demand: demand, chain: reading.chain, label: label, isComplete: true, date: .now,
-                          reader: Self.reader(for: reading), accessibilityWords: reading.accessibilityWords,
-                          recognizedWords: reading.recognizedWords)
+            entry = Entry(demand: demand, tileDemand: cache[key]?.demand, chain: reading.chain, label: label,
+                          isComplete: true, date: .now, reader: Self.reader(for: reading),
+                          accessibilityWords: reading.accessibilityWords, recognizedWords: reading.recognizedWords)
             store(entry, for: key)
         }
-        let ranked = await rank(entry.demand, candidates: candidates, context: context, byMeaning: true)
+        let ranked = await rank(entry, candidates: candidates, context: context, byMeaning: true)
         guard !Task.isCancelled else { return nil }
         demandReady?(context, entry.demand, ranked.map(\.itemID))
         report(entry, context: context, matches: ranked.count, readyMs: Self.milliseconds(since: started))
@@ -100,19 +103,20 @@ final class FlixFitsProvider: FlixFitsProviding {
     func tileFitCount(for context: FlixFrontmostContext, candidates: [FlixItem]) async -> Int? {
         let key = await reader.key(for: context)
         guard !Task.isCancelled else { return nil }
-        let demand: FlixWindowDemand
+        let entry: Entry
         if let cached = cache[key] {
-            demand = cached.demand
+            entry = cached
         } else {
             let text = await reader.accessibilityText(for: context)
             guard !Task.isCancelled else { return nil }
-            demand = FlixDemandFallbackParser.parse(text, pageKind: Self.pageKind(for: context))
-            store(Entry(demand: demand, chain: FlixReaderChain(steps: [.accessibility], succeeded: true),
-                        label: Self.label(for: context, title: key.title), isComplete: false, date: .now), for: key)
+            entry = Entry(demand: FlixDemandFallbackParser.parse(text, pageKind: Self.pageKind(for: context)),
+                          chain: FlixReaderChain(steps: [.accessibility], succeeded: true),
+                          label: Self.label(for: context, title: key.title), isComplete: false, date: .now)
+            store(entry, for: key)
         }
-        let ranked = await rank(demand, candidates: candidates, context: context, byMeaning: false)
+        let ranked = await rank(entry, candidates: candidates, context: context, byMeaning: false)
         guard !Task.isCancelled else { return nil }
-        demandReady?(context, demand, ranked.map(\.itemID))
+        demandReady?(context, entry.demand, ranked.map(\.itemID))
         return ranked.isEmpty ? nil : ranked.count
     }
 
@@ -150,6 +154,16 @@ final class FlixFitsProvider: FlixFitsProviding {
         var result = demand ?? FlixDemandFallbackParser.parse(reading.text, pageKind: kind)
         if result.pageKind == .other { result.pageKind = kind }
         return result
+    }
+
+    /// Ranks the candidates for an entry's demand, or, when that matches nothing, for the tile's
+    /// demand it replaced (words only). The tile and the panel rank the same entry this way, so
+    /// the panel never comes up empty after the tile's pill counted matches for the window.
+    private func rank(_ entry: Entry, candidates: [FlixItem], context: FlixFrontmostContext,
+                      byMeaning: Bool) async -> [FlixFitRanker.Ranked] {
+        let ranked = await rank(entry.demand, candidates: candidates, context: context, byMeaning: byMeaning)
+        guard ranked.isEmpty, let tileDemand = entry.tileDemand, !Task.isCancelled else { return ranked }
+        return await rank(tileDemand, candidates: candidates, context: context, byMeaning: false)
     }
 
     /// Ranks the candidates for `demand`. `byMeaning` adds Lookout's meaning scores, which costs one
