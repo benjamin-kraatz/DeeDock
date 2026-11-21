@@ -1245,6 +1245,8 @@ extension DockCoordinator {
         flix.prepareSettings = { [weak self] in self?.settingsFlixRequest = true }
         flix.didOpen = { [weak self] in self?.discovery.markUsed(.flix) }
         dragging.keepInFlix = { [weak self] urls in self?.flix.keepDroppedFiles(urls) }
+        // Phase B2's intelligence: Lookout for meaning, Robi's settings and key for Ask Robi.
+        flix.installSmartProviders(lookout: hub.lookout, robi: robi.store)
         flix.start()
     }
 }

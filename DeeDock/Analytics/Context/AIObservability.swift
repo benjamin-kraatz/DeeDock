@@ -70,11 +70,32 @@ nonisolated enum AIObservability {
     ///   - usage: Token counts, when the model reports them.
     ///   - cacheDiagnostics: The cache comparison, for a request that opted in to one.
     ///   - error: A message safe to show the person, for a generation that failed.
+    ///   - includesContent: False leaves the instructions, the prompt and the answer out of this one
+    ///     generation, whatever `capturesContent` says: only metadata (model, latency, token
+    ///     counts, the error message) is sent. Flix Files passes false for every call, because its
+    ///     prompts carry file names and file contents.
     static func capture(trace: Trace, name: String, input: String, output: String? = nil,
                         startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
                         model: String = "apple_foundation_models", provider: String = "apple",
                         instructions: String? = nil, usage: Usage? = nil,
-                        cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil) async {
+                        cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil,
+                        includesContent: Bool = true) async {
+        let properties = properties(trace: trace, name: name, input: input, output: output, startedAt: startedAt,
+                                    maximumResponseTokens: maximumResponseTokens, stream: stream, model: model,
+                                    provider: provider, instructions: instructions, usage: usage,
+                                    cacheDiagnostics: cacheDiagnostics, error: error,
+                                    includesContent: includesContent)
+        await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))
+    }
+
+    /// The `$ai_generation` properties ``capture(trace:name:input:output:startedAt:maximumResponseTokens:stream:model:provider:instructions:usage:cacheDiagnostics:error:includesContent:)``
+    /// sends, built apart from sending so the content opt-out can be checked without a backend.
+    static func properties(trace: Trace, name: String, input: String, output: String? = nil,
+                           startedAt: Date, maximumResponseTokens: Int? = nil, stream: Bool = false,
+                           model: String = "apple_foundation_models", provider: String = "apple",
+                           instructions: String? = nil, usage: Usage? = nil,
+                           cacheDiagnostics: CacheDiagnostics? = nil, error: String? = nil,
+                           includesContent: Bool = true) -> [String: Any] {
         var properties: [String: Any] = [
             "$ai_trace_id": trace.id,
             "$ai_session_id": sessionID,
@@ -100,14 +121,14 @@ nonisolated enum AIObservability {
             properties["$ai_is_error"] = true
             properties["$ai_error"] = redacted(error)
         }
-        if capturesContent {
+        if capturesContent, includesContent {
             var messages: [[String: String]] = []
             if let instructions { messages.append(["role": "system", "content": redacted(instructions)]) }
             messages.append(["role": "user", "content": redacted(input)])
             properties["$ai_input"] = messages
             if let output { properties["$ai_output_choices"] = [["role": "assistant", "content": redacted(output)]] }
         }
-        await Analytics.captureAI(AIObservabilityRecord(name: "$ai_generation", properties: properties))
+        return properties
     }
 }
 

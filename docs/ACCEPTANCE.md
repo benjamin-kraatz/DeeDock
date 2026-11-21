@@ -3735,3 +3735,30 @@ Built on `codex/dee-163-b1`. How each part works, the per-browser table, and the
 - [ ] With a browser in front, **Save this page** keeps the page and turns into **Saved**; it also works in Safari and in a private window, because it is deliberate.
 - [ ] Link rows show a monogram; with **Load site icons** on, the site's icon after a moment and no request while it is off. A click opens the page in the browser it came from; dragging a link into Finder makes a `.webloc`, into a browser opens the page.
 - [ ] VoiceOver reads the Fits rows with their conversion, the sensitive reason, link relation lines, and the Save this page card. Reduce Motion: the card and chips appear without animation beyond a fade.
+
+### Phase B2: intelligence
+
+Built on `codex/dee-163-b2`: search in plain words, Threads, captions, rename suggestions, key facts, folder suggestions, versions, Tidy, Smart Filters from a sentence with the filter tip, Where were you?, More like this, drag memory, and Ask Robi, with Lookout accessors and AI observability's per-call content opt-out. Details in [FLIX.md](FLIX.md#phase-b2-intelligence).
+
+Validation status:
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix, Lookout, Robi, or AI observability files.
+- New tests in `DeeDockTests/Flix/` compile: rule-based query parsing in English and German, search matching with totals, captions, and Lookout paths, cryptic names, rename sanitizing and collisions, version families and ranks, Thread clustering without Lookout, Thread identity overlap, drag memory counts and the filter tip, fact extraction from text and metadata, model facts checked against the text, and the content opt-out. **The tests have not been run.**
+- The app was not launched. No Apple Intelligence or Claude call, no Lookout query, and no file reading has been exercised.
+
+Hands-on acceptance:
+
+- [ ] With Apple Intelligence on, take a screenshot of an error: within a minute its row shows a caption instead of "New screenshot" and a **✦ Rename** pill; renaming keeps `.png`.
+- [ ] Download an invoice PDF into an allowed Downloads: chips show its due date and total; with a Finance folder in the history, **✦ Move to Finance** appears. A file in a folder DOKK may not read gets no caption and causes no prompt.
+- [ ] Without Apple Intelligence: no captions or renames, facts still appear for readable PDFs, search still makes tokens from the rules.
+- [ ] Search "invoices over €1,000", "contract sent last week", "Fotos von gestern", "Rechnungen über 1.000 €": tokens match the sentence, ✕ on a token widens the list, typing again cancels the earlier search. With Lookout on, a file found by its content shows **✦ by meaning**.
+- [ ] Work on three files in one project folder within an afternoon: a Thread appears in the sidebar, first with the folder's name, then with Apple Intelligence's name and summary on its card. A new file in that folder joins the same Thread without changing its selection.
+- [ ] Have "Contract draft v2", "Contract draft v3", and "Signed contract" in the history: one row with a **3 versions** pill; dragging v2 out asks about the newer version.
+- [ ] Tidy: suggestions list renames and moves; unchecking one leaves it alone; **Apply** renames and moves, Undo restores names and places.
+- [ ] New Smart Filter from "everything for <a folder you use>": the proposal shows "Location contains … or about … by meaning" and a count that matches the list after adding it. "tax stuff" gets a 🧾 filter.
+- [ ] On the first open of a day after working the day before: **Where were you?** names yesterday's threads; **Reopen** opens their files; the card does not come back that day, also after a relaunch.
+- [ ] **More like this** on a PDF with Lookout on lists related files from the history; with Lookout off, files from the same folder.
+- [ ] Drag PDFs into the same browser three times: rows of PDFs say "↺ you've sent PDFs here before" when that browser is in front, and a toast says what Flix Files noticed. **Forget** in Settings clears it.
+- [ ] Open files in one folder three mornings: one filter tip appears in the sidebar, once.
+- [ ] Ask Robi with Claude and a key: suggested questions fit the selection, the answer streams, and closing the sheet stops it. With Claude and no key: the sheet says to add one. With the on-device model: the privacy line says nothing leaves the Mac. PostHog's `$ai_generation` for `flix_ask_robi` and every `flix_*` span has no `$ai_input` or `$ai_output_choices`.
+- [ ] Turning off captions, Threads, folder suggestions, or drag memory hides that surface at once and stops its background work. No reading or model call happens while a drag is in progress.

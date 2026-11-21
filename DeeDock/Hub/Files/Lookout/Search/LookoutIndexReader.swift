@@ -71,6 +71,19 @@ actor LookoutIndexReader: LookoutIndexSearching {
         return Set(found.compactMap { byIndexPath[$0] })
     }
 
+    func fileVectors(_ paths: [String]) -> [String: LookoutFileVector] {
+        guard let searcher = try? openIfNeeded(), !paths.isEmpty else { return [:] }
+        let byIndexPath = Dictionary(paths.map { (Self.indexPath($0), $0) }, uniquingKeysWith: { first, _ in first })
+        do {
+            let found = try searcher.fileVectors(paths: Set(byIndexPath.keys))
+            return Dictionary(found.compactMap { key, value in byIndexPath[key].map { ($0, value) } },
+                              uniquingKeysWith: { first, _ in first })
+        } catch {
+            LookoutLog.logger.error("Can't read stored Lookout vectors: \(String(describing: error), privacy: .public)")
+            return [:]
+        }
+    }
+
     /// A path as the index stores it: standardized and real (/private/var, not /var), as the crawl reports it.
     private static func indexPath(_ path: String) -> String {
         FolderSelection.realPath((path as NSString).standardizingPath)

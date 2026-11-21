@@ -157,6 +157,9 @@ nonisolated protocol LookoutIndexSearching: Sendable {
     func similarSource(path: String, segmentID: Int64?) async -> LookoutSimilarSource?
     /// Which of `paths` the index holds with at least one vector, so Find Similar can reuse it.
     func indexedPaths(_ paths: [String]) async -> Set<String>
+    /// Each of `paths`' whole-file vector (`Searcher.fileVectors`), keyed by the caller's spelling of the path. Files
+    /// the index doesn't hold, or holds without a vector, are left out; so is everything while there's no index.
+    func fileVectors(_ paths: [String]) async -> [String: LookoutFileVector]
 }
 
 extension LookoutIndexSearching {
@@ -164,6 +167,7 @@ extension LookoutIndexSearching {
     func similar(_ request: LookoutSimilarRequest) async throws -> LookoutSimilarResults? { nil }
     func similarSource(path: String, segmentID: Int64?) async -> LookoutSimilarSource? { nil }
     func indexedPaths(_ paths: [String]) async -> Set<String> { [] }
+    func fileVectors(_ paths: [String]) async -> [String: LookoutFileVector] { [:] }
 }
 
 /// What the monitor reports.

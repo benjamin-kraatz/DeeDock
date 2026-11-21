@@ -29,9 +29,15 @@ struct FlixAskRobiSheet: View {
             .onSubmit { ask(question) }
             .onAppear { focused = true }
         answer
-        Label { Text(items.count == 1 ? .flixAskRobiPrivacyOne : .flixAskRobiPrivacyMany) } icon: { Image(systemName: "lock.fill") }
+        Label { Text(privacy) } icon: { Image(systemName: "lock.fill") }
             .font(.system(size: 10.5))
             .foregroundStyle(.tertiary)
+    }
+
+    /// What leaves the Mac: the files, to Claude; or nothing, when Robi answers on this Mac.
+    private var privacy: LocalizedStringResource {
+        if state.intelligence.robiAnswersOnDevice { return .flixAskRobiPrivacyOnDevice }
+        return items.count == 1 ? .flixAskRobiPrivacyOne : .flixAskRobiPrivacyMany
     }
 
     @ViewBuilder private var answer: some View {

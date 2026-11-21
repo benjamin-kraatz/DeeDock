@@ -47,7 +47,11 @@ struct FlixSmartFilterSheet: View {
             Text(.flixSmartFilterFailed).font(.system(size: 12)).foregroundStyle(.secondary)
         case .ready(let proposal):
             FlixSmartFilterProposalView(proposal: proposal,
-                                        count: state.history.items.count { proposal.filter.matches($0, now: state.now) },
+                                        count: state.history.items.count { item in
+                                            proposal.filter.matches(item, now: state.now) { topic, item in
+                                                state.intelligence.semanticMatch(topic: topic, item: item)
+                                            }
+                                        },
                                         add: { state.addSmartFilter(proposal.filter) })
         }
     }
