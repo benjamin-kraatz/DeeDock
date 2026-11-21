@@ -22,6 +22,7 @@ struct LookoutRulesTests {
         #expect(classify(marked) == .index(.screenshot))
         #expect(classify(try folder.write("Screenshot 2026-10-01 at 9.41.07 PM.png")) == .index(.screenshot))
         #expect(classify(try folder.write("CleanShot 2026-10-01.png")) == .index(.screenshot))
+        #expect(classify(try folder.write("Bildschirmfoto 2026-10-01 um 09.41.07.png")) == .index(.screenshot))
         #expect(classify(try folder.write("holiday.jpg")) == .index(.image))
     }
 
@@ -77,8 +78,13 @@ struct LookoutRulesTests {
         let xcode = try folder.folder("app")
         try folder.folder("app/App.xcodeproj")
         let plain = try folder.folder("photos")
+        let unity = try folder.folder("game")
+        try folder.folder("game/ProjectSettings")
+        let dotnet = try folder.folder("tool")
+        try folder.write("tool/Tool.csproj")
         #expect(Rules.isProjectRoot(repo.path))
         #expect(Rules.isProjectRoot(xcode.path))
+        #expect(Rules.isProjectRoot(unity.path) && Rules.isProjectRoot(dotnet.path))
         #expect(!Rules.isProjectRoot(plain.path))
     }
 

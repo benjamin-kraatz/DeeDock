@@ -24,17 +24,26 @@ nonisolated enum Rules {
         "node_modules", "bower_components", "venv", "site-packages", "__pycache__", "DerivedData", "Pods", "Carthage",
     ]
 
-    /// Any of these in a folder makes it a code project, where only screenshots are indexed.
+    /// Any of these in a folder makes it a code project, where only screenshots are indexed. Unity's `ProjectSettings`
+    /// and Godot's `project.godot` mark game projects, whose build folders hold thousands of generated text files
+    /// (DEE-166: 141 of a Unity project's `Library/Bee/artifacts/*.dag/*.txt` were indexed as documents).
     static let projectMarkers = [
         ".git", "package.json", "Package.swift", "pyproject.toml", "setup.py", "requirements.txt", "Cargo.toml",
         "go.mod", "pom.xml", "build.gradle", "build.gradle.kts", "Gemfile", "composer.json", "CMakeLists.txt",
+        "ProjectSettings", "project.godot",
     ]
-    static let projectBundleExtensions: Set<String> = ["xcodeproj", "xcworkspace"]
+    /// Files or bundles with these extensions make their folder a code project too: Xcode, .NET (Unity writes these
+    /// beside its project) and Unreal.
+    static let projectBundleExtensions: Set<String> = [
+        "xcodeproj", "xcworkspace", "csproj", "fsproj", "vbproj", "sln", "slnx", "uproject",
+    ]
 
     /// Build output folders, not walked inside a code project (`isProjectRoot`, found at the folder's parent or above).
     /// Outside one, a folder with one of these names may hold your own files, so it's walked like any other. A folder
-    /// with one of these names that is itself a project root, with nothing above it, is a project and walked.
-    static let buildOutputFolderNames: Set<String> = ["build", "dist", "target", "out"]
+    /// with one of these names that is itself a project root, with nothing above it, is a project and walked. Unity
+    /// keeps its import cache and build artifacts in `Library` and `Temp` (tens of thousands of files), .NET its build in
+    /// `obj` and `bin`.
+    static let buildOutputFolderNames: Set<String> = ["build", "dist", "target", "out", "Library", "Temp", "obj", "bin"]
 
     /// Documents, read as text (`DocExtractor`). Markup formats (reStructuredText, AsciiDoc, Org, Textile, MDX) are
     /// read as they are written, subtitles without their cue numbers and timings, LaTeX without its commands, and
@@ -63,7 +72,8 @@ nonisolated enum Rules {
         "metal", "glsl", "hlsl", "wgsl", "cu", "pyi", "pyc",
     ]
 
-    static let screenshotPrefixes = ["Screenshot", "Screen Shot", "CleanShot", "SCR-"]
+    /// macOS's English and German screenshot names ("Bildschirmfoto 2026-10-01 um 09.41.07"), then common tools'.
+    static let screenshotPrefixes = ["Screenshot", "Screen Shot", "Bildschirmfoto", "CleanShot", "SCR-"]
 
     /// Decides what a file is from its name, its type and its screen-capture attribute. It never opens the file: the
     /// crawler classifies before its `lstat` check, so the file may still be a FIFO (opening one with no writer blocks
@@ -156,6 +166,7 @@ nonisolated enum Rules {
         if projectMarkers.contains(name) { return true }
         let url = URL(fileURLWithPath: path, isDirectory: false)
         let ext = url.pathExtension.lowercased()
+        if projectBundleExtensions.contains(ext) { return true }
         // The crawl reads the type from the file's resource values, which follow the extension for a type the system
         // knows. Without one, the type may come from the file itself, so an ignored file of unknown type is kept.
         let type = ext.isEmpty ? nil : UTType(filenameExtension: ext)
