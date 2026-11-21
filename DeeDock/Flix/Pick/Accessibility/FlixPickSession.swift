@@ -8,7 +8,23 @@ nonisolated enum FlixPickReadback: Equatable, Sendable {
     case gone
     /// No list view to read (column or icon view).
     case unavailable
-    case selected(URL?)
+    /// How many rows are selected, and the file when exactly one is.
+    case selected(count: Int, url: URL?)
+
+    /// Exactly `path` is selected, nothing else.
+    func isExactly(_ path: String) -> Bool {
+        guard case .selected(1, let url?) = self else { return false }
+        return FlixPickAX.same(url, path)
+    }
+}
+
+/// Whether the picker shows a folder, by the place its listed rows are in.
+nonisolated enum FlixPickFolderCheck: Equatable, Sendable {
+    case verified
+    case elsewhere
+    /// Nothing listed to tell from (an empty folder, or no list view).
+    case unknown
+    case gone
 }
 
 /// What selecting a file among the rows the picker lists found.
@@ -17,6 +33,20 @@ nonisolated enum FlixPickListedResult: Equatable, Sendable {
     /// Not among the listed rows (another folder, or too many rows to look through).
     case notListed
     /// No list view, or the selection could not be set.
+    case unavailable
+    case gone
+}
+
+/// Why an action that needs the picker in front did not run.
+nonisolated enum FlixPickGuardResult: Equatable, Sendable {
+    case done
+    case secureInput
+    case modifiersHeld
+    /// Another app or window is in front, or the frontmost app changed since the action began.
+    case notFrontmost
+    /// The picker's selection or folder is not exactly what was asked for.
+    case notVerified
+    /// The control is disabled or offers no action.
     case unavailable
     case gone
 }
@@ -293,7 +323,10 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
             guard let current else { return }
             let isList = current.controls[FlixPickAX.listView].map { CFEqual($0, element) } ?? false
             guard isList || FlixPickAX.identifier(element) == FlixPickAX.listView else { return }
-            post(.selection(serial: current.serial, url: FlixPickAX.selectedURL(in: element)))
+            AXUIElementSetMessagingTimeout(element, FlixPickAX.messagingTimeout)
+            // A file only when exactly one is selected: several selected files are no one choice.
+            post(.selection(serial: current.serial,
+                            url: FlixPickAX.selection(in: element, deadline: FlixPickAX.Deadline(seconds: 0.3)).url))
         case kAXValueChangedNotification:
             guard let current, let popup = current.controls[FlixPickAX.wherePopup], CFEqual(element, popup) else { return }
             post(.folderChanged(serial: current.serial, name: FlixPickAX.string(popup, kAXValueAttribute)))
@@ -330,71 +363,98 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         if !listAlive || picker.controls[FlixPickAX.okButton] == nil { discoverControls(picker) }
     }
 
-    /// Selects `path` in place when the picker lists it. The first row says which folder is
-    /// listed, so a file elsewhere is answered at once; at most 300 rows are looked through.
+    /// The app with keyboard focus, from the system-wide element.
+    private func focusedPID() -> pid_t? {
+        let system = AXUIElementCreateSystemWide()
+        guard let focused = RobiAX.element(system, kAXFocusedApplicationAttribute) else { return nil }
+        var pid: pid_t = 0
+        return AXUIElementGetPid(focused, &pid) == .success ? pid : nil
+    }
+
+    /// Everything an action re-checks right before it acts: the attachment it started under, the
+    /// picker, its app with keyboard focus, and the picker focused in it.
+    private func inFront(_ serial: Int, generation: Int) -> (picker: Picker?, result: FlixPickGuardResult) {
+        guard isCurrent(generation) else { return (nil, .notFrontmost) }
+        guard let picker = live(serial) else { return (nil, .gone) }
+        guard focusedPID() == pid, focused(picker) else { return (picker, .notFrontmost) }
+        return (picker, .done)
+    }
+
+    private func focused(_ picker: Picker) -> Bool {
+        guard let app, let window = FlixPickAX.element(app, kAXFocusedWindowAttribute),
+              let found = FlixPickAX.picker(in: window) else { return false }
+        return CFEqual(found.element, picker.element)
+    }
+
+    /// Selects `path` in place when the picker lists it, replacing any other selection. The first
+    /// row says which folder is listed, so a file elsewhere is answered at once; at most 300 rows
+    /// are looked through, within 0.8 seconds.
     func selectListed(_ path: String, serial: Int) -> FlixPickListedResult {
         guard let picker = live(serial) else { return .gone }
         ensureControls(picker)
         guard let list = picker.controls[FlixPickAX.listView] else { return .unavailable }
-        guard let rows = RobiAX.value(list, kAXRowsAttribute) as? [AXUIElement], let first = rows.first else {
-            return .notListed
-        }
-        guard rows.count <= 300, let firstURL = FlixPickAX.url(ofRow: first),
+        let deadline = FlixPickAX.Deadline(seconds: 0.8)
+        guard let rows = FlixPickAX.elements(list, kAXRowsAttribute), let first = rows.first else { return .notListed }
+        guard rows.count <= 300, let firstURL = FlixPickAX.url(ofRow: first, deadline: deadline),
               FlixPickAX.same(firstURL.deletingLastPathComponent(), (path as NSString).deletingLastPathComponent)
         else { return .notListed }
         for row in rows {
-            AXUIElementSetMessagingTimeout(row, FlixPickAX.messagingTimeout)
-            guard let url = FlixPickAX.url(ofRow: row), FlixPickAX.same(url, path) else { continue }
+            guard !deadline.passed else { return .notListed }
+            guard let url = FlixPickAX.url(ofRow: row, deadline: deadline), FlixPickAX.same(url, path) else { continue }
             let result = AXUIElementSetAttributeValue(list, kAXSelectedRowsAttribute as CFString, [row] as CFArray)
             return result == .success ? .selected : .unavailable
         }
         return .notListed
     }
 
-    /// The file selected in the list now.
+    /// The list's selection now.
     func selection(serial: Int) -> FlixPickReadback {
         guard let picker = live(serial) else { return .gone }
         ensureControls(picker)
         guard let list = picker.controls[FlixPickAX.listView] else { return .unavailable }
-        return .selected(FlixPickAX.selectedURL(in: list))
+        let selected = FlixPickAX.selection(in: list, deadline: FlixPickAX.Deadline(seconds: 0.5))
+        return .selected(count: selected.count, url: selected.url)
     }
 
-    /// Whether the picker shows `folder` now: its listed rows are inside it, or (an empty folder)
-    /// the folder popup shows `displayName`.
-    func shows(folder: String, displayName: String, serial: Int) -> Bool {
-        guard let picker = live(serial) else { return false }
+    /// Whether the picker shows `folder`, by the folder its first listed row is in. An empty folder
+    /// is `unknown`: its name in the folder popup is never taken as proof of its place.
+    func folder(_ folder: String, serial: Int) -> FlixPickFolderCheck {
+        guard let picker = live(serial) else { return .gone }
         ensureControls(picker)
-        if let list = picker.controls[FlixPickAX.listView],
-           let rows = RobiAX.value(list, kAXRowsAttribute) as? [AXUIElement], let first = rows.first,
-           let url = FlixPickAX.url(ofRow: first) {
-            return FlixPickAX.same(url.deletingLastPathComponent(), folder)
-        }
-        guard let popup = picker.controls[FlixPickAX.wherePopup],
-              let name = FlixPickAX.string(popup, kAXValueAttribute) ?? FlixPickAX.string(popup, kAXTitleAttribute)
-        else { return false }
-        return name.localizedCaseInsensitiveCompare(displayName) == .orderedSame
+        guard let list = picker.controls[FlixPickAX.listView],
+              let shown = FlixPickAX.listedFolder(in: list, deadline: FlixPickAX.Deadline(seconds: 0.5))
+        else { return .unknown }
+        return FlixPickAX.same(shown, folder) ? .verified : .elsewhere
     }
 
-    /// Whether the picker still has focus in its app: the focused window is the picker or holds it
-    /// as a sheet.
+    /// Whether the picker still has focus in its app.
     func hasFocus(serial: Int) -> Bool {
-        guard let picker = live(serial), let app,
-              let window = RobiAX.element(app, kAXFocusedWindowAttribute),
-              let found = FlixPickAX.picker(in: window) else { return false }
-        return CFEqual(found.element, picker.element)
+        guard let picker = live(serial) else { return false }
+        return focused(picker)
+    }
+
+    /// Posts ⇧⌘G, the one keystroke with no Accessibility alternative, after checking in the same
+    /// block, immediately before posting: the attachment, the picker, its app with keyboard focus,
+    /// the picker focused, no modifier held, and Secure Event Input off.
+    func postGoToFolder(serial: Int, generation: Int) -> FlixPickGuardResult {
+        let check = inFront(serial, generation: generation)
+        guard check.result == .done else { return check.result }
+        guard FlixPickKeys.canType else { return .secureInput }
+        guard !FlixPickKeys.modifiersHeld else { return .modifiersHeld }
+        FlixPickKeys.press(FlixPickKeys.goToFolderKey, flags: [.maskShift, .maskCommand])
+        return .done
     }
 
     /// The focused element when it is the Go to Folder field of this picker: identifier
     /// `PathTextField`, inside the picker (or its window). Nothing else is ever written.
     private func pathField(of picker: Picker) -> AXUIElement? {
-        guard let app, let focused = RobiAX.element(app, kAXFocusedUIElementAttribute) else { return nil }
-        AXUIElementSetMessagingTimeout(focused, FlixPickAX.messagingTimeout)
-        guard FlixPickAX.identifier(focused) == FlixPickAX.pathField else { return nil }
+        guard let app, let focused = FlixPickAX.element(app, kAXFocusedUIElementAttribute),
+              FlixPickAX.identifier(focused) == FlixPickAX.pathField else { return nil }
         var ancestor: AXUIElement? = focused
         for _ in 0..<12 {
             guard let element = ancestor else { break }
             if CFEqual(element, picker.element) || picker.parent.map({ CFEqual(element, $0) }) == true { return focused }
-            ancestor = RobiAX.element(element, kAXParentAttribute)
+            ancestor = FlixPickAX.element(element, kAXParentAttribute)
         }
         return nil
     }
@@ -410,12 +470,55 @@ nonisolated final class FlixPickSession: @unchecked Sendable {
         return AXUIElementSetAttributeValue(field, kAXValueAttribute as CFString, path as CFString) == .success
     }
 
-    /// Presses `OKButton` when it is enabled.
-    func pressDefaultButton(serial: Int) -> Bool {
-        guard let picker = live(serial) else { return false }
+    /// Sends the Go to Folder sheet on, on the field or the sheet itself, never as a key: the
+    /// field's `AXConfirm`, else the sheet's default button when it is not the picker's
+    /// `OKButton`. `unavailable` leaves the sheet open with the path typed, for the person.
+    func submitGoToFolder(serial: Int) -> FlixPickGuardResult {
+        guard let picker = live(serial) else { return .gone }
+        guard let field = pathField(of: picker) else { return .unavailable }
+        if FlixPickAX.actions(field).contains(kAXConfirmAction as String) {
+            return AXUIElementPerformAction(field, kAXConfirmAction as CFString) == .success ? .done : .unavailable
+        }
+        guard let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
+              let button = FlixPickAX.element(sheet, kAXDefaultButtonAttribute),
+              FlixPickAX.identifier(button) != FlixPickAX.okButton else { return .unavailable }
+        return AXUIElementPerformAction(button, kAXPressAction as CFString) == .success ? .done : .unavailable
+    }
+
+    /// Closes the Go to Folder sheet the same way: the field's `AXCancel`, else the sheet's cancel
+    /// button when it is not the picker's `CancelButton`. Does nothing when neither exists, so the
+    /// picker itself is never cancelled.
+    func dismissGoToFolder(serial: Int) {
+        guard let picker = live(serial), let field = pathField(of: picker) else { return }
+        if FlixPickAX.actions(field).contains(kAXCancelAction as String) {
+            _ = AXUIElementPerformAction(field, kAXCancelAction as CFString)
+            return
+        }
+        guard let sheet = FlixPickAX.goToSheet(of: field, picker: picker.element),
+              let button = FlixPickAX.element(sheet, kAXCancelButtonAttribute),
+              FlixPickAX.identifier(button) != FlixPickAX.cancelButton else { return }
+        _ = AXUIElementPerformAction(button, kAXPressAction as CFString)
+    }
+
+    /// Presses `OKButton`, in one block with every check right before the press: the attachment
+    /// the action started under, the picker in front and focused, exactly `path` selected (Open)
+    /// or the picker's listed rows inside `path` (Save), and the button enabled. `done` only when
+    /// the press went through.
+    func confirm(_ path: String, isSave: Bool, serial: Int, generation: Int) -> FlixPickGuardResult {
+        let check = inFront(serial, generation: generation)
+        guard check.result == .done, let picker = check.picker else { return check.result }
         ensureControls(picker)
+        guard let list = picker.controls[FlixPickAX.listView] else { return .notVerified }
+        let deadline = FlixPickAX.Deadline(seconds: 0.5)
+        if isSave {
+            guard let shown = FlixPickAX.listedFolder(in: list, deadline: deadline), FlixPickAX.same(shown, path)
+            else { return .notVerified }
+        } else {
+            let selected = FlixPickAX.selection(in: list, deadline: deadline)
+            guard selected.count == 1, let url = selected.url, FlixPickAX.same(url, path) else { return .notVerified }
+        }
         guard let ok = picker.controls[FlixPickAX.okButton],
-              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? true else { return false }
-        return AXUIElementPerformAction(ok, kAXPressAction as CFString) == .success
+              (RobiAX.value(ok, kAXEnabledAttribute) as? Bool) ?? false else { return .unavailable }
+        return AXUIElementPerformAction(ok, kAXPressAction as CFString) == .success ? .done : .unavailable
     }
 }

@@ -29,6 +29,9 @@ final class FlixPickObserver {
         }
     }
     private(set) var isRunning = false
+    /// The session's attachment generation. Any app switch or re-attach changes it, so an action
+    /// that captured it can tell, right before it acts, that the app it started in moved away.
+    var generation: Int { session.generation }
 
     private let session = FlixPickSession()
     private var workspaceObserver: NSObjectProtocol?

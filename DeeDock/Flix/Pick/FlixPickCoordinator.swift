@@ -37,9 +37,15 @@ final class FlixPickCoordinator {
         var evidence: FlixPickClosingEvidence
         /// The panel showed for this picker, so its closing is reported.
         var shown = false
+        /// The rows shown, by standardized path, for the chosen row's rank when it closes.
+        var rowPaths: [String] = []
     }
 
     private var session: Session?
+    /// A picker that closed while an action that may press its default button was still running.
+    /// Its closing is resolved when that action reports whether the press went through, so a
+    /// rejected press (Save with an empty name) is never learned as a pick.
+    private var closingDuringConfirm: (session: Session, at: Date)?
     /// A picker that lost focus without closing, kept so it is recognized when focus returns.
     private var parked: Session?
     /// The action running on a row; a double-click on it upgrades it to a confirm.
@@ -115,6 +121,7 @@ final class FlixPickCoordinator {
         observer.stop()
         endSession()
         parked = nil
+        closingDuringConfirm = nil
         for entry in systemObservers { entry.center.removeObserver(entry.token) }
         systemObservers = []
         heldReport?.task.cancel()
@@ -224,6 +231,7 @@ final class FlixPickCoordinator {
         state.busyRowID = nil
         let panel = panel ?? makePanel()
         panel.show(beside: Self.appKit(current.picker.frame))
+        current.rowPaths = rows.map { FlixPaths.standardized($0.path) }
         if !current.shown {
             current.shown = true
             Analytics.track(.flixPickShown(picker: AnalyticsFlixPickerKind(current.picker.kind),
@@ -251,13 +259,22 @@ final class FlixPickCoordinator {
             return
         }
         parked = nil
-        let (outcome, chosen) = FlixPickClosing.outcome(current.evidence, closedAt: .now)
+        if running?.confirm == true {
+            closingDuringConfirm = (current, .now)
+            return
+        }
+        resolveClosing(current, at: .now)
+    }
+
+    /// Decides how the picker closed, learns the pick, and reports it.
+    private func resolveClosing(_ current: Session, at date: Date) {
+        let (outcome, chosen) = FlixPickClosing.outcome(current.evidence, closedAt: date)
         if let chosen, outcome == .pickedViaFlixPick || outcome == .pickedElsewhere {
             flix?.intelligence.recordPickerPick(chosen, isFolder: current.picker.kind == .save,
                                                 app: current.bundleIdentifier)
         }
         guard current.shown else { return }
-        let rank = chosen.flatMap { path in state.rows.firstIndex { FlixPaths.standardized($0.path) == path } }
+        let rank = chosen.flatMap { current.rowPaths.firstIndex(of: $0) }
         Analytics.track(.flixPickPickerClosed(picker: AnalyticsFlixPickerKind(current.picker.kind), outcome: outcome,
                                               chosenRank: rank.map { $0 + 1 }))
     }
@@ -340,16 +357,14 @@ final class FlixPickCoordinator {
         state.busyRowID = row.id
         setMessage(nil)
         let picker = current.picker
-        let folderName = Self.folderName(row.path)
         actionTask = Task { [weak self] in
             guard let self else { return }
-            let willConfirm: () -> Void = { [weak self] in self?.confirming(row.path, serial: picker.serial) }
-            var result = await FlixPickRouter.perform(path: row.path, folderName: folderName, picker: picker,
-                                                      confirm: confirm, observer: observer, willConfirm: willConfirm)
+            var result = await FlixPickRouter.perform(path: row.path, picker: picker, confirm: confirm,
+                                                      observer: observer)
             // A double-click arrived while the click's jump ran: press the default button now.
             if !confirm, running?.confirm == true, result.selected, !Task.isCancelled {
-                let second = await FlixPickRouter.perform(path: row.path, folderName: folderName, picker: picker,
-                                                          confirm: true, observer: observer, willConfirm: willConfirm)
+                let second = await FlixPickRouter.perform(path: row.path, picker: picker, confirm: true,
+                                                          observer: observer)
                 result.confirmed = second.confirmed
                 result.failure = second.failure
             }
@@ -357,18 +372,20 @@ final class FlixPickCoordinator {
         }
     }
 
-    private func confirming(_ path: String, serial: Int) {
-        guard session?.picker.serial == serial else { return }
-        session?.evidence.confirmedByFlix = (FlixPaths.standardized(path), .now)
-    }
-
     private func finish(_ action: Action, result: FlixPickActionResult, serial: Int) {
         if running?.row.id == action.row.id { running = nil }
         actionTask = nil
         if state.busyRowID == action.row.id { state.busyRowID = nil }
+        let path = FlixPaths.standardized(action.row.path)
+        // Only a press that went through counts as Flix Pick's confirm.
+        if result.confirmed { session?.evidence.confirmedByFlix = (path, .now) }
+        if var closing = closingDuringConfirm, closing.session.picker.serial == serial {
+            closingDuringConfirm = nil
+            if result.confirmed { closing.session.evidence.confirmedByFlix = (path, closing.at) }
+            resolveClosing(closing.session, at: closing.at)
+        }
         if session?.picker.serial == serial {
             if result.selected {
-                let path = FlixPaths.standardized(action.row.path)
                 session?.evidence.placedByFlix = path
                 // Setting the selection through Accessibility may not post a selection change.
                 if action.kind == .open { session?.evidence.selection = URL(fileURLWithPath: path) }

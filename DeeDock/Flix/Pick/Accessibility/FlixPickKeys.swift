@@ -1,19 +1,19 @@
 import Carbon
 import CoreGraphics
 
-/// The keystrokes Flix Pick sends to a picker: ⇧⌘G (Go to Folder), Return, and Escape.
+/// The one keystroke Flix Pick sends to a picker: ⇧⌘G, which opens Go to Folder and has no
+/// Accessibility alternative. Return and Escape are never sent as keys; the Go to Folder sheet is
+/// submitted and dismissed through Accessibility actions on its own field or buttons
+/// (`FlixPickSession.submitGoToFolder(serial:)`).
 ///
-/// They are posted to the HID event tap with a source in the HID system state, so they reach the
+/// It is posted to the HID event tap with a source in the HID system state, so it reaches the
 /// frontmost app as if typed; posting to the app's process (`postToPid`) does not open Go to
-/// Folder. Because they go to whatever has keyboard focus, the caller checks right before each
-/// one that the picker's app is frontmost and the picker has focus (`FlixPickRouter`).
-///
-/// Never while Secure Event Input is on (a password field anywhere has the keyboard): then
-/// ``canType`` is false and the row can only be dragged in. Needs Accessibility permission.
+/// Folder. Because it goes to whatever has keyboard focus, it is posted from the Accessibility
+/// thread right after that thread checked, in the same block, that the picker's app has keyboard
+/// focus, the picker is focused, no modifier is held, and Secure Event Input is off
+/// (`FlixPickSession.postGoToFolder(serial:generation:)`). Needs Accessibility permission.
 nonisolated enum FlixPickKeys {
     static let goToFolderKey: CGKeyCode = 5 // G
-    static let returnKey: CGKeyCode = 36
-    static let escapeKey: CGKeyCode = 53
 
     /// The modifiers that would change a posted key (⌥ would turn ⇧⌘G into ⌥⇧⌘G).
     private static let held: CGEventFlags = [.maskAlternate, .maskCommand, .maskShift, .maskControl]

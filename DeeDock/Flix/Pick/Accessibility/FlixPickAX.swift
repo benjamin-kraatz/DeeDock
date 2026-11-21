@@ -61,49 +61,108 @@ nonisolated enum FlixPickAX {
         return nil
     }
 
+    /// A time limit shared by every Accessibility call of one operation, so a picker that answers
+    /// slowly (a folder on a network share) cannot hold the thread for long. Each call also carries
+    /// ``messagingTimeout``.
+    nonisolated struct Deadline {
+        let end: CFAbsoluteTime
+
+        init(seconds: Double) { end = CFAbsoluteTimeGetCurrent() + seconds }
+
+        var passed: Bool { CFAbsoluteTimeGetCurrent() >= end }
+    }
+
+    /// `element`'s children, each with the messaging timeout set before it is queried.
+    static func children(_ element: AXUIElement) -> [AXUIElement] {
+        timed(RobiAX.children(element))
+    }
+
+    /// An element-valued attribute, with the messaging timeout set on the element it returns.
+    static func element(_ element: AXUIElement, _ attribute: String) -> AXUIElement? {
+        guard let found = RobiAX.element(element, attribute) else { return nil }
+        AXUIElementSetMessagingTimeout(found, messagingTimeout)
+        return found
+    }
+
+    /// An element-list attribute (rows, selected rows), each with the messaging timeout set.
+    static func elements(_ element: AXUIElement, _ attribute: String) -> [AXUIElement]? {
+        (RobiAX.value(element, attribute) as? [AXUIElement]).map(timed)
+    }
+
+    private static func timed(_ elements: [AXUIElement]) -> [AXUIElement] {
+        for element in elements { AXUIElementSetMessagingTimeout(element, messagingTimeout) }
+        return elements
+    }
+
+    /// The actions an element offers.
+    static func actions(_ element: AXUIElement) -> [String] {
+        var names: CFArray?
+        guard AXUIElementCopyActionNames(element, &names) == .success else { return [] }
+        return names as? [String] ?? []
+    }
+
     /// The picker's controls Flix Pick uses, by identifier. Walks the picker's container structure
     /// breadth first, never into lists, outlines, tables, browsers, or rows, so a folder with
-    /// thousands of files costs nothing. At most 400 elements, 14 levels deep.
+    /// thousands of files costs nothing. At most 400 elements, 14 levels deep, half a second.
     static func controls(in picker: AXUIElement) -> [String: AXUIElement] {
         let wanted: Set<String> = [okButton, cancelButton, listView, columnView, wherePopup]
         let leaves: Set<String> = [kAXOutlineRole, kAXTableRole, kAXBrowserRole, kAXListRole, kAXRowRole,
                                    kAXTextAreaRole, "AXWebArea"]
+        let deadline = Deadline(seconds: 0.5)
         var found: [String: AXUIElement] = [:]
-        var queue: [(AXUIElement, Int)] = RobiAX.children(picker).map { ($0, 1) }
+        var queue: [(AXUIElement, Int)] = children(picker).map { ($0, 1) }
         var visited = 0
-        while !queue.isEmpty, visited < 400, found.count < wanted.count {
+        while !queue.isEmpty, visited < 400, found.count < wanted.count, !deadline.passed {
             let (element, depth) = queue.removeFirst()
             visited += 1
-            AXUIElementSetMessagingTimeout(element, messagingTimeout)
             if let id = identifier(element), wanted.contains(id), found[id] == nil { found[id] = element }
             guard depth < 14, let role = role(element), !leaves.contains(role) else { continue }
-            queue.append(contentsOf: RobiAX.children(element).map { ($0, depth + 1) })
+            queue.append(contentsOf: children(element).map { ($0, depth + 1) })
         }
         return found
     }
 
     /// The file a list row stands for: the `AXURL` of the text field in its first cells.
-    static func url(ofRow row: AXUIElement) -> URL? {
+    static func url(ofRow row: AXUIElement, deadline: Deadline) -> URL? {
         var queue: [(AXUIElement, Int)] = [(row, 0)]
         var visited = 0
-        while !queue.isEmpty, visited < 12 {
+        while !queue.isEmpty, visited < 12, !deadline.passed {
             let (element, depth) = queue.removeFirst()
             visited += 1
-            if depth > 0, let value = RobiAX.value(element, kAXURLAttribute) {
-                if let url = value as? URL { return url }
-            }
+            if depth > 0, let url = RobiAX.value(element, kAXURLAttribute) as? URL { return url }
             guard depth < 3 else { continue }
-            queue.append(contentsOf: RobiAX.children(element).prefix(6).map { ($0, depth + 1) })
+            queue.append(contentsOf: children(element).prefix(6).map { ($0, depth + 1) })
         }
         return nil
     }
 
-    /// The file of the first selected row in the list.
-    static func selectedURL(in list: AXUIElement) -> URL? {
-        guard let rows = RobiAX.value(list, kAXSelectedRowsAttribute) as? [AXUIElement], let first = rows.first else {
-            return nil
+    /// How many rows the list has selected, and the file when exactly one is.
+    static func selection(in list: AXUIElement, deadline: Deadline) -> (count: Int, url: URL?) {
+        let rows = elements(list, kAXSelectedRowsAttribute) ?? []
+        guard rows.count == 1 else { return (rows.count, nil) }
+        return (1, url(ofRow: rows[0], deadline: deadline))
+    }
+
+    /// The folder the list shows, from its first row's parent. Nil for an empty folder or a list
+    /// that cannot be read: a folder's name (the popup) is never proof of its place.
+    static func listedFolder(in list: AXUIElement, deadline: Deadline) -> URL? {
+        guard let first = elements(list, kAXRowsAttribute)?.first,
+              let url = url(ofRow: first, deadline: deadline) else { return nil }
+        return url.deletingLastPathComponent()
+    }
+
+    /// The Go to Folder sheet a field sits in: its nearest sheet or window ancestor, when that is
+    /// not the picker itself (whose default button is the picker's Open or Save).
+    static func goToSheet(of field: AXUIElement, picker: AXUIElement) -> AXUIElement? {
+        var ancestor = element(field, kAXParentAttribute)
+        for _ in 0..<12 {
+            guard let current = ancestor else { return nil }
+            if CFEqual(current, picker) { return nil }
+            let role = role(current)
+            if role == kAXSheetRole as String || role == kAXWindowRole as String { return current }
+            ancestor = element(current, kAXParentAttribute)
         }
-        return url(ofRow: first)
+        return nil
     }
 
     static func frame(_ element: AXUIElement) -> CGRect? { RobiAX.frame(of: element) }

@@ -45,15 +45,30 @@ enum FlixPickCandidates {
         }
     }
 
+    /// Standardized paths never suggested, whichever source names them: every history row the
+    /// sensitive guard flagged (not only the scanned ones, since a learned pick may name one).
+    private static func sensitivePaths(_ context: FlixPickContext) -> Set<String> {
+        guard !context.sensitive.isEmpty else { return [] }
+        return Set(context.items.compactMap { item in
+            context.sensitive.contains(item.id) ? item.path.map(FlixPaths.standardized) : nil
+        })
+    }
+
+    /// Whether a path from any source may be suggested: not flagged sensitive, not noise.
+    private static func allowed(_ path: String, sensitive: Set<String>, context: FlixPickContext) -> Bool {
+        !sensitive.contains(FlixPaths.standardized(path)) && !(context.hidesNoise && FlixNoiseRules.isNoise(path: path))
+    }
+
     // MARK: Open
 
     private static func files(for context: FlixPickContext, limit: Int) -> [FlixPickRow] {
         var candidates: [(id: FlixItem, signals: FlixPickSignals)] = []
         var seen = Set<String>()
         let thread = latestPickThread(context)
+        let sensitive = sensitivePaths(context)
         for item in context.items.prefix(scanned) {
             guard let path = item.path, item.link == nil, item.kind != .app, !context.sensitive.contains(item.id),
-                  !(context.hidesNoise && FlixNoiseRules.isNoise(path: path)), context.types.fits(item),
+                  allowed(path, sensitive: sensitive, context: context), context.types.fits(item),
                   seen.insert(path).inserted else { continue }
             let pick = context.picks[path]
             let kind = FlixDragMemory.kindClass(of: item)
@@ -69,7 +84,7 @@ enum FlixPickCandidates {
             let ext = (path as NSString).pathExtension
             let type = UTType(filenameExtension: ext)
             guard context.types.fits(type: type, pathExtension: ext, isFolder: false),
-                  !(context.hidesNoise && FlixNoiseRules.isNoise(path: path)) else { continue }
+                  allowed(path, sensitive: sensitive, context: context) else { continue }
             let item = FlixItem(path: path, name: (path as NSString).lastPathComponent,
                                 kind: FlixItemKind.classify(contentType: type, isDirectory: false, isPackage: false,
                                                             isScreenshot: false),
@@ -98,9 +113,11 @@ enum FlixPickCandidates {
     private static func folders(for context: FlixPickContext, limit: Int) -> [FlixPickRow] {
         var signals: [String: FlixPickSignals] = [:]
         var order: [String] = []
+        let sensitive = sensitivePaths(context)
         func update(_ folder: String, _ change: (inout FlixPickSignals) -> Void) {
             let folder = FlixPaths.standardized(folder)
-            guard isListableFolder(folder, home: context.home) else { return }
+            guard isListableFolder(folder, home: context.home), allowed(folder, sensitive: sensitive, context: context)
+            else { return }
             if signals[folder] == nil {
                 signals[folder] = FlixPickSignals(date: .distantPast)
                 order.append(folder)

@@ -27,4 +27,13 @@ struct FlixPickTests {
         #expect(ranked.map(\.id) == ["picked", "fresh"])
         #expect(ranked.first?.score.strongest == .picked(2))
     }
+
+    @Test func cancelAfterFlixPicksOwnConfirmWins() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var evidence = FlixPickClosingEvidence(kind: .save, placedByFlix: "/Users/x/Documents/Exports")
+        evidence.confirmedByFlix = ("/Users/x/Documents/Exports", now.addingTimeInterval(-1))
+        evidence.lastPress = (.cancel, 1, now.addingTimeInterval(-0.5))
+        let result = FlixPickClosing.outcome(evidence, closedAt: now)
+        #expect(result.outcome == .cancelled && result.chosen == nil)
+    }
 }
