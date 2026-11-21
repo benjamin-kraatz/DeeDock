@@ -8,7 +8,7 @@ import Foundation
 @MainActor
 final class LineIconCoverageReporter {
     /// The shortest gap between two reports.
-    static let interval: TimeInterval = 6 * 60 * 60
+    nonisolated static let interval: TimeInterval = 6 * 60 * 60
     private static let lastReportKey = "analytics.line-icon-coverage.last-report.v1"
     /// Keeps the folder scan out of the launch path.
     private static let launchDelay: Duration = .seconds(30)

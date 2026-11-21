@@ -9,7 +9,8 @@ enum FolderFileDrop {
               let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
                 options: [.urlReadingFileURLsOnly: true]) as? [URL], !urls.isEmpty,
               urls.count == info.draggingPasteboard.pasteboardItems?.count else { return nil }
-        return urls
+        // A Flix drag may carry converted upload copies; a folder or drive gets the originals.
+        return FlixDragSession.originalURLs(for: urls, on: info.draggingPasteboard)
     }
 
     /// The operation a drop performs: copy, or move while Shift is held where moving is offered.
@@ -32,17 +33,27 @@ enum FolderFileDrop {
     /// Captures source grants before the native drop callback returns. Work continues if the
     /// popover closes; completion reports partial success and never retries a batch silently.
     ///
-    /// - Parameter move: Moves instead of copying. Across volumes FileManager copies and then
-    ///   removes the source, so a failure part-way leaves the source in place.
+    /// - Parameters:
+    ///   - move: Moves instead of copying. Across volumes FileManager copies and then
+    ///     removes the source, so a failure part-way leaves the source in place.
+    ///   - verifying: For a move of a Flix Files drag, the rows' identities: when any file is not
+    ///     the one its row listed (replaced since), the whole batch fails before anything moves, and
+    ///     Flix Files is told so its rows catch up. Copies are never refused for it.
     static func copy(_ urls: [URL], to destination: URL, lease: FolderResourceAccess, move: Bool = false,
-                     completion: @escaping (String?) -> Void) {
+                     verifying: FlixDraggedFiles? = nil, completion: @escaping (String?) -> Void) {
         let sources = DocumentResourceAccess(urls)
+        let verifying = move ? verifying : nil
         Task {
-            let error = await Task.detached {
+            let (error, changed) = await Task.detached { () -> (String?, [URL]) in
                 defer { withExtendedLifetime((sources, lease)) {} }
                 let manager = FileManager.default
                 let target = destination.resolvingSymlinksInPath().standardizedFileURL
                 var completed = 0
+                // A stale Flix row must never move whatever took its file's place.
+                if let changed = verifying?.changed(among: sources.urls), let first = changed.first {
+                    let reason = FlixDraggedFileChanged(name: first.lastPathComponent).localizedDescription
+                    return (String(localized: .folderDropFailed(0, reason)), changed)
+                }
                 do {
                     var reserved: [String] = []
                     // Validate every destination before copying. FileManager still refuses a
@@ -72,11 +83,12 @@ enum FolderFileDrop {
                         else { try manager.copyItem(at: source, to: output) }
                         completed += 1
                     }
-                    return nil as String?
+                    return (nil, [])
                 } catch {
-                    return String(localized: .folderDropFailed(completed, error.localizedDescription))
+                    return (String(localized: .folderDropFailed(completed, error.localizedDescription)), [])
                 }
             }.value
+            if let verifying, !changed.isEmpty { verifying.reportChanged(changed) }
             completion(error)
         }
     }

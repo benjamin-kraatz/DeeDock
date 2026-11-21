@@ -3690,3 +3690,305 @@ The first hands-on run found that the orb took no clicks or drags: Liquid Glass 
 - Quit DOKK during the undo window and relaunch. The staged folder should be removed and not restored.
 - Move the orb across displays, including one with a negative origin, through sleep and wake, and over a full-screen app.
 - Check VoiceOver on the orb, rows and delete action. Check Reduce Motion and Reduce Transparency.
+
+## DEE-163 Flix Files
+
+Built on `codex/dee-163-flix-files` after the confirmed mockups `docs/mockups/flix-files-v2.html` and `docs/mockups/flix-files-ai.html`, in four phases: A (foundation and the full UI), B1 (window reading, conversions, sensitive guard, web links), B2 (intelligence), and C (analytics and the integration between B1 and B2). B1 and B2 were built on their own branches and merged here. Architecture, privacy, analytics, and limits are in [FLIX.md](FLIX.md). None of the four phases has been exercised on screen; every checklist below is open.
+
+### Phase A: foundation and UI
+
+#### Implemented
+
+- History with merge, dedupe, tombstones, a 5,000-item cap that spares flagged items, a separate noise cap, and debounced JSON files in `DDock/Flix/` (`Flix-dev/` for development builds).
+- Sources: Spotlight recents including folders, FSEvents on allowed watched folders (downloads with their page, screenshots, new and saved files), app activations. Rule-based noise.
+- Dock tile with live thumbnail, unseen badge, ✦ pill slot, plain drag of the newest item, Option-drag to reorder, file drops kept. Optional menu bar item.
+- Panel anchored above the tile or at the pointer (⌃⌥⌘F, configurable), sidebar, grouped list, rows, cards, sheets, dialogs, footer toast with Undo, context menu, keyboard, multi-select, drag out with stepping aside, drops on Favorites and the panel.
+- Every ✦ surface wired to `FlixIntelligence` slots, hidden while no provider is installed.
+- Settings → Flix Files with the shortcut recorder, watched folders and explicit access, web links and intelligence switches (which phases B1 and B2 act on), history clearing, and a privacy note. Discovery tip.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix files.
+- `DeeDockTests/Flix/` compiles: settings defaults and decoding, history merge, removal, cap, partial downloads, unseen count, persistence and recovery, storage folders, download-page stripping, noise rules, Smart Filter rules, sidebar filters, time sections, the shortcut recorder rules and conflicts, the list builder's noise, search, and versions, panel placement on displays with negative origins, and the read policy. **The tests have not been run.**
+- The app was not launched. Nothing below has been exercised on screen.
+
+#### Hands-on acceptance
+
+- [ ] On a fresh install, the Flix Files tile appears after the Notification Feed and Harbor tiles, shows the newest item, and survives a relaunch with its position.
+- [ ] Take a screenshot with a watched Desktop allowed: the tile pops, the badge counts 1, and opening the panel clears it.
+- [ ] Download a file in Safari and Chrome into an allowed Downloads: one row "Downloaded from <host>", no partial-download row left behind.
+- [ ] Open a file and a folder in Finder: both appear as Opened without any folder prompt.
+- [ ] With Downloads not yet allowed, no Files and Folders prompt appears at launch or in the background. The panel's card and Settings' **Allow…** each show the prompt once; allowing starts watching at once.
+- [ ] Click the tile: the panel springs out of it above a bottom dock, beside a left or right dock, and below a top dock, fully on screen at the display's edges.
+- [ ] Press ⌃⌥⌘F with Safari in front: the panel opens at the pointer, the newest row is selected, Return opens it, Escape closes the panel and Safari is in front again.
+- [ ] Hover over the tile and over rows: nothing opens and focus never moves.
+- [ ] Clicking the tile while the panel is open closes it without reopening. Clicking another dock tile closes it and does nothing else. Clicking another app closes it.
+- [ ] Opening Flix Files closes an open Shelf, folder stack, notification feed, plugin panel, and anchored Hub; opening any of those closes Flix Files.
+- [ ] Drag a row into a browser upload field: the panel fades aside as the pointer leaves it, the drop works, and the panel closes. With the pin on, it comes back. Escape during the drag brings it back.
+- [ ] Drag three selected rows (⌘-click, ⇧-click) into Mail: all three attach.
+- [ ] Drag the tile into a chat window: the newest item arrives. Option-drag the tile: it moves among the utilities.
+- [ ] Drop rows on a folder favorite: they move, the toast's Undo moves them back. Drop on an app favorite: they open in it.
+- [ ] Drop a Finder file on the tile and on the panel, and a URL from Safari on the panel: each is kept as an item.
+- [ ] Keys: ↑↓ and ⇧↑↓, ↩, ⌘↩, Space (Quick Look, arrows follow, Escape closes only Quick Look), ⌘C, ⌥⌘C, ⌘K, ⌘D, ⌘F, typing to search (first character kept), ⌫ with Undo, ⌘⌫ to the Trash.
+- [ ] Context menu items work on one and several rows; Rename… renames with Undo.
+- [ ] Smart Filter built by hand shows matching items and picks up a new download by itself; deleting it from its context menu works.
+- [ ] Noise (an autosave, an `.o` file, a `.crdownload`) is hidden, counted in the footer, and **Show** reveals it dimmed.
+- [ ] Settings: each switch takes effect immediately; turning Flix Files off removes the tile, menu bar item, and shortcut. Record ⌃⌘J: the old shortcut stops and the new one opens the panel. Recording ⌥⇧⌘Space or ⌘Q is refused; a key without a modifier asks for one; a combination another app holds shows the orange row.
+- [ ] Menu bar item on: it shows the unseen count and opens the panel under it.
+- [ ] Reduce Motion: crossfades instead of springs and pops. Reduce Transparency: solid panel and tile. Light and dark appearance. VoiceOver reads rows, the tile's value, and toasts.
+- [ ] Two displays with different edges and a display with a negative origin; Spaces and a full-screen app; unplugging the display the panel is anchored to; sleep and wake with the panel open.
+- [ ] Discovery: the Flix Files tip appears after the earlier tips and **Open Flix Files** opens the panel; opening it any other way suppresses the tip.
+
+### Phase B1: window reading, conversions, sensitive guard, web links
+
+Built on `codex/dee-163-b1` and merged. How each part works, the per-browser table, and the limits are in [FLIX.md](FLIX.md#window-reading-and-fits-this-window).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix files (all Flix sources recompiled).
+- New tests compile, **not run**: token stripping, excluded sites, web documents, private-window markers, omnibox values, link relations (`FlixLinkRulesTests`); fallback parsing, size limits, the text threshold, scoring, synonyms, ranking, upload-page filtering (`FlixWindowFitsTests`); conversion decisions, copy names, drag labels, ID, IBAN, card, and key rules, outside targets (`FlixConversionAndSensitiveTests`).
+- The app was not launched. No browser, Accessibility tree, capture, model call, conversion, or drag below has been exercised.
+
+#### Hands-on acceptance
+
+- [ ] Safari on an upload page that says "Attach the signed contract and this month's invoice. PDF only · max 5 MB": opening the panel shows **✦ Fits portal.example.com** with both items and "read via Accessibility"; reopening on the same page does not read again.
+- [ ] A Chromium browser and an Electron app: the read turns on the web tree for the read only (`AXEnhancedUserInterface` is off again afterwards, window animations unaffected).
+- [ ] A window without accessibility text (a canvas or a remote desktop) with Screen Recording granted: the chain reads **~~Accessibility~~ → Vision**; without Screen Recording it stops quietly and no prompt appears.
+- [ ] A window of icons only on a Mac with Apple Intelligence: the chain ends at **Apple Intelligence**. With Apple Intelligence off, the rules still find the items on the upload page.
+- [ ] Mail draft "attaching the moodboard and the packaging quote": the card names **Mail · <subject>** and suggests those files.
+- [ ] Tile pill: switch between the upload tab and another tab, then to another app: the pill appears and disappears within a second, without any capture (no Screen Recording indicator) and without focus moving.
+- [ ] Turning off **Suggest files for the window in front** hides the card; turning off **Show "fits here" on the tile** hides the pill and stops the observer.
+- [ ] Drag a HEIC photo from the Fits card into the PDF-only portal: the drag picture says **✦ Upload as PDF · …**, the portal receives `<name>.pdf`, and the original is unchanged. A 12 MB JPEG for a 5 MB limit arrives smaller. A `.pages` file goes out unchanged.
+- [ ] Drag an RTF, a Markdown file, and a `.docx` into the portal: each arrives as a readable PDF. An HTML file goes out unchanged.
+- [ ] Converted copies sit in `…/T/DOKK Flix Conversions/` and are gone after quitting DOKK.
+- [ ] A passport scan, an IBAN screenshot, and a `.pem` file in an allowed folder are blurred in the panel and, when newest, on the tile, within a minute of arriving. A protected folder that was not allowed is never read and never prompts.
+- [ ] Drag the passport scan into a browser: the question appears with **Send Anyway**, **Not Sensitive**, and **Cancel**. Into Finder or Preview: no question. **Not Sensitive** removes the blur and the question for good, also after a relaunch.
+- [ ] Turning the sensitive guard off removes every blur.
+- [ ] Track web links on: a download from Chrome, finishing while its page is in front, adds a link row "Source of “<file>”"; dropping a Flix file into a Chrome page adds "↑ You sent 1 file here".
+- [ ] A Google Doc in Chrome kept in front for 30 seconds is kept and listed under **Web documents**; switching tabs before 30 seconds keeps nothing.
+- [ ] **Pages you read** on: a page read for two minutes is kept; a page left in front while away from the Mac is not.
+- [ ] An Incognito window in Chrome, an InPrivate window in Edge, a Private window in Brave and Firefox, and Arc's incognito: nothing is kept automatically. Repeat with the browser's UI in German. Safari: nothing is kept automatically from any window.
+- [ ] Banking and health sites (a bank's login, a patient portal) and a site on the user's list are never kept automatically.
+- [ ] A page whose address carries `?token=…`, `?code=…&state=…`, or a signed S3 link is stored without its query.
+- [ ] With a browser in front, **Save this page** keeps the page and turns into **Saved**; it also works in Safari and in a private window, because it is deliberate.
+- [ ] Link rows show a monogram; with **Load site icons** on, the site's icon after a moment and no request while it is off. A click opens the page in the browser it came from; dragging a link into Finder makes a `.webloc`, into a browser opens the page.
+- [ ] VoiceOver reads the Fits rows with their conversion, the sensitive reason, link relation lines, and the Save this page card. Reduce Motion: the card and chips appear without animation beyond a fade.
+
+### Phase B2: intelligence
+
+Built on `codex/dee-163-b2` and merged: search in plain words, Threads, captions, rename suggestions, key facts, folder suggestions, versions, Tidy, Smart Filters from a sentence with the filter tip, Where were you?, More like this, drag memory, and Ask Robi, with Lookout accessors and AI observability's per-call content opt-out. Details in [FLIX.md](FLIX.md#phase-b2-intelligence).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder: both succeeded with no warnings in Flix, Lookout, Robi, or AI observability files.
+- New tests in `DeeDockTests/Flix/` compile: rule-based query parsing in English and German, search matching with totals, captions, and Lookout paths, cryptic names, rename sanitizing and collisions, version families and ranks, Thread clustering without Lookout, Thread identity overlap, drag memory counts and the filter tip, fact extraction from text and metadata, model facts checked against the text, and the content opt-out. **The tests have not been run.**
+- The app was not launched. No Apple Intelligence or Claude call, no Lookout query, and no file reading has been exercised.
+
+#### Hands-on acceptance
+
+- [ ] With Apple Intelligence on, take a screenshot of an error: within a minute its row shows a caption instead of "New screenshot" and a **✦ Rename** pill; renaming keeps `.png`.
+- [ ] Download an invoice PDF into an allowed Downloads: chips show its due date and total; with a Finance folder in the history, **✦ Move to Finance** appears. A file in a folder DOKK may not read gets no caption and causes no prompt.
+- [ ] Without Apple Intelligence: no captions or renames, facts still appear for readable PDFs, search still makes tokens from the rules.
+- [ ] Search "invoices over €1,000", "contract sent last week", "Fotos von gestern", "Rechnungen über 1.000 €": tokens match the sentence, ✕ on a token widens the list, typing again cancels the earlier search. With Lookout on, a file found by its content shows **✦ by meaning**.
+- [ ] Work on three files in one project folder within an afternoon: a Thread appears in the sidebar, first with the folder's name, then with Apple Intelligence's name and summary on its card. A new file in that folder joins the same Thread without changing its selection.
+- [ ] Have "Contract draft v2", "Contract draft v3", and "Signed contract" in the history: one row with a **3 versions** pill; dragging v2 out asks about the newer version.
+- [ ] Tidy: suggestions list renames and moves; unchecking one leaves it alone; **Apply** renames and moves, Undo restores names and places.
+- [ ] New Smart Filter from "everything for <a folder you use>": the proposal shows "Location contains … or about … by meaning" and a count that matches the list after adding it. "tax stuff" gets a 🧾 filter.
+- [ ] On the first open of a day after working the day before: **Where were you?** names yesterday's threads; **Reopen** opens their files; the card does not come back that day, also after a relaunch.
+- [ ] **More like this** on a PDF with Lookout on lists related files from the history; with Lookout off, files from the same folder.
+- [ ] Drag PDFs into the same browser three times: rows of PDFs say "↺ you've sent PDFs here before" when that browser is in front, and a toast says what Flix Files noticed. **Forget** in Settings clears it.
+- [ ] Open files in one folder three mornings: one filter tip appears in the sidebar, once.
+- [ ] Ask Robi with Claude and a key: suggested questions fit the selection, the answer streams, and closing the sheet stops it. With Claude and no key: the sheet says to add one. With the on-device model: the privacy line says nothing leaves the Mac. PostHog's `$ai_generation` for `flix_ask_robi` and every `flix_*` span has no `$ai_input` or `$ai_output_choices`.
+- [ ] Turning off captions, Threads, folder suggestions, or drag memory hides that surface at once and stops its background work. No reading or model call happens while a drag is in progress.
+
+### Phase C: analytics and integration
+
+Analytics after the approved spec: `flix_session_ended` once per open, `flix_drop`, `flix_search_ended`, `flix_fits_computed`, `flix_tidy`, `flix_suggestion_acted`, `flix_smart_filter_created` and `_removed`, `flix_thread_used`, `flix_morning_card`, `flix_more_like_this`, `flix_robi_asked`, `flix_sensitive_marked_safe`, `flix_versions_expanded`, `flix_link_saved`, `flix_folder_access`, `flix_shortcut_registration`, `flix_tip_shown` and `flix_tip_acted`, `setting_changed` with `area = flix`, 21 `usage_summary` counters, and ten `flix_*` person properties (PostHog only). Integration: Fits this window matches by meaning through Lookout and breaks ties with drag memory, the Robi row in Settings follows Robi's chosen model, the engine rows follow Lookout, Apple Intelligence, and Robi as they change, and a sensitive item's drag image is blurred. Details in [FLIX.md](FLIX.md#analytics) and [ANALYTICS.md](ANALYTICS.md#flix-files).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-C`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix or Analytics files.
+- New tests in `DeeDockTests/Flix/FlixAnalyticsTests.swift` compile, **not run**: event names and properties, kinds listed once, no file name in a payload, app categories, page kinds, folders, credential counting, shortcut tokens and their grammar, settings reduced to counts and tokens, item kinds and events, the first action and outcome rules, Fits acceptance, ISO weekdays, one session per open with a search visit inside it, meaning scores in Fits, and drag memory's tie-break.
+- The app was not launched. No event has been sent, and nothing has been checked in PostHog.
+
+#### Hands-on acceptance
+
+- [ ] With the debug menu's sending on, open the panel with ⌃⌥⌘F, drag a row into a browser, and check PostHog's DOKK project: one `flix_session_ended` (`trigger = shortcut`, `outcome = dragged_out`, a rank and section for the first action, `keyboard_only = false`) and one `flix_drop` with the browser's category and no name, path, host, or title anywhere.
+- [ ] Open and close the panel ten times by the tile, the shortcut, the menu bar item, and Discovery: exactly ten `flix_session_ended` with the matching `trigger` and `placement`, and the close reasons `escape`, `clicked_away`, and `shortcut_toggle` where nothing was done.
+- [ ] Search "contract sent last week", remove a token, and open a result: `flix_search_ended` with `query_word_count = 4`, the token types, `tokens_removed`, the parser, and `outcome = opened`; the sentence appears nowhere.
+- [ ] Drag a sensitive file into a browser and **Cancel**, then answer **Send Anyway** and drag again: one `flix_drop` with `warning_resolution = cancel` and no target, then one with `send_anyway` and a target.
+- [ ] Record a new shortcut: `setting_changed` (`area = flix`) for `shortcut_customized` and `shortcut_combo`, and `flix_shortcut_registration` with the new combo token. Add a watched folder: `watched_folder_count` changes, no path.
+- [ ] After a day, `usage_summary` carries the `flix_*` counters, including `flix_open_latency_ms_sum`, `_count`, `_max` and the window-read triple; the person profile has the ten `flix_*` properties.
+- [ ] `$ai_generation` events from Flix Files (`flix_caption_*`, `flix_search_understand`, `flix_thread_name`, `flix_smart_filter`, `flix_morning`, `flix_ask_robi`) carry no `$ai_input` or `$ai_output_choices`; the window interpreter and the sensitive scanner send none.
+- [ ] With Lookout reading a folder of contracts, a window asking for "the signed agreement" suggests a scanned contract whose name shares no word with it; with Lookout off, only name matches appear.
+- [ ] Settings → Flix Files → What powers it: with Robi on the on-device model and no key, the Robi row says **On this Mac**; switching Robi to Claude without a key changes it to **Not set up** at once, and saving a key to **Claude**. Turning Lookout off or on updates its row without reopening Settings.
+- [ ] Drag a blurred (sensitive) row and the tile when its newest item is sensitive: the drag picture is blurred with a lock.
+
+### Review fixes (R1)
+
+Fixes for the cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- Numbers from window text, OCR, files, and model output are checked for finiteness and bounds before every integer conversion (`FlixNumbers`).
+- AI observability sends only a closed error code (`AIObservability.ErrorCode`) for calls with `includesContent: false`, whatever the caller passes; Ask Robi and every `FlixLanguageModel` call pass codes.
+- A browser window counts as normal only when the toolbar holding its address (and, for Firefox, its title) was read completely within the budget; anything less is unknown.
+- Download pages follow the web-link settings (`FlixSourcePolicy`): full page only while tracking is on, host only while it is off, nothing for excluded sites; stored histories are migrated at launch. A download becomes a link row only when a normal window of the browser in front shows a page on its site.
+- Stored addresses lose their whole query (except a document key for OneDrive, SharePoint, and Confluence); credential routes, share links, and secret-looking path segments are not stored at all, except the document paths of known web-document services.
+- Turning Flix Files off cancels and blocks every background pass, worker, observer, and conversion; nothing starts at launch while it is off.
+- The read policy follows symbolic links without touching what they point to first; the folder watcher skips links and reads attributes with `XATTR_NOFOLLOW`.
+- DOKK's own drop targets (Shelf, Trash, folder, drive, and app tiles) get originals instead of converted upload copies; copies are substituted only while the window the panel read is still in front.
+- Moves report each file; the ones that moved get Undo, the rest are named in the toast. Undo of moves, renames, and Tidy verifies the file's identity and leaves changed or replaced files alone.
+- Clear History keeps a cutoff date that no source event can cross.
+- The front-window observer's Accessibility calls run on a dedicated thread with timeouts, after the switch settles; the web-tree switch for window reading runs detached.
+- HTML and web archives are no longer converted; document imports are typed and bounded, also for the sensitive scanner and captions.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R1`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixUntrustedInputTests` (numbers, observability codes, the master switch), `FlixFileSafetyTests` (symbolic links, partial moves, identity-checked Undo, HTML conversions), `FlixLinkRulesTests` (address policy, download-page policy, private-window evidence and the toolbar walk), `FlixHistoryTests` (clear cutoff, migration).
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] In Chrome, open an Incognito window and a normal one with many tabs: the Incognito window is never tracked; the normal one is tracked once its toolbar is read. With a slow, busy Chrome, nothing is tracked rather than a guess.
+- [ ] With **Track web links** off, download a file: its row says "Downloaded from <host>" and `history.json` holds no page address for it. Download from a bank's site: no host either.
+- [ ] With web links on, download from a page in a private window while a normal window is in front on another site: no "Source of" link row appears.
+- [ ] Save a password-reset or invitation page with **Save this page**: nothing is kept.
+- [ ] Turn Flix Files off while captions are being written: no file is read afterwards (Activity Monitor's disk reads for DOKK settle), and nothing starts after a relaunch.
+- [ ] In an allowed folder, make a symbolic link to `~/Documents` (not allowed): no Files and Folders prompt appears, and the link's files show type icons only.
+- [ ] Drag a converted Fits row onto the dock's Shelf, Trash, and a folder tile: each gets the original, not the PDF copy; the copy still goes to the portal when dropped there.
+- [ ] Move three files to a folder favorite where one name is locked: two move, the toast names the third, and Undo returns the two. Replace a moved file in Finder, then press Undo: it stays, and the toast says so.
+- [ ] Clear History, quit, and relaunch: the files you opened before the clear do not reappear.
+- [ ] Switch quickly between a hung app and others: the dock stays responsive.
+
+### Review fixes (R2)
+
+Fixes for the second cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- Trash, Move, Rename, Tidy, **✦ Move to …**, and drops on folder favorites check that the file at a row's path is still the one the row recorded (`FlixItem.fileIdentity`: volume and inode, plus size and modification time for files). A replaced, re-saved, or missing file is left alone, its row refreshed, and a toast says so; a row without an identity yet is checked and refused once. Identities come with the folder watcher's events and from a background pass for everything else.
+- Moves, renames, Tidy, Undo, and the Trash's identity check run on a serial background worker (`FlixFileWorker`) in order; results are applied to the history on the main actor. A slow move shows "Moving …".
+- Upload conversions never leave content out: multi-page TIFF and HEIC files become one PDF page per frame (up to 30); animations, multi-frame pictures for JPEG or PNG, and text documents with attachments, pictures, embedded objects, headers, or footers are declined and go out unchanged. Legacy `.doc` files are no longer converted.
+- A download's full page reaches its file row only after the link tracker verified it: a normal window of an automatic-tracking browser showed that very page (not just the same site) when the download arrived. Pages stored without that verification are scrubbed to their host at launch.
+- The browser walk keeps each Accessibility read's status: a failed role, label, or child-list read in the toolbar, a web area inside it, an expired walk, or an unreadable window title makes the window's privacy unknown. Toolbar labels are no longer dropped by the label cap.
+- Invitation, meeting, short-link, and share-secret addresses are never stored (`FlixShareLinkDenylist`, best-effort): Discord, Telegram, WhatsApp, Signal, Zoom, Meet, Teams, Slack, Calendly, URL shorteners, WeTransfer, DocSend, OneDrive and Drive shares, iCloud shares, Box, Dropbox, MEGA, Notion sites, SharePoint sharing links.
+- A drag of a flagged file always asks first, whichever app is in front (also Finder), with the 30-second grace after an answer and **Not Sensitive**. The Settings help says so.
+- Protected folders are compared case- and normalization-insensitively. Background reads re-check the policy when they open a file (`FlixSafeFile`: resolved again, opened with `O_NOFOLLOW_ANY`, checked by real path, FIFOs refused) and decode the checked descriptor; thumbnails, icons, stamps, and listings use the path resolved right before the call; the folder watcher re-checks every event path.
+- Hub Files (panes, sidebar, picture search), Hub Apps, and Vapor map converted upload copies back to the originals before anything is moved, copied, adopted, or deleted.
+- Spotlight's gathers and updates and the folder watcher's batches merge in one pass (`record(batch:)`), with the same result as merging each event. The sensitive guard reports cached verdicts without touching the disk.
+- While Flix Files is off the tile reads nothing and requests no thumbnail; turning it off cancels the thumbnail request, and turning it on refreshes the tile.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R2`): `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixFileCommandSafetyTests` (identity-checked move, rename, Trash, Tidy, the identity pass, history identity rules, the worker), `FlixHistoryBatchTests` (batch merge equals sequential merging; capacity; verified download pages and the migration), `FlixConversionFidelityTests` (planner decisions; a three-page TIFF, a GIF, an RTFD with an attachment, an RTF with a picture), `FlixShareLinkDenylistTests`, `FlixSafeReadTests` (case aliases, link swaps after queueing, FIFOs), `FlixGatingTests` (the sensitive question with Finder in front, the tile while off), and additions to `FlixLinkRulesTests` (toolbar read failures, expiry, many tabs, title read failure) and `FlixFileSafetyTests`.
+- The drop-site mapping for Hub Files, Hub Apps, and Vapor needs a live drag and has no unit test.
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] Download `Invoice.pdf`, then download another file with the same name so it replaces the first (or replace it in Finder). Move to Trash on the old row: nothing is trashed, the toast says it changed, and a second Move to Trash trashes the new file.
+- [ ] Edit a listed document in TextEdit and save, then rename it from Flix Files: the first attempt is refused with the "changed" toast, the second renames it.
+- [ ] Move a large folder to a favorite on an external or network disk: the dock and panel stay responsive, "Moving …" shows, and Undo afterwards puts it back.
+- [ ] Drag a three-page TIFF onto a PDF-only upload form: the PDF copy has three pages. Drag a Word file with a picture or a header onto it: no "Upload as PDF" label, and the original goes out.
+- [ ] With web links on, download a file from a normal Chrome window, then switch to another tab of the same site before the download finishes: the row says "Downloaded from <host>", no "Source of" link row appears, and `history.json` holds no page address.
+- [ ] Save a Zoom, Meet, Discord, or bit.ly page with **Save this page**: nothing is kept.
+- [ ] Mark a file as sensitive (a `.pem` key), open Flix Files with Finder in front, and drag it to the Desktop: the question appears.
+- [ ] Drag a converted Fits row into Hub Files, onto the Hub Apps tab, and onto Vapor: each gets the original.
+- [ ] Turn Flix Files off: the tile disappears and no Quick Look thumbnail is requested (no `quicklookd` activity for the newest file); turn it on: the tile shows the newest item again.
+
+### Review fixes (R3)
+
+Fixes for the third cross-model review of PR #432, on the same branch. Details in [FLIX.md](FLIX.md).
+
+#### Implemented
+
+- A Flix drag keeps the file identity each row listed when the drag began. The dock's Trash compares them with the files at their paths in the payload's background read and refuses the drop when one changed, with the Trash's failure message naming the file; it checks once more off the main actor right before recycling. Folder and drive tiles check before a Shift move (copies are not checked), and drops on folder favorites move with the drag's identities. Each refusal refreshes the rows, so dragging again acts on the file as it is now.
+- Background readers no longer map files. `FlixSafeFile` copies bytes with `pread` in 4 MB chunks, with a cap per use (pictures and PDFs for captions 64 MB, the sensitive scanner 60 MB, conversion pictures 100 MB, documents 25 MB), and reports a failed or short read as an error instead of crashing with `SIGBUS`. RTFD packages are read without mapping.
+- Drop answers are scoped to the question kind (sensitive or older version), the item, and the file identity its row listed (`FlixDropApprovals`). **Use Newer** grants nothing and the new set is asked again at once, so a flagged newer version asks its sensitive question; a flagged older version asks both questions in turn.
+- Word (`.docx`, `.doc`), OpenDocument, and RTFD files are no longer converted for uploads. Plain text and Markdown (laid out as written) and flat RTF still are; the RTF check now reads whole control words and also declines footnotes, shapes and text boxes, positioned frames, comments, and tracked changes, without mistaking Word's `\headery` for a header.
+- Nothing in Flix Files touches the disk on the main actor any more except spelling checks: the sensitive guard queues from memory and resolves on its worker; thumbnails and file icons resolve in the background; the watcher resolves its folders on its own queue; Tidy, captions, Ask Robi, and conversions resolve off the main actor; dropped files are read on the file worker; folder names come from the path, with localized home folder names looked up in the background.
+- MediaFire's file, folder, view, download, and key routes and its subdomains are never stored, and the other file shares gained their standard routes: Dropbox `/l`, `/request`, and direct links; Box `/v`, `/shared`, `/f`; pCloud public links; Drive downloads; published Google Docs; OneDrive redirects, embeds, downloads, and `?redeem=`; iCloud Mail Drop and shared albums; `mega.co.nz`.
+- A download's page is verified against the full addresses as read, queries included, kept in memory only; the stored addresses stay cleaned.
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` with an isolated derived-data folder (`DD-R3`), every touched file recompiled: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in touched files.
+- New and updated tests compile, **not run**: `FlixDropSafetyTests` (scoped approvals, Use Newer re-asking the sensitive question, both questions in turn, stale dragged files), `FlixSafeReadTests` (truncated after open, empty, folder, chunked reads, folder names from the path, the guard skipping protected spellings), `FlixConversionFidelityTests` and `FlixConversionAndSensitiveTests` (Word, OpenDocument, and RTFD never converted; RTF control words; an RTF footnote declined; Markdown as written), `FlixShareLinkDenylistTests` (file-share routes through the sanitizer), and `FlixLinkRulesTests` (download pages verified by their full address).
+- The Trash and folder-tile refusals need a live drag and have no unit test beyond `FlixDraggedFiles`.
+- The app was not launched.
+
+#### Hands-on acceptance
+
+- [ ] List `Invoice.pdf` in Flix Files, replace it in Finder with another file of the same name, then drag the old row onto the dock's Trash: the drag slides back, the dock says “Invoice.pdf” changed, and nothing is in the Trash. Drag it again: the new file is trashed.
+- [ ] Do the same with Shift held onto a folder tile in the dock: nothing moves and the folder stack shows the message. Without Shift, the copy goes ahead.
+- [ ] Mark the newer of two versions as sensitive (a `.pem` pair, or a passport scan v1/v2), drag the older one, and choose **Use Newer**: the sensitive question appears next.
+- [ ] Drag a `.docx` onto a PDF-only upload form: no "Upload as PDF" label, and the Word file goes out. Drag an RTF with a footnote: likewise. Drag a Markdown file: the PDF shows the Markdown as written, links included.
+- [ ] Open Flix Files while a network share with listed files is disconnecting: the dock and panel stay responsive, rows show type icons, and DOKK does not crash while captions or the sensitive guard read files from it.
+- [ ] Save `https://www.mediafire.com/file/<key>/x.pdf/file` with **Save this page**: nothing is kept.
+
+### Flix Pick (DEE-164)
+
+Built on `codex/dee-163-flix-files` after the approved mockup `docs/mockups/flix-pick.html` (style Tuck, name Flix Pick, both ⌥-click and double-click open). A rail beside other apps' Open and Save pickers lists the files or folders the app most likely wants; click selects in the picker, ⌥-click and double-click also press its default button, and rows drag in. Architecture, routes, ranking, learning, and limits are in [FLIX.md](FLIX.md#flix-pick).
+
+#### Implemented
+
+- Detection of `open-panel` and `save-panel` windows and sheets in the frontmost app with one `AXObserver` on `FlixAXThread`, no polling; DOKK's own pickers and apps under **Not in** are never observed. Nothing is read from any other window beyond its identifier and its children's roles.
+- The routes: already there, listed row (`AXSelectedRows`), Go to Folder (⇧⌘G to the HID event tap, checked in the same block for the app's keyboard focus, the picker's focus, modifiers, and Secure Event Input; `PathTextField`, then the field's `AXConfirm`, the sheet's default button, or, last, Return with the same checks plus the focused field still holding the path; Escape never), and confirm (`OKButton`, in one block with the exact selection or listed folder, focus, and attachment checked right before the press).
+- Ranking from the history, the app's declared document types, Threads, drag memory, and earlier picks; Save pickers list folders.
+- Learning from the picker's close: Flix Pick's own confirm, a press on `OKButton`, or a double-click in the list counts; Cancel never does; keyboard closes are unknown. Stored in `memory.json` with drag memory, capped, cleared by **Forget**.
+- The panel: non-activating, never key, Tuck rail that opens on hover, flips to the picker's left at the screen edge, follows the picker, the ⋯ menu (**Not in**, **Flix Pick Settings…**), Reduce Motion and Reduce Transparency paths, VoiceOver actions on every row.
+- Settings → Flix Files → **Flix Pick**: the switch (on), the Accessibility note, and the hidden apps with **Show Again**.
+- Analytics: `flix_pick_shown`, `flix_pick_used`, `flix_pick_picker_closed`, `flix_pick_disabled_for_app`, `flix_pick_expanded`, `flix_pick_settings_opened`, `flix_pick_no_candidates`, `flix_drag_memory_forgotten` (**Forget**), and `shows_flix_pick` and `flix_pick_excluded_app_count` in `setting_changed`; categories and counts only ([ANALYTICS.md](ANALYTICS.md#flix-files)).
+
+#### Validation status
+
+- `xcodebuild … build` and `… build-for-testing` (scheme DeeDock, Debug) with an isolated derived-data folder: `** BUILD SUCCEEDED **` and `** TEST BUILD SUCCEEDED **`, no warnings in Flix Pick or the files it touched.
+- Two tests in `DeeDockTests/Flix/FlixPickTests.swift` compile, **not run**: the rail flipping to the picker's left at the screen edge, and earlier picks outranking a file opened a minute ago.
+- Hands-on acceptance below passed on macOS 27 (Benn, 2026-11-21), except the line of setups no probe covered.
+- Fixed during hands-on: reopening a picker with the pointer resting where the rail appears crashed DOKK (AppKit's "Update Constraints in Window" loop). Hover is now reported after the layout pass, the window moves only when its frame changes and never forces a display, and the hosting view sits in a plain container.
+
+#### Hands-on acceptance
+
+- [x] Pages, File › Open: the rail appears to the right of the picker within a moment, its top 8 points below the picker's top, with Pages documents only. Hover opens it with names, coloured reasons, places, and times; leaving closes it.
+- [x] Click a row whose file is in the folder the picker shows: it is selected without anything flashing. Click one elsewhere: Go to Folder flashes and the file is selected. Pages stays in front, and typing goes to the picker.
+- [x] ⌥-click and double-click a row: the file opens. Hold ⌥ for a while before letting go: nothing is typed until it is released.
+- [x] Pages, File › Save (a sheet): folders are listed; click one and the picker goes there with the typed name kept; ⌥-click saves there.
+- [x] Drag a row into the picker: it goes to the file.
+- [x] Move the picker by its toolbar: the rail follows. Move it to the right screen edge and reopen it: the rail is on its left and opens away from it.
+- [x] Open a file through Flix Pick twice, then reopen the picker: the row says **Picked here 2×** in green and moves up. Pick a file in the picker itself with the Open button: it is counted too. Cancel: nothing is counted. **Forget** in Settings clears the counts.
+- [x] ⋯ › **Not in Pages**: the rail disappears and stays away in Pages; Settings lists Pages with **Show Again**, which brings it back.
+- [x] Turn off Accessibility for DOKK: no rail anywhere, and the Settings card shows the note. Turn off Flix Pick or Flix Files: no rail.
+- [x] A password field focused in another app's sheet (Secure Event Input): a click on a row says to drag instead.
+- [x] Go to Folder: click a row in another folder and switch apps right after the click; nothing is typed into the new app. Check which of `AXConfirm`, the sheet's default button, and the guarded Return the macOS 27 Go to Folder sheet ends up using (in that order); with Return, edit the field or click elsewhere in the instant before it would be posted, and the sheet stays open with the path typed instead.
+- [x] Open picker with ⌘-click selecting two files, ⌥-click one of them on the rail: only that file opens. Save picker on an empty folder, ⌥-click a folder row with the same name elsewhere: the picker goes there and Save is not pressed.
+- [x] Save picker with the name field emptied, ⌥-click a folder, then Cancel: nothing is learned for that folder.
+- [x] Switch away from the app with the picker open: the rail hides, and comes back when you return. Change the display arrangement: it hides.
+- [x] Reduce Motion: the rail fades in and opens without a slide or spring. Reduce Transparency: a solid panel. VoiceOver: each row reads its name, reason, and place, and offers Select in Picker and Open (or Go There and Save Here).
+- [x] DOKK's own Open panels (Settings → Add Folder…): no rail.
+- [ ] Not yet covered by any probe: Chrome and Electron pickers, the column and icon views (a click should still go to the file; ⌥-click should not press Open), a picker on a second display or one with a negative origin, and a picker over a full-screen app.
+- [x] With the debug menu's sending on: `flix_pick_shown`, `flix_pick_used` with `route` and `trigger`, and `flix_pick_picker_closed` with `outcome`, and no app name, path, or file name anywhere.
+
+#### Polish pass
+
+A visual and interaction pass over the panel and the Settings card, against the mockup's Tuck style. Detection, routes, ranking, learning, analytics, and what the settings mean are unchanged.
+
+- Surface: the Flix glass with the mockup's 14-point corner and a shorter shadow. The header keeps the rows' columns, so the logo (now the mockup's glyph) is centred over the icons and the title starts where the names do.
+- Motion (`FlixPickMotion`): the panel fades in over 0.22 s while it slides 12 points from the picker's side and grows from 98 %, and leaves with a 0.18 s fade. The rail springs open, and the text fades in 80 ms later; on closing the text fades first. With Reduce Motion the panel only fades and the rail changes width at once.
+- Rows: the highlight follows the rail's width (a square around the icon when closed), hover and press fade in 0.12 s, a click flashes the row for 160 ms, and a dragged row dims. Reason colours are the mockup's, with darker orange, green, and purple in light appearance.
+- Footer: three hints with the action words a level stronger ("Click **selects**", "⌥-click **opens**", "or drag it in"), also beside a Save picker. A long translation moves them closer, then drops the last one. New strings: `flixPickHintClickSelects`, `flixPickHintClickGoesThere`, `flixPickHintOptionOpens`, `flixPickHintOptionSaves`, `flixPickHintDrag`; they replace `flixPickHintOpen` and `flixPickHintSave`.
+- Settings: the switch is titled **Show Flix Pick** (`flixSettingsPickShow`) under the **Flix Pick** heading, the Accessibility note is the shared status row, and hidden apps sit on the page's row grid.
+- Previews: closed, open (dark and light), Save in German, nothing fits, a row at work with the footer note, Reduce Transparency, and left of the picker. Their read policy now refuses the sample paths, so folders show folder icons.
+
+Validation: `xcodebuild -scheme DeeDock -configuration Debug -derivedDataPath <isolated folder> build` ended with `** BUILD SUCCEEDED **`, with no warnings in the files touched. No tests were run and the app was not launched. The views were drawn off screen from the debug build with the preview data (both appearances, English and German, solid surface) to check layout, alignment, colours, and truncation. That does not show Liquid Glass, any animation, or hover.
+
+- [x] Closed rail: the logo and the icons share one centre line; nothing of the text shows through.
+- [x] Hover: the rail springs open with a slight settle, the text follows a moment later, and the hovered row's highlight grows with the rail. Leave: the text goes first, then the rail closes; nothing jumps when the window narrows.
+- [x] A picker opening: the rail slides in from the picker's side (from the right when it sits on the picker's left) and fades; a picker closing: it fades away.
+- [x] Click a row: it dips and tints for a moment, and stays tinted while Go to Folder runs. Drag a row: it dims until the drag ends.
+- [x] Light and dark appearance over a bright and a dark window: names, reasons, and the footer stay readable on the glass.
+- [x] Reduce Motion: no slide, spring, or dip; the width changes at once and the text fades. Reduce Transparency: a solid body with the same corner and hairline.
+- [x] German: the footer shows all three hints beside an Open picker without clipping.
+- [x] Settings → Flix Files → **Flix Pick**: the card lines up with its neighbours, in both appearances.

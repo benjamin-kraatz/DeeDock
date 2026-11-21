@@ -519,6 +519,7 @@ final class DockPanelController {
 
     func trashTarget(at point: CGPoint) -> Bool { utilityTarget(.trash, at: point) }
     func shelfTarget(at point: CGPoint) -> Bool { utilityTarget(.shelf, at: point) }
+    func flixTarget(at point: CGPoint) -> Bool { utilityTarget(.flix, at: point) }
 
     /// Document drags can expose either group; application drags still expose only pins.
     func updateSectionDragHover(at point: CGPoint, valid: Bool, documents: Bool = false) {
@@ -882,6 +883,7 @@ final class DockPanelController {
         interaction.canMoveVolume = nil; interaction.moveVolume = nil
         interaction.openSessionCapsules = nil; interaction.openSessionCapsule = nil
         interaction.openNotificationFeed = nil; interaction.notificationFeed = nil; interaction.openHarbor = nil
+        interaction.flix = nil; interaction.openFlix = nil; interaction.beginFlixDrag = nil; interaction.prepareFlixSettings = nil
         interaction.clearNotificationFeed = nil; interaction.prepareNotificationFeedSettings = nil
         interaction.plugins = nil; interaction.openPlugin = nil; interaction.togglePluginPanel = nil
         interaction.isPluginPanelOpen = nil; interaction.preparePluginSettings = nil

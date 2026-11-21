@@ -52,11 +52,35 @@ struct AnalyticsContextInputs {
     var systemDockTuckedSide: SystemDockOrientation?
     /// Nil in builds that do not update themselves.
     var updates: Updates?
+    /// Flix Files' switches and counts, for the person profile. Nil leaves them out.
+    var flix: Flix?
 
     struct Updates {
         var checksAutomatically: Bool
         var installsAutomatically: Bool
         var installsWhenIdle: Bool
+    }
+
+    /// Flix Files, as counts and switches only: never a name, path, or address.
+    struct Flix: Equatable {
+        var enabled: Bool
+        var tileShown: Bool
+        var menuBar: Bool
+        var favoritesCount: Int
+        var flagsCount: Int
+        var smartFilterCount: Int
+        var historyCount: Int
+        var linkTracking: Bool
+        var linkCount: Int
+        var shortcutCustomized: Bool
+
+        var properties: AnalyticsProperties {
+            ["flix_enabled": AnalyticsValue(enabled), "flix_tile_shown": AnalyticsValue(tileShown),
+             "flix_menu_bar": AnalyticsValue(menuBar), "flix_favorites_count": AnalyticsValue(favoritesCount),
+             "flix_flags_count": AnalyticsValue(flagsCount), "flix_smart_filter_count": AnalyticsValue(smartFilterCount),
+             "flix_history_count": AnalyticsValue(historyCount), "flix_link_tracking": AnalyticsValue(linkTracking),
+             "flix_link_count": AnalyticsValue(linkCount), "flix_shortcut_customized": AnalyticsValue(shortcutCustomized)]
+        }
     }
 }
 
@@ -94,7 +118,8 @@ enum AnalyticsContext {
     }
 
     /// Everything in ``superProperties(_:)`` plus the complete configuration: the shared
-    /// defaults and, per display, the effective settings and the pin and running-app counts.
+    /// defaults and, per display, the effective settings and the pin and running-app counts, and
+    /// Flix Files' `flix_*` switches and counts.
     static func personProperties(_ inputs: AnalyticsContextInputs) -> AnalyticsProperties {
         var result = superProperties(inputs)
         result.merge(AnalyticsProperties(reflecting: inputs.sharedSettings, scope: .shared))
@@ -102,6 +127,7 @@ enum AnalyticsContext {
             result.merge(AnalyticsProperties(reflecting: display.settings, scope: scope))
             result.merge(counts(display).scoped(scope))
         }
+        if let flix = inputs.flix { result.merge(flix.properties) }
         return result
     }
 

@@ -20,6 +20,7 @@ This guide describes every DOKK feature in detail. For a short overview, see the
 - [Action Tiles](#action-tiles)
 - [DOKK Hub](#dokk-hub)
 - [Lookout](#lookout)
+- [Flix Files](#flix-files)
 - [App badges](#app-badges)
 - [Notification Feed](#notification-feed)
 - [Robi on your windows](#robi-on-your-windows)
@@ -138,7 +139,7 @@ The folder stack header has a Sort by menu with Recency, Alphabetical, and Size.
 
 Downloads appears to the left of Capsules and Shelf by default. Click it to browse the Downloads folder in a stack, or use its context menu to open it in the [DOKK Hub](HUB.md#open-in-hub) and choose grid or list presentation.
 
-Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
+Drag Downloads, Capsules, Shelf, or the Notification Feed within their section to change their order. Flix Files moves with an Option-drag, because a plain drag of its tile carries its newest item. A floating icon follows the pointer while an insertion gap previews the saved position. The order is saved separately for each display. Escape or releasing outside the utility section cancels the move. Focus Dock and VoiceOver can open Downloads; VoiceOver move actions also reorder these tiles. When you first turn on the Notification Feed, its tile joins the end of this order.
 
 Ordinary Shelf dragging now moves the tile. Hold Option while dragging Shelf to carry all staged files, or drag individual files from its open panel.
 
@@ -409,6 +410,104 @@ Press ⌫ in the empty search field, or click ✕ on the chip, to go back to the
 
 Lookout reads only the folders you pick, on this Mac, and keeps its index here. DOKK downloads the model once from Hugging Face, and that request sends nothing about your files. The file names in the first pass show only on your screen. When usage-data sharing is on, Lookout sends counts only, never file names, paths, or what you searched for.
 
+## Flix Files
+
+**Flix Files** keeps what you opened, downloaded, saved, and screenshotted, so you can drag it straight into the window in front: an upload form, a mail, a chat. It is on by default, with its own tile in the dock's utility section. See [Flix Files](FLIX.md) for how it is built, its privacy rules, and its limits.
+
+### Open it
+
+- **Click the Flix Files tile.** The panel opens above the tile (beside it on a side dock) and springs out of it. Click the tile again, press Escape, or click anywhere else to close it.
+- **Press Control-Option-Command-F.** The panel opens at the pointer with the newest item selected and takes the keyboard, so Return opens that item at once. Change the shortcut in **Settings → Flix Files**.
+- **Menu bar.** Turn on **Show in the menu bar** for a Flix Files item; a click opens the panel under it. It is off by default.
+
+Hover never opens the panel. Opening it closes DOKK's other popovers and an anchored Hub.
+
+### The tile
+
+The tile shows the newest item's picture. A red badge counts what arrived by itself since you last looked, such as downloads and new screenshots; opening the panel clears it. A plain drag of the tile carries the newest item, so you can drop the file you just downloaded into a browser without opening anything. Option-drag moves the tile among the other utilities. Drop a file from Finder on the tile to keep it in Flix Files. A purple **✦ N fit here** pill above the tile counts items that fit the window in front (see [Fits this window](#fits-this-window)); it reads only the window's accessibility text, when you switch windows.
+
+### The panel
+
+The sidebar lists **All Activity**, **Opened**, **Downloaded**, **New**, **Saved**, **Links** (while web links are on or pages are kept), and **Flagged**, then **Kinds** (Screenshots, Images, Documents, Web documents, Folders, Apps), **Smart Filters**, and **Favorites**. Counts follow the noise switch in the footer. The list groups items into **Just Now**, **Today**, **Yesterday**, and **Earlier**. Each row shows the item's picture, its name, what happened ("Downloaded from billing.example.com", "New screenshot", "Saved"), the folder it is in, a flag when flagged, and when.
+
+- **Select** with a click, Command-click to add or remove, Shift-click for a range. Up and Down move the selection; Shift extends it.
+- **Drag** one row or the whole selection out of the panel. As the pointer leaves the panel it fades aside so you can reach the window underneath. After a drop outside, the panel closes; pin it with the header's pin button (or choose **Stay open** in Settings) to keep it open. A cancelled drag brings it back.
+- **Favorites** take drops of rows: a folder moves the files there, with **Undo** in the footer; an app opens them with that app. A folder favorite also filters the list to what is inside it. When some files cannot be moved, the others still move and the toast names the ones that stayed. Undo puts back only files that are still the ones Flix Files moved: a file changed, moved, or replaced since stays where it is, and the toast says so. Moves run in the background, so the dock stays responsive; a slow one (to another disk or a server) shows "Moving …" until it is done.
+- **Changed files are left alone.** Move to Trash, moving to a folder, Rename, Tidy, and **✦ Move to …** act only on the file a row lists. If the file at that place was replaced or saved again since (a new download with the same name, an edit in another app), nothing happens, the row is refreshed, and the toast says the file changed; do it again to act on the file as it is now. A row Flix Files has just added may say it was "just checked" the first time for the same reason. The same goes for dragging a row onto the Trash in the dock, or moving it (Shift) onto a folder or drive in the dock: if the file changed since Flix Files listed it, nothing is trashed or moved, the dock says which file changed, and dragging it again uses the file as it is now.
+- **Search** with Command-F, the magnifier button (it turns into the search field), or just by typing. It matches names, and understands whole sentences (see [Intelligence](#intelligence)).
+- **Smart Filters** are saved rules: name contains, folder contains, downloaded from, extension, kind, activity, recent days, or flagged. **New Smart Filter…** builds one; new items join by themselves.
+- **Noise** (autosaves, build products, partial downloads, temporary files) is hidden. The footer says how many and offers **Show**.
+- Files you drop on the panel, and web addresses dragged in from a browser, are kept as items.
+
+Keys: Return opens, Command-Return shows in Finder, Space opens Quick Look, Command-C copies, Option-Command-C copies the path, Command-K flags, Command-D adds to Favorites, Command-F searches, Delete removes from Flix Files, Command-Delete moves to the Trash, and Escape steps back (search, then the panel).
+
+The context menu offers **Open**, **Show in Finder**, **Rename…**, **Copy**, **Copy Path**, **Send to Shelf**, **Flag**, **Add to Favorites**, **Remove from Flix Files**, and **Move to Trash**. Removing an item never touches the file, and **Undo** brings it back. Flagged items never age out of the history, which keeps up to 5,000 items. **Clear History…** in Settings empties it for good: files you opened before the clear do not come back.
+
+Turning Flix Files off in Settings stops everything it does in the background, from watching folders to reading files for captions; nothing of it starts again until you turn it back on.
+
+Reduce Motion replaces the springs with crossfades. Reduce Transparency draws a solid panel.
+
+### What it tracks
+
+- **Files you open**, from Spotlight's recent-use dates, including folders. This works without any folder access.
+- **New, saved, and downloaded files** in the watched folders: Desktop, Documents, Downloads, and iCloud Drive by default. A download's row says which site it came from ("Downloaded from example.com"); the full page address is kept only while **Track web links** is on, and banking, health, and your excluded sites leave no trace at all. Symbolic links in watched folders are not listed. macOS asks before DOKK may read these folders, so Flix Files waits for you: the panel shows a card with **Allow…** buttons, and **Settings → Flix Files** lists each folder with its own button. Nothing is read before you press one. Folders Lookout already reads with your permission are watched without asking again.
+- **Apps** you bring to the front, at most once every five minutes per app.
+
+### Fits this window
+
+When the panel opens, Flix Files reads the window that was in front and shows **✦ Fits portal.example.com** at the top of the list: up to three items, each with the window's own words ("asks for “the signed contract”"). The label on the right says how the window was read: **read via Accessibility**, or **~~Accessibility~~ → Vision** when the window's text was not available and Flix Files recognized the text in a picture of that one window, or **→ Apple Intelligence** when Apple Intelligence looked at the picture itself. The card shimmers while it reads and disappears when the window asks for nothing. Opening the panel again on the same window reuses the reading; a new page or conversation is read afresh.
+
+Suggestions match the window's words against names, captions, folders, and download pages. With Lookout set up, they also match by meaning: a file Lookout has read can fit even when its name shares no word with the window. When two files fit equally well, the kind you sent to this app before comes first, and a row says "↺ you've sent PDFs here before".
+
+Flix Files needs Accessibility permission to read a window's text and Screen Recording for the picture; without them it skips those readers and never asks. Apple Intelligence understands what the window asks for when it is available; otherwise plain rules do (request words such as "attach" or "upload", file types, and size limits, in English and German). Turn it off with **Suggest files for the window in front**; **Show "fits here" on the tile** controls the tile's pill, which uses only the window's accessibility text and plain rules, never a picture or a model.
+
+### Uploads that fit
+
+When the window in front states limits ("PDF only · max 5 MB"), Flix Files prepares copies that fit before you drag: pictures (including HEIC) become a PDF or a JPEG, a multi-page TIFF or HEIC becomes a PDF with every page, plain text, Markdown (as written), and RTF documents become a PDF, and pictures over the limit are scaled down. A copy is made only when it can show everything: an animation, a multi-page picture that would have to be a JPEG, and an RTF document with pictures, headers, footers, footnotes, text boxes, comments, or tracked changes go out unchanged. Word (`.docx`, `.doc`), OpenDocument, and RTFD documents are never converted, because a converted copy could silently lose footnotes, text boxes, comments, or tracked changes; they go out as they are. A Fits row shows the copy ("as PDF · 1.2 MB"), and the drag picture says **✦ Upload as PDF · 1.2 MB**. The copy keeps the original's name with its new extension; the original never changes. HTML pages, web archives, Pages, Numbers, Keynote, and other formats go out unchanged. A copy that is not ready yet when the drag starts is skipped too, and so is every copy once you switched to another window. Dropping on the Shelf, the Trash, a folder or app in the dock, the Hub's Files and Apps tabs, or Vapor always uses the original file.
+
+### Sensitive files
+
+With **Sensitive file guard** on, Flix Files checks each file once in the background for an ID or passport, bank details (an IBAN, account and routing numbers, a card), or a key or password file, and blurs its picture in the panel, on the tile, and under the pointer while you drag it. Dragging one out of Flix Files first asks **Send Anyway**, **Not Sensitive** (never asks about that file again), or **Cancel**, whichever app is in front: macOS doesn't say where a drag will land, so it asks every time, also on the way to Finder. After **Send Anyway**, drag it again; for 30 seconds the same files go without that question. Each question counts on its own: if the file is also an older version, the version question follows, and choosing **Use Newer** asks about the newer file if it looks sensitive too. Only files Flix Files may read are checked, and nothing leaves the Mac.
+
+### Web links
+
+**Settings → Flix Files → Track web links** (off by default) keeps the pages around your files: the page a download came from ("Source of “Invoice.pdf”", when the download finished while that very page was in front in a normal browser window; otherwise the download's row keeps only the site's name), a page you dropped a Flix file into ("↑ You sent 2 files here"), and web documents such as Google Docs, Figma, Notion, Linear, Office, and Atlassian pages that stay in front for 30 seconds. **Pages you read**, a separate switch, also keeps any page that stays in front for two minutes while you use the Mac. With a browser in front, **Save this page** at the top of the panel keeps its page, and a web address dragged onto the panel is kept too.
+
+Private and incognito windows are never tracked: a window counts as normal only when Flix Files could read the part of the browser where the private badge would be, and is skipped otherwise. Safari does not show which of its windows are private, so Safari pages are kept only when you save them. Banking and health sites are left out (**Leave out banking and health sites**), and you can add your own sites. Flix Files keeps only the address without its query, the title, and the time; sign-in, password reset, invitation, meeting, short (bit.ly and the like), and share links are not kept at all, even when you save them. That list covers the common services (Discord, Telegram, WhatsApp, Signal, Zoom, Meet, Teams, Slack, WeTransfer, iCloud and Drive shares, and others) and is not exhaustive. Link rows show the site's first letter, or its icon with **Load site icons** on; they open in the browser they came from and drag out as a web address (a `.webloc` in Finder).
+
+### Intelligence
+
+The ✦ features run on this Mac. Apple Intelligence writes captions, names, and summaries; Lookout, when you set it up, adds search by meaning. Without either, Flix Files still groups, searches, and suggests with names, folders, and time. Only **Ask Robi** can send anything off the Mac, and only when you ask. Each helper has its switch in **Settings → Flix Files**. Suggestions for the window in front, the sensitive-file guard, and web links are described above.
+
+- **Search in your own words.** Type a sentence such as "contract sent last week" or "Rechnungen über 1.000 €". After a short pause Flix Files shows what it understood as tokens: an activity ("↓ Downloaded"), a kind, a time ("Last 7 days"), an amount ("Over €1,000"), a folder, a site, and what the file is about. Click ✕ on a token to drop it and widen the search. Rows found through a caption, a folder, or Lookout's reading of the file, rather than their name, carry a **✦ by meaning** chip. The examples under "Ask in your own words" run with one click. A single word without Lookout is a plain name search.
+- **Threads.** The sidebar's ✦ Threads section groups the last week's work: files that are about the same thing (with Lookout), share a word in their names, or sit in the same working folder at about the same time. Downloads, the Desktop, and Documents never group files by folder alone. Apple Intelligence names each thread and writes a line about it; until then a thread is named after its folder or shared word. Click a thread to see its files with a card on top: open them all, drag the card to carry them all, or ask Robi about them. **Show Thread** in a row's context menu goes to its thread.
+- **Captions and better names.** Files whose names say nothing, such as screenshots, `IMG_4821`, or `document (3).pdf`, get a one-line caption from Apple Intelligence in place of the event line, and a **✦ Rename** pill with a better name. The extension stays; a name already in the folder gets a number.
+- **Key facts.** Documents show chips for a due date, a total with its currency, "Needs signature" or "Signed", "Paid", and the number of pages or slides.
+- **Folders for downloads.** A file in Downloads offers **✦ Move to …** a folder you already file similar things in: by meaning with Lookout, otherwise when the folder's name appears in the file's name or caption, or for invoices and pictures.
+- **Versions.** Files that are versions of one document ("Contract draft v2", "Contract draft v3", "Signed contract") collapse under the newest, with a **3 versions** pill to show the others. Dragging an older one out asks whether to send the newer one instead.
+- **Tidy.** The header's wand button collects the renames and moves for Downloads in one sheet; uncheck what you don't want and apply them together, with one Undo.
+- **Smart Filter from a sentence.** In **New Smart Filter…**, describe it ("everything for a client", "tax stuff"). Flix Files proposes a name, an emoji, and rules, shows how many files match now, and adds it with **Add to Sidebar**. Rules about what files are about match by meaning when Lookout is set up.
+- **Where were you?** On the first open of a day, a card recaps the threads of your last day at the Mac, with buttons to reopen the main thread's files or show the second thread. It appears once per day.
+- **More like this.** In a row's context menu: files in Flix Files close to this one in meaning, or without Lookout, files of the same kind from the same folder or with a shared name word.
+- **Learning where you drag things.** Rows of a kind you dropped on the app in front before say "↺ you've sent PDFs here before". After a few drops Flix Files says what it noticed. It also notices folders you open at the same time of day and offers a Smart Filter for them once in the sidebar. These counts stay on this Mac; **Forget** in Settings erases them.
+- **Ask Robi.** Select files and press Command-R (or **Ask Robi…** in the context menu). Robi suggests questions for the selection (totals and due dates for invoices, what changed between versions) or answers your own. Robi answers with the model chosen in Robi's settings: Claude with your API key sends the question and the selected files' contents to Anthropic; the on-device model keeps everything on this Mac. With Claude chosen and no key saved, the sheet says to add one in Robi's settings. Robi can't act on the files from here.
+
+### Flix Pick
+
+When another app shows an **Open** or **Save** window (a picker), **Flix Pick** puts the files that app most likely wants right beside it: a narrow rail of file icons next to the picker, which opens on hover to show up to five rows. Each row has the file's icon and name, why it is suggested, where it is, and when it was last used. Beside a Save picker the rows are folders.
+
+- **Click** a row to select the file in the picker (a folder: the picker goes there). The app stays in front and its picker keeps the keyboard.
+- **Option-click** or **double-click** also presses the picker's button (Open, Import, Save). A Save picker keeps the name you typed.
+- **Drag** a row into the picker, as from Flix Files.
+
+The reason line says what stood out: green **Picked here 3×** for what you chose in this app's picker before, purple **Part of …** for a file in the same thread as your last pick, orange **New in Downloads** for something that just arrived, and blue for kinds you drag to this app and files you used lately. Beside an Open picker only files of the types the app says it opens are listed (any file when it says nothing). Beside a Save picker you see the folders you saved to through it before, the folders of your recent files for that app, and folders you worked in lately. Files the sensitive guard flagged are never suggested.
+
+When nothing fits, no rail appears. The **⋯** menu has **Not in** followed by the app's name, which hides Flix Pick for that app, and **Flix Pick Settings…**. In **Settings → Flix Files**, the **Flix Pick** card turns it off and lists the apps you hid it in, each with **Show Again**.
+
+A file that is already listed in the picker is selected in place. Otherwise Flix Pick opens the picker's **Go to Folder** with the file's path, so that sheet flashes for a moment. It waits until you let go of Option, and does nothing if the app or the picker is no longer in front. While a password field has the keyboard it cannot type, and the footer says to drag the row in instead. In a picker's column or icon view, a click still goes to the file, but Option-click and double-click do not press the button, because Flix Pick cannot see what is selected there.
+
+Flix Pick needs Accessibility permission for DOKK; without it, it stays hidden and the Settings card says so. It reads only the Open and Save windows themselves, never other windows. What you pick in them is counted on this Mac with **Learn where I drag things**, and **Forget** clears it. Reduce Motion replaces the slide and spring with fades; Reduce Transparency draws a solid panel. Flix Pick hides when the picker closes, when you switch apps, and when displays change.
+
 ## App badges
 
 Enable **Settings → Features → App badges → Show app badges**, then allow Accessibility access using the controls in that card. The setting is off by default and applies to every display. Screen Recording is not required.
@@ -550,7 +649,7 @@ DOKK checks for newly installed plugins when it comes to the front and when you 
 
 ## DOKK Discovery
 
-**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, and Radar's Shift-Command-Space shortcut. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
+**DOKK Discovery** offers occasional local feature tips. A minute after launch, Discovery announces the Notification Feed until you turn it on or choose **Don't show again**. Later launch tips announce DOKK Islands, Robi, Radar's Shift-Command-Space shortcut, and Flix Files. Disable tips in **Settings → Features → DOKK Discovery**. See [Discovery](DISCOVERY.md) for scheduling, privacy, and acceptance limits.
 
 ## Settings
 

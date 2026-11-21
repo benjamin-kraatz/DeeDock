@@ -119,3 +119,12 @@ nonisolated struct LookoutSimilarSource: Sendable, Equatable {
     /// The file's own path in the index, which its results leave out.
     let path: String
 }
+
+/// A whole file's vector: its segments' vectors averaged and normalized (`Searcher.fileVectors`).
+nonisolated struct LookoutFileVector: Sendable, Equatable {
+    /// 768 L2-normalized floats.
+    let vector: [Float]
+    /// Averaged from picture vectors, because the file has no text segment. Compare it with other picture vectors:
+    /// text and picture vectors score on different scales (`Modality`).
+    let isPicture: Bool
+}

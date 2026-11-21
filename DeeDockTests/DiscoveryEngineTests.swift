@@ -156,6 +156,7 @@ struct DiscoveryEngineTests {
         let engine = DiscoveryEngine(defaults: defaults, catalog: catalog)
         engine.markUsed(.notificationFeed)
         engine.markUsed(.islands)
+        engine.markUsed(.flix)
         let launch = try sameDay(hour: 9)
 
         engine.record(.launched, at: launch)
@@ -181,7 +182,7 @@ struct DiscoveryEngineTests {
         let (defaults, suite) = try isolatedDefaults()
         defer { defaults.removePersistentDomain(forName: suite) }
         let catalog = DiscoveryProposal.catalog.filter { $0.signal == .launched }
-        #expect(catalog.map(\.id) == ["notificationFeed", "islands", "robi", "harbor"])
+        #expect(catalog.map(\.id) == ["notificationFeed", "islands", "robi", "harbor", "flix"])
         let launch = try sameDay(hour: 9)
 
         let engine = DiscoveryEngine(defaults: defaults, catalog: catalog)
@@ -195,7 +196,7 @@ struct DiscoveryEngineTests {
         // Two per session: Robi and Radar keep their place but wait for the next launch.
         now = now.addingTimeInterval(DiscoveryEngine.spacing)
         #expect(engine.advance(at: now, canPresent: true) == nil)
-        #expect(engine.queue == ["robi", "harbor"])
+        #expect(engine.queue == ["robi", "harbor", "flix"])
 
         // Three per day: the next launch shows Robi, and Radar waits for another day.
         let relaunch = now.addingTimeInterval(600)
@@ -208,7 +209,7 @@ struct DiscoveryEngineTests {
         second.finish(forever: false, at: now)
         now = now.addingTimeInterval(DiscoveryEngine.spacing)
         #expect(second.advance(at: now, canPresent: true) == nil)
-        #expect(second.queue == ["notificationFeed", "islands", "harbor"])
+        #expect(second.queue == ["notificationFeed", "islands", "harbor", "flix"])
     }
 
     /// Asks `isDue` and then `advance(canPresent: true)` at the same instant and requires them to

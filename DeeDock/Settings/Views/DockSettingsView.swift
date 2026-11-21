@@ -101,6 +101,11 @@ struct DockSettingsView: View {
             coordinator?.settingsPluginsRequest = false
             select(.plugins)
         }
+        .onChange(of: coordinator?.settingsFlixRequest, initial: true) { _, requested in
+            guard requested == true else { return }
+            coordinator?.settingsFlixRequest = false
+            select(.flix)
+        }
         .onChange(of: coordinator?.settingsFeaturesRequest, initial: true) { _, requested in
             guard requested == true else { return }
             coordinator?.settingsFeaturesRequest = false
@@ -147,6 +152,10 @@ struct DockSettingsView: View {
         case .plugins:
             if let plugins = coordinator?.plugins {
                 PluginsSettingsPane(controller: plugins)
+            }
+        case .flix:
+            if let flix = coordinator?.flix {
+                FlixSettingsPane(flix: flix)
             }
         case .display(let id):
             displayOverview(SettingsOverrideContext(profiles: profiles, id: id)).id(id)

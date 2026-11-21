@@ -228,6 +228,59 @@ enum AnalyticsEvent {
     case lineIconCoverage(LineIconCoverage)
     case toolOpened(AnalyticsTool, trigger: AnalyticsTrigger)
 
+    // MARK: Flix Files
+
+    /// One panel visit ended: how and where it opened, what was done first and how often, and how it
+    /// ended. Exactly one per open. Never names, paths, URLs, or text (see `AnalyticsFlixSession`).
+    case flixSessionEnded(AnalyticsFlixSession)
+    /// A drag out of Flix Files completed, or was cancelled at a warning.
+    case flixDrop(AnalyticsFlixDrop)
+    /// A search ended: cleared, closed, or a result used. Never the sentence.
+    case flixSearchEnded(AnalyticsFlixSearch)
+    /// "Fits this window" finished reading and matching. Word counts only, never the window's text.
+    case flixFitsComputed(AnalyticsFlixFits)
+    case flixTidy(AnalyticsFlixTidy)
+    /// An inline move or rename suggestion was accepted or undone.
+    case flixSuggestionActed(AnalyticsFlixSuggestionType, action: AnalyticsFlixSuggestionAction,
+                             itemKind: AnalyticsFlixItemKind?)
+    case flixSmartFilterCreated(source: AnalyticsFlixFilterSource, ruleKinds: [AnalyticsFlixRuleKind], matchCount: Int,
+                                generator: AnalyticsFlixGenerator?)
+    case flixSmartFilterRemoved(source: AnalyticsFlixFilterSource)
+    case flixThreadUsed(AnalyticsFlixThreadAction, threadSize: Int, namedBy: AnalyticsFlixThreadNamer)
+    case flixMorningCard(AnalyticsFlixMorningAction, threadCount: Int)
+    case flixMoreLikeThis(resultCount: Int, outcome: AnalyticsFlixResultOutcome, itemKind: AnalyticsFlixItemKind?)
+    /// Ask Robi's metadata. Never the question or the answer.
+    case flixRobiAsked(AnalyticsFlixRobi)
+    /// The person told the sensitive guard an item is not sensitive.
+    case flixSensitiveMarkedSafe(itemKind: AnalyticsFlixItemKind?)
+    case flixVersionsExpanded(versionCount: Int)
+    /// A new link item was recorded. Never the address or the host.
+    case flixLinkSaved(AnalyticsFlixLinkTrigger, pageKind: AnalyticsFlixPageKind)
+    /// macOS answered an explicit request to read a watched folder. Never the folder's path.
+    case flixFolderAccess(AnalyticsFlixAccessResult, folder: AnalyticsFlixFolder)
+    /// The shortcut was registered (or could not be) after a change, or could not be at launch.
+    case flixShortcutRegistration(AnalyticsFlixShortcutResult, customized: Bool, combo: AnalyticsShortcutCombo)
+    case flixTipShown(AnalyticsFlixTip)
+    case flixTipActed(AnalyticsFlixTip, action: AnalyticsFlixTipAction)
+    /// Flix Pick appeared beside another app's Open or Save picker. The app as a category only.
+    case flixPickShown(picker: AnalyticsFlixPickerKind, appCategory: FlixAppCategory, candidateCount: Int)
+    /// A Flix Pick row was used. Never the file, the folder, or the app.
+    case flixPickUsed(AnalyticsFlixPickUse)
+    /// A picker Flix Pick sat beside closed. `chosenRank` only when the chosen file was a row.
+    case flixPickPickerClosed(picker: AnalyticsFlixPickerKind, outcome: AnalyticsFlixPickOutcome, chosenRank: Int?)
+    /// **Not in <App>** in Flix Pick's menu.
+    case flixPickDisabledForApp(appCategory: FlixAppCategory)
+    /// **Forget** next to drag memory in Flix Files' settings: what drops and picker picks taught
+    /// Flix Files (Flix Pick's "Picked here" included) is cleared. `learningOn` is the switch beside it.
+    case flixDragMemoryForgotten(learningOn: Bool)
+    /// Flix Pick's rail opened under the pointer, once per picker.
+    case flixPickExpanded(picker: AnalyticsFlixPickerKind, candidateCount: Int)
+    /// **Flix Pick Settings…** in Flix Pick's menu.
+    case flixPickSettingsOpened(picker: AnalyticsFlixPickerKind)
+    /// A picker appeared but Flix Pick had nothing likely for it, so it stayed hidden. Once per
+    /// picker. The app as a category only.
+    case flixPickNoCandidates(picker: AnalyticsFlixPickerKind, appCategory: FlixAppCategory)
+
     // Focus Dock
     case focusDockEntered(trigger: AnalyticsTrigger)
     case focusDockCommand(AnalyticsFocusCommand)

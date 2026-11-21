@@ -214,13 +214,16 @@ final class DiscoveryController {
             open: { [weak self] in
                 guard let self else { return .none }
                 Analytics.track(.discoveryCallout(proposal.destination, action: .opened))
+                if proposal.destination == .flix { Analytics.track(.flixTipActed(.discovery, action: .accepted)) }
                 markUsed(proposal.destination)
                 return openDestination(proposal.destination)
             }, snooze: { [weak self] in
                 Analytics.track(.discoveryCallout(proposal.destination, action: .snoozed))
+                if proposal.destination == .flix { Analytics.track(.flixTipActed(.discovery, action: .dismissed)) }
                 self?.finish()
             }, dismiss: { [weak self] in
                 Analytics.track(.discoveryCallout(proposal.destination, action: .dismissed))
+                if proposal.destination == .flix { Analytics.track(.flixTipActed(.discovery, action: .dismissed)) }
                 self?.finish(forever: true)
             }))
         let size = view.fittingSize
@@ -239,6 +242,8 @@ final class DiscoveryController {
         }) { monitors.append(monitor) }
         panel.orderFrontRegardless()
         Analytics.track(.discoveryCallout(proposal.destination, action: .shown))
+        // Flix Files' own tip events mirror its Discovery callout, beside its sidebar tip.
+        if proposal.destination == .flix { Analytics.track(.flixTipShown(.discovery)) }
     }
 
     private func finish(forever: Bool = false) {

@@ -31,7 +31,8 @@ enum HubFileOperations {
     /// allowed on case-insensitive volumes.
     /// - Returns: The renamed item's URL.
     /// - Throws: `OperationError` or the file system's error.
-    static func rename(_ url: URL, to newName: String) throws -> URL {
+    /// Nonisolated: touches only the file system, so Flix Files runs it on its file worker.
+    nonisolated static func rename(_ url: URL, to newName: String) throws -> URL {
         let name = newName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty, name != ".", name != ".." else { throw OperationError.emptyName }
         guard !name.contains("/"), !name.contains(":") else { throw OperationError.invalidCharacter }

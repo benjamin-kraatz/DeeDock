@@ -24,6 +24,8 @@ enum DockRenderSlot: Identifiable {
     case sessionCapsules(CapsuleDockItem)
     case shelf(ShelfDockItem)
     case notificationFeed(NotificationFeedDockItem)
+    /// The Flix Files tile: the newest item, its unseen badge, and the panel.
+    case flix(FlixDockItem)
     case harbor(HarborDockItem)
     /// A pinned plugin, in its own section between the applications and DOKK's own tiles.
     case plugin(PluginDockItem)
@@ -49,6 +51,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules(let item): return item.id
         case .shelf(let item): return item.id
         case .notificationFeed(let item): return item.id
+        case .flix(let item): return item.id
         case .harbor(let item): return item.id
         case .plugin(let item): return item.id
         case .volume(let item): return item.id
@@ -62,7 +65,7 @@ enum DockRenderSlot: Identifiable {
         case .folder(let item): return !item.isDownloads
         case .gap(let id): return !id.hasPrefix("utility:") && id != Self.launcherGapID
         case .group(let control): return control.group == .pinned
-        case .melt, .launcher, .action, .sessionCapsule, .sessionCapsules, .shelf, .notificationFeed, .harbor, .plugin, .volume, .update, .trash: return false
+        case .melt, .launcher, .action, .sessionCapsule, .sessionCapsules, .shelf, .notificationFeed, .flix, .harbor, .plugin, .volume, .update, .trash: return false
         }
     }
     var item: DockItem? { if case .app(let item) = self { return item }; return nil }
@@ -71,6 +74,7 @@ enum DockRenderSlot: Identifiable {
     var shelf: ShelfDockItem? { if case .shelf(let item) = self { return item }; return nil }
     var notificationFeed: NotificationFeedDockItem? { if case .notificationFeed(let item) = self { return item }; return nil }
     var harbor: HarborDockItem? { if case .harbor(let item) = self { return item }; return nil }
+    var flix: FlixDockItem? { if case .flix(let item) = self { return item }; return nil }
     var plugin: PluginDockItem? { if case .plugin(let item) = self { return item }; return nil }
     var volume: VolumeDockItem? { if case .volume(let item) = self { return item }; return nil }
     var update: UpdateDockItem? { if case .update(let item) = self { return item }; return nil }
@@ -81,7 +85,7 @@ enum DockRenderSlot: Identifiable {
     var action: ActionDockItem? { if case .action(let item) = self { return item }; return nil }
     var isUtility: Bool {
         if case .gap(let id) = self { return id.hasPrefix("utility:") || id == Self.launcherGapID }
-        return melt != nil || folder?.isDownloads == true || target == .launcher || action != nil || trash != nil || update != nil || shelf != nil || notificationFeed != nil || harbor != nil || volume != nil || capsules != nil || capsule != nil
+        return melt != nil || folder?.isDownloads == true || target == .launcher || action != nil || trash != nil || update != nil || shelf != nil || notificationFeed != nil || flix != nil || harbor != nil || volume != nil || capsules != nil || capsule != nil
     }
     /// The launcher tile, or the gap holding its place during a drag.
     var isLauncher: Bool {
@@ -97,7 +101,7 @@ enum DockRenderSlot: Identifiable {
         case .app(let item): item.isFavorite ? .pinned : .running
         case .folder(let item): item.isDownloads ? nil : .pinned
         case .group(let control): control.group
-        case .melt, .launcher, .action, .sessionCapsule, .sessionCapsules, .shelf, .notificationFeed, .harbor, .plugin, .volume, .update, .trash, .gap: nil
+        case .melt, .launcher, .action, .sessionCapsule, .sessionCapsules, .shelf, .notificationFeed, .flix, .harbor, .plugin, .volume, .update, .trash, .gap: nil
         }
     }
     var pin: DockPin? {
@@ -109,7 +113,8 @@ enum DockRenderSlot: Identifiable {
     }
     /// Only these built-in tiles can exchange positions in the trailing section.
     var movableUtilityID: String? {
-        if folder?.isDownloads == true || capsules != nil || shelf != nil || notificationFeed != nil || harbor != nil { return id }
+        if folder?.isDownloads == true || capsules != nil || shelf != nil || notificationFeed != nil || flix != nil
+            || harbor != nil { return id }
         return nil
     }
 
@@ -126,6 +131,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules: String(localized: .capsulesName)
         case .shelf: String(localized: .shelfName)
         case .notificationFeed: String(localized: .notificationFeedName)
+        case .flix: String(localized: .flixName)
         case .harbor: String(localized: .harborName)
         case .plugin(let item): item.isStopped ? String(localized: .pluginTooltipStopped(item.title)) : item.title
         case .volume(let item): item.name
@@ -147,6 +153,7 @@ enum DockRenderSlot: Identifiable {
         case .sessionCapsules: .sessionCapsules
         case .shelf: .shelf
         case .notificationFeed: .notificationFeed
+        case .flix: .flix
         case .harbor: .harbor
         case .plugin(let item): .plugin(item.pluginID)
         case .volume(let item): .volume(item.volumeID)

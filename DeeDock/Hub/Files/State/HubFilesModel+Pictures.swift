@@ -419,7 +419,7 @@ extension HubFilesModel: HubSearchExtras {
             let current = NSPasteboard(name: .drag)
             guard pictureDrag.isActive, current.changeCount == changeCount else { return }
             pictureDrag.forgetClassification()
-            showDropWell(for: pictureDrag.classify(current) { classifyDrag($0) })
+            showDropWell(for: pictureDrag.classify(current) { self.classifyDrag($0) })
             isPictureDropTargeted = pictureDrag.holds(Self.fieldDragKey) && searchFieldAcceptsDrag
         }
     }
@@ -440,7 +440,8 @@ extension HubFilesModel: HubSearchExtras {
 
     /// The file URLs on a drag pasteboard, in order.
     private static func draggedFiles(on pasteboard: NSPasteboard) -> [URL] {
-        pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL] ?? []
+        // A Flix drag may carry converted upload copies; search with the picture the person dragged.
+        FlixDragSession.fileURLs(on: pasteboard)
     }
 
     private func classifyDrag(_ pasteboard: NSPasteboard) -> LookoutPictureDrop? {
