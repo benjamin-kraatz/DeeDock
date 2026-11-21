@@ -65,6 +65,10 @@ struct FlixPickRowInteraction: NSViewRepresentable {
 }
 
 /// Reports the pointer entering and leaving the panel body, whether or not DOKK is active.
+///
+/// Reports on the next main-queue turn, in order. AppKit can send these while it updates tracking
+/// areas inside a layout or display pass (the panel appearing under a still pointer), and opening
+/// the rail resizes the window, which must not happen inside that pass.
 struct FlixPickHoverTracker: NSViewRepresentable {
     var hover: (Bool) -> Void
 
@@ -84,7 +88,11 @@ struct FlixPickHoverTracker: NSViewRepresentable {
             addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],
                                            owner: self))
         }
-        override func mouseEntered(with event: NSEvent) { hover?(true) }
-        override func mouseExited(with event: NSEvent) { hover?(false) }
+        override func mouseEntered(with event: NSEvent) { report(true) }
+        override func mouseExited(with event: NSEvent) { report(false) }
+
+        private func report(_ inside: Bool) {
+            DispatchQueue.main.async { [weak self] in self?.hover?(inside) }
+        }
     }
 }

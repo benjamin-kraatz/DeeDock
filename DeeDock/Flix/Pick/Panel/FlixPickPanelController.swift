@@ -63,7 +63,15 @@ final class FlixPickPanelController {
         let hosting = FlixPickHostingView(rootView: content)
         hosting.sizingOptions = []
         hosting.safeAreaRegions = []
-        window.contentView = hosting
+        // The hosting view sits in a plain container instead of being the content view, so it never
+        // takes part in the window's own constraint pass (`updateWindowContentSizeExtrema`). As the
+        // content view it could loop there when the window moved during a display cycle, which
+        // AppKit ends with an "Update Constraints in Window" exception.
+        let container = NSView(frame: .zero)
+        hosting.frame = container.bounds
+        hosting.autoresizingMask = [.width, .height]
+        container.addSubview(hosting)
+        window.contentView = container
     }
 
     /// Whether a screen point is over the panel's body.
@@ -82,7 +90,7 @@ final class FlixPickPanelController {
             state.isShown = false
         }
         windowOpen = false
-        window.setFrame(FlixPickPlacement.window(around: body(open: false)), display: false)
+        setFrame(FlixPickPlacement.window(around: body(open: false)))
         isVisible = true
         window.orderFrontRegardless()
         DispatchQueue.main.async { [weak self] in
@@ -96,13 +104,13 @@ final class FlixPickPanelController {
     func follow(_ picker: CGRect) {
         guard isVisible, picker != self.picker else { return }
         place(picker)
-        window.setFrame(FlixPickPlacement.window(around: body(open: windowOpen)), display: true)
+        setFrame(FlixPickPlacement.window(around: body(open: windowOpen)))
     }
 
     /// The number of rows changed.
     func refreshSize() {
         guard isVisible else { return }
-        window.setFrame(FlixPickPlacement.window(around: body(open: windowOpen)), display: true)
+        setFrame(FlixPickPlacement.window(around: body(open: windowOpen)))
     }
 
     /// Opens or closes the rail.
@@ -129,7 +137,15 @@ final class FlixPickPanelController {
     /// Sizes the window for the open or the closed rail; the edge next to the picker stays put.
     private func resizeWindow(open: Bool) {
         windowOpen = open
-        window.setFrame(FlixPickPlacement.window(around: body(open: open)), display: true)
+        setFrame(FlixPickPlacement.window(around: body(open: open)))
+    }
+
+    /// Moves the window only when its frame changes, and never forces a display: the next display
+    /// cycle draws it. A forced display here can run inside AppKit's own layout pass (a hover that
+    /// opens the rail arrives from tracking-area updates) and restart it.
+    private func setFrame(_ frame: CGRect) {
+        guard window.frame != frame else { return }
+        window.setFrame(frame, display: false)
     }
 
     /// Fades away and orders out.
@@ -155,6 +171,7 @@ final class FlixPickPanelController {
     /// Hides at once and releases the content. The controller must not be used after.
     func stop() {
         hide(animated: false)
+        window.contentView?.subviews.forEach { $0.removeFromSuperview() }
         window.contentView = nil
     }
 
