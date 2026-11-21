@@ -64,6 +64,9 @@ struct FlixSidebarView: View {
             row(Text(verbatim: thread.name), .emoji(thread.emoji), count: base.count { members.contains($0.id) },
                 filter: .thread(thread.id))
                 .help(Text(verbatim: thread.name))
+                .contextMenu {
+                    Button { state.hideThread(thread.id) } label: { Text(.flixThreadHide) }
+                }
                 .transition(.opacity)
         }
     }

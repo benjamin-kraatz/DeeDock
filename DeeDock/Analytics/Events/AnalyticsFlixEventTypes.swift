@@ -145,6 +145,8 @@ nonisolated enum AnalyticsFlixGenerator: String, AnalyticsToken {
 
 nonisolated enum AnalyticsFlixThreadAction: String, AnalyticsToken {
     case filter, openAll = "open_all", dragCard = "drag_card", robi
+    /// Hidden from the sidebar, and that hiding undone.
+    case hide, hideUndone = "hide_undone"
 }
 
 /// What named a Thread.

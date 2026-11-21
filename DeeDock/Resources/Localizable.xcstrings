@@ -10741,6 +10741,24 @@
         }
       }
     },
+    "flixThreadHide" : {
+      "comment" : "Flix Files: context menu item of a Thread in the sidebar. Takes the thread off the sidebar; its files stay.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thread ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Thread"
+          }
+        }
+      }
+    },
     "flixThreadNamedByAppleIntelligence" : {
       "comment" : "Flix Files: chip on a Thread card. Apple Intelligence is a product name.",
       "extractionState" : "manual",
@@ -11697,6 +11715,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couldn't put that on the Shelf."
+          }
+        }
+      }
+    },
+    "flixToastThreadHidden" : {
+      "comment" : "Flix Files: toast after hiding a Thread, with Undo. The argument is the thread's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ ausgeblendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hid “%@”."
           }
         }
       }

@@ -14,7 +14,12 @@ import Foundation
 /// thread is named again when fewer than ``renameBelow`` of its members are the ones it was named
 /// for. The model sees member names, captions, and folders, never file contents, plus the names the
 /// other threads already carry, so it tells them apart. Threads that still end up with the same name
-/// are shown as one (``displayThreads(_:dates:)``). Main actor.
+/// are shown as one (``displayThreads(_:dates:)``).
+///
+/// A thread the person hides (``setHidden(_:thread:)``) stays hidden through later passes: a
+/// cluster that keeps its identity keeps the flag, and a hidden thread no cluster matched is kept
+/// while any of its members is still recent, so it cannot come back under a new identity on the
+/// next pass. Main actor.
 @MainActor
 final class FlixThreadProvider: FlixThreadProviding {
     nonisolated struct Record: Codable, Equatable, Sendable {
@@ -26,6 +31,12 @@ final class FlixThreadProvider: FlixThreadProviding {
         var namedByModel = false
         /// The members Apple Intelligence saw when it named the thread.
         var namedMembers: [FlixItem.ID] = []
+        /// The person hid the thread from the sidebar. Nil (not false) when shown, so older
+        /// `threads.json` files decode.
+        var hidden: Bool?
+        /// The ``FlixThreadNamer/version`` of the instructions that named it; a thread named by an
+        /// older version is named again once.
+        var namingVersion: Int?
     }
 
     static let window: TimeInterval = 7 * 86_400
@@ -92,6 +103,8 @@ final class FlixThreadProvider: FlixThreadProviding {
             taken.insert(record.id)
             next.append(record)
         }
+        let recentIDs = Set(recent.map(\.id))
+        next += records.filter { $0.hidden == true && !taken.contains($0.id) && $0.memberIDs.contains(where: recentIDs.contains) }
         if next != records {
             records = next
             file?.schedule(records)
@@ -103,7 +116,9 @@ final class FlixThreadProvider: FlixThreadProviding {
     // MARK: Naming
 
     private func needsName(_ record: Record) -> Bool {
-        !record.namedByModel || Self.overlap(Set(record.memberIDs), Set(record.namedMembers)) < Self.renameBelow
+        guard record.hidden != true else { return false }
+        return !record.namedByModel || record.namingVersion != FlixThreadNamer.version
+            || Self.overlap(Set(record.memberIDs), Set(record.namedMembers)) < Self.renameBelow
     }
 
     private func enqueueNaming() {
@@ -127,7 +142,7 @@ final class FlixThreadProvider: FlixThreadProviding {
                   let record = records.first(where: { $0.id == id }), needsName(record) else { continue }
             let byID = Dictionary(services.items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
             let members = record.memberIDs
-            let otherNames = records.filter { $0.id != id && !$0.name.isEmpty }.map(\.name)
+            let otherNames = records.filter { $0.id != id && $0.hidden != true && !$0.name.isEmpty }.map(\.name)
             guard let generated = await FlixThreadNamer.generated(for: namerMembers(members, byID: byID),
                                                                   otherNames: otherNames),
                   !Task.isCancelled, let index = records.firstIndex(where: { $0.id == id }) else { continue }
@@ -136,6 +151,7 @@ final class FlixThreadProvider: FlixThreadProviding {
             records[index].summary = generated.summary.isEmpty ? nil : generated.summary
             records[index].namedByModel = true
             records[index].namedMembers = members
+            records[index].namingVersion = FlixThreadNamer.version
             named = true
         }
         if named, !Task.isCancelled {
@@ -151,6 +167,21 @@ final class FlixThreadProvider: FlixThreadProviding {
         }
     }
 
+    // MARK: Hiding
+
+    /// Hides a thread from the sidebar, or shows it again, and returns the threads as shown now.
+    /// Records shown as one with it (the same name) change with it.
+    func setHidden(_ hidden: Bool, thread id: String) -> [FlixThread] {
+        if let key = records.first(where: { $0.id == id }).map({ Self.nameKey($0.name) }) {
+            for index in records.indices where records[index].id == id || (!key.isEmpty && Self.nameKey(records[index].name) == key) {
+                records[index].hidden = hidden ? true : nil
+            }
+            file?.schedule(records)
+        }
+        let dates = Dictionary(services.items.map { ($0.id, $0.date) }, uniquingKeysWith: { first, _ in first })
+        return Self.displayThreads(records, dates: dates)
+    }
+
     // MARK: Helpers
 
     private static func folder(of item: FlixItem) -> String? {
@@ -164,8 +195,8 @@ final class FlixThreadProvider: FlixThreadProviding {
         return union == 0 ? 0 : Double(a.intersection(b).count) / Double(union)
     }
 
-    /// The threads as the sidebar and the morning card see them: records with the same name
-    /// (ignoring case, accents, and surrounding spaces) shown as one thread.
+    /// The threads as the sidebar and the morning card see them: hidden records left out, and records
+    /// with the same name (ignoring case, accents, and surrounding spaces) shown as one thread.
     ///
     /// The clusterer can split one piece of work in two (files more than ``FlixThreadClusterer/linkWindow``
     /// apart, or in two folders), and each part may then be named the same. Two rows reading "Craft
@@ -176,9 +207,8 @@ final class FlixThreadProvider: FlixThreadProviding {
     static func displayThreads(_ records: [Record], dates: [FlixItem.ID: Date]) -> [FlixThread] {
         var threads: [FlixThread] = []
         var indexByName: [String: Int] = [:]
-        for record in records {
-            let key = record.name.trimmingCharacters(in: .whitespacesAndNewlines)
-                .folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
+        for record in records where record.hidden != true {
+            let key = nameKey(record.name)
             guard !key.isEmpty, let index = indexByName[key] else {
                 if !key.isEmpty { indexByName[key] = threads.count }
                 threads.append(thread(record))
@@ -201,6 +231,11 @@ final class FlixThreadProvider: FlixThreadProviding {
             threads[index].memberIDs = Array(sorted.prefix(FlixThreadClusterer.memberLimit))
         }
         return threads
+    }
+
+    private static func nameKey(_ name: String) -> String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
     }
 
     private static func thread(_ record: Record) -> FlixThread {

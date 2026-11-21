@@ -448,6 +448,18 @@ extension FlixPanelState {
         Analytics.track(.flixSmartFilterRemoved(source: removed.origin?.analytics ?? .manual))
     }
 
+    /// Hides a thread from the sidebar, with Undo. Its files stay in the list.
+    func hideThread(_ id: String) {
+        guard let thread = intelligence.thread(id) else { return }
+        reportThread(.hide, thread)
+        if filter == .thread(id) { filter = .all }
+        intelligence.setThreadHidden(id, true)
+        showToast(String(localized: .flixToastThreadHidden(thread.name))) { [weak self] in
+            self?.intelligence.setThreadHidden(id, false)
+            self?.reportThread(.hideUndone, thread)
+        }
+    }
+
     /// Accepts a row's ✦ folder suggestion, with Undo.
     func moveToSuggestedFolder(_ item: FlixItem) {
         guard let folder = intelligence.annotation(for: item.id)?.folderSuggestion else { return }

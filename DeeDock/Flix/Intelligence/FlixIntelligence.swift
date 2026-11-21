@@ -90,6 +90,12 @@ final class FlixIntelligence {
 
     func thread(_ id: String) -> FlixThread? { threads.first { $0.id == id } }
 
+    /// Hides a thread from the sidebar, or shows it again (Undo).
+    func setThreadHidden(_ id: String, _ hidden: Bool) {
+        guard let provider = providers.threads else { return }
+        threads = provider.setHidden(hidden, thread: id)
+    }
+
     /// The Thread an item belongs to, for "Show Thread".
     func thread(containing id: FlixItem.ID) -> FlixThread? {
         guard settings.groupsThreads else { return nil }

@@ -522,7 +522,7 @@ the window in front is off), or `no_permission` (neither Accessibility nor Scree
 | `flix_suggestion_acted` | An inline ✦ Move or ✦ Rename, from the row or its context menu. `type` (`move`, `rename`), `action` (`accepted`, `undone`), `item_kind` |
 | `flix_smart_filter_created` | `source` (`sentence`, `tip`, `manual`), `rule_kinds` (list of `location`, `kind`, `tag` (flagged), `name`, `meaning` (about a topic, or a total read from the file), `event` (activity or time)), `match_count`, `generator` (`apple_intelligence`, `rules`; only for `sentence`) |
 | `flix_smart_filter_removed` | `source` |
-| `flix_thread_used` | `action` (`filter`, `open_all`, `drag_card`, `robi`), `thread_size`, `named_by` (`apple_intelligence`, `folder`) |
+| `flix_thread_used` | `action` (`filter`, `open_all`, `drag_card`, `robi`, `hide`, `hide_undone`), `thread_size`, `named_by` (`apple_intelligence`, `folder`) |
 | `flix_morning_card` | `action` (`reopen`, `thread`, `dismiss`, or `ignored` when the panel closed with the card unanswered), `thread_count` |
 | `flix_more_like_this` | Sent when More like this ends. `result_count`, `outcome` (`opened`, `dragged`, `none`), `item_kind` (of the file it started from) |
 | `flix_robi_asked` | `question` (`suggested_1`, `suggested_2`, `suggested_3`, `typed`), `selection_count`, `item_kinds`, `latency_ms`, `result` (`answered`, `failed`, `cancelled`, `no_key`). Never the question or the answer |

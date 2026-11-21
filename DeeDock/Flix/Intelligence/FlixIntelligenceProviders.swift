@@ -56,6 +56,9 @@ nonisolated struct FlixSearchReport: Equatable, Sendable {
 /// Groups activity into Threads.
 @MainActor protocol FlixThreadProviding: AnyObject {
     func threads(for items: [FlixItem]) async -> [FlixThread]
+    /// Hides a thread from the sidebar, or shows it again; hidden threads stay hidden through later
+    /// passes. Returns the threads as shown now.
+    func setHidden(_ hidden: Bool, thread id: String) -> [FlixThread]
 }
 
 /// Captions, renames, facts, folder suggestions, the sensitive check, versions, and learned noise.
